@@ -1,0 +1,4 @@
+# The engine, harness, dashboard and every test run on the Python 3 standard library.
+# This is needed only to switch the two LLM agents from the deterministic fallback
+# to Claude (see docs/PLAN.md D11), alongside an ANTHROPIC_API_KEY.
+anthropic>=1.0

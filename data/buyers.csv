@@ -1,0 +1,21 @@
+buyer_id,buyer_name,short_name,sector,city,size_band,parent_id,annual_turnover_inr,relationship_start
+BUY002,Arcline Fabricators Limited,Arcline,Steel Fabrication,Nagpur,mid,,440000000,2021-06-12
+BUY003,Suvarna Textiles Pvt Ltd,Suvarna,Textiles,Surat,small,,175000000,2020-06-15
+BUY004,Girikand Agro Processors Limited,Girikand,Food Processing,Kolhapur,mid,PAR02,864000000,2021-05-07
+BUY005,Emberline Electricals Pvt Ltd,Emberline,Electrical Equipment,Coimbatore,small,,135000000,2023-06-22
+BUY009,Kalpataru Prime Components Pvt Ltd,Kalpataru Prime,Auto Components,Chennai,mid,PAR01,265000000,2023-04-16
+BUY010,Bluestone Engineering Limited,Bluestone,Engineering,Faridabad,large,,2732000000,2021-02-04
+BUY017,Mahanadi Industries Limited,Mahanadi,Chemicals,Cuttack,mid,,505000000,2023-01-23
+BUY025,Westbridge Packaging Limited,Westbridge,Packaging,Daman,large,PAR03,1206000000,2021-03-31
+BUY011,Chandra Mills Pvt Ltd,Chandra,Textiles,Ichalkaranji,small,PAR03,167000000,2022-06-09
+BUY013,Falcon Electronics Supply Pvt Ltd,Falcon,Electronics,Noida,mid,,399000000,2021-06-22
+BUY014,Indus Crest Steel Traders Pvt Ltd,Indus Crest,Steel Trading,Raipur,mid,,645000000,2023-07-14
+BUY015,Jayanth Polymers Limited,Jayanth,Plastics,Hosur,large,PAR04,2422000000,2020-06-17
+BUY016,Lakshya Distributors Pvt Ltd,Lakshya,Pharma Distribution,Lucknow,small,,207000000,2022-12-04
+BUY018,Nirvana Foods Pvt Ltd,Nirvana,Food Processing,Jaipur,small,,167000000,2023-05-04
+BUY019,Oakhurst Components Pvt Ltd,Oakhurst,Auto Components,Aurangabad,mid,,651000000,2021-08-04
+BUY021,Quartzline Ceramics Pvt Ltd,Quartzline,Construction Materials,Morbi,mid,,536000000,2022-10-22
+BUY023,Udaan Traders Pvt Ltd,Udaan,Steel Trading,Ludhiana,small,,83000000,2021-06-04
+BUY024,Vaishnavi Chemicals Pvt Ltd,Vaishnavi,Chemicals,Ankleshwar,mid,,393000000,2023-11-07
+BUY026,Yashodhan Agro Pvt Ltd,Yashodhan,Agri Commodities,Sangli,small,,154000000,2022-01-13
+BUY029,Chetak Mills Limited,Chetak,Textiles,Bhilwara,mid,PAR04,588000000,2020-09-10

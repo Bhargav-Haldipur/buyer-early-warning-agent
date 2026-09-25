@@ -1,0 +1,168 @@
+article_id,published_date,publication,headline,body,mentioned_entity_as_written,gt_buyer_id,gt_about_covered_buyer,gt_is_parent_story,gt_severity,gt_category
+NWS0038,2024-07-28,Metro Business Daily,WESTBRIDGE PACKAGING LIMITED signs distribution tie-up for northern markets,"WESTBRIDGE PACKAGING LIMITED has entered into a distribution arrangement covering northern markets, the company said.
+
+Under the arrangement, a regional distributor will handle secondary sales for part of the company's Packaging range. The company said the tie-up would extend its reach without additional fixed costs.
+
+Terms were not disclosed.",WESTBRIDGE PACKAGING LIMITED,BUY025,Y,N,0,tie_up
+NWS0027,2024-07-30,Regional Commerce Review,Indus Crest commissions new line at Raipur facility,"Indus Crest has commissioned an additional production line at its Raipur facility, taking installed capacity higher in the Steel Trading segment.
+
+The company said the line was funded through a mix of internal accruals and a term facility, and would be ramped up over two quarters.
+
+Management said existing customers had indicated demand for the additional volumes.",Indus Crest,BUY014,Y,N,0,expansion
+NWS0032,2024-08-09,The Business Standard Wire,Mahanadi Industries Limited signs distribution tie-up for northern markets,"Mahanadi Industries Limited has entered into a distribution arrangement covering northern markets, the company said.
+
+Under the arrangement, a regional distributor will handle secondary sales for part of the company's Chemicals range. The company said the tie-up would extend its reach without additional fixed costs.
+
+Terms were not disclosed.",Mahanadi Industries Limited,BUY017,Y,N,0,tie_up
+NWS0033,2024-09-21,Industry Ledger,Mahanadi Inds. scales back operations at Cuttack unit,"Mahanadi Inds. has reduced operations at its Cuttack unit, moving to a single shift from three, according to two people with direct knowledge of the decision.
+
+The company has cited weak order inflow in the Chemicals segment. Contract workers engaged at the unit have not been recalled since the end of the previous month.
+
+A former employee said material procurement had also slowed noticeably since the start of the quarter.
+
+The company confirmed a ""temporary realignment of production"" without giving details.",Mahanadi Inds.,BUY017,Y,N,3,capacity_cut
+NWS0030,2024-10-15,The Business Standard Wire,Workers at Jayanth Inds. plant protest over delayed wages,"Workers at the Hosur facility of Jayanth Inds. halted work for part of the day this week over what they described as delays in salary disbursement running to several weeks.
+
+A representative of the works committee said wages for the preceding month had been paid only in part, and that provident fund deductions had been made without corresponding remittance. Management met the committee the same evening and, according to one attendee, sought additional time.
+
+The plant employs a workforce in the low hundreds and supplies Plastics components to customers across western India.
+
+The company declined to comment on the specifics of the dispute.",Jayanth Inds.,BUY015,Y,N,5,wage_delay
+NWS0022,2024-10-29,Udyog Times,Bluestone Engineering commissions new line at Faridabad facility,"Bluestone Engineering has commissioned an additional production line at its Faridabad facility, taking installed capacity higher in the Engineering segment.
+
+The company said the line was funded through a mix of internal accruals and a term facility, and would be ramped up over two quarters.
+
+Management said existing customers had indicated demand for the additional volumes.",Bluestone Engineering,BUY010,Y,N,0,expansion
+NWS0025,2024-11-07,Regional Commerce Review,Falcon Electronics Supply. commissions new line at Noida facility,"Falcon Electronics Supply. has commissioned an additional production line at its Noida facility, taking installed capacity higher in the Electronics segment.
+
+The company said the line was funded through a mix of internal accruals and a term facility, and would be ramped up over two quarters.
+
+Management said existing customers had indicated demand for the additional volumes.",Falcon Electronics Supply.,BUY013,Y,N,0,expansion
+NWS0021,2024-11-19,Metro Business Daily,Bluestone Inds. reports higher volumes for the quarter,"Bluestone Inds. has reported higher dispatch volumes for the quarter, attributing the increase to firmer demand in the Engineering segment.
+
+The company said realisations were broadly stable and that it expected the trend to hold through the remainder of the year.
+
+Detailed financials were not disclosed.",Bluestone Inds.,BUY010,Y,N,0,volumes
+NWS0036,2024-12-08,Udyog Times,Vaishnavi Chemicals Pvt Ltd appoints new chief operating officer,"Vaishnavi Chemicals Pvt Ltd has appointed a new chief operating officer with effect from the start of the month.
+
+The appointee has previously held operations roles at two Chemicals companies. The company said the appointment was part of a planned strengthening of its senior management team.
+
+No other changes to the leadership team were announced.",Vaishnavi Chemicals Pvt Ltd,BUY024,Y,N,0,appointment
+NWS0026,2025-02-04,The Trade Journal,Falcon reports higher volumes for the quarter,"Falcon has reported higher dispatch volumes for the quarter, attributing the increase to firmer demand in the Electronics segment.
+
+The company said realisations were broadly stable and that it expected the trend to hold through the remainder of the year.
+
+Detailed financials were not disclosed.",Falcon,BUY013,Y,N,0,volumes
+NWS0039,2025-03-19,Metro Business Daily,Westbridge Packaging. reports higher volumes for the quarter,"Westbridge Packaging. has reported higher dispatch volumes for the quarter, attributing the increase to firmer demand in the Packaging segment.
+
+The company said realisations were broadly stable and that it expected the trend to hold through the remainder of the year.
+
+Detailed financials were not disclosed.",Westbridge Packaging.,BUY025,Y,N,0,volumes
+NWS0041,2025-04-22,Regional Commerce Review,Westbridge Packaging. signs distribution tie-up for northern markets,"Westbridge Packaging. has entered into a distribution arrangement covering northern markets, the company said.
+
+Under the arrangement, a regional distributor will handle secondary sales for part of the company's Packaging range. The company said the tie-up would extend its reach without additional fixed costs.
+
+Terms were not disclosed.",Westbridge Packaging.,BUY025,Y,N,0,tie_up
+NWS0028,2025-05-15,The Business Standard Wire,Indus Crest signs distribution tie-up for northern markets,"Indus Crest has entered into a distribution arrangement covering northern markets, the company said.
+
+Under the arrangement, a regional distributor will handle secondary sales for part of the company's Steel Trading range. The company said the tie-up would extend its reach without additional fixed costs.
+
+Terms were not disclosed.",Indus Crest,BUY014,Y,N,0,tie_up
+NWS0029,2025-07-10,The Trade Journal,Jayanth Polymers. commissions new line at Hosur facility,"Jayanth Polymers. has commissioned an additional production line at its Hosur facility, taking installed capacity higher in the Plastics segment.
+
+The company said the line was funded through a mix of internal accruals and a term facility, and would be ramped up over two quarters.
+
+Management said existing customers had indicated demand for the additional volumes.",Jayanth Polymers.,BUY015,Y,N,0,expansion
+NWS0008,2025-10-20,Metro Business Daily,Suvarna Textiles Pvt Ltd scales back operations at Surat unit,"Suvarna Textiles Pvt Ltd has reduced operations at its Surat unit, moving to a single shift from three, according to two people with direct knowledge of the decision.
+
+The company has cited weak order inflow in the Textiles segment. Contract workers engaged at the unit have not been recalled since the end of the previous month.
+
+A former employee said material procurement had also slowed noticeably since the start of the quarter.
+
+The company confirmed a ""temporary realignment of production"" without giving details.",Suvarna Textiles Pvt Ltd,BUY003,Y,N,3,capacity_cut
+NWS0009,2025-10-26,Udyog Times,Girikand Agro Processors Limited scales back operations at Kolhapur unit,"Girikand Agro Processors Limited has reduced operations at its Kolhapur unit, moving to a single shift from three, according to two people with direct knowledge of the decision.
+
+The company has cited weak order inflow in the Food Processing segment. Contract workers engaged at the unit have not been recalled since the end of the previous month.
+
+A former employee said material procurement had also slowed noticeably since the start of the quarter.
+
+The company confirmed a ""temporary realignment of production"" without giving details.",Girikand Agro Processors Limited,BUY004,Y,N,3,capacity_cut
+NWS0010,2025-11-09,Metro Business Daily,Vendors say Emberline has fallen behind on payments,"Several suppliers to Emberline, the Electrical Equipment firm based in Coimbatore, say invoice settlements have slipped well beyond agreed terms over the past two quarters.
+
+Three vendors, who asked not to be named because they continue to trade with the company, described payment delays of between 60 and 100 days against contractual terms of 45 days. One said part-payments had been offered in place of full settlement on two occasions.
+
+A person familiar with the company's operations said working capital had been ""stretched"" by slower collections from its own customers. Emberline did not respond to a request for comment.
+
+Trade sources in Coimbatore said the company continued to place fresh orders through the period.",Emberline,BUY005,Y,N,4,vendor_payment_delay
+NWS0004,2025-11-10,Regional Commerce Review,Vendors say ARCLINE FABRICATORS LIMITED has fallen behind on payments,"Several suppliers to ARCLINE FABRICATORS LIMITED, the Steel Fabrication firm based in Nagpur, say invoice settlements have slipped well beyond agreed terms over the past two quarters.
+
+Three vendors, who asked not to be named because they continue to trade with the company, described payment delays of between 60 and 100 days against contractual terms of 45 days. One said part-payments had been offered in place of full settlement on two occasions.
+
+A person familiar with the company's operations said working capital had been ""stretched"" by slower collections from its own customers. ARCLINE FABRICATORS LIMITED did not respond to a request for comment.
+
+Trade sources in Nagpur said the company continued to place fresh orders through the period.",ARCLINE FABRICATORS LIMITED,BUY002,Y,N,4,vendor_payment_delay
+NWS0023,2025-11-11,The Trade Journal,Bluestone reports higher volumes for the quarter,"Bluestone has reported higher dispatch volumes for the quarter, attributing the increase to firmer demand in the Engineering segment.
+
+The company said realisations were broadly stable and that it expected the trend to hold through the remainder of the year.
+
+Detailed financials were not disclosed.",Bluestone,BUY010,Y,N,0,volumes
+NWS0005,2025-11-15,Udyog Times,Legal notice served on Arcline Inds. over unpaid dues,"A Steel Fabrication trading firm has served a legal notice on Arcline Inds. seeking recovery of dues it says have been outstanding for more than six months.
+
+The notice, a copy of which was reviewed, relates to material supplied across three consignments. The claimant has sought settlement within a stipulated period, failing which it has indicated it will pursue recovery proceedings.
+
+It is the second such notice reported against the company in the current financial year, according to a person in the local trade association.
+
+Arcline Inds. could not be reached for comment.",Arcline Inds.,BUY002,Y,N,3,legal_notice
+NWS0006,2025-11-28,Udyog Times,Lenders said to be reviewing exposure to Arcline Fabricators Limited,"At least two lenders to Arcline Fabricators Limited have initiated a review of their exposure to the Nagpur-based Steel Fabrication company, people aware of the discussions said.
+
+The review follows what one of the people described as irregularity in servicing of working capital facilities during the last quarter. No formal classification has been made, and the account remains standard on the books of both lenders.
+
+A banker involved said the company had sought an enhancement of its cash credit limit earlier in the year, which was not sanctioned in full.
+
+Arcline Fabricators Limited did not respond to queries.",Arcline Fabricators Limited,BUY002,Y,N,4,lender_review
+NWS0042,2025-12-04,Metro Business Daily,Contractor serves recovery notice on Arcline Media Pvt Ltd,"A production contractor has served a recovery notice on Arcline Media Pvt Ltd over unpaid invoices relating to campaign work commissioned last year.
+
+The Mumbai-based advertising and content agency said the amount was disputed and that it had responded through its counsel. The agency employs about ninety people and works largely with consumer brands.",Arcline Media Pvt Ltd,,N,N,0,decoy
+NWS0011,2026-01-06,The Business Standard Wire,Emberline Inds. scales back operations at Coimbatore unit,"Emberline Inds. has reduced operations at its Coimbatore unit, moving to a single shift from three, according to two people with direct knowledge of the decision.
+
+The company has cited weak order inflow in the Electrical Equipment segment. Contract workers engaged at the unit have not been recalled since the end of the previous month.
+
+A former employee said material procurement had also slowed noticeably since the start of the quarter.
+
+The company confirmed a ""temporary realignment of production"" without giving details.",Emberline Inds.,BUY005,Y,N,3,capacity_cut
+NWS0031,2026-01-21,Metro Business Daily,MAHANADI INDUSTRIES LIMITED appoints new chief operating officer,"MAHANADI INDUSTRIES LIMITED has appointed a new chief operating officer with effect from the start of the month.
+
+The appointee has previously held operations roles at two Chemicals companies. The company said the appointment was part of a planned strengthening of its senior management team.
+
+No other changes to the leadership team were announced.",MAHANADI INDUSTRIES LIMITED,BUY017,Y,N,0,appointment
+NWS0043,2026-02-17,Regional Commerce Review,Suvarna Jewellers Pvt Ltd reports weaker festive quarter,"Suvarna Jewellers Pvt Ltd has reported a weaker festive quarter, citing softer retail footfall and higher gold prices.
+
+The Coimbatore retailer operates four showrooms in western Tamil Nadu. Management said margins had held up and that it expected demand to recover through the wedding season.",Suvarna Jewellers Pvt Ltd,,N,N,0,decoy
+NWS0007,2026-03-05,Udyog Times,Workers at Arcline plant protest over delayed wages,"Workers at the Nagpur facility of Arcline halted work for part of the day this week over what they described as delays in salary disbursement running to several weeks.
+
+A representative of the works committee said wages for the preceding month had been paid only in part, and that provident fund deductions had been made without corresponding remittance. Management met the committee the same evening and, according to one attendee, sought additional time.
+
+The plant employs a workforce in the low hundreds and supplies Steel Fabrication components to customers across western India.
+
+The company declined to comment on the specifics of the dispute.",Arcline,BUY002,Y,N,5,wage_delay
+NWS0040,2026-04-15,Industry Ledger,Westbridge reports higher volumes for the quarter,"Westbridge has reported higher dispatch volumes for the quarter, attributing the increase to firmer demand in the Packaging segment.
+
+The company said realisations were broadly stable and that it expected the trend to hold through the remainder of the year.
+
+Detailed financials were not disclosed.",Westbridge,BUY025,Y,N,0,volumes
+NWS0037,2026-04-21,Metro Business Daily,Vaishnavi Chemicals Pvt Ltd reports higher volumes for the quarter,"Vaishnavi Chemicals Pvt Ltd has reported higher dispatch volumes for the quarter, attributing the increase to firmer demand in the Chemicals segment.
+
+The company said realisations were broadly stable and that it expected the trend to hold through the remainder of the year.
+
+Detailed financials were not disclosed.",Vaishnavi Chemicals Pvt Ltd,BUY024,Y,N,0,volumes
+NWS0044,2026-05-22,The Trade Journal,Staff at Chandra Hospitals Pvt Ltd protest over delayed salaries,"Nursing and support staff at Chandra Hospitals Pvt Ltd stopped work for several hours this week over salaries they said were more than a month overdue.
+
+The Nashik healthcare group runs two facilities and employs around four hundred people. The administration said a payment run had been delayed by a banking issue and that dues would be cleared within the week.",Chandra Hospitals Pvt Ltd,,N,N,0,decoy
+NWS0024,2026-06-13,The Trade Journal,BLUESTONE ENGINEERING LIMITED appoints new chief operating officer,"BLUESTONE ENGINEERING LIMITED has appointed a new chief operating officer with effect from the start of the month.
+
+The appointee has previously held operations roles at two Engineering companies. The company said the appointment was part of a planned strengthening of its senior management team.
+
+No other changes to the leadership team were announced.",BLUESTONE ENGINEERING LIMITED,BUY010,Y,N,0,appointment
+NWS0045,2026-06-30,Industry Ledger,Lenders review exposure to Oakhurst Realty LLP,"Two lenders to Oakhurst Realty LLP have begun reviewing their exposure to the Gurugram property developer, people aware of the discussions said.
+
+The review follows slower-than-expected sales at two residential projects. The firm develops mid-market housing and has no manufacturing operations.",Oakhurst Realty LLP,,N,N,0,decoy

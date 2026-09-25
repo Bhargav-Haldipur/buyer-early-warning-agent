@@ -1,0 +1,21 @@
+buyer_id,buyer_name,failed,default_date,deterioration_start,trajectory
+BUY002,Arcline Fabricators Limited,Y,2026-05-15,2025-07-15,gradual
+BUY003,Suvarna Textiles Pvt Ltd,Y,2026-05-06,2025-11-05,gradual
+BUY004,Girikand Agro Processors Limited,Y,2026-02-25,2025-04-27,gradual
+BUY005,Emberline Electricals Pvt Ltd,Y,2026-04-24,2025-05-25,gradual
+BUY009,Kalpataru Prime Components Pvt Ltd,N,,,wobble_recovered
+BUY010,Bluestone Engineering Limited,N,,,wobble_recovered
+BUY017,Mahanadi Industries Limited,N,,,wobble_recovered
+BUY025,Westbridge Packaging Limited,N,,,wobble_recovered
+BUY011,Chandra Mills Pvt Ltd,N,,,healthy
+BUY013,Falcon Electronics Supply Pvt Ltd,N,,,healthy
+BUY014,Indus Crest Steel Traders Pvt Ltd,N,,,healthy
+BUY015,Jayanth Polymers Limited,N,,,healthy
+BUY016,Lakshya Distributors Pvt Ltd,N,,,healthy
+BUY018,Nirvana Foods Pvt Ltd,N,,,healthy
+BUY019,Oakhurst Components Pvt Ltd,N,,,healthy
+BUY021,Quartzline Ceramics Pvt Ltd,N,,,healthy
+BUY023,Udaan Traders Pvt Ltd,N,,,healthy
+BUY024,Vaishnavi Chemicals Pvt Ltd,N,,,healthy
+BUY026,Yashodhan Agro Pvt Ltd,N,,,healthy
+BUY029,Chetak Mills Limited,N,,,healthy

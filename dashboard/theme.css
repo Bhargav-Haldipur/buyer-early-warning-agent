@@ -1,0 +1,141 @@
+/* TCS-Frontend design tokens, copied verbatim.
+   Source: packages/ui-components/src/ThemeVariations/cssVariables.ts
+           packages/ui-components/src/ThemeProvider/{commonTheme,defaultLightTheme}.ts
+
+   Only the platform's own default variation is used. No third-party insurer
+   branding appears anywhere in this prototype: the insurers in the dataset are
+   invented, so borrowing a real insurer's brand colour for one of them would put
+   a real company's identity on fabricated risk data.
+
+   Every insurer therefore renders in the default theme. The [data-theme] hook is
+   left in place for whoever wants per-insurer variations later. */
+
+/* --- default variation -------------------------------------------------- */
+:root {
+  --theme-accent: #05BBD2;
+  --theme-neutral-0: #FFFFFF;
+  --theme-neutral-50: #f8fafc;
+  --theme-neutral-100: #f1f5f9;
+  --theme-neutral-200: #e2e8f0;
+  --theme-neutral-300: #cbd5e1;
+  --theme-neutral-400: #94a3b8;
+  --theme-neutral-500: #64748b;
+  --theme-neutral-600: #475569;
+  --theme-neutral-700: #334155;
+  --theme-neutral-800: #1e293b;
+  --theme-neutral-900: #0f172a;
+  --theme-neutral-1000: #000000;
+
+  /* semantic colours - identical across every variation */
+  --theme-red-50: #FEF2F2;
+  --theme-red-500: #ef4444;
+  --theme-red-600: #dc2626;
+  --theme-green-200: #BBF7D0;
+  --theme-green-900: #14532D;
+  --theme-orange-200: #FED7AA;
+  --theme-orange-700: #C2410C;
+  --theme-orange-900: #7C2D12;
+  --theme-blue-500: #2b80ff;
+
+  --page-bg: #f8f8f8;                  /* defaultLightTheme background.default */
+  --font: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* --- typography (commonTheme) ------------------------------------------ */
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--page-bg); color: var(--theme-neutral-900);
+  font-family: var(--font); font-size: 1rem; font-weight: 400; line-height: 1.75rem;
+}
+h1 { font-size: 2rem;     font-weight: 800; line-height: 2.5rem;  margin: 0 0 .25rem; }
+h2 { font-size: 1.5rem;   font-weight: 600; line-height: 2rem;    margin: 2rem 0 .75rem; }
+h3 { font-size: 1.125rem; font-weight: 600; line-height: 1.75rem; margin: 1.5rem 0 .5rem; }
+h4 { font-size: 1rem;     font-weight: 600; line-height: 1.5rem;  margin: 0 0 .5rem; }
+.body2 { font-size: .875rem; line-height: 1.5rem; }
+.overline { font-size: 12px; line-height: 2; text-transform: none;
+            letter-spacing: .04em; color: var(--theme-neutral-500); }
+
+/* --- prototype banner (never dismissible) ------------------------------ */
+.banner {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--theme-orange-200); color: var(--theme-orange-900);
+  font-size: .8125rem; font-weight: 700; letter-spacing: .08em;
+  text-align: center; padding: .4rem 1rem; line-height: 1.4;
+}
+
+/* --- layout ------------------------------------------------------------ */
+.wrap { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+.crumb { font-size: .875rem; color: var(--theme-neutral-500); margin-bottom: 1rem; }
+.crumb a { color: var(--theme-accent); text-decoration: none; }
+.crumb a:hover { text-decoration: underline; }
+.sub { color: var(--theme-neutral-500); margin: 0 0 1.5rem; font-size: .9375rem; }
+
+.cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.card {
+  background: var(--theme-neutral-0); border: 1px solid var(--theme-neutral-200);
+  border-top: 4px solid var(--theme-accent); border-radius: 8px; padding: 1.25rem;
+  text-decoration: none; color: inherit; display: block;
+}
+.card:hover { border-color: var(--theme-accent); }
+.card .metric { display: flex; justify-content: space-between; font-size: .875rem;
+                padding: .3rem 0; border-top: 1px solid var(--theme-neutral-100); }
+.card .metric b { font-weight: 600; }
+
+table { width: 100%; border-collapse: collapse; background: var(--theme-neutral-0);
+        border: 1px solid var(--theme-neutral-200); border-radius: 8px; overflow: hidden; }
+th { text-align: left; font-size: .75rem; text-transform: uppercase; letter-spacing: .06em;
+     color: var(--theme-neutral-600); background: var(--theme-neutral-50);
+     padding: .6rem .75rem; border-bottom: 1px solid var(--theme-neutral-200); }
+td { padding: .6rem .75rem; border-bottom: 1px solid var(--theme-neutral-100);
+     font-size: .875rem; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--theme-neutral-50); }
+td a { color: var(--theme-accent); text-decoration: none; font-weight: 500; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* --- bands map onto the existing semantic tokens ----------------------- */
+.pill { display: inline-block; padding: .1rem .5rem; border-radius: 999px;
+        font-size: .75rem; font-weight: 600; white-space: nowrap; }
+.pill.high    { background: var(--theme-red-50);      color: var(--theme-red-600); }
+.pill.watch   { background: var(--theme-orange-200);  color: var(--theme-orange-700); }
+.pill.healthy { background: var(--theme-green-200);   color: var(--theme-green-900); }
+.pill.freeze  { background: var(--theme-red-50);      color: var(--theme-red-600); }
+.pill.reduce  { background: var(--theme-orange-200);  color: var(--theme-orange-700); }
+.pill.maintain{ background: var(--theme-neutral-100); color: var(--theme-neutral-600); }
+.pill.refused { background: var(--theme-neutral-200); color: var(--theme-neutral-700); }
+
+/* --- tabs -------------------------------------------------------------- */
+.tabs { display: flex; gap: .25rem; border-bottom: 1px solid var(--theme-neutral-200);
+        margin: 1.25rem 0 1.25rem; flex-wrap: wrap; }
+.tabs a { padding: .5rem .9rem; font-size: .875rem; font-weight: 500; text-decoration: none;
+          color: var(--theme-neutral-600); border-bottom: 2px solid transparent; }
+.tabs a.on { color: var(--theme-accent); border-bottom-color: var(--theme-accent); }
+
+.panel { background: var(--theme-neutral-0); border: 1px solid var(--theme-neutral-200);
+         border-radius: 8px; padding: 1.25rem; }
+.case p { margin: 0 0 .9rem; }
+.trace { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8125rem;
+         background: var(--theme-neutral-50); border: 1px solid var(--theme-neutral-200);
+         border-radius: 6px; padding: .6rem .75rem; color: var(--theme-neutral-700);
+         overflow-x: auto; }
+.score-big { font-size: 2.5rem; font-weight: 800; line-height: 1; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: .25rem 1rem;
+      font-size: .875rem; }
+.kv dt { color: var(--theme-neutral-500); }
+.kv dd { margin: 0; font-weight: 500; }
+
+/* --- demo panel -------------------------------------------------------- */
+.demo { background: var(--theme-neutral-0); border: 1px solid var(--theme-neutral-300);
+        border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; }
+.demo button, .demo a.btn {
+  font: inherit; font-size: .875rem; font-weight: 600; cursor: pointer;
+  background: var(--theme-accent); color: var(--theme-neutral-0);
+  border: none; border-radius: 6px; padding: .45rem 1rem; text-decoration: none;
+  display: inline-block; }
+.demo a.btn.ghost { background: var(--theme-neutral-100); color: var(--theme-neutral-700); }
+.step { font-size: .875rem; padding: .35rem 0; border-top: 1px solid var(--theme-neutral-100); }
+.step.done { color: var(--theme-neutral-500); }
+.step.next { font-weight: 600; }
+
+footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--theme-neutral-200);
+         font-size: .75rem; color: var(--theme-neutral-500); line-height: 1.6; }
