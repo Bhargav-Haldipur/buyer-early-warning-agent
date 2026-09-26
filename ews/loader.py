@@ -38,10 +38,18 @@ class Loader:
     def __init__(self, data_dir: Path | str = DATA_DIR, *, harness: bool = False,
                  demo_steps: int = 0, swap_invoices: bool = False):
         # a negative slice silently *keeps* demo articles ([:-1] of 7 keeps 6), so the
-        # range is checked rather than trusted
-        available = len(_read(Path(data_dir) / "demo" / "demo_articles_to_add.csv"))
-        if not 0 <= demo_steps <= available:
-            raise ValueError(f"demo_steps must be between 0 and {available}, got {demo_steps}")
+        # range is checked rather than trusted - but only when the demo is in play, so a
+        # dataset without a demo/ folder still loads
+        if demo_steps:
+            demo_file = Path(data_dir) / "demo" / "demo_articles_to_add.csv"
+            if not demo_file.exists():
+                raise ValueError(f"demo_steps={demo_steps} but there is no {demo_file}")
+            available = len(_read(demo_file))
+            if not 0 <= demo_steps <= available:
+                raise ValueError(f"demo_steps must be between 0 and {available}, "
+                                 f"got {demo_steps}")
+        elif demo_steps < 0:
+            raise ValueError(f"demo_steps must not be negative, got {demo_steps}")
         self.dir = Path(data_dir)
         self.harness = harness
         self.demo_steps = demo_steps          # how many demo articles are in play

@@ -76,7 +76,11 @@ def run_agent(llm, *, spec: AgentSpec, task: str, tools: list[Tool],
         "task": task, "data": cache_payload})
     cached = llm.cache.get(key)
     if cached is not None:
-        return {**cached, "cached": True}
+        # the cache ships with the repo, so an entry can be hand-edited or mangled by a
+        # merge. A wrong shape is a miss, not a crashed run.
+        if isinstance(cached, dict) and {"result", "trace", "turns"} <= cached.keys():
+            return {**cached, "cached": True}
+        print(f"  [cache] ignoring malformed entry for agent:{spec.name}", file=sys.stderr)
     if getattr(llm, "disabled", False):
         raise AgentError("Claude unavailable for this run")
 

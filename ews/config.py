@@ -88,4 +88,40 @@ def pd_for(score: float) -> float:
     return PD_ANCHORS[-1][1]
 
 
+def _validate() -> None:
+    """These constants are the whole scoring model. A wrong one does not crash - it
+    quietly changes every score, so each is checked when the module loads."""
+    problems = []
+    if not 0 < NEWS_HALF_LIFE_DAYS:
+        problems.append("NEWS_HALF_LIFE_DAYS must be positive (a zero divides by zero)")
+    if not 0 < NEWS_MAX_AGE_DAYS:
+        problems.append("NEWS_MAX_AGE_DAYS must be positive (a negative scores all news 0)")
+    if not 0 <= NEWS_FADE_DAYS < NEWS_MAX_AGE_DAYS:
+        problems.append(f"NEWS_FADE_DAYS must be in [0, {NEWS_MAX_AGE_DAYS}) - a longer "
+                        f"fade than horizon discounts even a same-day article")
+    if DPD_KNEE <= 0:
+        problems.append("DPD_KNEE must be positive")
+    if abs(W_PAYMENT + W_NEWS - 1.0) > 1e-9:
+        problems.append(f"W_PAYMENT + W_NEWS must be 1.0, got {W_PAYMENT + W_NEWS}")
+    if not 0 < BAND_WATCH < BAND_HIGH <= 100:
+        problems.append("bands must satisfy 0 < BAND_WATCH < BAND_HIGH <= 100")
+    xs = [x for x, _ in PD_ANCHORS]
+    ys = [y for _, y in PD_ANCHORS]
+    if xs != sorted(xs) or len(set(xs)) != len(xs):
+        problems.append("PD_ANCHORS scores must be strictly increasing")
+    if ys != sorted(ys) or not all(0 <= y <= 1 for y in ys):
+        problems.append("PD_ANCHORS probabilities must be non-decreasing and within [0, 1]")
+    missing = set(PARENT_STEP_DOWN) - set(NEWS_BASE)
+    if missing:
+        problems.append(f"PARENT_STEP_DOWN reads severities absent from NEWS_BASE: {sorted(missing)}")
+    unreachable = set(PARENT_STEP_DOWN.values()) - set(NEWS_BASE)
+    if unreachable:
+        problems.append(f"PARENT_STEP_DOWN maps onto severities absent from NEWS_BASE: "
+                        f"{sorted(unreachable)}")
+    if problems:
+        raise ValueError("ews/config.py is inconsistent:\n  - " + "\n  - ".join(problems))
+
+
+_validate()
+
 PD_TARGET = pd_for(PD_TARGET_SCORE)

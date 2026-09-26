@@ -466,3 +466,108 @@ class RunOutputNames(unittest.TestCase):
         finally:
             for n, on in before.items():
                 settings.AGENTS[n]["enabled"] = on
+
+
+class ScoringConstants(unittest.TestCase):
+    """config.py IS the scoring model. A wrong constant does not crash — it quietly
+    changes every score, so each is checked when the module loads."""
+
+    def setUp(self):
+        self.saved = {k: getattr(config, k) for k in
+                      ("NEWS_HALF_LIFE_DAYS", "NEWS_MAX_AGE_DAYS", "NEWS_FADE_DAYS",
+                       "DPD_KNEE", "W_NEWS", "W_PAYMENT", "BAND_WATCH", "BAND_HIGH",
+                       "PD_ANCHORS", "PARENT_STEP_DOWN")}
+
+    def tearDown(self):
+        for k, v in self.saved.items():
+            setattr(config, k, v)
+
+    def test_the_shipped_constants_are_consistent(self):
+        config._validate()
+
+    def test_each_way_of_breaking_them_is_caught(self):
+        for attr, bad, why in [
+            ("NEWS_FADE_DAYS", 800, "a fade longer than the horizon discounts fresh news"),
+            ("NEWS_HALF_LIFE_DAYS", 0, "divides by zero"),
+            ("NEWS_MAX_AGE_DAYS", -10, "scores all news zero"),
+            ("DPD_KNEE", 0, "divides by zero"),
+            ("W_NEWS", 0.5, "weights no longer sum to 1"),
+            ("BAND_HIGH", 20.0, "High Risk below Watch"),
+            ("PD_ANCHORS", [(50, 0.5), (10, 0.1)], "anchors out of order"),
+            ("PARENT_STEP_DOWN", {5: 2}, "steps onto a severity with no base score"),
+        ]:
+            setattr(config, attr, bad)
+            with self.assertRaises(ValueError, msg=f"{attr}={bad!r} ({why})"):
+                config._validate()
+            setattr(config, attr, self.saved[attr])
+
+    def test_a_fresh_article_is_worth_full_weight(self):
+        self.assertEqual(config.decay(0), 1.0)
+
+
+class ShippedCacheIsUntrusted(unittest.TestCase):
+    """The cache ships with the repo, so an entry can be hand-edited or mangled by a
+    merge. A wrong shape must be a miss, not a crashed run."""
+
+    def test_a_malformed_entry_is_ignored_and_the_agent_re_runs(self):
+        from ews.agents import definition
+        from ews.agents.definition import AgentSpec
+        from ews.agents.runtime import Tool, run_agent
+        from ews.llm import CACHE_DIR, _Cache, _key
+
+        spec = AgentSpec(name="t", title="T", description="d", tools={"submit_v": "s"},
+                         system="s", path=definition.AGENTS_DIR / "t.md", enabled=True,
+                         model="m", effort="low", max_turns=3, max_tokens=500,
+                         guardrails={"required_before_submit": []})
+        key = _key("claude", "agent:t",
+                   {"model": "m", "effort": "low", "max_tokens": 500,
+                    "guardrails": spec.guardrails, "system": "s", "tools": spec.tools,
+                    "task": "go", "data": {}})
+        entry = CACHE_DIR / f"{key}.json"
+
+        class Resp:
+            def __init__(self, c): self.content, self.stop_reason = c, "tool_use"
+
+        class Block:
+            def __init__(self, n, i, c):
+                self.type, self.name, self.input, self.id = "tool_use", n, i, c
+
+        try:
+            for content in ('"a string"', "[1, 2, 3]", '{"turns": 1}'):
+                entry.write_text(content)
+                seq = iter([Resp([Block("submit_v", {"v": "recovered"}, "1")])])
+
+                class LLM:
+                    name, agentic, api_errors = "claude", True, ()
+                    def __init__(self):
+                        self.cache, self.calls = _Cache(True), 0
+                        self.degraded, self.disabled = 0, False
+                    def create(self, **kw): return next(seq)
+
+                out = run_agent(LLM(), spec=spec, task="go", cache_payload={},
+                                tools=[Tool("submit_v", {"v": {"type": "string"}},
+                                            lambda v: v)])
+                self.assertEqual(out["result"], "recovered", content)
+                self.assertFalse(out["cached"], content)
+        finally:
+            entry.unlink(missing_ok=True)
+
+
+class LoaderWithoutDemoFiles(unittest.TestCase):
+    """Range-checking demo_steps must not make demo/ a hard dependency of loading."""
+
+    def _without_demo(self):
+        import shutil, tempfile
+        from pathlib import Path as P
+        d = P(tempfile.mkdtemp()) / "data"
+        shutil.copytree(ROOT / "data", d)
+        shutil.rmtree(d / "demo")
+        return d
+
+    def test_a_dataset_with_no_demo_folder_still_loads(self):
+        self.assertTrue(Loader(self._without_demo()).buyers())
+
+    def test_asking_for_demo_steps_without_the_file_says_so(self):
+        with self.assertRaises(ValueError) as ctx:
+            Loader(self._without_demo(), demo_steps=3)
+        self.assertIn("demo_articles_to_add.csv", str(ctx.exception))
