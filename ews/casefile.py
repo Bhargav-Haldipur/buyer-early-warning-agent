@@ -1,9 +1,9 @@
 """Case File writer + the D10 guard.
 
-The Case File is the default tab, so the LLM is never trusted with arithmetic. It
-receives a facts dict and may use only those numbers; every numeric token it writes
-back is checked against them, and a single unmatched figure discards the whole text
-in favour of a template built from the same facts.
+The Case File is the default tab, so the agent is never trusted with arithmetic. Every
+numeric token it submits is checked against the data its tools returned; a draft with
+an unmatched figure is sent back to the agent, and if it cannot produce a clean one the
+template built from the same facts renders instead.
 """
 from __future__ import annotations
 
@@ -101,14 +101,52 @@ def build_facts(buyer: dict, verdict: dict, lines: list[dict]) -> dict:
     return {"buyer": buyer, "verdict": v, "limits": lines, "what_would_lift_it": lift}
 
 
-def write(llm, buyer: dict, verdict: dict, lines: list[dict]) -> dict:
+def write(llm, buyer: dict, verdict: dict, lines: list[dict], items: list[dict] | None = None,
+          articles: dict[str, dict] | None = None) -> dict:
+    """The Case File agent (agents/casefile.md), with the D10 guard as its submit check.
+
+    Without Claude (and for every Healthy buyer) the template renders instead.
+    """
+    from .agents import definition
+    from .agents.runtime import Tool, attempt
+    from .evidence import evidence_view
+
+    spec = definition.load("casefile")
+    guard = spec.guardrails
     facts = build_facts(buyer, verdict, lines)
-    text = llm.write_case_file(facts)
-    if text is None:
-        return {"text": template(facts), "source": "template", "rejected_numbers": []}
-    bad = verify(text, facts)
-    if bad:
-        return {"text": template(facts), "source": "template",
-                "rejected_numbers": bad,
-                "note": "LLM output discarded - it contained figures not present in the facts"}
-    return {"text": text, "source": "llm", "rejected_numbers": []}
+    items, articles = items or [], articles or {}
+    sources = {e["source"] for e in items}
+    view = evidence_view(items)
+    guard_facts = {"facts": facts, "evidence": view,
+                   "articles": [articles[s] for s in sources if s in articles]}
+
+    def get_article(article_id: str) -> dict:
+        if article_id not in sources or article_id not in articles:
+            raise ValueError(f"{article_id!r} is not evidence for this buyer")
+        a = articles[article_id]
+        return {k: a[k] for k in ("article_id", "published_date", "publication",
+                                  "headline", "body")}
+
+    def submit(text: str) -> dict:
+        bad = (verify(text, guard_facts, guard["figure_tolerance"])
+               if guard["verify_figures"] else [])
+        if bad:
+            raise ValueError(f"these figures are not in the data: {bad}. Use only the "
+                             f"numbers the tools returned, then resubmit")
+        return {"text": text.strip(), "source": "llm", "rejected_numbers": []}
+
+    run = attempt(
+        llm, lambda: {"text": template(facts), "source": "template", "rejected_numbers": []},
+        spec=spec,
+        task=f"Write the case file for {buyer['buyer_name']} ({buyer['buyer_id']}).",
+        tools=[
+            Tool("get_verdict", {}, lambda: verdict),
+            Tool("get_limits", {}, lambda: lines or [{"note": "no limit lines"}]),
+            Tool("get_evidence", {}, lambda: view or [{"note": "no evidence"}]),
+            Tool("get_article", {"article_id": {"type": "string"}}, get_article),
+            Tool("submit_case_file", {"text": {"type": "string"}}, submit),
+        ],
+        cache_payload={"facts": facts, "evidence": view},
+    )
+    return {**run["result"], "agent": {k: run[k] for k in
+                                       ("mode", "turns", "cached", "trace", "error")}}

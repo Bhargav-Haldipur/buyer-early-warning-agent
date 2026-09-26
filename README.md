@@ -29,20 +29,23 @@ python3 -m dashboard.server
 |---|---|
 | `ews.run` | scores every buyer, writes `out/runs/<date>.json` |
 | `harness.evaluate` | grades that run against the labels — 9 gates |
-| `unittest discover -s tests` | leakage, determinism, formulae, resolver, guard, theme — 18 tests |
+| `unittest discover -s tests` | leakage, determinism, formulae, resolver, guard, theme, agent loop, agent definitions, settings — 40 tests |
 | `dashboard.server` | serves the dashboard on http://localhost:8000 (Ctrl-C to stop) |
 
 **No install, no API key, no network.** Everything above runs on the Python 3 standard
 library. Run them from the repository root.
 
-The dashboard blocks the terminal, so give it its own window. Its home page carries a
-live demo: press **Publish article** eight times to walk the whole story.
+The dashboard blocks the terminal, so give it its own window. The live demo is at
+http://localhost:8000/demo (linked from the home page): press **Publish article** eight times to walk the whole story.
 [`docs/DEMO_GUIDE.md`](docs/DEMO_GUIDE.md) says what each step is meant to prove.
 
-### Switching the LLM agents on
+### Switching the agents on
 
-Entity resolution, severity grading and the case-file prose run on a deterministic
-fallback by default, so the demo always works. To use Claude instead:
+The four agents (Payment Behaviour, News Intelligence, Risk Adjudicator, Case File)
+are autonomous Claude agents: each gets read-only tools over the engine's data,
+decides what to look at and when it has seen enough, and ends by calling a `submit_*`
+tool whose input code checks. Without Claude, each falls back to its rule-based path,
+so the demo, harness and tests always work offline. To use Claude:
 
 ```bash
 pip install anthropic
@@ -50,34 +53,57 @@ export ANTHROPIC_API_KEY=sk-ant-...
 python3 -m ews.run
 ```
 
-Claude is picked up automatically once both are in place. To force the deterministic
+Claude is picked up automatically once both are in place. To force the rule-based
 path back on:
 
 ```bash
 EWS_LLM=fallback python3 -m ews.run
 ```
 
-Responses are cached to `out/.llm_cache/` by content hash, so re-runs cost nothing and
-need no network. Any API failure degrades that one call to the deterministic answer
-rather than taking the demo down.
+Every agent run is cached to `out/.llm_cache/` by content hash, so re-runs cost nothing
+and need no network. A refusal, a run that never submits, or any API failure degrades
+that one item to its rule-based answer rather than taking the demo down. Each buyer's
+**Agents** tab on the dashboard shows which path ran and every tool call the agent made.
+
+Each agent is defined in its own Markdown file under [`agents/`](agents/):
+`payment.md`, `news.md`, `adjudicator.md`, `casefile.md`. The frontmatter lists which
+tools the agent may use, with the descriptions it reads; the body is its instructions.
+
+How each agent runs lives in [`ews/settings.py`](ews/settings.py): `model`, `effort`
+(`low` to `max`), `max_turns`, `max_tokens`, `enabled`, and its **guardrails** - the
+tools it must call before it may submit, and the checks its submission must pass.
+Every value is validated when the agent loads, so a typo stops the run instead of
+being ignored.
+
+Edit either file and the next run uses it. Both are part of the cache key, so a changed
+agent re-runs rather than replaying an old answer. Tool implementations stay in code.
+
+The guardrails, with their defaults in `ews/settings.py`:
+
+| Agent | Decides | Guardrails (settings.py) | Always, in code |
+|---|---|---|---|
+| Payment Behaviour | settlement trend, concerns | must call `get_open_invoices` first; `must_match_ledger`; `max_concerns` | the score uses the ledger, never the agent |
+| News Intelligence | which entity an article is about, severity | must call `search_entities` first; `entity_must_be_looked_up`; `allowed_severities` | entity must be in the registry; parent fan-out |
+| Risk Adjudicator | agree / caveats / challenge, with cited evidence | must call `get_evidence` first; `require_real_citations`; `verify_figures`; `max_concerns` | cannot change the score |
+| Case File | the write-up | must call `get_verdict` and `get_limits` first; `verify_figures`; `figure_tolerance`; `run_for_bands` | template when the agent cannot produce a clean draft |
 
 ---
 
 ## What was built
 
-A deterministic spine with LLM agents at the leaves, joined by one typed Evidence
-Store. Evidence producers never score risk; a single Adjudicator emits the only number;
+A deterministic spine with autonomous Claude agents at the leaves, joined by one typed
+Evidence Store. Evidence producers never score risk; a single Adjudicator emits the only number;
 the case-file writer can explain a verdict but never change one.
 
 ```
-  EVIDENCE   Payment Behaviour   deterministic, per insurer line
-             News Intelligence   LLM, two gated passes, incl. parent contagion
+  EVIDENCE   Payment Behaviour   agent over a deterministic ledger, per insurer line
+             News Intelligence   agent, one run per article, incl. parent contagion
                       │
   EVIDENCE STORE      │          typed, dated, source-cited
                       │
-  JUDGMENT   Risk Adjudicator    the only component that emits a number
+  JUDGMENT   Risk Adjudicator    formula emits the only number; agent reviews it
                       │
-  ACTION     Limit recommendations → Case File → dashboard
+  ACTION     Limit recommendations → Case File agent → dashboard
              Harness grades every run against the labels
 ```
 
@@ -180,7 +206,9 @@ it first.
 |---|---|
 | `ews/config.py` | every fixed constant — weights, bands, decay, PD curve |
 | `ews/loader.py` | CSV access and the leakage boundary |
-| `ews/agents/` | payment, news, adjudicator |
+| `agents/` | the four agent definitions, one `.md` each |
+| `ews/settings.py` | model, effort, limits and guardrails for each agent |
+| `ews/agents/` | their tools and checks, `definition.py` (reads the `.md` files) and `runtime.py` (the agent loop) |
 | `ews/limits.py` · `ews/casefile.py` · `ews/run.py` | recommendations, case file + guard, orchestrator |
 | `ews/llm.py` | Claude client, deterministic fallback, disk cache |
 | `harness/evaluate.py` | the only module permitted to read the labels |

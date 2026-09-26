@@ -21,9 +21,7 @@ PD_ANCHORS = [(0, 0.01), (20, 0.10), (55, 0.45), (80, 0.85), (100, 0.95)]
 # --- D6: risk appetite ------------------------------------------------------
 PD_TARGET_SCORE = 35.0              # PD at the Watch line == 25%
 
-# --- D11: models ------------------------------------------------------------
-MODEL_GRADING = "claude-sonnet-5"   # entity resolution + severity
-MODEL_CASEFILE = "claude-opus-5"    # case file prose
+# --- D11: models are set per agent, in agents/*.md ---------------------------
 
 
 def payment_score(dpd: int) -> float:

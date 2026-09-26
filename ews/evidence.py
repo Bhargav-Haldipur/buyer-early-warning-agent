@@ -36,3 +36,15 @@ class EvidenceStore:
 
     def to_list(self) -> list[dict]:
         return [e.to_dict() for e in self._items]
+
+
+def evidence_view(items: list[dict], kind: str = "all") -> list[dict]:
+    """Evidence as the agents see it - without other agents' tool traces."""
+    out = []
+    for e in items:
+        if kind != "all" and e["kind"] != kind:
+            continue
+        data = {k: v for k, v in e["data"].items() if k != "agent"}
+        out.append({"id": e["source"], "kind": e["kind"], "date": e["date"],
+                    "detail": e["detail"], "data": data})
+    return out

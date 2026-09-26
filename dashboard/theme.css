@@ -139,3 +139,59 @@ td a { color: var(--theme-accent); text-decoration: none; font-weight: 500; }
 
 footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--theme-neutral-200);
          font-size: .75rem; color: var(--theme-neutral-500); line-height: 1.6; }
+
+/* --- client dashboard: filter chips + sortable headers ----------------- */
+.card .bands { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
+.chips { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.chip { font: inherit; font-size: .8125rem; font-weight: 500; cursor: pointer;
+        background: var(--theme-neutral-0); color: var(--theme-neutral-700);
+        border: 1px solid var(--theme-neutral-300); border-radius: 999px; padding: .25rem .8rem; }
+.chip span { color: var(--theme-neutral-500); margin-left: .2rem; }
+.chip.on { background: var(--theme-accent); border-color: var(--theme-accent);
+           color: var(--theme-neutral-0); }
+.chip.on span { color: var(--theme-neutral-0); }
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover { color: var(--theme-neutral-900); }
+th.sortable.asc::after  { content: " \25B2"; font-size: .6rem; }
+th.sortable.desc::after { content: " \25BC"; font-size: .6rem; }
+
+/* --- risk score gauge (bands per D8) ----------------------------------- */
+.gauge { max-width: 340px; margin: 0 auto 1rem; text-align: center; }
+.gauge svg { width: 100%; height: auto; display: block; }
+.g-track, .g-fill { fill: none; stroke-width: 44; }
+.g-track { stroke: var(--theme-neutral-200); }
+.g-fill.high    { stroke: var(--theme-red-500); }
+.g-fill.watch   { stroke: var(--theme-orange-700); }
+.g-fill.healthy { stroke: var(--theme-green-900); }
+.g-tick { stroke: var(--theme-neutral-0); stroke-width: 3; }
+.g-hub { fill: var(--theme-neutral-50); stroke: var(--theme-neutral-200); stroke-width: 1; }
+.g-num { font-size: 34px; font-weight: 800; fill: var(--theme-neutral-1000); font-family: var(--font); }
+.g-lab, .g-end { font-size: 11px; font-weight: 600; fill: var(--theme-neutral-400); font-family: var(--font); }
+.g-current { font-size: 1.25rem; color: var(--theme-neutral-600); margin-top: .25rem; }
+.g-current b { font-weight: 700; }
+.g-current .high    { color: var(--theme-red-600); }
+.g-current .watch   { color: var(--theme-orange-700); }
+.g-current .healthy { color: var(--theme-green-900); }
+.g-legend { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;
+            font-size: .875rem; color: var(--theme-neutral-700); margin-top: .5rem; }
+.g-legend em { font-style: normal; color: var(--theme-neutral-400); font-size: .75rem; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: .35rem; }
+.dot.high    { background: var(--theme-red-500); }
+.dot.watch   { background: var(--theme-orange-700); }
+.dot.healthy { background: var(--theme-green-900); }
+.mini-gauge { width: 80px; height: auto; display: block; margin-left: auto; }
+.mini-gauge .g-track, .mini-gauge .g-fill { stroke-width: 12; }
+.mini-gauge .g-tick { stroke-width: 1.5; }
+.mini-gauge .g-num { font-size: 15px; font-weight: 700; }
+
+/* --- agents tab -------------------------------------------------------- */
+.pill.agent { background: var(--theme-accent); color: var(--theme-neutral-0); }
+.agent-card { margin-bottom: 1rem; }
+.agent-card h3 { margin-top: 0; }
+.agent-card p { margin: .25rem 0; }
+.agent-trace { margin: .75rem 0 0; padding-left: 1.25rem; font-size: .8125rem; }
+.agent-trace li { margin-bottom: .35rem; }
+.agent-trace code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+                    color: var(--theme-neutral-800); }
+.agent-trace .res { display: block; color: var(--theme-neutral-500); word-break: break-word; }
+.agent-trace .err { display: block; color: var(--theme-red-600); }

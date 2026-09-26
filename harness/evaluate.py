@@ -11,7 +11,7 @@ from collections import Counter
 from pathlib import Path
 
 from ews import run as engine
-from ews.agents.news import _candidates
+from ews.agents.news import NewsDesk
 from ews.config import PARENT_STEP_DOWN
 from ews.llm import get_llm
 from ews.loader import Loader
@@ -24,7 +24,8 @@ def evaluate(llm=None) -> dict:
     labels = {r["buyer_id"]: r for r in Loader(harness=True).table("ground_truth")}
     labelled_news = Loader(harness=True, demo_steps=7).news()
     hl = Loader(harness=True)
-    cands = _candidates(hl)
+    # the agent investigates through an engine loader, so its tools never see a label
+    desk = NewsDesk(Loader(demo_steps=7))
     subs = hl.subsidiaries()
     parents_by_name = {p["name"]: p["parent_id"] for p in hl.parent_companies()}
 
@@ -61,7 +62,7 @@ def evaluate(llm=None) -> dict:
     sev_pairs: list[tuple[int, int]] = []
     for art in labelled_news:
         clean = {k: v for k, v in art.items() if not k.startswith("gt_")}
-        res = llm.resolve(clean, cands)
+        res = desk.decide(clean, llm)
         if art["gt_category"] == "decoy":
             if res["kind"] != "none":
                 precision_bad.append((art["article_id"], res["name"]))
@@ -75,8 +76,7 @@ def evaluate(llm=None) -> dict:
             hit = res["kind"] == "buyer" and res["id"] == art["gt_buyer_id"]
             recall_ok += hit
             if hit and art.get("gt_severity"):
-                sev_pairs.append((int(llm.grade(clean, res["name"])["severity"]),
-                                  int(art["gt_severity"])))
+                sev_pairs.append((int(res["severity"]), int(art["gt_severity"])))
 
     gates.append({"gate": "Entity resolution - recall on genuine mentions",
                   "status": PASS if recall_ok == recall_n else FAIL,

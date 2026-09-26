@@ -1,6 +1,7 @@
 """One interface, two implementations (D11).
 
-  ClaudeLLM    - the real thing, needs `pip install anthropic` and an API key
+  ClaudeLLM    - drives the autonomous agents (agents/runtime.py); needs
+                 `pip install anthropic` and an API key
   FallbackLLM  - deterministic, always available, used offline and by every gate
 
 Every response is cached to disk by content hash, so a demo re-run costs nothing
@@ -116,6 +117,7 @@ class _Cache:
 # --------------------------------------------------------------------------
 class FallbackLLM:
     name = "fallback"
+    agentic = False
 
     def __init__(self, cache: bool = True):
         self.cache = _Cache(cache)
@@ -139,146 +141,61 @@ class FallbackLLM:
 
 
 class ClaudeLLM:
-    """Wraps the official SDK. Any failure degrades to FallbackLLM for that call."""
-    name = "claude"
+    """Transport for the agent loop in agents/runtime.py.
 
-    RESOLVE_SCHEMA = {
-        "type": "object",
-        "properties": {
-            "kind": {"type": "string", "enum": ["buyer", "parent", "none"]},
-            "id": {"type": "string"},
-            "reason": {"type": "string"},
-        },
-        "required": ["kind", "id", "reason"],
-        "additionalProperties": False,
-    }
-    GRADE_SCHEMA = {
-        "type": "object",
-        "properties": {
-            "severity": {"type": "integer", "enum": [0, 3, 4, 5]},
-            "category": {"type": "string"},
-            "reason": {"type": "string"},
-        },
-        "required": ["severity", "category", "reason"],
-        "additionalProperties": False,
-    }
+    Holds the SDK client and the disk cache. The first authentication failure
+    disables it for the rest of the run, so a missing key costs one failed call
+    rather than one per article.
+    """
+    name = "claude"
+    agentic = True
 
     def __init__(self, cache: bool = True):
-        import anthropic                                   # noqa: F401  (import error is caught by get_llm)
+        import anthropic                                   # import error is caught by get_llm
         self._anthropic = anthropic
         self.client = anthropic.Anthropic()
+        self.api_errors = (anthropic.APIError,)
         self.cache = _Cache(cache)
-        self.fallback = FallbackLLM(cache=False)
         self.calls = 0
         self.degraded = 0
+        self.disabled = False
 
-    # -- plumbing ---------------------------------------------------------
-    def _json_call(self, task: str, payload: dict, system: str, prompt: str, schema: dict) -> dict:
-        key = _key(self.name, task, payload)
-        cached = self.cache.get(key)
-        if cached is not None:
-            return cached
+    def create(self, *, model: str, effort: str, **params):
+        from .settings import REFUSAL_FALLBACK
         self.calls += 1
-        resp = self.client.messages.create(
-            model=config.MODEL_GRADING,
-            max_tokens=1024,
-            system=system,
-            messages=[{"role": "user", "content": prompt}],
-            output_config={"effort": "low", "format": {"type": "json_schema", "schema": schema}},
-        )
-        text = next(b.text for b in resp.content if b.type == "text")
-        out = json.loads(text)
-        self.cache.put(key, out)
-        return out
-
-    # -- the two gated passes ---------------------------------------------
-    def resolve(self, article: dict, candidates: list[dict]) -> dict:
-        payload = {"mention": article["mentioned_entity_as_written"],
-                   "headline": article["headline"], "body": article["body"],
-                   "candidates": [{"id": c["id"], "name": c["name"], "kind": c["kind"],
-                                   "sector": c.get("sector", ""), "city": c.get("city", "")}
-                                  for c in candidates]}
-        system = (
-            "You match a company named in a news article to a list of known entities for a "
-            "credit insurer. You are deliberately RELUCTANT: a wrong match puts a healthy "
-            "company on a risk watchlist.\n"
-            "Match only if the leading brand word matches AND every other distinguishing word "
-            "in the mention also appears in that entity's own registered name. Abbreviations of "
-            "legal form (Pvt, Ltd, Limited, LLP) and the generic 'Inds.' may be ignored.\n"
-            "A different line of business is decisive: 'Arcline Media Pvt Ltd' is NOT "
-            "'Arcline Fabricators Limited'. If in any doubt, answer none."
-        )
-        prompt = json.dumps(payload, indent=2)
+        params["output_config"] = {"effort": effort}
         try:
-            out = self._json_call("resolve", payload, system, prompt, self.RESOLVE_SCHEMA)
-        except Exception as exc:                                     # noqa: BLE001
-            self.degraded += 1
-            print(f"  [llm] resolve degraded to fallback: {exc}", file=sys.stderr)
-            return self.fallback.resolve(article, candidates)
-        if out["kind"] == "none":
-            return {"kind": "none", "id": "", "name": "", "reason": out["reason"]}
-        match = next((c for c in candidates if c["id"] == out["id"]), None)
-        if match is None:        # hallucinated id — treat as a refusal
-            self.degraded += 1
-            return {"kind": "none", "id": "", "name": "",
-                    "reason": f"model returned unknown id {out['id']!r}; refused"}
-        return {"kind": match["kind"], "id": match["id"], "name": match["name"],
-                "reason": out["reason"]}
+            if REFUSAL_FALLBACK and model.startswith("claude-opus-5"):
+                # server-side refusal fallback: a declined request is re-run on
+                # Anthropic's recommended model instead of failing the agent
+                return self.client.beta.messages.create(
+                    model=model, betas=["server-side-fallback-2026-07-01"],
+                    fallbacks="default", **params)
+            return self.client.messages.create(model=model, **params)
+        except self._anthropic.AuthenticationError:
+            self.disabled = True
+            raise
+        except TypeError as exc:
+            # the SDK raises TypeError when it finds no credentials at all
+            if "authentication" not in str(exc).lower():
+                raise
+            self.disabled = True
+            from .agents.runtime import AgentError
+            raise AgentError(f"no Anthropic credentials: {exc}") from exc
 
-    def grade(self, article: dict, entity_name: str) -> dict:
-        payload = {"entity": entity_name, "headline": article["headline"], "body": article["body"]}
-        system = (
-            "You grade a news article about a company for a credit insurer's early-warning "
-            "system. Return exactly one severity:\n"
-            "  0 - neutral or positive (appointments, expansion, tie-ups, higher volumes)\n"
-            "  3 - mild negative (capacity cut, legal notice, contract loss)\n"
-            "  4 - moderate negative (unpaid vendors, lenders reviewing exposure)\n"
-            "  5 - severe negative (unpaid wages, debt restructuring, insolvency)\n"
-            "Grade what the article says about THIS company only."
-        )
-        try:
-            return self._json_call("grade", payload, system, json.dumps(payload, indent=2),
-                                   self.GRADE_SCHEMA)
-        except Exception as exc:                                     # noqa: BLE001
-            self.degraded += 1
-            print(f"  [llm] grade degraded to fallback: {exc}", file=sys.stderr)
-            return self.fallback.grade(article, entity_name)
 
-    # -- case file ---------------------------------------------------------
-    def write_case_file(self, facts: dict) -> str | None:
-        key = _key(self.name, "casefile", facts)
-        cached = self.cache.get(key)
-        if cached is not None:
-            return cached
-        system = (
-            "You write a short case file for a trade credit underwriter.\n"
-            "CRITICAL: use ONLY the numbers given to you. Never compute, round differently, "
-            "estimate or invent a figure. Any number you write that is not in the input will "
-            "cause your text to be discarded.\n"
-            "Four short paragraphs, no headings, no bullet points: how the buyer is doing; "
-            "why it is in this band; what the recommended limit action is; what would lift it."
-        )
-        try:
-            self.calls += 1
-            resp = self.client.messages.create(
-                model=config.MODEL_CASEFILE,
-                max_tokens=1200,
-                system=system,
-                messages=[{"role": "user", "content": json.dumps(facts, indent=2)}],
-            )
-            text = "".join(b.text for b in resp.content if b.type == "text").strip()
-        except Exception as exc:                                     # noqa: BLE001
-            self.degraded += 1
-            print(f"  [llm] case file degraded to template: {exc}", file=sys.stderr)
-            return None
-        self.cache.put(key, text)
-        return text
+def _has_credentials() -> bool:
+    """Whether the SDK can authenticate: a key or token, a federation rule, or a profile."""
+    if any(os.environ.get(v) for v in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN",
+                                       "ANTHROPIC_FEDERATION_RULE_ID", "ANTHROPIC_PROFILE")):
+        return True
+    return (Path.home() / ".config" / "anthropic").is_dir()
 
 
 def get_llm(cache: bool = True):
     """EWS_LLM=claude|fallback. Defaults to Claude when it is actually usable."""
     want = os.environ.get("EWS_LLM", "auto").lower()
-    if want == "fallback":
+    if want == "fallback" or (want == "auto" and not _has_credentials()):
         return FallbackLLM(cache)
     try:
         llm = ClaudeLLM(cache)
