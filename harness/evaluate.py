@@ -22,16 +22,25 @@ PASS, FAIL, WARN = "PASS", "FAIL", "WARN"
 def evaluate(llm=None) -> dict:
     llm = llm or get_llm()
     labels = {r["buyer_id"]: r for r in Loader(harness=True).table("ground_truth")}
-    labelled_news = Loader(harness=True, demo_steps=7).news()
+    all_demo = len(Loader(harness=True).demo_articles())
+    labelled_news = Loader(harness=True, demo_steps=all_demo).news()
     hl = Loader(harness=True)
     # the agent investigates through an engine loader, so its tools never see a label
-    desk = NewsDesk(Loader(demo_steps=7))
+    desk = NewsDesk(Loader(demo_steps=all_demo))
     subs = hl.subsidiaries()
     parents_by_name = {p["name"]: p["parent_id"] for p in hl.parent_companies()}
 
-    result = engine.run()
+    result = engine.run(llm=llm)
     verdicts = {r["buyer_id"]: r["verdict"] for r in result["buyers"]}
     gates: list[dict] = []
+
+    unscored = sorted(set(labels) - set(verdicts))
+    unlabelled = sorted(set(verdicts) - set(labels))
+    if unscored or unlabelled:
+        raise ValueError(
+            "ground_truth.csv and the scored buyers disagree — every gate below would "
+            f"be measuring a different population.\n  labelled but not scored: {unscored}"
+            f"\n  scored but not labelled: {unlabelled}")
 
     # --- 1/2: detection and false positives ------------------------------
     missed = [b for b, l in labels.items() if l["failed"] == "Y" and verdicts[b]["band"] == "Healthy"]
@@ -49,12 +58,18 @@ def evaluate(llm=None) -> dict:
                             + (f"; flagged {false_pos}" if false_pos else "")})
 
     wobblers = [b for b, l in labels.items() if l["trajectory"] == "wobble_recovered"]
-    jayanth = next((b for b, l in labels.items() if l["buyer_name"].startswith("Jayanth")), None)
-    named = [b for b in wobblers + ([jayanth] if jayanth else []) if verdicts[b]["band"] != "Healthy"]
-    gates.append({"gate": "Named traps - wobblers and Jayanth stay Healthy",
+    # derived, not hardcoded: a buyer that never defaults yet carries a severity-5
+    # story. Naming it would let a rename silently drop the check.
+    traps = sorted({a["gt_buyer_id"] for a in labelled_news
+                    if a["gt_buyer_id"] and int(a["gt_severity"]) == 5
+                    and labels.get(a["gt_buyer_id"], {}).get("failed") == "N"})
+    watched = sorted(set(wobblers) | set(traps))
+    named = [b for b in watched if verdicts[b]["band"] != "Healthy"]
+    trap_names = ", ".join(labels[b]["buyer_name"].split()[0] for b in traps) or "none in data"
+    gates.append({"gate": "Named traps - wobblers and severity-5 survivors stay Healthy",
                   "status": PASS if not named else FAIL,
-                  "detail": f"{len(wobblers)} wobblers + Jayanth"
-                            + (f"; flagged {named}" if named else "; all clean")})
+                  "detail": f"{len(wobblers)} wobblers + {len(traps)} sev-5 trap(s) "
+                            f"({trap_names})" + (f"; flagged {named}" if named else "; all clean")})
 
     # --- 3/4: entity resolution ------------------------------------------
     recall_ok = recall_n = 0
@@ -96,7 +111,7 @@ def evaluate(llm=None) -> dict:
                             + (f"; disagreements (label->got) {dict(confusion)}" if confusion else "")})
 
     # --- 6: parent fan-out ------------------------------------------------
-    demo = engine.run(demo_steps=7)
+    demo = engine.run(demo_steps=all_demo, llm=llm)
     fan_issues = []
     for art in labelled_news:
         if art["gt_is_parent_story"] != "Y":
@@ -120,11 +135,12 @@ def evaluate(llm=None) -> dict:
                 4: ("BUY019", 47.7), 6: ("BUY023", 47.7), 7: ("BUY011", 37.3)}
     replay_bad = []
     for step, (bid, want) in expected.items():
-        got = next(r["verdict"]["score"] for r in engine.run(demo_steps=step)["buyers"]
+        got = next(r["verdict"]["score"] for r in engine.run(demo_steps=step, llm=llm)["buyers"]
                    if r["buyer_id"] == bid)
         if abs(got - want) > 0.15:
             replay_bad.append(f"step {step} {bid}: {got} != {want}")
-    swap = next(r["verdict"] for r in engine.run(demo_steps=7, swap_invoices=True)["buyers"]
+    swap = next(r["verdict"] for r in engine.run(demo_steps=all_demo, swap_invoices=True,
+                                                 llm=llm)["buyers"]
                 if r["buyer_id"] == "BUY023")
     if abs(swap["score"] - 65.0) > 0.15 or swap["band"] != "High Risk":
         replay_bad.append(f"step 8 BUY023: {swap['score']} {swap['band']} != 65.0 High Risk")
@@ -150,7 +166,18 @@ def evaluate(llm=None) -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--json", default=None)
+    ap.add_argument("--agents", default=None,
+                    help="comma-separated agents to run on Claude (the rest use rules)")
+    ap.add_argument("--max-calls", type=int, default=None,
+                    help="cap the model calls this harness run may make")
     args = ap.parse_args()
+    from ews import settings
+    try:
+        settings.apply_overrides(args.agents, args.max_calls)
+    except settings.SettingsError as exc:
+        ap.error(str(exc))
+    print(f"agents on Claude: {', '.join(settings.enabled_agents()) or 'none'} "
+          f"· budget {settings.MAX_MODEL_CALLS} calls")
     report = evaluate()
 
     width = max(len(g["gate"]) for g in report["gates"])

@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY025",
+    "name": "Westbridge Packaging Ltd",
+    "severity": 0,
+    "category": "expansion",
+    "reason": "Article describes a positive distribution tie-up extending market reach with no negative financial implications for Westbridge Packaging Ltd."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Westbridge Packaging"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY025\", \"name\": \"Westbridge Packaging Ltd\", \"sector\": \"Packaging\", \"city\": \"Bristol\"}, {\"kind\": \"buyer\", \"id\": \"BUY034\", \"name\": \"Tornquist Packaging AS\", \"sector\": \"Packaging\", \"city\": \"Aarhus\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY025",
+        "severity": 0,
+        "category": "expansion",
+        "reason": "Article describes a positive distribution tie-up extending market reach with no negative financial implications for Westbridge Packaging Ltd."
+      }
+    }
+  ],
+  "turns": 2
+}

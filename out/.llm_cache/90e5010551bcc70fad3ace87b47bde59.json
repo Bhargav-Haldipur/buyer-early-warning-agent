@@ -1,0 +1,78 @@
+{
+  "result": {
+    "assessment": "agree_with_caveats",
+    "rationale": "The Healthy band is correct on the evidence: all five open invoices sit at 0 days past due and there is no adverse news or parent linkage, so both formula components are genuine zeros rather than gaps in coverage. However, a score of exactly 0.0 overstates the comfort available here. The payment agent's own review (INV001494) flags that the sole settled invoice on record was paid 28 days late against a 90-day term, that trend is explicitly \"insufficient_history\", and that open exposure of EUR 695.5k runs to roughly 79% of the single EUR 880k limit \u2014 none of which a current-DPD-only payment score can capture. I recommend the underwriter treat this as a thin-file Healthy with limited headroom rather than a clean risk.",
+    "concerns": [
+      {
+        "source_id": "INV001494",
+        "issue": "The payment score reads 0.0 off current DPD only and therefore ignores the single settled invoice on record (INV001489, EUR 195k), which was paid 28 days late against a 90-day term. With trend recorded as 'insufficient_history', the 0 DPD reading reflects invoices not yet due rather than a demonstrated record of paying on time."
+      },
+      {
+        "source_id": "INV001494",
+        "issue": "Concentration and headroom are outside the formula entirely. Open exposure of EUR 695.5k across five invoices equals about 79% of the sole insurer's EUR 880k credit limit, leaving little buffer if the 28-day lateness seen on the one settled invoice recurs across the open book."
+      },
+      {
+        "source_id": "INV001494",
+        "issue": "The credit limit was last reviewed in Jan 2025, over a year before this review dated 2026-09-15, so the EUR 880k limit against which utilisation is measured may not reflect current exposure levels."
+      },
+      {
+        "source_id": "INV001490",
+        "issue": "Staleness of the underlying payment snapshot: the 0 DPD observation is dated 2026-06-24 while the payment review is dated 2026-09-15, a gap of nearly three months. On the 90-day terms cited in INV001494, invoices open at the June snapshot could have reached or passed their due date without being reflected in the score."
+      }
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_score_breakdown",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY021\", \"score\": 0.0, \"band\": \"Healthy\", \"pd\": 0.01, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": \"CL01\"}, \"news\": {\"severity\": 0, \"category\": null, \"article_id\": null, \"age_days\": null, \"headline\": null, \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x 0.0 (payment, 0 DPD) + 0.35 x 0.0 (news) = 0.0\"}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "all"
+      },
+      "result": "[{\"id\": \"INV001490\", \"kind\": \"payment\", \"date\": \"2026-06-24\", \"detail\": \"5 open invoice(s) with CL01; worst is 0 days past due\", \"data\": {\"client_id\": \"CL01\", \"dpd\": 0, \"owed\": 695500.0, \"open_count\": 5}}, {\"id\": \"INV001494\", \"kind\": \"payment_review\", \"date\": \"2026-09-15\", \"detail\": \"No invoices are currently past due, but the only settled invoice on record (INV001489, \\u20ac195k) was paid 28 days"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "payment_review"
+      },
+      "result": "[{\"id\": \"INV001494\", \"kind\": \"payment_review\", \"date\": \"2026-09-15\", \"detail\": \"No invoices are currently past due, but the only settled invoice on record (INV001489, \\u20ac195k) was paid 28 days late, a flag worth monitoring. Open exposure of \\u20ac695.5k across five invoices runs to ~79% of the single \\u20ac880k credit limit held by one insurer, so headroom is limited if late payment recurs.\", \""
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "news"
+      },
+      "result": "[{\"note\": \"no news evidence\"}]"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The Healthy band is correct on the evidence: all five open invoices sit at 0 days past due and there is no adverse news or parent linkage, so both formula components are genuine zeros rather than gaps in coverage. However, a score of exactly 0.0 overstates the comfort available here. The payment agent's own review (INV001494) flags that the sole settled invoice on record was paid 28 days late against a 90-day term, that trend is explicitly \"insufficient_history\", and that open exposure of EUR 695.5k runs to roughly 79% of the single EUR 880k limit \u2014 none of which a current-DPD-only payment score can capture. I recommend the underwriter treat this as a thin-file Healthy with limited headroom rather than a clean risk.",
+        "concerns": [
+          {
+            "source_id": "INV001494",
+            "issue": "The payment score reads 0.0 off current DPD only and therefore ignores the single settled invoice on record (INV001489, EUR 195k), which was paid 28 days late against a 90-day term. With trend recorded as 'insufficient_history', the 0 DPD reading reflects invoices not yet due rather than a demonstrated record of paying on time."
+          },
+          {
+            "source_id": "INV001494",
+            "issue": "Concentration and headroom are outside the formula entirely. Open exposure of EUR 695.5k across five invoices equals about 79% of the sole insurer's EUR 880k credit limit, leaving little buffer if the 28-day lateness seen on the one settled invoice recurs across the open book."
+          },
+          {
+            "source_id": "INV001494",
+            "issue": "The credit limit was last reviewed in Jan 2025, over a year before this review dated 2026-09-15, so the EUR 880k limit against which utilisation is measured may not reflect current exposure levels."
+          },
+          {
+            "source_id": "INV001490",
+            "issue": "Staleness of the underlying payment snapshot: the 0 DPD observation is dated 2026-06-24 while the payment review is dated 2026-09-15, a gap of nearly three months. On the 90-day terms cited in INV001494, invoices open at the June snapshot could have reached or passed their due date without being reflected in the score."
+          }
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

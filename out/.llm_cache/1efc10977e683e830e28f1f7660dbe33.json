@@ -1,0 +1,111 @@
+{
+  "result": {
+    "assessment": "agree_with_caveats",
+    "rationale": "The Healthy band holds, and for the right reason: the payment component alone scores 33.3 raw, still below the 35 Watch threshold, so the band does not depend on the null news input propping it up. Nonetheless the score rests entirely on a single payment line \u2014 get_evidence returned no news and no parent records \u2014 so the 0.0 news score is an absence of search results rather than a verified clean screen, and 35% of the formula is carrying no information. Within the payment evidence the \"improving\" trend is thin and already contradicted: INV001567 (\u20ac86,900) is 25 days past due, and two of only three settled invoices were paid 46 and 55 days late against 45-day terms. I would pass this as Healthy but treat it as a near-threshold file warranting a refreshed limit review, not a clean one.",
+    "concerns": [
+      {
+        "source_id": "INV001567",
+        "issue": "This payment record is the only evidence on file for the buyer. No news or parent evidence was recorded, and the breakdown carries a null article_id, category and age_days, so the 0.0 news score is a default for 'nothing found' rather than an adjudicated clean screen. Because news carries a 0.35 weight, that null input dilutes the composite from a payment raw of 33.3 down to 21.7, making the file present as materially safer than the only real evidence supports. Underwriter should confirm the news screen actually ran against this entity before relying on the Healthy label."
+      },
+      {
+        "source_id": "INV001567",
+        "issue": "The band has very little headroom. The payment raw of 33.3, driven by 25 DPD on worst line CL01, sits under the 35 Watch threshold by under two points. Further slippage on this single line pushes the payment component into Watch territory on its own."
+      },
+      {
+        "source_id": "INV001567",
+        "issue": "The 'improving' trend label overstates the evidence. It rests on only three settled invoices, two of which were paid 46 and 55 days late against 45-day terms; a single 10-day settlement is the sole basis for the improvement claim. The current open invoice at 25 days past due already breaks that pattern, so the trend direction is not established."
+      },
+      {
+        "source_id": "INV001567",
+        "issue": "Credit line staleness is understated in the payment review text. The \u20ac430,000 line was last reviewed 2024-10-24 against an evidence date of 2026-08-31 \u2014 substantially longer than the 'over a year' described. Open exposure of \u20ac189,100 across 3 invoices is within the line, but the line has not been tested against current payment behaviour."
+      }
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_score_breakdown",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY023\", \"score\": 21.7, \"band\": \"Healthy\", \"pd\": 0.1167, \"payment\": {\"dpd\": 25, \"raw\": 33.3, \"weighted\": 21.7, \"worst_line\": \"CL01\"}, \"news\": {\"severity\": 0, \"category\": null, \"article_id\": null, \"age_days\": null, \"headline\": null, \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x 33.3 (payment, 25 DPD) + 0.35 x 0.0 (news) = 21.7\"}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "all"
+      },
+      "result": "[{\"id\": \"INV001567\", \"kind\": \"payment\", \"date\": \"2026-08-31\", \"detail\": \"3 open invoice(s) with CL01; worst is 25 days past due\", \"data\": {\"client_id\": \"CL01\", \"dpd\": 25, \"owed\": 189100.0, \"open_count\": 3}}, {\"id\": \"INV001567\", \"kind\": \"payment_review\", \"date\": \"2026-08-31\", \"detail\": \"Kessler Traders GmbH shows a clear improvement in settlement behavior: days-late fell from 46 and 55 days on the "
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "news"
+      },
+      "result": "[{\"note\": \"no news evidence\"}]"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "parent"
+      },
+      "result": "[{\"note\": \"no parent evidence\"}]"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "payment"
+      },
+      "result": "[{\"id\": \"INV001567\", \"kind\": \"payment\", \"date\": \"2026-08-31\", \"detail\": \"3 open invoice(s) with CL01; worst is 25 days past due\", \"data\": {\"client_id\": \"CL01\", \"dpd\": 25, \"owed\": 189100.0, \"open_count\": 3}}]"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The Healthy band holds, and it holds for the right reason: the payment component alone scores 33.3 raw, still below the 35 Watch threshold, so the band does not depend on the null news input propping it up. Nonetheless the score is built on a single payment line with no corroborating news or parent evidence, and the 0.0 news score is an absence of search results rather than a verified clean screen \u2014 35% of the formula is contributing no information. Within the payment evidence the \"improving\" trend is thin and already contradicted: INV001567 (\u20ac86,900) is 25 days past due, and two of only three settled invoices were paid 46 and 55 days late against 45-day terms. I would pass this as Healthy but flag it as a near-threshold case warranting a refreshed limit review rather than a clean file.",
+        "concerns": [
+          {
+            "source_id": "news",
+            "issue": "No news evidence and no parent evidence were recorded, and the breakdown carries a null article_id, category and age_days. The 0.0 news score is therefore a default for 'nothing found', not an adjudicated clean screen. Because news carries a 0.35 weight, this null input pulls the composite down from a payment raw of 33.3 to 21.7 \u2014 a 11.6-point dilution that makes the file look materially safer than the only real evidence supports. Underwriter should confirm the news screen actually ran against this entity before relying on the Healthy label."
+          },
+          {
+            "source_id": "INV001567",
+            "issue": "The band is close to its boundary. Payment raw of 33.3 sits under the 35 Watch threshold by under two points, and it is driven by 25 DPD on the worst line CL01. Any further slippage on this single line moves the payment component into Watch territory on its own, so the Healthy classification has very little headroom."
+          },
+          {
+            "source_id": "INV001567",
+            "issue": "The 'improving' trend label overstates the evidence. It rests on only three settled invoices, two of which were paid 46 and 55 days late against 45-day terms; the single 10-day settlement is the sole basis for the improvement claim. The current open invoice at 25 days past due already breaks that pattern, so the trend direction is not established."
+          },
+          {
+            "source_id": "INV001567",
+            "issue": "Credit line staleness is understated in the review text. The line of \u20ac430,000 was last reviewed 2024-10-24 against an evidence date of 2026-08-31 \u2014 substantially longer than the 'over a year' described. Open exposure of \u20ac189,100 across 3 invoices is within the line, but the line itself has not been tested against current payment behaviour."
+          }
+        ]
+      },
+      "error": "not evidence for this buyer: ['news']; cite ids from get_evidence"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The Healthy band holds, and for the right reason: the payment component alone scores 33.3 raw, still below the 35 Watch threshold, so the band does not depend on the null news input propping it up. Nonetheless the score rests entirely on a single payment line \u2014 get_evidence returned no news and no parent records \u2014 so the 0.0 news score is an absence of search results rather than a verified clean screen, and 35% of the formula is carrying no information. Within the payment evidence the \"improving\" trend is thin and already contradicted: INV001567 (\u20ac86,900) is 25 days past due, and two of only three settled invoices were paid 46 and 55 days late against 45-day terms. I would pass this as Healthy but treat it as a near-threshold file warranting a refreshed limit review, not a clean one.",
+        "concerns": [
+          {
+            "source_id": "INV001567",
+            "issue": "This payment record is the only evidence on file for the buyer. No news or parent evidence was recorded, and the breakdown carries a null article_id, category and age_days, so the 0.0 news score is a default for 'nothing found' rather than an adjudicated clean screen. Because news carries a 0.35 weight, that null input dilutes the composite from a payment raw of 33.3 down to 21.7, making the file present as materially safer than the only real evidence supports. Underwriter should confirm the news screen actually ran against this entity before relying on the Healthy label."
+          },
+          {
+            "source_id": "INV001567",
+            "issue": "The band has very little headroom. The payment raw of 33.3, driven by 25 DPD on worst line CL01, sits under the 35 Watch threshold by under two points. Further slippage on this single line pushes the payment component into Watch territory on its own."
+          },
+          {
+            "source_id": "INV001567",
+            "issue": "The 'improving' trend label overstates the evidence. It rests on only three settled invoices, two of which were paid 46 and 55 days late against 45-day terms; a single 10-day settlement is the sole basis for the improvement claim. The current open invoice at 25 days past due already breaks that pattern, so the trend direction is not established."
+          },
+          {
+            "source_id": "INV001567",
+            "issue": "Credit line staleness is understated in the payment review text. The \u20ac430,000 line was last reviewed 2024-10-24 against an evidence date of 2026-08-31 \u2014 substantially longer than the 'over a year' described. Open exposure of \u20ac189,100 across 3 invoices is within the line, but the line has not been tested against current payment behaviour."
+          }
+        ]
+      }
+    }
+  ],
+  "turns": 5
+}

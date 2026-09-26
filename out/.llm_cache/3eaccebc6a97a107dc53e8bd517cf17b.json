@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY017",
+    "name": "Rheinfels Industries GmbH",
+    "severity": 0,
+    "category": "appointment",
+    "reason": "Article reports a routine senior management appointment (new COO) at Rheinfels Industries GmbH, described as planned strengthening of the leadership team with no negative financial implications."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "RHEINFELS"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY017\", \"name\": \"Rheinfels Industries GmbH\", \"sector\": \"Chemicals\", \"city\": \"Duisburg\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY017",
+        "severity": 0,
+        "category": "appointment",
+        "reason": "Article reports a routine senior management appointment (new COO) at Rheinfels Industries GmbH, described as planned strengthening of the leadership team with no negative financial implications."
+      }
+    }
+  ],
+  "turns": 2
+}

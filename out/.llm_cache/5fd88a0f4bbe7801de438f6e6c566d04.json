@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "parent",
+    "id": "PAR03",
+    "name": "Northpoint Industrial Holdings Ltd",
+    "severity": 5,
+    "category": "debt_restructuring",
+    "reason": "Northpoint Industrial Holdings Ltd is reported to be in restructuring talks with lenders on consolidated debt, with tightening cash flows and harder intra-group support, indicating severe financial distress at the parent level."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Northpoint"
+      },
+      "result": "[{\"kind\": \"parent\", \"id\": \"PAR03\", \"name\": \"Northpoint Industrial Holdings Ltd\", \"sector\": \"holding company\", \"city\": \"London\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "PAR03"
+      },
+      "result": "{\"id\": \"PAR03\", \"kind\": \"parent\", \"name\": \"Northpoint Industrial Holdings Ltd\", \"hq\": \"London\", \"listed\": \"N\", \"subsidiaries\": [{\"id\": \"BUY025\", \"name\": \"Westbridge Packaging Ltd\"}, {\"id\": \"BUY011\", \"name\": \"Marchetti Mills SpA\"}]}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "parent",
+        "entity_id": "PAR03",
+        "severity": 5,
+        "category": "debt_restructuring",
+        "reason": "Northpoint Industrial Holdings Ltd is reported to be in restructuring talks with lenders on consolidated debt, with tightening cash flows and harder intra-group support, indicating severe financial distress at the parent level."
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -2,8 +2,12 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
-out/
-.llm_cache/
+# git will not descend into an ignored directory, so ignore the contents of out/
+# rather than out/ itself - otherwise the negation below can never take effect.
+out/*
+# ...except the agent cache: model decisions over synthetic articles, so a clone gets
+# the Claude-quality output with no key, no network and no cost.
+!out/.llm_cache/
 .DS_Store
 .idea/
 .vscode/

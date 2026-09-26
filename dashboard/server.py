@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import html
 import json
+import traceback
 import urllib.parse
-from datetime import date
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
@@ -16,17 +16,18 @@ from ews.agents import definition
 
 HERE = Path(__file__).resolve().parent
 BANNER = "HACKATHON PROTOTYPE &middot; SYNTHETIC DATA"
+TABS = ("case", "score", "limit", "payments", "news", "agents")
 
 DEMO_STEPS = [
-    "Chandra Mills appoints new plant head (severity 0)",
-    "Indus Crest scales back operations (severity 3)",
-    "Vendors say Lakshya has fallen behind on payments (severity 4)",
+    "Marchetti Mills appoints new plant head (severity 0)",
+    "Nordkrans scales back operations (severity 3)",
+    "Vendors say Larsson has fallen behind on payments (severity 4)",
     "Workers at Oakhurst protest over delayed wages (severity 5)",
-    "Udaan LOGISTICS wage protest - a decoy, must be refused",
-    "Workers at Udaan TRADERS protest over delayed wages (severity 5)",
+    "Kessler LOGISTICS wage protest - a decoy, must be refused",
+    "Workers at Kessler TRADERS protest over delayed wages (severity 5)",
     "Northpoint parent in restructuring talks - fans out to two subsidiaries",
 ]
-SWAP_STEP = "Payment data updates: Udaan moves from 25 to 40 days past due"
+SWAP_STEP = "Payment data updates: Kessler moves from 25 to 40 days past due"
 
 STATE = {"step": 0, "swap": False}
 _CACHE: dict[tuple[int, bool], dict] = {}
@@ -46,11 +47,11 @@ def e(x) -> str:
 
 def money(v: float) -> str:
     v = float(v)
-    if abs(v) >= 1e7:
-        return f"&#8377;{v/1e7:,.2f} Cr"
-    if abs(v) >= 1e5:
-        return f"&#8377;{v/1e5:,.1f} L"
-    return f"&#8377;{v:,.0f}"
+    if abs(v) >= 1e6:
+        return f"&euro;{v/1e6:,.2f}M"
+    if abs(v) >= 1e3:
+        return f"&euro;{v/1e3:,.0f}k"
+    return f"&euro;{v:,.0f}"
 
 
 def band_pill(band: str) -> str:
@@ -141,9 +142,7 @@ def page(title: str, body: str, theme: str = "") -> bytes:
 <footer>
   <b>{BANNER}</b><br>
   Every buyer, insurer, invoice and news article here is fabricated. No real counterparty appears.
-  Not reviewed by Risk or Compliance, and not a product.<br>
-  Design tokens copied from TCS-Frontend; insurers without a published variation fall back to
-  the default theme. Built {date.today().isoformat()}.
+  Not reviewed by Risk or Compliance, and not a product.
 </footer>
 </div></body></html>""".encode()
 
@@ -151,7 +150,8 @@ def page(title: str, body: str, theme: str = "") -> bytes:
 def crumbs(*parts) -> str:
     out = []
     for label, href in parts:
-        out.append(f'<a href="{href}">{e(label)}</a>' if href else e(label))
+        # the href is built from ids that come from CSV: escape it like any other input
+        out.append(f'<a href="{e(href)}">{e(label)}</a>' if href else e(label))
     return f'<div class="crumb">{" &rsaquo; ".join(out)}</div>'
 
 
@@ -161,11 +161,11 @@ def demo_panel() -> str:
         cls = "done" if i <= STATE["step"] else ("next" if i == STATE["step"] + 1 else "")
         mark = "&#10003;" if i <= STATE["step"] else f"{i}."
         rows.append(f'<div class="step {cls}">{mark} {e(text)}</div>')
-    swap_cls = "done" if STATE["swap"] else ("next" if STATE["step"] == 7 else "")
+    swap_cls = "done" if STATE["swap"] else ("next" if STATE["step"] == len(DEMO_STEPS) else "")
     rows.append(f'<div class="step {swap_cls}">'
                 f'{"&#10003;" if STATE["swap"] else "8."} {e(SWAP_STEP)}</div>')
 
-    if STATE["step"] < 7:
+    if STATE["step"] < len(DEMO_STEPS):
         nxt = f'<a class="btn" href="/demo/next">Publish article {STATE["step"]+1}</a>'
     elif not STATE["swap"]:
         nxt = '<a class="btn" href="/demo/next">Update payment data</a>'
@@ -179,38 +179,44 @@ def demo_panel() -> str:
 
 
 # ---------------------------------------------------------------- pages
-def action_counts(data: dict, cid: str) -> dict[str, int]:
-    counts = {"FREEZE": 0, "REDUCE": 0}
-    for r in data["buyers"]:
-        for l in r["limits"]:
-            if l["client_id"] == cid and l["action"] in counts:
-                counts[l["action"]] += 1
-    return counts
-
-
 def home() -> bytes:
     data = snapshot()
     cards = []
     for c in data["clients"]:
         b = c["bands"]
-        acts = action_counts(data, c["client_id"])
-        bands = " ".join(f'{band_pill(k)} <b>{b.get(k, 0)}</b>'
-                         for k in ("High Risk", "Watch", "Healthy"))
+        counts = " ".join(f'{band_pill(k)} <b>{b.get(k, 0)}</b>'
+                          for k in ("High Risk", "Watch", "Healthy"))
         cards.append(f"""<a class="card" href="/client/{e(c['client_id'])}">
 <h4>{e(c['client_name'])}</h4>
 <div class="overline">{e(c['city'])}</div>
 <div class="metric"><span>Buyers</span><b>{c['buyers']}</b></div>
-<div class="metric"><span>Bands</span><span class="bands">{bands}</span></div>
-<div class="metric"><span>Expected loss</span><b>{money(c['expected_loss'])}</b></div>
-<div class="metric"><span>Actions pending</span><b>{c['actions_pending']}
-<span class="overline">({acts['FREEZE']} FREEZE + {acts['REDUCE']} REDUCE)</span></b></div></a>""")
+<div class="metric"><span>Bands</span><span class="bands">{counts}</span></div></a>""")
+
+    bands = {k: sum(1 for r in data["buyers"] if r["verdict"]["band"] == k)
+             for k in ("High Risk", "Watch", "Healthy")}
+    engine_label = "Claude agents" if data["llm"] == "claude" else "rules engine"
+
+    def stat(figure, label, dot=""):
+        mark = f'<span class="dot {dot}"></span>' if dot else ""
+        return (f'<div class="stat"><div class="figure">{figure}</div>'
+                f'<div class="statlabel">{mark}{label}</div></div>')
+
+    tiles = [stat(len(data["buyers"]), "Buyers watched"),
+             stat(bands["High Risk"], "High risk", dot="high"),
+             stat(bands["Watch"], "Watch", dot="watch")]
 
     return page("Buyer Early Warning", f"""
-{crumbs(("Home", None))}
-<h1>Buyer Early Warning</h1>
-<p class="sub">As of {e(data['as_of'])} &middot; scoring engine: {e(data['llm'])}
-&middot; {len(data['buyers'])} buyers across {len(data['clients'])} insurers
-&middot; <a href="/demo">Live demo &rsaquo;</a></p>
+<div class="hero">
+<p class="masthead">Buyer Early Warning</p>
+<h1>Today&rsquo;s risk across every insurer</h1>
+<p class="lede">Every covered buyer is scored each day on how it pays and what is
+written about it. Anything that leaves Healthy surfaces here with the limit action it
+warrants &mdash; while there is still limit to cut.</p>
+<div class="statrow">{"".join(tiles)}</div>
+<p class="meta">As of {e(data['as_of'])} &middot; <span class="engine">{engine_label}</span>
+&middot; {len(data['clients'])} insurers &middot; <a href="/demo">Live demo &rsaquo;</a></p>
+</div>
+<h2>Insurers</h2>
 <div class="cards">{"".join(cards)}</div>""")
 
 
@@ -290,11 +296,14 @@ def client_page(cid: str) -> bytes:
             ("News Score", True), ("Band", False), ("DPD", True),
             ("Worst news", True), ("Expected loss", True), ("Recommended action", False)]))
 
+    actions_note = (f" &middot; {client['actions_pending']} limit action"
+                    f"{'s' if client['actions_pending'] != 1 else ''} available"
+                    if client["actions_pending"] else "")
     return page(client["client_name"], f"""
 {crumbs(("Home", "/"), (client["client_name"], None))}
 <h1>{e(client["client_name"])}</h1>
 <p class="sub">{client['buyers']} buyers &middot; {money(client['expected_loss'])} expected loss
-&middot; {client['actions_pending']} actions pending. This insurer sees only its own buyers.</p>
+{actions_note}. This insurer sees only its own buyers.</p>
 <div class="chips">{chips}</div>
 <table id="buyers"><thead><tr>{heads}</tr></thead>
 <tbody>{"".join(rows)}</tbody></table>
@@ -540,6 +549,15 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):                 # noqa: N802
+        try:
+            self._route()
+        except Exception as exc:                                   # noqa: BLE001
+            # a traceback in the browser is the worst thing that can happen mid-demo
+            traceback.print_exc()
+            self._send(page("Error", f"<h1>Something went wrong</h1>"
+                                     f'<div class="panel"><code>{e(exc)}</code></div>'), code=500)
+
+    def _route(self):
         url = urllib.parse.urlparse(self.path)
         parts = [p for p in url.path.split("/") if p]
         query = urllib.parse.parse_qs(url.query)
@@ -551,11 +569,14 @@ class Handler(BaseHTTPRequestHandler):
         if url.path == "/demo":
             return self._send(demo_page())
         if parts[:1] == ["client"] and len(parts) == 2:
-            return self._send(client_page(parts[1]))
+            body = client_page(parts[1])
+            return self._send(body, code=404 if b"Unknown insurer" in body else 200)
         if parts[:1] == ["buyer"] and len(parts) == 2:
-            return self._send(buyer_page(parts[1], query.get("tab", ["case"])[0]))
+            tab = query.get("tab", ["case"])[0]
+            body = buyer_page(parts[1], tab if tab in TABS else "case")
+            return self._send(body, code=404 if b"Unknown buyer" in body else 200)
         if url.path == "/demo/next":
-            if STATE["step"] < 7:
+            if STATE["step"] < len(DEMO_STEPS):
                 STATE["step"] += 1
             elif not STATE["swap"]:
                 STATE["swap"] = True

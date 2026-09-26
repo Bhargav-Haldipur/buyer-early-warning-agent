@@ -1,0 +1,78 @@
+{
+  "result": {
+    "assessment": "agree_with_caveats",
+    "rationale": "The Healthy band is supported by the evidence as recorded: the sole news item is verified from full text as a routine plant-head appointment with no distress signal, correctly scored severity 0, and open exposure of EUR 221k sits within the EUR 310k credit limit. However, the entire 21.7 score rests on a single payment input (25 DPD) captured 2026-08-31, which is materially older than the news input dated 2026-09-20 and scored at 5 days old. The payment agent itself flags insufficient history (only 2 settled invoices, both paid late at 9 and 11 days) so the model is banding a buyer whose trend cannot yet be established. I agree with Healthy but the underwriter should refresh the DPD position before this goes out.",
+    "concerns": [
+      {
+        "source_id": "INV000777",
+        "issue": "Staleness of the sole score driver: the payment evidence is dated 2026-08-31 while the news evidence is dated 2026-09-20 and scored at 5 days old. The 25 DPD figure produces the 33.3 payment raw that is the only non-zero input to the 21.7 score. If INV000777 (EUR 41,500) remains unpaid since that snapshot, the DPD underpinning the band has advanced and the score should be recomputed on current data before issue."
+      },
+      {
+        "source_id": "INV000777",
+        "issue": "Thin history undermines confidence in the band, not just the trend. The payment review records trend as 'insufficient_history' with only 2 settled invoices, both paid late (9 and 11 days), against generous 90-day terms. A Healthy band implies a demonstrated record the file does not contain; the formula treats absence of adverse history the same as good history."
+      },
+      {
+        "source_id": "NWSDEMO01",
+        "issue": "The news component contributes 0.0 on the strength of a single routine item, so 35% of the model weight reflects absence of coverage rather than a positive clean finding. This is correctly scored and I do not dispute it, but it means the Healthy band is effectively a payment-only judgement and carries no independent corroboration."
+      },
+      {
+        "source_id": "INV000777",
+        "issue": "Control gap flagged by the payment agent and not reflected in the score: the credit line was last reviewed Sep 2024 and predates the current overdue activity. The EUR 310k limit that makes the EUR 221k exposure look comfortable has not been revalidated against recent behaviour."
+      }
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_score_breakdown",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY011\", \"score\": 21.7, \"band\": \"Healthy\", \"pd\": 0.1167, \"payment\": {\"dpd\": 25, \"raw\": 33.3, \"weighted\": 21.7, \"worst_line\": \"CL03\"}, \"news\": {\"severity\": 0, \"category\": \"appointment\", \"article_id\": \"NWSDEMO01\", \"age_days\": 5, \"headline\": \"Marchetti Mills appoints new plant head at Biella unit\", \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x "
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "all"
+      },
+      "result": "[{\"id\": \"INV000777\", \"kind\": \"payment\", \"date\": \"2026-08-31\", \"detail\": \"4 open invoice(s) with CL03; worst is 25 days past due\", \"data\": {\"client_id\": \"CL03\", \"dpd\": 25, \"owed\": 221000.0, \"open_count\": 4}}, {\"id\": \"INV000777\", \"kind\": \"payment_review\", \"date\": \"2026-08-31\", \"detail\": \"Marchetti Mills SpA has one overdue invoice (INV000777, \\u20ac41,500, 25 DPD) while three others remain within te"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "NWSDEMO01"
+      },
+      "result": "{\"article_id\": \"NWSDEMO01\", \"published_date\": \"2026-09-20\", \"publication\": \"Business Dispatch\", \"headline\": \"Marchetti Mills appoints new plant head at Biella unit\", \"body\": \"Marchetti Mills SpA has appointed a new plant head to oversee operations at its Biella facility, as part of a routine leadership refresh across its manufacturing sites.\"}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "parent"
+      },
+      "result": "[{\"note\": \"no parent evidence\"}]"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The Healthy band is supported by the evidence as recorded: the sole news item is verified from full text as a routine plant-head appointment with no distress signal, correctly scored severity 0, and open exposure of EUR 221k sits within the EUR 310k credit limit. However, the entire 21.7 score rests on a single payment input (25 DPD) captured 2026-08-31, which is materially older than the news input dated 2026-09-20 and scored at 5 days old. The payment agent itself flags insufficient history (only 2 settled invoices, both paid late at 9 and 11 days) so the model is banding a buyer whose trend cannot yet be established. I agree with Healthy but the underwriter should refresh the DPD position before this goes out.",
+        "concerns": [
+          {
+            "source_id": "INV000777",
+            "issue": "Staleness of the sole score driver: the payment evidence is dated 2026-08-31 while the news evidence is dated 2026-09-20 and scored at 5 days old. The 25 DPD figure produces the 33.3 payment raw that is the only non-zero input to the 21.7 score. If INV000777 (EUR 41,500) remains unpaid since that snapshot, the DPD underpinning the band has advanced and the score should be recomputed on current data before issue."
+          },
+          {
+            "source_id": "INV000777",
+            "issue": "Thin history undermines confidence in the band, not just the trend. The payment review records trend as 'insufficient_history' with only 2 settled invoices, both paid late (9 and 11 days), against generous 90-day terms. A Healthy band implies a demonstrated record the file does not contain; the formula treats absence of adverse history the same as good history."
+          },
+          {
+            "source_id": "NWSDEMO01",
+            "issue": "The news component contributes 0.0 on the strength of a single routine item, so 35% of the model weight reflects absence of coverage rather than a positive clean finding. This is correctly scored and I do not dispute it, but it means the Healthy band is effectively a payment-only judgement and carries no independent corroboration."
+          },
+          {
+            "source_id": "INV000777",
+            "issue": "Control gap flagged by the payment agent and not reflected in the score: the credit line was last reviewed Sep 2024 and predates the current overdue activity. The EUR 310k limit that makes the EUR 221k exposure look comfortable has not been revalidated against recent behaviour."
+          }
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

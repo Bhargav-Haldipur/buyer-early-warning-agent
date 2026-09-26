@@ -23,7 +23,7 @@ A wrong match puts a healthy company on a risk watchlist.
 Match only when the leading brand word matches AND every other distinguishing word in the
 mention appears in that entity's own registered name. Legal-form words (Pvt, Ltd,
 Limited, LLP) and the generic "Inds." may be ignored. A different line of business is
-decisive: "Arcline Media Pvt Ltd" is not "Arcline Fabricators Limited". If in doubt,
+decisive: "Arcline Media BV" is not "Arcline Fabrications NV". If in doubt,
 answer kind "none". A story about a parent holding company is kind "parent".
 
 ## Severity for the matched entity

@@ -1,0 +1,45 @@
+{
+  "result": {
+    "trend": "insufficient_history",
+    "summary": "Maasland Agro Processing BV has one seriously overdue invoice (INV000340, 55 DPD, \u20ac140,000) alongside \u20ac1.13M in other open invoices not yet past due, against a single active credit line of \u20ac1.38M with 60-day terms. No settled invoice history is available to assess a payment trend, so this overdue exposure combined with total open exposure approaching the credit limit warrants close monitoring.",
+    "concerns": [
+      "Invoice INV000340 is 55 days past due with no settled payment history to gauge whether late payment is typical or exceptional",
+      "Total open invoice exposure (~\u20ac1.27M) is close to the single insurer's credit limit of \u20ac1.38M",
+      "Only one insurer holds a credit line on this buyer, concentrating risk",
+      "Lack of any settled invoice history prevents trend analysis and raises data quality/monitoring concerns"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_invoices",
+      "input": {},
+      "result": "[{\"invoice_id\": \"INV000340\", \"client_id\": \"CL03\", \"invoice_date\": \"2026-06-02\", \"due_date\": \"2026-08-01\", \"amount_eur\": 140000.0, \"days_past_due\": 55}, {\"invoice_id\": \"INV000339\", \"client_id\": \"CL03\", \"invoice_date\": \"2026-05-23\", \"due_date\": \"2026-07-22\", \"amount_eur\": 216400.0, \"days_past_due\": 0}, {\"invoice_id\": \"INV000338\", \"client_id\": \"CL03\", \"invoice_date\": \"2026-05-14\", \"due_date\": \"2026-0"
+    },
+    {
+      "tool": "get_payment_history",
+      "input": {},
+      "result": "[{\"note\": \"no settled invoices\"}]"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"CL03\", \"credit_limit_eur\": 1380000.0, \"payment_terms_days\": 60, \"limit_status\": \"Active\", \"last_reviewed_date\": \"2024-07-07\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 55,
+        "worst_invoice_id": "INV000340",
+        "trend": "insufficient_history",
+        "summary": "Maasland Agro Processing BV has one seriously overdue invoice (INV000340, 55 DPD, \u20ac140,000) alongside \u20ac1.13M in other open invoices not yet past due, against a single active credit line of \u20ac1.38M with 60-day terms. No settled invoice history is available to assess a payment trend, so this overdue exposure combined with total open exposure approaching the credit limit warrants close monitoring.",
+        "concerns": [
+          "Invoice INV000340 is 55 days past due with no settled payment history to gauge whether late payment is typical or exceptional",
+          "Total open invoice exposure (~\u20ac1.27M) is close to the single insurer's credit limit of \u20ac1.38M",
+          "Only one insurer holds a credit line on this buyer, concentrating risk",
+          "Lack of any settled invoice history prevents trend analysis and raises data quality/monitoring concerns"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

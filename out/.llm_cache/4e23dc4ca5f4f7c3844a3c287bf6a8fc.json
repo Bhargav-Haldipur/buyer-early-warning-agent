@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY024",
+    "name": "Verhoeven Chemicals BV",
+    "severity": 0,
+    "category": "higher_volumes",
+    "reason": "Article reports higher dispatch volumes and stable realisations for Verhoeven Chemicals BV, a positive/neutral operational update with no negative credit implications."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Verhoeven"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY024\", \"name\": \"Verhoeven Chemicals BV\", \"sector\": \"Chemicals\", \"city\": \"Terneuzen\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY024",
+        "severity": 0,
+        "category": "higher_volumes",
+        "reason": "Article reports higher dispatch volumes and stable realisations for Verhoeven Chemicals BV, a positive/neutral operational update with no negative credit implications."
+      }
+    }
+  ],
+  "turns": 2
+}

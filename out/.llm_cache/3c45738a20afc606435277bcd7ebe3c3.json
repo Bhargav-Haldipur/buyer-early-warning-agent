@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY014",
+    "name": "Nordkrans Steel Traders AB",
+    "severity": 3,
+    "category": "capacity_cut",
+    "reason": "Nordkrans has scaled back production at its Malmo facility due to softer demand in steel trading, indicating a mild negative operational contraction."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Nordkrans"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY014\", \"name\": \"Nordkrans Steel Traders AB\", \"sector\": \"Steel Trading\", \"city\": \"Malmo\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY014"
+      },
+      "result": "{\"id\": \"BUY014\", \"kind\": \"buyer\", \"name\": \"Nordkrans Steel Traders AB\", \"short_name\": \"Nordkrans\", \"sector\": \"Steel Trading\", \"city\": \"Malmo\", \"size_band\": \"mid\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY014",
+        "severity": 3,
+        "category": "capacity_cut",
+        "reason": "Nordkrans has scaled back production at its Malmo facility due to softer demand in steel trading, indicating a mild negative operational contraction."
+      }
+    }
+  ],
+  "turns": 3
+}

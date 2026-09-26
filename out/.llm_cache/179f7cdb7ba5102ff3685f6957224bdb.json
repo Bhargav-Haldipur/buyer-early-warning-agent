@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY002",
+    "name": "Arcline Fabrications NV",
+    "severity": 4,
+    "category": "legal_notice_unpaid_dues",
+    "reason": "A supplier has served a legal notice on Arcline Fabrications NV over dues unpaid for more than six months, with a second such notice reported this financial year, indicating a pattern of payment delays to vendors."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Arcline"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY002\", \"name\": \"Arcline Fabrications NV\", \"sector\": \"Steel Fabrication\", \"city\": \"Antwerp\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY002"
+      },
+      "result": "{\"id\": \"BUY002\", \"kind\": \"buyer\", \"name\": \"Arcline Fabrications NV\", \"short_name\": \"Arcline\", \"sector\": \"Steel Fabrication\", \"city\": \"Antwerp\", \"size_band\": \"mid\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY002",
+        "severity": 4,
+        "category": "legal_notice_unpaid_dues",
+        "reason": "A supplier has served a legal notice on Arcline Fabrications NV over dues unpaid for more than six months, with a second such notice reported this financial year, indicating a pattern of payment delays to vendors."
+      }
+    }
+  ],
+  "turns": 3
+}

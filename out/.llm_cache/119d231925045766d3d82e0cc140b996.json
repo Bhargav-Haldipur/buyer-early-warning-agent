@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY013",
+    "name": "Falcon Electronics Supply BV",
+    "severity": 0,
+    "category": "capacity_expansion",
+    "reason": "Article reports a positive capacity expansion at Falcon Electronics Supply's Eindhoven facility, funded via internal accruals and a term facility, with demand support from existing customers - no negative credit signal."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Falcon Electronics"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY013\", \"name\": \"Falcon Electronics Supply BV\", \"sector\": \"Electronics\", \"city\": \"Eindhoven\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY013",
+        "severity": 0,
+        "category": "capacity_expansion",
+        "reason": "Article reports a positive capacity expansion at Falcon Electronics Supply's Eindhoven facility, funded via internal accruals and a term facility, with demand support from existing customers - no negative credit signal."
+      }
+    }
+  ],
+  "turns": 2
+}

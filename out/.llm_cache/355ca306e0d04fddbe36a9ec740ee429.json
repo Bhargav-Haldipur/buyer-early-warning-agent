@@ -1,0 +1,84 @@
+{
+  "result": {
+    "assessment": "agree_with_caveats",
+    "rationale": "The Healthy band is defensible: the worst open item is 18 DPD giving a payment raw of 24.0, no news or parent evidence exists so the news component contributes 0.0, and the resulting 15.6 sits far below the 35 Watch threshold \u2014 payment raw would have to roughly double to change the band, so the verdict is robust. Two caveats the formula cannot express: it reads a point-in-time worst DPD and is blind to the deteriorating trend the payment agent flags, and it ignores the undiversified single-insurer exposure on CL05. Separately, the 0.0 news score reflects that no article was matched (article_id null, severity 0) rather than adverse coverage being searched and ruled out \u2014 thin coverage is expected for a private mid-size firm, but 35% of the weight rests on a null and should be read as 'nothing found', not 'verified clean'. Release as scored with these points surfaced.",
+    "concerns": [
+      {
+        "source_id": "INV002195",
+        "issue": "The score reflects only the point-in-time worst DPD (18) and does not capture trajectory. The payment agent records settled invoices moving 4 days late -> on-time -> 9 days late, with the current open item at 18 DPD \u2014 double the prior worst settled lateness of 9 days. The direction of travel is adverse even though the level is still modest, and further deterioration would move this buyer toward Watch faster than the current 15.6 suggests."
+      },
+      {
+        "source_id": "INV002195",
+        "issue": "Concentration risk is not an input to the formula at all. A single insurer (CL05) holds the entire EUR 420,000 active credit limit with no diversification and no recent limit review. Current exposure is EUR 184,401 across 3 open invoices, and two of those (EUR 61,467 and EUR 65,167) are not yet due, so near-term exposure grows if the lateness pattern continues. A limit review is advisable despite the Healthy band."
+      }
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_score_breakdown",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY033\", \"score\": 15.6, \"band\": \"Healthy\", \"pd\": 0.0802, \"payment\": {\"dpd\": 18, \"raw\": 24.0, \"weighted\": 15.6, \"worst_line\": \"CL05\"}, \"news\": {\"severity\": 0, \"category\": null, \"article_id\": null, \"age_days\": null, \"headline\": null, \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x 24.0 (payment, 18 DPD) + 0.35 x 0.0 (news) = 15.6\"}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "all"
+      },
+      "result": "[{\"id\": \"INV002195\", \"kind\": \"payment\", \"date\": \"2026-09-07\", \"detail\": \"3 open invoice(s) with CL05; worst is 18 days past due\", \"data\": {\"client_id\": \"CL05\", \"dpd\": 18, \"owed\": 184401.0, \"open_count\": 3}}, {\"id\": \"INV002195\", \"kind\": \"payment_review\", \"date\": \"2026-09-07\", \"detail\": \"Rautio Plastics Oy shows a worsening payment pattern: settled invoices went from 4 days late to on-time to 9 days"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "news"
+      },
+      "result": "[{\"note\": \"no news evidence\"}]"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "parent"
+      },
+      "result": "[{\"note\": \"no parent evidence\"}]"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The Healthy band is defensible on the evidence: the worst open item is 18 DPD giving a payment raw of 24.0, no news evidence exists to lift the news component above 0.0, and the resulting 15.6 sits far below the 35 Watch threshold \u2014 payment raw would have to reach roughly double its current level to change the band, so the verdict is robust to reasonable assumptions. However, the formula reads a point-in-time worst DPD and is blind to trajectory, and the payment agent explicitly flags a deteriorating trend that the score cannot express. Combined with undiversified single-insurer exposure on CL05 and two further invoices not yet due, this is a Healthy buyer that warrants monitoring rather than a clean file. I would release the band as scored with the trend and concentration points surfaced to the underwriter.",
+        "concerns": [
+          {
+            "source_id": "INV002195",
+            "issue": "The score reflects only the point-in-time worst DPD (18) and does not capture trajectory. The payment agent records settled invoices moving 4 days late -> on-time -> 9 days late, with the current open item at 18 DPD \u2014 double the prior worst settled lateness of 9 days. The direction of travel is adverse even though the level is still modest, and a further deterioration would move this buyer toward Watch faster than the current 15.6 suggests."
+          },
+          {
+            "source_id": "INV002195",
+            "issue": "Concentration risk is not an input to the formula at all. A single insurer (CL05) holds the entire EUR 420,000 active credit limit with no diversification and no recent limit review. Current exposure is EUR 184,401 across 3 open invoices, and two of those (EUR 61,467 and EUR 65,167) are not yet due \u2014 so near-term exposure grows if the lateness pattern continues. A limit review is advisable despite the Healthy band."
+          },
+          {
+            "source_id": "news",
+            "issue": "The news component contributes 0.0 weighted because no article was matched (article_id is null, severity 0), not because adverse coverage was searched and ruled out. Since news carries 35% of the formula weight, the low score rests partly on a null rather than a verified-clean result. For a private mid-size Finnish plastics firm thin coverage is expected, so this does not undermine the band, but the zero should be read as 'nothing found' rather than 'nothing there'."
+          }
+        ]
+      },
+      "error": "not evidence for this buyer: ['news']; cite ids from get_evidence"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The Healthy band is defensible: the worst open item is 18 DPD giving a payment raw of 24.0, no news or parent evidence exists so the news component contributes 0.0, and the resulting 15.6 sits far below the 35 Watch threshold \u2014 payment raw would have to roughly double to change the band, so the verdict is robust. Two caveats the formula cannot express: it reads a point-in-time worst DPD and is blind to the deteriorating trend the payment agent flags, and it ignores the undiversified single-insurer exposure on CL05. Separately, the 0.0 news score reflects that no article was matched (article_id null, severity 0) rather than adverse coverage being searched and ruled out \u2014 thin coverage is expected for a private mid-size firm, but 35% of the weight rests on a null and should be read as 'nothing found', not 'verified clean'. Release as scored with these points surfaced.",
+        "concerns": [
+          {
+            "source_id": "INV002195",
+            "issue": "The score reflects only the point-in-time worst DPD (18) and does not capture trajectory. The payment agent records settled invoices moving 4 days late -> on-time -> 9 days late, with the current open item at 18 DPD \u2014 double the prior worst settled lateness of 9 days. The direction of travel is adverse even though the level is still modest, and further deterioration would move this buyer toward Watch faster than the current 15.6 suggests."
+          },
+          {
+            "source_id": "INV002195",
+            "issue": "Concentration risk is not an input to the formula at all. A single insurer (CL05) holds the entire EUR 420,000 active credit limit with no diversification and no recent limit review. Current exposure is EUR 184,401 across 3 open invoices, and two of those (EUR 61,467 and EUR 65,167) are not yet due, so near-term exposure grows if the lateness pattern continues. A limit review is advisable despite the Healthy band."
+          }
+        ]
+      }
+    }
+  ],
+  "turns": 4
+}

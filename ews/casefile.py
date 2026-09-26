@@ -40,10 +40,10 @@ def allowed_numbers(facts: dict) -> set[float]:
         out.add(v)
         out.add(round(v, 1))
         out.add(round(v))
-        if abs(v) >= 1000:                       # ₹42,800,000 may be written "42.8" (millions)
+        if abs(v) >= 1000:                       # 4,280,000 may be written "4.28" (millions)
             out.add(round(v / 1e6, 1))
             out.add(round(v / 1e6, 2))
-            out.add(round(v / 1e5, 1))           # or in lakh
+            out.add(round(v / 1e3))              # or in thousands
         if 0 < abs(v) <= 1:                      # 0.25 may be written "25" (per cent)
             out.add(round(v * 100, 1))
             out.add(round(v * 100))

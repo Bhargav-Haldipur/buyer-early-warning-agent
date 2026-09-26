@@ -25,10 +25,16 @@ CACHE_DIR = Path(__file__).resolve().parent.parent / "out" / ".llm_cache"
 # entity normalisation — shared by the fallback matcher and the Claude prompt
 # --------------------------------------------------------------------------
 # Dropped before comparison: legal forms, and "Inds." which appears in genuine
-# mentions ("Mahanadi Inds.") as a generic stand-in for the real business word.
-GENERIC_TOKENS = frozenset(
-    {"PVT", "PRIVATE", "LTD", "LIMITED", "LLP", "INC", "CO", "COMPANY", "CORP", "INDS"}
-)
+# mentions ("Rheinfels Inds.") as a generic stand-in for the real business word.
+GENERIC_TOKENS = frozenset({
+    # Anglo
+    "LTD", "LIMITED", "PLC", "LLP", "INC", "CO", "COMPANY", "CORP",
+    # continental European legal forms, written without dots in this dataset
+    "GMBH", "AG", "KG", "NV", "BV", "SA", "SAS", "SARL", "SPA", "SRL",
+    "AB", "AS", "APS", "OY", "OYJ",
+    # generic industry filler that appears in genuine mentions ("Rheinfels Inds.")
+    "INDS",
+})
 
 
 def tokens(name: str) -> list[str]:
@@ -43,8 +49,8 @@ def strict_resolve(mention: str, candidates: list[dict]) -> dict | None:
     distinguishing token in the mention must appear in that candidate's own
     name. Anything else refuses.
 
-    'Arcline Inds.'        -> Arcline Fabricators Limited   (no distinguishing tokens)
-    'Arcline Media Pvt Ltd'-> refused ('MEDIA' is not in the name)
+    'Arcline Inds.'        -> Arcline Fabrications NV   (no distinguishing tokens)
+    'Arcline Media BV'-> refused ('MEDIA' is not in the name)
     """
     tk = tokens(mention)
     if not tk:
@@ -102,14 +108,36 @@ class _Cache:
             CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
     def get(self, key: str):
+        """A corrupt entry is a cache miss, never a crashed run.
+
+        The demo runs from this cache, so a half-written file - an interrupted run, a
+        full disk - must not be able to break it permanently.
+        """
         if not self.enabled:
             return None
         p = CACHE_DIR / f"{key}.json"
-        return json.loads(p.read_text()) if p.exists() else None
+        if not p.exists():
+            return None
+        try:
+            return json.loads(p.read_text())
+        except (json.JSONDecodeError, OSError, UnicodeDecodeError) as exc:
+            print(f"  [cache] discarding unreadable entry {p.name}: {exc}", file=sys.stderr)
+            p.unlink(missing_ok=True)
+            return None
 
     def put(self, key: str, value) -> None:
-        if self.enabled:
-            (CACHE_DIR / f"{key}.json").write_text(json.dumps(value, indent=2))
+        """Write through a temp file and rename, so an interrupted write leaves the
+        previous entry intact rather than a truncated one."""
+        if not self.enabled:
+            return
+        final = CACHE_DIR / f"{key}.json"
+        tmp = final.with_suffix(".json.tmp")
+        try:
+            tmp.write_text(json.dumps(value, indent=2))
+            tmp.replace(final)                      # atomic on the same filesystem
+        except OSError as exc:
+            print(f"  [cache] could not write {final.name}: {exc}", file=sys.stderr)
+            tmp.unlink(missing_ok=True)
 
 
 # --------------------------------------------------------------------------
@@ -153,25 +181,71 @@ class ClaudeLLM:
     def __init__(self, cache: bool = True):
         import anthropic                                   # import error is caught by get_llm
         self._anthropic = anthropic
-        self.client = anthropic.Anthropic()
+        from .settings import MAX_RETRIES
+        self.client = anthropic.Anthropic(max_retries=MAX_RETRIES)
+        # per-model token accounting, so spend is a measured number, not an estimate
+        self.usage: dict[str, dict[str, int]] = {}
         self.api_errors = (anthropic.APIError,)
         self.cache = _Cache(cache)
         self.calls = 0
         self.degraded = 0
         self.disabled = False
 
+    # -- usage accounting --------------------------------------------------
+    def _record(self, model: str, resp):
+        """Every response passes through here, so spend is measured, not estimated."""
+        u = getattr(resp, "usage", None)
+        row = self.usage.setdefault(model, {"calls": 0, "input": 0, "output": 0,
+                                            "cache_read": 0})
+        row["calls"] += 1
+        if u is not None:
+            row["input"] += getattr(u, "input_tokens", 0) or 0
+            row["output"] += getattr(u, "output_tokens", 0) or 0
+            row["cache_read"] += getattr(u, "cache_read_input_tokens", 0) or 0
+        return resp
+
+    def total_tokens(self) -> int:
+        return sum(r["input"] + r["output"] for r in self.usage.values())
+
+    def spend(self) -> dict:
+        """What this run actually used, and what it cost, per model."""
+        from .settings import DEFAULT_PRICE, PRICING
+        by_model, total = {}, 0.0
+        for model, r in sorted(self.usage.items()):
+            price_in, price_out = PRICING.get(model, DEFAULT_PRICE)
+            usd = r["input"] / 1e6 * price_in + r["output"] / 1e6 * price_out
+            total += usd
+            by_model[model] = {**r, "usd": round(usd, 4)}
+        return {"by_model": by_model, "total_tokens": self.total_tokens(),
+                "total_usd": round(total, 4)}
+
     def create(self, *, model: str, effort: str, **params):
-        from .settings import REFUSAL_FALLBACK
+        from .settings import MAX_MODEL_CALLS, MAX_MODEL_TOKENS, REFUSAL_FALLBACK
+        from .agents.runtime import AgentError
+        if self.total_tokens() >= MAX_MODEL_TOKENS:
+            if not self.disabled:
+                print(f"  [llm] token budget of {MAX_MODEL_TOKENS:,} reached - "
+                      f"falling back to rules for the rest of this run", file=sys.stderr)
+            self.disabled = True
+            raise AgentError(f"token budget of {MAX_MODEL_TOKENS:,} reached")
+        if self.calls >= MAX_MODEL_CALLS:
+            # spend cap reached: switch off for the rest of the run rather than
+            # keep going. Everything after this point uses the rule-based path.
+            if not self.disabled:
+                print(f"  [llm] call budget of {MAX_MODEL_CALLS} reached - "
+                      f"falling back to rules for the rest of this run", file=sys.stderr)
+            self.disabled = True
+            raise AgentError(f"call budget of {MAX_MODEL_CALLS} reached")
         self.calls += 1
         params["output_config"] = {"effort": effort}
         try:
             if REFUSAL_FALLBACK and model.startswith("claude-opus-5"):
                 # server-side refusal fallback: a declined request is re-run on
                 # Anthropic's recommended model instead of failing the agent
-                return self.client.beta.messages.create(
+                return self._record(model, self.client.beta.messages.create(
                     model=model, betas=["server-side-fallback-2026-07-01"],
-                    fallbacks="default", **params)
-            return self.client.messages.create(model=model, **params)
+                    fallbacks="default", **params))
+            return self._record(model, self.client.messages.create(model=model, **params))
         except self._anthropic.AuthenticationError:
             self.disabled = True
             raise

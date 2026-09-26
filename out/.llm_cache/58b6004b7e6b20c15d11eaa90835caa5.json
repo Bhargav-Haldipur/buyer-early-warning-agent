@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "Article concerns Arcline Media BV, a Frankfurt advertising agency; the registry only has Arcline Fabrications NV, a steel fabrication company in Antwerp - different business and location, so no match."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Arcline"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY002\", \"name\": \"Arcline Fabrications NV\", \"sector\": \"Steel Fabrication\", \"city\": \"Antwerp\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "Article concerns Arcline Media BV, a Frankfurt advertising agency; the registry only has Arcline Fabrications NV, a steel fabrication company in Antwerp - different business and location, so no match."
+      }
+    }
+  ],
+  "turns": 2
+}

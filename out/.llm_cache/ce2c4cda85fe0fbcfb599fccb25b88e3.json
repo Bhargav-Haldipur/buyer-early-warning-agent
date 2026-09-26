@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY010",
+    "name": "Bluestone Engineering Ltd",
+    "severity": 0,
+    "category": "appointment",
+    "reason": "Routine announcement of a new COO appointment as part of planned management strengthening; no negative financial or operational implications."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Bluestone Engineering"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY010\", \"name\": \"Bluestone Engineering Ltd\", \"sector\": \"Engineering\", \"city\": \"Leeds\"}, {\"kind\": \"buyer\", \"id\": \"BUY035\", \"name\": \"Sandvall Engineering Works AB\", \"sector\": \"Engineering\", \"city\": \"Linkoping\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY010",
+        "severity": 0,
+        "category": "appointment",
+        "reason": "Routine announcement of a new COO appointment as part of planned management strengthening; no negative financial or operational implications."
+      }
+    }
+  ],
+  "turns": 2
+}

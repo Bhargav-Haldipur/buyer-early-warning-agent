@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY024",
+    "name": "Verhoeven Chemicals BV",
+    "severity": 0,
+    "category": "appointment",
+    "reason": "Routine announcement of a new COO appointment at Verhoeven Chemicals BV, described as part of planned management strengthening with no negative financial implications."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Verhoeven"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY024\", \"name\": \"Verhoeven Chemicals BV\", \"sector\": \"Chemicals\", \"city\": \"Terneuzen\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY024",
+        "severity": 0,
+        "category": "appointment",
+        "reason": "Routine announcement of a new COO appointment at Verhoeven Chemicals BV, described as part of planned management strengthening with no negative financial implications."
+      }
+    }
+  ],
+  "turns": 2
+}

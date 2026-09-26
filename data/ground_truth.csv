@@ -1,21 +1,27 @@
 buyer_id,buyer_name,failed,default_date,deterioration_start,trajectory
-BUY002,Arcline Fabricators Limited,Y,2026-05-15,2025-07-15,gradual
-BUY003,Suvarna Textiles Pvt Ltd,Y,2026-05-06,2025-11-05,gradual
-BUY004,Girikand Agro Processors Limited,Y,2026-02-25,2025-04-27,gradual
-BUY005,Emberline Electricals Pvt Ltd,Y,2026-04-24,2025-05-25,gradual
-BUY009,Kalpataru Prime Components Pvt Ltd,N,,,wobble_recovered
-BUY010,Bluestone Engineering Limited,N,,,wobble_recovered
-BUY017,Mahanadi Industries Limited,N,,,wobble_recovered
-BUY025,Westbridge Packaging Limited,N,,,wobble_recovered
-BUY011,Chandra Mills Pvt Ltd,N,,,healthy
-BUY013,Falcon Electronics Supply Pvt Ltd,N,,,healthy
-BUY014,Indus Crest Steel Traders Pvt Ltd,N,,,healthy
-BUY015,Jayanth Polymers Limited,N,,,healthy
-BUY016,Lakshya Distributors Pvt Ltd,N,,,healthy
-BUY018,Nirvana Foods Pvt Ltd,N,,,healthy
-BUY019,Oakhurst Components Pvt Ltd,N,,,healthy
-BUY021,Quartzline Ceramics Pvt Ltd,N,,,healthy
-BUY023,Udaan Traders Pvt Ltd,N,,,healthy
-BUY024,Vaishnavi Chemicals Pvt Ltd,N,,,healthy
-BUY026,Yashodhan Agro Pvt Ltd,N,,,healthy
-BUY029,Chetak Mills Limited,N,,,healthy
+BUY002,Arcline Fabrications NV,Y,2026-05-15,2025-07-15,gradual
+BUY003,Halberg Textiles GmbH,Y,2026-05-06,2025-11-05,gradual
+BUY004,Maasland Agro Processing BV,Y,2026-02-25,2025-04-27,gradual
+BUY005,Emberline Electricals Ltd,Y,2026-04-24,2025-05-25,gradual
+BUY009,Prevost Prime Components SA,N,,,wobble_recovered
+BUY010,Bluestone Engineering Ltd,N,,,wobble_recovered
+BUY017,Rheinfels Industries GmbH,N,,,wobble_recovered
+BUY025,Westbridge Packaging Ltd,N,,,wobble_recovered
+BUY011,Marchetti Mills SpA,N,,,healthy
+BUY013,Falcon Electronics Supply BV,N,,,healthy
+BUY014,Nordkrans Steel Traders AB,N,,,healthy
+BUY015,Vandermeer Polymers BV,N,,,healthy
+BUY016,Larsson Distributors AB,N,,,healthy
+BUY018,Novara Foods SpA,N,,,healthy
+BUY019,Oakhurst Components Ltd,N,,,healthy
+BUY021,Quartzline Ceramics SA,N,,,healthy
+BUY023,Kessler Traders GmbH,N,,,healthy
+BUY024,Verhoeven Chemicals BV,N,,,healthy
+BUY026,Ysselmonde Agro BV,N,,,healthy
+BUY029,Carreau Mills SA,N,,,healthy
+BUY031,Delvaux Commodities SA,N,,,healthy
+BUY032,Ekhart Distributors GmbH,N,,,healthy
+BUY033,Rautio Plastics Oy,N,,,healthy
+BUY034,Tornquist Packaging AS,N,,,healthy
+BUY035,Sandvall Engineering Works AB,N,,,healthy
+BUY036,Osterlund Polymers AB,N,,,healthy

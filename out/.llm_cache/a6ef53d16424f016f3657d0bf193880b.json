@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY002",
+    "name": "Arcline Fabrications NV",
+    "severity": 4,
+    "category": "lender_exposure_review",
+    "reason": "Lenders are reviewing exposure due to irregularities in servicing working capital facilities, and a requested credit limit enhancement was not fully sanctioned, indicating emerging financial stress though no formal default classification yet."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Arcline"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY002\", \"name\": \"Arcline Fabrications NV\", \"sector\": \"Steel Fabrication\", \"city\": \"Antwerp\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY002",
+        "severity": 4,
+        "category": "lender_exposure_review",
+        "reason": "Lenders are reviewing exposure due to irregularities in servicing working capital facilities, and a requested credit limit enhancement was not fully sanctioned, indicating emerging financial stress though no formal default classification yet."
+      }
+    }
+  ],
+  "turns": 2
+}

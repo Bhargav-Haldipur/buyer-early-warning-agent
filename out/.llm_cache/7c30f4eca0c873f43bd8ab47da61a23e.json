@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY014",
+    "name": "Nordkrans Steel Traders AB",
+    "severity": 0,
+    "category": "capacity_expansion",
+    "reason": "Article reports a positive capacity expansion funded partly by internal accruals with demand from existing customers, indicating growth rather than financial distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Nordkrans"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY014\", \"name\": \"Nordkrans Steel Traders AB\", \"sector\": \"Steel Trading\", \"city\": \"Malmo\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY014",
+        "severity": 0,
+        "category": "capacity_expansion",
+        "reason": "Article reports a positive capacity expansion funded partly by internal accruals with demand from existing customers, indicating growth rather than financial distress."
+      }
+    }
+  ],
+  "turns": 2
+}

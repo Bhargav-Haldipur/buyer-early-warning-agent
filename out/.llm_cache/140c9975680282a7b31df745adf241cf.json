@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY003",
+    "name": "Halberg Textiles GmbH",
+    "severity": 3,
+    "category": "capacity_cut",
+    "reason": "Halberg Textiles has cut its Bielefeld unit from three shifts to one due to weak order inflow, with contract workers not recalled and slower material procurement, indicating a mild negative demand-driven capacity reduction."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Halberg"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY003\", \"name\": \"Halberg Textiles GmbH\", \"sector\": \"Textiles\", \"city\": \"Bielefeld\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY003"
+      },
+      "result": "{\"id\": \"BUY003\", \"kind\": \"buyer\", \"name\": \"Halberg Textiles GmbH\", \"short_name\": \"Halberg\", \"sector\": \"Textiles\", \"city\": \"Bielefeld\", \"size_band\": \"small\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY003",
+        "severity": 3,
+        "category": "capacity_cut",
+        "reason": "Halberg Textiles has cut its Bielefeld unit from three shifts to one due to weak order inflow, with contract workers not recalled and slower material procurement, indicating a mild negative demand-driven capacity reduction."
+      }
+    }
+  ],
+  "turns": 3
+}

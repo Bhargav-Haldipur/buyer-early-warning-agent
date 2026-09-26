@@ -1,0 +1,43 @@
+{
+  "result": {
+    "trend": "insufficient_history",
+    "summary": "Prevost Prime Components SA has one open invoice 10 days past due (INV000662, \u20ac236,900) out of \u20ac1.27M total exposure, with the rest not yet due. Only one settled invoice is on record (paid 12 days late), which is too little history to establish a payment trend. A single insurer (CL01) holds a \u20ac1.33M active credit line against this buyer, so current exposure is near the limit and warrants monitoring given the emerging late-payment signal.",
+    "concerns": [
+      "Only one prior settled invoice available, limiting trend confidence",
+      "Current worst open invoice is already 10 days past due",
+      "Total open exposure (~\u20ac1.27M) is close to the single insurer's \u20ac1.33M credit limit"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_invoices",
+      "input": {},
+      "result": "[{\"invoice_id\": \"INV000662\", \"client_id\": \"CL01\", \"invoice_date\": \"2026-06-17\", \"due_date\": \"2026-09-15\", \"amount_eur\": 236900.0, \"days_past_due\": 10}, {\"invoice_id\": \"INV000661\", \"client_id\": \"CL01\", \"invoice_date\": \"2026-06-02\", \"due_date\": \"2026-08-31\", \"amount_eur\": 369900.0, \"days_past_due\": 0}, {\"invoice_id\": \"INV000660\", \"client_id\": \"CL01\", \"invoice_date\": \"2026-05-21\", \"due_date\": \"2026-0"
+    },
+    {
+      "tool": "get_payment_history",
+      "input": {},
+      "result": "[{\"invoice_id\": \"INV000657\", \"client_id\": \"CL01\", \"due_date\": \"2026-06-18\", \"payment_date\": \"2026-06-30\", \"amount_eur\": 256900.0, \"days_late\": 12}]"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"CL01\", \"credit_limit_eur\": 1330000.0, \"payment_terms_days\": 90, \"limit_status\": \"Active\", \"last_reviewed_date\": \"2024-11-21\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 10,
+        "worst_invoice_id": "INV000662",
+        "trend": "insufficient_history",
+        "summary": "Prevost Prime Components SA has one open invoice 10 days past due (INV000662, \u20ac236,900) out of \u20ac1.27M total exposure, with the rest not yet due. Only one settled invoice is on record (paid 12 days late), which is too little history to establish a payment trend. A single insurer (CL01) holds a \u20ac1.33M active credit line against this buyer, so current exposure is near the limit and warrants monitoring given the emerging late-payment signal.",
+        "concerns": [
+          "Only one prior settled invoice available, limiting trend confidence",
+          "Current worst open invoice is already 10 days past due",
+          "Total open exposure (~\u20ac1.27M) is close to the single insurer's \u20ac1.33M credit limit"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

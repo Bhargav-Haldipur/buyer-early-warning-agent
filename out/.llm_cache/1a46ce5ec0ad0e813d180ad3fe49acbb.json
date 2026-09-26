@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY004",
+    "name": "Maasland Agro Processing BV",
+    "severity": 4,
+    "category": "capacity_cut",
+    "reason": "Maasland Agro Processing BV has cut its Zwolle unit from three shifts to one due to weak order inflow, released contract workers, and slowed material procurement, indicating a moderate operational and demand downturn."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Maasland"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY004\", \"name\": \"Maasland Agro Processing BV\", \"sector\": \"Food Processing\", \"city\": \"Zwolle\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY004",
+        "severity": 4,
+        "category": "capacity_cut",
+        "reason": "Maasland Agro Processing BV has cut its Zwolle unit from three shifts to one due to weak order inflow, released contract workers, and slowed material procurement, indicating a moderate operational and demand downturn."
+      }
+    }
+  ],
+  "turns": 2
+}

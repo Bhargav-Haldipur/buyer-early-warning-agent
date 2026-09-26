@@ -24,6 +24,7 @@ OUT_DIR = Path(__file__).resolve().parent.parent / "out" / "runs"
 
 def run(demo_steps: int = 0, swap_invoices: bool = False, llm=None, cache: bool = True) -> dict:
     loader = Loader(demo_steps=demo_steps, swap_invoices=swap_invoices)
+    loader.validate()          # fail on an inconsistent dataset, not halfway through scoring
     llm = llm or get_llm(cache=cache)
     store = EvidenceStore()
 
@@ -83,6 +84,7 @@ def run(demo_steps: int = 0, swap_invoices: bool = False, llm=None, cache: bool 
         "as_of": AS_OF.isoformat(),
         "llm": getattr(llm, "name", "unknown"),
         "agent_runs": _agent_stats(records, store),
+        "spend": llm.spend() if hasattr(llm, "spend") else None,
         "demo_steps": demo_steps,
         "swap_invoices": swap_invoices,
         "clients": clients,
@@ -126,15 +128,37 @@ def main() -> None:
     ap.add_argument("--demo-steps", type=int, default=0,
                     help="append the first N demo articles (0-7)")
     ap.add_argument("--swap-invoices", action="store_true",
-                    help="demo step 8: Udaan moves from 25 to 40 DPD")
+                    help="demo step 8: Kessler moves from 25 to 40 DPD")
     ap.add_argument("--no-cache", action="store_true", help="bypass the LLM disk cache")
+    ap.add_argument("--agents", default=None,
+                    help="comma-separated agents to run on Claude this run "
+                         "(payment,news,adjudicator,casefile); the rest use rules")
+    ap.add_argument("--max-calls", type=int, default=None,
+                    help="override the run-wide model call budget (default: settings.MAX_MODEL_CALLS)")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
+    from . import settings
+    try:
+        settings.apply_overrides(args.agents, args.max_calls)
+    except settings.SettingsError as exc:
+        ap.error(str(exc))
+    if args.agents is not None or args.max_calls is not None:
+        print(f"running on Claude: {', '.join(settings.enabled_agents()) or 'none'} "
+              f"(others use rules) · budget {settings.MAX_MODEL_CALLS} calls")
+
     result = run(args.demo_steps, args.swap_invoices, cache=not args.no_cache)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    tag = f"demo{args.demo_steps}" + ("-swap" if args.swap_invoices else "")
-    path = Path(args.out) if args.out else OUT_DIR / f"{result['as_of']}-{tag}.json"
+    # The filename records what produced the run, so a narrowed test run cannot
+    # quietly overwrite a full one - they are different results, not versions.
+    parts = [result["as_of"], f"demo{args.demo_steps}"]
+    if args.swap_invoices:
+        parts.append("swap")
+    parts.append(result["llm"])
+    on_claude = settings.enabled_agents()
+    if result["llm"] == "claude" and set(on_claude) != set(settings.AGENTS):
+        parts.append("agents-" + ("+".join(on_claude) if on_claude else "none"))
+    path = Path(args.out) if args.out else OUT_DIR / ("-".join(parts) + ".json")
     path.write_text(json.dumps(result, indent=2))
 
     print(f"as of {result['as_of']}  ·  llm={result['llm']}  ·  {len(result['buyers'])} buyers")
@@ -146,6 +170,15 @@ def main() -> None:
     print(f"  refusals: {len(result['refusals'])}")
     for name, modes in result["agent_runs"].items():
         print(f"  agent {name:11} " + ", ".join(f"{n} {m}" for m, n in modes.items()))
+    sp = result.get("spend")
+    if sp is not None and not sp["by_model"]:
+        print("  spend: nothing — every agent run came from the cache")
+    elif sp:
+        print("  spend (measured, not estimated):")
+        for model, r in sp["by_model"].items():
+            print(f"    {model:18} {r['calls']:4} calls  "
+                  f"{r['input']:>9,} in  {r['output']:>8,} out  ${r['usd']:.2f}")
+        print(f"    {'TOTAL':18} {sp['total_tokens']:>9,} tokens{'':20}${sp['total_usd']:.2f}")
     print(f"-> {path}")
 
 

@@ -163,7 +163,8 @@ def assess(loader: Loader, llm, store) -> dict[str, dict]:
 
     for art in desk.articles:
         d = desk.decide(art, llm)
-        age = (AS_OF - parse_date(art["published_date"])).days
+        age = (AS_OF - parse_date(art["published_date"],
+                                  what=f"article {art['article_id']} published_date")).days
 
         if d["kind"] == "none":
             store.add(Evidence(

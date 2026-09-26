@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY025",
+    "name": "Westbridge Packaging Ltd",
+    "severity": 0,
+    "category": "higher_volumes",
+    "reason": "Article reports higher dispatch volumes and stable realisations for Westbridge Packaging Ltd, a positive/neutral development with no indication of financial stress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Westbridge"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY025\", \"name\": \"Westbridge Packaging Ltd\", \"sector\": \"Packaging\", \"city\": \"Bristol\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY025",
+        "severity": 0,
+        "category": "higher_volumes",
+        "reason": "Article reports higher dispatch volumes and stable realisations for Westbridge Packaging Ltd, a positive/neutral development with no indication of financial stress."
+      }
+    }
+  ],
+  "turns": 2
+}

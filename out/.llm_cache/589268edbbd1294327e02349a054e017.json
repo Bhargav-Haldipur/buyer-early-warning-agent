@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY015",
+    "name": "Vandermeer Polymers BV",
+    "severity": 0,
+    "category": "capacity_expansion",
+    "reason": "Article describes Vandermeer Polymers BV commissioning a new production line at its Geleen facility, funded by internal accruals and a term facility, with demand from existing customers - a positive capacity expansion with no signs of financial distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Vandermeer"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY015\", \"name\": \"Vandermeer Polymers BV\", \"sector\": \"Plastics\", \"city\": \"Geleen\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY015",
+        "severity": 0,
+        "category": "capacity_expansion",
+        "reason": "Article describes Vandermeer Polymers BV commissioning a new production line at its Geleen facility, funded by internal accruals and a term facility, with demand from existing customers - a positive capacity expansion with no signs of financial distress."
+      }
+    }
+  ],
+  "turns": 2
+}

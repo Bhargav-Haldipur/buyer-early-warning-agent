@@ -195,3 +195,32 @@ th.sortable.desc::after { content: " \25BC"; font-size: .6rem; }
                     color: var(--theme-neutral-800); }
 .agent-trace .res { display: block; color: var(--theme-neutral-500); word-break: break-word; }
 .agent-trace .err { display: block; color: var(--theme-red-600); }
+
+/* --- home hero + KPI row ------------------------------------------------ */
+.hero { margin-bottom: 2rem; }
+.hero h1 { margin-bottom: .5rem; }
+.masthead { font-size: .75rem; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--theme-accent); margin: 0 0 .35rem; }
+.lede { font-size: 1.0625rem; line-height: 1.7; color: var(--theme-neutral-600);
+        max-width: 64ch; margin: 0 0 1.5rem; }
+.meta { font-size: .8125rem; color: var(--theme-neutral-500); margin: 1rem 0 0; }
+.meta a { color: var(--theme-accent); text-decoration: none; font-weight: 500; }
+.meta a:hover { text-decoration: underline; }
+.engine { display: inline-block; padding: .05rem .45rem; border-radius: 4px;
+          background: var(--theme-neutral-100); color: var(--theme-neutral-700);
+          font-size: .75rem; font-weight: 600; }
+
+.statrow { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1.25rem 2.5rem;
+           background: var(--theme-neutral-0); border: 1px solid var(--theme-neutral-200);
+           border-radius: 8px; padding: 1.25rem 1.5rem; }
+.stat { min-width: 6.5rem; }
+/* proportional figures: tabular-nums makes a display-size number read loose */
+.stat .figure { font-size: 2rem; font-weight: 700; line-height: 1.1;
+                color: var(--theme-neutral-900); }
+.stat .statlabel { font-size: .8125rem; line-height: 1.6;
+                   color: var(--theme-neutral-500); margin-top: .15rem; }
+.stat .dot { display: inline-block; width: .5rem; height: .5rem; border-radius: 50%;
+             margin-right: .35rem; vertical-align: .05rem; }
+.dot.high { background: var(--theme-red-500); }
+.dot.watch { background: var(--theme-orange-700); }
+.dot.healthy { background: var(--theme-green-900); }

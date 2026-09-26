@@ -1,0 +1,118 @@
+{
+  "result": {
+    "assessment": "agree_with_caveats",
+    "rationale": "The arithmetic and the band hold: 25 DPD yields a raw payment score of 33.3, which is itself below the 35 Watch threshold, so the zero news component is not masking a higher band \u2014 even at full weight the payment signal alone would read Healthy. That said, the news component comes from no matched articles and no parent evidence, so it is an absence of findings rather than confirmed clean standing, and the formula takes no account of exposure against limit. The payment review records total open exposure of \u20ac1,549,800 against a \u20ac1,450,000 credit limit, an overline of roughly \u20ac99,800 that the Healthy label does not convey, and the trend is flagged insufficient_history off a single settled invoice. I agree with the band as scored, but the limit breach is an action item and the Healthy read should be treated as provisional.",
+    "concerns": [
+      {
+        "source_id": "INV001413",
+        "issue": "Overline not captured by the score: total open exposure of \u20ac1,549,800 exceeds the \u20ac1,450,000 credit limit by roughly \u20ac99,800. The formula scores only DPD and news, so a limit breach of this size is invisible in the 21.7 Healthy output and needs a separate limit decision."
+      },
+      {
+        "source_id": "INV001413",
+        "issue": "Low confidence in the payment input: the review flags trend as insufficient_history, with only one settled invoice (paid on time). The 33.3 payment score therefore rests on a file too short to establish a paying pattern, so the Healthy band should be treated as provisional pending further settlement history."
+      },
+      {
+        "source_id": "INV001413",
+        "issue": "Concentration and forward exposure: all 5 open invoices sit with a single client (CL05), and \u20ac1,220,700 of the \u20ac1,549,800 is not yet due. If the behaviour behind the 25 days past due item (INV001413, \u20ac329,100) repeats as those invoices fall due, deterioration would be rapid and on a large balance."
+      }
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_score_breakdown",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY019\", \"score\": 21.7, \"band\": \"Healthy\", \"pd\": 0.1167, \"payment\": {\"dpd\": 25, \"raw\": 33.3, \"weighted\": 21.7, \"worst_line\": \"CL05\"}, \"news\": {\"severity\": 0, \"category\": null, \"article_id\": null, \"age_days\": null, \"headline\": null, \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x 33.3 (payment, 25 DPD) + 0.35 x 0.0 (news) = 21.7\"}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "all"
+      },
+      "result": "[{\"id\": \"INV001413\", \"kind\": \"payment\", \"date\": \"2026-08-31\", \"detail\": \"5 open invoice(s) with CL05; worst is 25 days past due\", \"data\": {\"client_id\": \"CL05\", \"dpd\": 25, \"owed\": 1549800.0, \"open_count\": 5}}, {\"id\": \"INV001413\", \"kind\": \"payment_review\", \"date\": \"2026-08-31\", \"detail\": \"Oakhurst Components has one invoice (INV001413, \\u20ac329,100) 25 days past due, while four others totaling \\u20"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "news"
+      },
+      "result": "[{\"note\": \"no news evidence\"}]"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "parent"
+      },
+      "result": "[{\"note\": \"no parent evidence\"}]"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The arithmetic and the band hold: 25 DPD yields a raw payment score of 33.3, which is itself below the 35 Watch threshold, so the zero news component is not masking a higher band \u2014 even at full weight the payment signal alone would read Healthy. However, the formula takes no account of exposure against limit, and the payment review (INV001413) records total open exposure of \u20ac1,549,800 against a \u20ac1,450,000 credit limit, an overline of roughly \u20ac99,800 that the Healthy label does not convey. Confidence in the payment input is also thin: the trend is flagged insufficient_history off a single settled invoice, so 33.3 rests on a very short file concentrated in one client (CL05). I agree with the band as scored but the underwriter should treat the limit breach as an action item rather than reading Healthy as no-touch.",
+        "concerns": [
+          {
+            "source_id": "INV001413",
+            "issue": "Overline not captured by the score: total open exposure of \u20ac1,549,800 exceeds the \u20ac1,450,000 credit limit by roughly \u20ac99,800. The formula scores only DPD and news, so a limit breach of this size is invisible in the 21.7 Healthy output and needs a separate limit decision."
+          },
+          {
+            "source_id": "INV001413",
+            "issue": "Low confidence in the payment input: the review flags trend as insufficient_history, with only one settled invoice (paid on time). The 33.3 payment score is therefore built on a file too short to establish a paying pattern, and the Healthy band should be treated as provisional pending further settlement history."
+          },
+          {
+            "source_id": "INV001413",
+            "issue": "Concentration and forward exposure: all 5 open invoices sit with a single client (CL05), and \u20ac1,220,700 of the \u20ac1,549,800 is not yet due. If the behaviour behind the 25 DPD item on INV001413 (\u20ac329,100) repeats as those fall due, deterioration would be rapid and on a large balance."
+          },
+          {
+            "source_id": "news",
+            "issue": "The 0.0 news component is derived from no matched articles and no parent evidence, i.e. absence of findings rather than confirmed clean standing. It does not change the band here, but it should not be read as positive corroboration of the Healthy verdict."
+          }
+        ]
+      },
+      "error": "not evidence for this buyer: ['news']; cite ids from get_evidence"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The arithmetic and the band hold: 25 DPD yields a raw payment score of 33.3, which is itself below the 35 Watch threshold, so the zero news component is not masking a higher band \u2014 even at full weight the payment signal alone would read Healthy. That said, the news component comes from no matched articles and no parent evidence, so it is an absence of findings rather than confirmed clean standing, and the formula takes no account of exposure against limit. The payment review records total open exposure of \u20ac1,549,800 against a \u20ac1,450,000 credit limit, an overline of roughly \u20ac99,800 that the Healthy label does not convey, and the trend is flagged insufficient_history off a single settled invoice. I agree with the band as scored, but the limit breach is an action item and the Healthy read should be treated as provisional.",
+        "concerns": [
+          {
+            "source_id": "INV001413",
+            "issue": "Overline not captured by the score: total open exposure of \"\\u20ac1,549,800\" exceeds the \"\\u20ac1,450,000\" credit limit by roughly \"\\u20ac99,800\". The formula scores only DPD and news, so a limit breach of this size is invisible in the 21.7 Healthy output and needs a separate limit decision."
+          },
+          {
+            "source_id": "INV001413",
+            "issue": "Low confidence in the payment input: the review flags trend as insufficient_history, with only one settled invoice (paid on time). The 33.3 payment score therefore rests on a file too short to establish a paying pattern, so the Healthy band should be treated as provisional pending further settlement history."
+          },
+          {
+            "source_id": "INV001413",
+            "issue": "Concentration and forward exposure: all 5 open invoices sit with a single client (CL05), and \"\\u20ac1,220,700\" of the \"\\u20ac1,549,800\" is not yet due. If the behaviour behind the 25 days past due item (INV001413, \"\\u20ac329,100\") repeats as those invoices fall due, deterioration would be rapid and on a large balance."
+          }
+        ]
+      },
+      "error": "these figures are not in the data: ['549,800', '450,000', '800', '220,700', '549,800']"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The arithmetic and the band hold: 25 DPD yields a raw payment score of 33.3, which is itself below the 35 Watch threshold, so the zero news component is not masking a higher band \u2014 even at full weight the payment signal alone would read Healthy. That said, the news component comes from no matched articles and no parent evidence, so it is an absence of findings rather than confirmed clean standing, and the formula takes no account of exposure against limit. The payment review records total open exposure of \u20ac1,549,800 against a \u20ac1,450,000 credit limit, an overline of roughly \u20ac99,800 that the Healthy label does not convey, and the trend is flagged insufficient_history off a single settled invoice. I agree with the band as scored, but the limit breach is an action item and the Healthy read should be treated as provisional.",
+        "concerns": [
+          {
+            "source_id": "INV001413",
+            "issue": "Overline not captured by the score: total open exposure of \u20ac1,549,800 exceeds the \u20ac1,450,000 credit limit by roughly \u20ac99,800. The formula scores only DPD and news, so a limit breach of this size is invisible in the 21.7 Healthy output and needs a separate limit decision."
+          },
+          {
+            "source_id": "INV001413",
+            "issue": "Low confidence in the payment input: the review flags trend as insufficient_history, with only one settled invoice (paid on time). The 33.3 payment score therefore rests on a file too short to establish a paying pattern, so the Healthy band should be treated as provisional pending further settlement history."
+          },
+          {
+            "source_id": "INV001413",
+            "issue": "Concentration and forward exposure: all 5 open invoices sit with a single client (CL05), and \u20ac1,220,700 of the \u20ac1,549,800 is not yet due. If the behaviour behind the 25 days past due item (INV001413, \u20ac329,100) repeats as those invoices fall due, deterioration would be rapid and on a large balance."
+          }
+        ]
+      }
+    }
+  ],
+  "turns": 5
+}

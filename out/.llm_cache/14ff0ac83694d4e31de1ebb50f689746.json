@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY011",
+    "name": "Marchetti Mills SpA",
+    "severity": 0,
+    "category": "appointment",
+    "reason": "Routine leadership appointment at the Biella plant; no indication of financial or operational distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Marchetti Mills"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY011\", \"name\": \"Marchetti Mills SpA\", \"sector\": \"Textiles\", \"city\": \"Biella\"}, {\"kind\": \"buyer\", \"id\": \"BUY029\", \"name\": \"Carreau Mills SA\", \"sector\": \"Textiles\", \"city\": \"Roubaix\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY011",
+        "severity": 0,
+        "category": "appointment",
+        "reason": "Routine leadership appointment at the Biella plant; no indication of financial or operational distress."
+      }
+    }
+  ],
+  "turns": 2
+}

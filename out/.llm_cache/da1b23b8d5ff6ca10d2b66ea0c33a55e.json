@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY013",
+    "name": "Falcon Electronics Supply BV",
+    "severity": 0,
+    "category": "higher_volumes",
+    "reason": "Article reports higher dispatch volumes and stable realisations for Falcon, matching Falcon Electronics Supply BV's sector; this is positive/neutral news with no indication of payment risk."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Falcon"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY013\", \"name\": \"Falcon Electronics Supply BV\", \"sector\": \"Electronics\", \"city\": \"Eindhoven\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY013",
+        "severity": 0,
+        "category": "higher_volumes",
+        "reason": "Article reports higher dispatch volumes and stable realisations for Falcon, matching Falcon Electronics Supply BV's sector; this is positive/neutral news with no indication of payment risk."
+      }
+    }
+  ],
+  "turns": 2
+}

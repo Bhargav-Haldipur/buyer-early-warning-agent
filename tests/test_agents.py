@@ -241,11 +241,14 @@ class Settings(unittest.TestCase):
             definition.load("payment")
 
     def test_disabled_agent_uses_rules_without_a_call(self):
+        # counts come from the data, so adding a buyer or an article cannot break this
+        n_buyers = len(Loader().buyers())
+        n_articles = len(Loader().news())
         llm = ScriptedLLM(policy)
         with self._with("payment", enabled=False):
             out = engine.run(llm=llm)
-        self.assertEqual(out["agent_runs"]["payment"], {"disabled": 20})
-        self.assertEqual(out["agent_runs"]["news"], {"agent": 31})
+        self.assertEqual(out["agent_runs"]["payment"], {"disabled": n_buyers})
+        self.assertEqual(out["agent_runs"]["news"], {"agent": n_articles})
 
     def test_submitting_before_the_required_tools_is_sent_back(self):
         spec = AgentSpec(**{**SPEC.__dict__, "guardrails": {"required_before_submit": ["echo"]}})
@@ -331,3 +334,108 @@ class EndToEnd(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class CallBudget(unittest.TestCase):
+    """The run-wide spend cap, tested on the real client with its transport stubbed."""
+
+    def _client(self, budget):
+        from ews.llm import ClaudeLLM
+        llm = ClaudeLLM.__new__(ClaudeLLM)          # skip __init__; no SDK, no key
+        llm.calls = llm.degraded = 0
+        llm.disabled = False
+        llm.usage = {}
+        llm.cache = _Cache(False)
+        llm.client = type("C", (), {"messages": type("M", (), {
+            "create": staticmethod(lambda **kw: "ok")})()})()
+        settings.MAX_MODEL_CALLS = budget
+        return llm
+
+    def setUp(self):
+        self._original = settings.MAX_MODEL_CALLS
+
+    def tearDown(self):
+        settings.MAX_MODEL_CALLS = self._original
+
+    def test_calls_under_the_budget_go_through(self):
+        llm = self._client(3)
+        for _ in range(3):
+            llm.create(model="claude-sonnet-5", effort="low", messages=[], max_tokens=16)
+        self.assertEqual(llm.calls, 3)
+        self.assertFalse(llm.disabled)
+
+    def test_the_call_over_the_budget_raises_and_disables(self):
+        llm = self._client(2)
+        llm.create(model="claude-sonnet-5", effort="low", messages=[], max_tokens=16)
+        llm.create(model="claude-sonnet-5", effort="low", messages=[], max_tokens=16)
+        with self.assertRaises(AgentError):
+            llm.create(model="claude-sonnet-5", effort="low", messages=[], max_tokens=16)
+        self.assertTrue(llm.disabled, "budget must switch the client off, not just fail once")
+        self.assertEqual(llm.calls, 2, "the refused call must not be billed")
+
+    def test_a_disabled_client_short_circuits_before_any_request(self):
+        llm = self._client(1)
+        llm.disabled = True
+        with self.assertRaises(AgentError):
+            run_agent(llm, spec=SPEC, task="go", tools=[ECHO, _submit()], cache_payload={})
+        self.assertEqual(llm.calls, 0, "a disabled client must not reach the network")
+
+
+class UsageAccounting(unittest.TestCase):
+    """A call budget is a crude proxy for spend; this measures the real thing."""
+
+    def _client(self):
+        from ews.llm import ClaudeLLM
+        from ews.llm import _Cache as C
+        llm = ClaudeLLM.__new__(ClaudeLLM)
+        llm.calls = llm.degraded = 0
+        llm.disabled = False
+        llm.usage = {}
+        llm.cache = C(False)
+
+        class U:
+            input_tokens, output_tokens, cache_read_input_tokens = 1000, 200, 0
+
+        class R:
+            usage = U()
+        msgs = type("M", (), {"create": staticmethod(lambda **kw: R())})()
+        # opus-5 goes through the beta endpoint for refusal fallback, so stub both
+        llm.client = type("C", (), {"messages": msgs,
+                                    "beta": type("B", (), {"messages": msgs})()})()
+        return llm
+
+    def setUp(self):
+        self._tok, self._calls = settings.MAX_MODEL_TOKENS, settings.MAX_MODEL_CALLS
+
+    def tearDown(self):
+        settings.MAX_MODEL_TOKENS, settings.MAX_MODEL_CALLS = self._tok, self._calls
+
+    def test_tokens_are_recorded_per_model(self):
+        llm = self._client()
+        llm.create(model="claude-sonnet-5", effort="low", messages=[], max_tokens=16)
+        llm.create(model="claude-opus-5", effort="low", messages=[], max_tokens=16)
+        self.assertEqual(llm.usage["claude-sonnet-5"]["input"], 1000)
+        self.assertEqual(llm.usage["claude-opus-5"]["output"], 200)
+        self.assertEqual(llm.total_tokens(), 2400)
+
+    def test_cost_uses_the_published_price_for_each_model(self):
+        llm = self._client()
+        llm.create(model="claude-sonnet-5", effort="low", messages=[], max_tokens=16)
+        sp = llm.spend()
+        # 1000 in at $2/MTok + 200 out at $10/MTok
+        self.assertAlmostEqual(sp["by_model"]["claude-sonnet-5"]["usd"], 0.004, places=4)
+
+    def test_an_unpriced_model_is_never_reported_as_cheap(self):
+        llm = self._client()
+        llm.create(model="claude-something-new", effort="low", messages=[], max_tokens=16)
+        cheapest = min(p[0] for p in settings.PRICING.values())
+        self.assertGreater(llm.spend()["total_usd"], 1000 / 1e6 * cheapest)
+
+    def test_the_token_budget_disables_the_client(self):
+        from ews.agents.runtime import AgentError
+        llm = self._client()
+        settings.MAX_MODEL_TOKENS = 1000          # one call spends 1200
+        llm.create(model="claude-sonnet-5", effort="low", messages=[], max_tokens=16)
+        with self.assertRaises(AgentError):
+            llm.create(model="claude-sonnet-5", effort="low", messages=[], max_tokens=16)
+        self.assertTrue(llm.disabled)

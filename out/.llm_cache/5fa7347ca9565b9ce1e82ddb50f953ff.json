@@ -1,0 +1,104 @@
+{
+  "result": {
+    "assessment": "agree_with_caveats",
+    "rationale": "The Healthy band is well supported and robust: payment is clean at 0 DPD with \u20ac1.40M open against a \u20ac4.05M limit, and the sole adverse item is a severity 5 wage-delay report aged 710 days, decayed from base 75 to 2.16, since superseded by a capacity expansion (NWS0029, severity 0). The band does not hinge on the decay treatment \u2014 even taking the news leg at its undecayed base of 75, the 0.35 weighting would leave it below the 35 threshold \u2014 so only the payment leg could move this buyer, and it is the input least well evidenced. My caveats concern the freshness and depth of that payment evidence, plus an unverified entity match on NWS0030, rather than the band itself.",
+    "concerns": [
+      {
+        "source_id": "INV001018",
+        "issue": "The 0 DPD driving the 0.65-weighted payment leg is a snapshot dated 2026-06-22. The news items carry age_days of 710 and 442 from publication dates of 2024-10-15 and 2025-07-10 respectively, which places the scoring as-of date materially later than this invoice snapshot and later than the 2026-08-02 payment review. The one input capable of changing the band is the one not refreshed; underwriter should confirm current DPD before the score is relied on."
+      },
+      {
+        "source_id": "INV001020",
+        "issue": "The 'improving' trend is thin-file. Only three settled invoices are available, and the improvement rests on a single most-recent on-time payment against a prior pattern of 10 and 21 days late. This supports a payment raw score of 0.0 far less firmly than the score's precision implies."
+      },
+      {
+        "source_id": "INV001020",
+        "issue": "The \u20ac4.05M credit limit was last reviewed in Aug 2024 \u2014 before the 2024-10-15 wage-delay event (NWS0030). The limit therefore predates the only adverse signal on file and has never been tested against it. All \u20ac1.40M of open exposure is concentrated with a single client, CL01."
+      },
+      {
+        "source_id": "NWS0030",
+        "issue": "Entity match unverified. The headline and body refer only to 'Vandermeer Inds.' and never name Vandermeer Polymers BV; the link appears to rest on the Geleen location and Plastics sector alone. Immaterial to the band either way, but it should not be carried forward as a confirmed adverse event on this buyer without confirmation."
+      }
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_score_breakdown",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY015\", \"score\": 0.8, \"band\": \"Healthy\", \"pd\": 0.0134, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": \"CL01\"}, \"news\": {\"severity\": 5, \"category\": \"wage_delay\", \"article_id\": \"NWS0030\", \"age_days\": 710, \"headline\": \"Workers at Vandermeer Inds. plant protest over delayed wages\", \"via_parent\": false, \"parent_name\": null, \"raw\": 2.2, \"weighted\": 0.8}, \"trace\": \"0.65 x"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "all"
+      },
+      "result": "[{\"id\": \"INV001018\", \"kind\": \"payment\", \"date\": \"2026-06-22\", \"detail\": \"3 open invoice(s) with CL01; worst is 0 days past due\", \"data\": {\"client_id\": \"CL01\", \"dpd\": 0, \"owed\": 1401400.0, \"open_count\": 3}}, {\"id\": \"INV001020\", \"kind\": \"payment_review\", \"date\": \"2026-08-02\", \"detail\": \"Vandermeer Polymers BV currently has three open invoices totaling ~\\u20ac1.40M, none past due. Settled invoice his"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "NWS0030"
+      },
+      "result": "{\"article_id\": \"NWS0030\", \"published_date\": \"2024-10-15\", \"publication\": \"The Commerce Wire\", \"headline\": \"Workers at Vandermeer Inds. plant protest over delayed wages\", \"body\": \"Workers at the Geleen facility of Vandermeer Inds. halted work for part of the day this week over what they described as delays in salary disbursement running to several weeks.\\n\\nA representative of the works committee s"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "NWS0029"
+      },
+      "result": "{\"article_id\": \"NWS0029\", \"published_date\": \"2025-07-10\", \"publication\": \"The Trade Journal\", \"headline\": \"Vandermeer Polymers. commissions new line at Geleen facility\", \"body\": \"Vandermeer Polymers. has commissioned an additional production line at its Geleen facility, taking installed capacity higher in the Plastics segment.\\n\\nThe company said the line was funded through a mix of internal accru"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The Healthy band is well supported and robust: payment is clean at 0 DPD with \u20ac1.40M open against a \u20ac4.05M limit, and the sole adverse item is a 710-day-old severity-5 wage-delay report decayed from base 75 to 2.16, since superseded by a capacity expansion (NWS0029, severity 0). The band does not hinge on the decay treatment \u2014 even at the undecayed base of 75 the news leg would weight to 26.25, still below the 35 threshold \u2014 so only the payment leg could move this buyer, and it is the input least well evidenced. My caveats concern the freshness and depth of that payment evidence, plus an unverified entity match on NWS0030, rather than the band itself.",
+        "concerns": [
+          {
+            "source_id": "INV001018",
+            "issue": "The 0 DPD driving 65% of the score is a snapshot dated 2026-06-22. Both news items' age_days (710 from 2024-10-15; 442 from 2025-07-10) independently imply an as-of date of ~2026-09-25, making this invoice data roughly three months stale. The one input capable of changing the band is the one not refreshed; underwriter should confirm current DPD before the score is relied on."
+          },
+          {
+            "source_id": "INV001020",
+            "issue": "The 'improving' trend is thin-file. Only three settled invoices are available, and the improvement rests on a single most-recent on-time payment against a prior pattern of 10 and 21 days late. This supports a 0 payment score far less firmly than the score's precision implies."
+          },
+          {
+            "source_id": "INV001020",
+            "issue": "The \u20ac4.05M credit limit was last reviewed in Aug 2024 \u2014 before the Oct 2024 wage-delay event (NWS0030). The limit therefore predates the only adverse signal on file and has never been tested against it. All \u20ac1.40M of open exposure is concentrated with a single client, CL01."
+          },
+          {
+            "source_id": "NWS0030",
+            "issue": "Entity match unverified. The headline and body refer only to 'Vandermeer Inds.' and never name Vandermeer Polymers BV; the link appears to rest on the Geleen location and Plastics sector alone. Immaterial to the band either way, but it should not be carried forward as a confirmed adverse event on this buyer without confirmation."
+          }
+        ]
+      },
+      "error": "these figures are not in the data: ['26.25', '09', '25, m']"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The Healthy band is well supported and robust: payment is clean at 0 DPD with \u20ac1.40M open against a \u20ac4.05M limit, and the sole adverse item is a severity 5 wage-delay report aged 710 days, decayed from base 75 to 2.16, since superseded by a capacity expansion (NWS0029, severity 0). The band does not hinge on the decay treatment \u2014 even taking the news leg at its undecayed base of 75, the 0.35 weighting would leave it below the 35 threshold \u2014 so only the payment leg could move this buyer, and it is the input least well evidenced. My caveats concern the freshness and depth of that payment evidence, plus an unverified entity match on NWS0030, rather than the band itself.",
+        "concerns": [
+          {
+            "source_id": "INV001018",
+            "issue": "The 0 DPD driving the 0.65-weighted payment leg is a snapshot dated 2026-06-22. The news items carry age_days of 710 and 442 from publication dates of 2024-10-15 and 2025-07-10 respectively, which places the scoring as-of date materially later than this invoice snapshot and later than the 2026-08-02 payment review. The one input capable of changing the band is the one not refreshed; underwriter should confirm current DPD before the score is relied on."
+          },
+          {
+            "source_id": "INV001020",
+            "issue": "The 'improving' trend is thin-file. Only three settled invoices are available, and the improvement rests on a single most-recent on-time payment against a prior pattern of 10 and 21 days late. This supports a payment raw score of 0.0 far less firmly than the score's precision implies."
+          },
+          {
+            "source_id": "INV001020",
+            "issue": "The \u20ac4.05M credit limit was last reviewed in Aug 2024 \u2014 before the 2024-10-15 wage-delay event (NWS0030). The limit therefore predates the only adverse signal on file and has never been tested against it. All \u20ac1.40M of open exposure is concentrated with a single client, CL01."
+          },
+          {
+            "source_id": "NWS0030",
+            "issue": "Entity match unverified. The headline and body refer only to 'Vandermeer Inds.' and never name Vandermeer Polymers BV; the link appears to rest on the Geleen location and Plastics sector alone. Immaterial to the band either way, but it should not be carried forward as a confirmed adverse event on this buyer without confirmation."
+          }
+        ]
+      }
+    }
+  ],
+  "turns": 4
+}

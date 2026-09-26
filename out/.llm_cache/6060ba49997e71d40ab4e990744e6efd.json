@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY023",
+    "name": "Kessler Traders GmbH",
+    "severity": 5,
+    "category": "unpaid_wages",
+    "reason": "Workers at Kessler Traders GmbH's Essen plant protested over delayed wages, indicating severe cash flow distress and potential inability to meet payroll obligations."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Kessler"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY023\", \"name\": \"Kessler Traders GmbH\", \"sector\": \"Steel Trading\", \"city\": \"Essen\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY023"
+      },
+      "result": "{\"id\": \"BUY023\", \"kind\": \"buyer\", \"name\": \"Kessler Traders GmbH\", \"short_name\": \"Kessler\", \"sector\": \"Steel Trading\", \"city\": \"Essen\", \"size_band\": \"small\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY023",
+        "severity": 5,
+        "category": "unpaid_wages",
+        "reason": "Workers at Kessler Traders GmbH's Essen plant protested over delayed wages, indicating severe cash flow distress and potential inability to meet payroll obligations."
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -1,0 +1,96 @@
+{
+  "result": {
+    "assessment": "agree_with_caveats",
+    "rationale": "The Healthy band is defensible: there is no adverse news or parent linkage on file, the sole open invoice is not yet due, and the payment agent reads the trend as improving. However, the 0.0 payment score is a point-in-time artifact rather than a statement of payment quality \u2014 it reads 0 DPD only because the single open item (INV002179, \u20ac299,700) has not reached its due date, while the same review documents consistently late settlement of 13-22 days past due through May 2026. A pristine 0.0, the floor of the scale, therefore overstates this buyer's discipline, and the 35% news weight is carried by a confirmed absence of coverage, which for a private regional mill is weak evidence of health rather than positive evidence of stability. The chronic lateness is mild and trending the right way, so I do not think it supports a different band, but this should go out as Healthy-but-monitor, not as a clean file.",
+    "concerns": [
+      {
+        "source_id": "INV002179",
+        "issue": "The payment leg scores 0.0 on a 0 DPD snapshot, but 0 DPD holds only because the single open invoice (\u20ac299,700) is not yet due. The same evidence records a persistent late-payment pattern of 13-22 days past due through May 2026, averaging ~13-14 days with one spike to 22 days. The formula's current-DPD input structurally cannot see this behaviour, so the score reflects invoice timing rather than payment reliability."
+      },
+      {
+        "source_id": "INV002179",
+        "issue": "The \u20ac1.52M credit limit has not been reviewed since 2024-08-09, despite ongoing late-payment behaviour over the intervening period. Exposure sits with a single counterparty (CL01) on one open invoice, so the limit governs materially more headroom than current utilisation of \u20ac299,700 suggests."
+      },
+      {
+        "source_id": "INV002179",
+        "issue": "The 'improving' trend that supports the benign reading rests on only 5 settled invoices, with the signal carried largely by one most-recent invoice paid 2 days late. That is thin support for treating a multi-month 13-22 DPD pattern as resolved; a single near-on-time datapoint should not be weighted as a regime change."
+      }
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_score_breakdown",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY029\", \"score\": 0.0, \"band\": \"Healthy\", \"pd\": 0.01, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": \"CL01\"}, \"news\": {\"severity\": 0, \"category\": null, \"article_id\": null, \"age_days\": null, \"headline\": null, \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x 0.0 (payment, 0 DPD) + 0.35 x 0.0 (news) = 0.0\"}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "all"
+      },
+      "result": "[{\"id\": \"INV002179\", \"kind\": \"payment\", \"date\": \"2026-07-10\", \"detail\": \"1 open invoice(s) with CL01; worst is 0 days past due\", \"data\": {\"client_id\": \"CL01\", \"dpd\": 0, \"owed\": 299700.0, \"open_count\": 1}}, {\"id\": \"INV002179\", \"kind\": \"payment_review\", \"date\": \"2026-07-10\", \"detail\": \"Carreau Mills SA has a history of consistently late payments (13-22 days past due) through May 2026, but the most r"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "news"
+      },
+      "result": "[{\"note\": \"no news evidence\"}]"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "parent"
+      },
+      "result": "[{\"note\": \"no parent evidence\"}]"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The Healthy band is defensible on the available evidence: there is no adverse news or parent linkage, the sole open invoice is not yet due, and the payment agent reads the trend as improving. However, the 0.0 payment score is a point-in-time artifact rather than a statement of payment quality \u2014 it reads 0 DPD only because the single open item (INV002179, \u20ac299,700) has not reached its due date, while the same review documents consistently late settlement of 13-22 days past due through May 2026. A pristine 0.0, the absolute floor of the scale, therefore overstates this buyer's discipline, and I would flag it as a Healthy-but-monitor rather than a clean file. The chronic lateness is mild and trending the right way, so I do not think it supports a different band, but it should not disappear from the underwriter's view.",
+        "concerns": [
+          {
+            "source_id": "INV002179",
+            "issue": "The payment leg scores 0.0 on a 0 DPD snapshot, but 0 DPD holds only because the single open invoice (\u20ac299,700) is not yet due. The same evidence records a persistent late-payment pattern of 13-22 days past due through May 2026, averaging ~13-14 days with one spike to 22 days. The formula's current-DPD input structurally cannot see this behaviour, so the score reflects invoice timing rather than payment reliability."
+          },
+          {
+            "source_id": "INV002179",
+            "issue": "The \u20ac1.52M credit limit has not been reviewed since 2024-08-09, despite ongoing late-payment behaviour over the intervening period. Exposure is also concentrated in a single counterparty (CL01) with one open invoice, so the limit governs materially more headroom than current utilisation of \u20ac299,700 suggests."
+          },
+          {
+            "source_id": "INV002179",
+            "issue": "The 'improving' trend that supports the benign reading rests on only 5 settled invoices, with the improvement signal carried largely by one most-recent invoice paid 2 days late. This is thin support for treating a multi-month 13-22 DPD pattern as resolved; a single on-time datapoint should not be weighted as a regime change."
+          },
+          {
+            "source_id": "BUY029",
+            "issue": "The news leg contributes 0.0 from a confirmed absence of any matched article (severity 0, no article_id, no parent linkage). For a privately held regional textile mill, absence of coverage is weak evidence of health rather than positive evidence of stability, so 35% of the score is effectively carried by an uninformative input."
+          }
+        ]
+      },
+      "error": "not evidence for this buyer: ['BUY029']; cite ids from get_evidence"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The Healthy band is defensible: there is no adverse news or parent linkage on file, the sole open invoice is not yet due, and the payment agent reads the trend as improving. However, the 0.0 payment score is a point-in-time artifact rather than a statement of payment quality \u2014 it reads 0 DPD only because the single open item (INV002179, \u20ac299,700) has not reached its due date, while the same review documents consistently late settlement of 13-22 days past due through May 2026. A pristine 0.0, the floor of the scale, therefore overstates this buyer's discipline, and the 35% news weight is carried by a confirmed absence of coverage, which for a private regional mill is weak evidence of health rather than positive evidence of stability. The chronic lateness is mild and trending the right way, so I do not think it supports a different band, but this should go out as Healthy-but-monitor, not as a clean file.",
+        "concerns": [
+          {
+            "source_id": "INV002179",
+            "issue": "The payment leg scores 0.0 on a 0 DPD snapshot, but 0 DPD holds only because the single open invoice (\u20ac299,700) is not yet due. The same evidence records a persistent late-payment pattern of 13-22 days past due through May 2026, averaging ~13-14 days with one spike to 22 days. The formula's current-DPD input structurally cannot see this behaviour, so the score reflects invoice timing rather than payment reliability."
+          },
+          {
+            "source_id": "INV002179",
+            "issue": "The \u20ac1.52M credit limit has not been reviewed since 2024-08-09, despite ongoing late-payment behaviour over the intervening period. Exposure sits with a single counterparty (CL01) on one open invoice, so the limit governs materially more headroom than current utilisation of \u20ac299,700 suggests."
+          },
+          {
+            "source_id": "INV002179",
+            "issue": "The 'improving' trend that supports the benign reading rests on only 5 settled invoices, with the signal carried largely by one most-recent invoice paid 2 days late. That is thin support for treating a multi-month 13-22 DPD pattern as resolved; a single near-on-time datapoint should not be weighted as a regime change."
+          }
+        ]
+      }
+    }
+  ],
+  "turns": 4
+}

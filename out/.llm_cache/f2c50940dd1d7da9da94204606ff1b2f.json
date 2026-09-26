@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY010",
+    "name": "Bluestone Engineering Ltd",
+    "severity": 0,
+    "category": "capacity_expansion",
+    "reason": "Article describes Bluestone Engineering commissioning a new production line funded via internal accruals and a term facility, with existing customer demand supporting the expansion - a positive/neutral capacity growth story with no signs of financial distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Bluestone"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY010\", \"name\": \"Bluestone Engineering Ltd\", \"sector\": \"Engineering\", \"city\": \"Leeds\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY010",
+        "severity": 0,
+        "category": "capacity_expansion",
+        "reason": "Article describes Bluestone Engineering commissioning a new production line funded via internal accruals and a term facility, with existing customer demand supporting the expansion - a positive/neutral capacity growth story with no signs of financial distress."
+      }
+    }
+  ],
+  "turns": 2
+}

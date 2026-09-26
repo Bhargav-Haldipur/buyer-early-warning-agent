@@ -24,7 +24,9 @@ TRENDS = ["deteriorating", "stable", "improving", "insufficient_history"]
 
 
 def _days_late(inv: dict) -> int:
-    return (parse_date(inv["payment_date"]) - parse_date(inv["due_date"])).days
+    """A Paid invoice with no payment_date is a broken row, not a zero-day settlement."""
+    return (parse_date(inv["payment_date"], what=f"invoice {inv['invoice_id']} payment_date")
+            - parse_date(inv["due_date"], what=f"invoice {inv['invoice_id']} due_date")).days
 
 
 def rules_trend(history: list[dict]) -> str:
@@ -50,17 +52,17 @@ class Ledger:
         self.open = sorted(
             ({"invoice_id": i["invoice_id"], "client_id": i["client_id"],
               "invoice_date": i["invoice_date"], "due_date": i["due_date"],
-              "amount_inr": float(i["invoice_amount_inr"] or 0),
+              "amount_eur": float(i["invoice_amount_eur"] or 0),
               "days_past_due": int(i["days_past_due"] or 0)}
              for i in mine if i["status"] == "Open"),
             key=lambda i: -i["days_past_due"])
         self.history = sorted(
             ({"invoice_id": i["invoice_id"], "client_id": i["client_id"],
               "due_date": i["due_date"], "payment_date": i["payment_date"],
-              "amount_inr": float(i["invoice_amount_inr"] or 0), "days_late": _days_late(i)}
+              "amount_eur": float(i["invoice_amount_eur"] or 0), "days_late": _days_late(i)}
              for i in mine if i["status"] != "Open" and i["payment_date"]),
             key=lambda i: i["due_date"])
-        self.lines = [{"client_id": l["client_id"], "credit_limit_inr": float(l["credit_limit_inr"]),
+        self.lines = [{"client_id": l["client_id"], "credit_limit_eur": float(l["credit_limit_eur"]),
                        "payment_terms_days": int(l["payment_terms_days"]),
                        "limit_status": l["limit_status"],
                        "last_reviewed_date": l["last_reviewed_date"]}
@@ -109,7 +111,7 @@ def assess(loader: Loader, store, llm=None) -> dict[str, dict]:
         key = (inv["buyer_id"], inv["client_id"])
         dpd = int(inv["days_past_due"] or 0)
         rec = lines[key]
-        rec["owed"] += float(inv["invoice_amount_inr"] or 0)
+        rec["owed"] += float(inv["invoice_amount_eur"] or 0)
         rec["open_count"] += 1
         if dpd >= rec["dpd"]:
             rec.update(dpd=dpd, worst_invoice=inv["invoice_id"], worst_due=inv["due_date"])

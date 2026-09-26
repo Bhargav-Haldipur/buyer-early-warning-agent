@@ -116,7 +116,10 @@ def run_agent(llm, *, spec: AgentSpec, task: str, tools: list[Tool],
                     if skipped:
                         raise ValueError(f"call {', '.join(skipped)} before submitting")
                     accepted = submit.fn(**args)
-                except (TypeError, ValueError) as exc:
+                # KeyError too: a submission missing a field the schema said was
+                # required is the agent's mistake to correct, not a reason to end the
+                # run. The read-tool path below has always treated it that way.
+                except (TypeError, ValueError, KeyError) as exc:
                     trace.append({"tool": call.name, "input": args, "error": str(exc)})
                     results.append({"type": "tool_result", "tool_use_id": call.id,
                                     "content": f"Rejected: {exc}", "is_error": True})

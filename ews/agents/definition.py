@@ -110,6 +110,10 @@ def load(name: str) -> AgentSpec:
     submits = [t for t in meta["tools"] if t.startswith("submit_")]
     if len(submits) != 1:
         raise DefinitionError(f"{path.name}: needs exactly one submit_* tool, found {submits}")
+    if not body.strip():
+        # an agent with no instructions does not fail - it flails for max_turns on every
+        # item and then falls back, which is the most expensive way to do nothing
+        raise DefinitionError(f"{path.name}: has no system prompt below the frontmatter")
     s = settings.agent(name)
     required = s["guardrails"]["required_before_submit"]
     unlisted = [t for t in required if t not in meta["tools"] or t in submits]

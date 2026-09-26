@@ -1,0 +1,61 @@
+{
+  "result": {
+    "trend": "insufficient_history",
+    "summary": "No invoices are currently past due, but the only settled invoice on record (INV001489, \u20ac195k) was paid 28 days late, a flag worth monitoring. Open exposure of \u20ac695.5k across five invoices runs to ~79% of the single \u20ac880k credit limit held by one insurer, so headroom is limited if late payment recurs.",
+    "concerns": [
+      "Only one settled invoice exists, so a reliable payment trend cannot yet be established",
+      "That single settled invoice was paid 28 days late relative to a 90-day term, indicating some payment friction despite generous terms",
+      "Open invoice exposure (\\u20ac695.5k) is concentrated and represents ~79% of the sole insurer's \\u20ac880k credit limit, leaving little buffer",
+      "Credit limit was last reviewed over a year ago (Jan 2025) and may not reflect current exposure levels"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_invoices",
+      "input": {},
+      "result": "[{\"invoice_id\": \"INV001494\", \"client_id\": \"CL01\", \"invoice_date\": \"2026-06-17\", \"due_date\": \"2026-09-15\", \"amount_eur\": 95200.0, \"days_past_due\": 0}, {\"invoice_id\": \"INV001492\", \"client_id\": \"CL01\", \"invoice_date\": \"2026-05-06\", \"due_date\": \"2026-08-04\", \"amount_eur\": 75800.0, \"days_past_due\": 0}, {\"invoice_id\": \"INV001493\", \"client_id\": \"CL01\", \"invoice_date\": \"2026-05-05\", \"due_date\": \"2026-08-0"
+    },
+    {
+      "tool": "get_payment_history",
+      "input": {},
+      "result": "[{\"invoice_id\": \"INV001489\", \"client_id\": \"CL01\", \"due_date\": \"2026-06-02\", \"payment_date\": \"2026-06-30\", \"amount_eur\": 195000.0, \"days_late\": 28}]"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"CL01\", \"credit_limit_eur\": 880000.0, \"payment_terms_days\": 90, \"limit_status\": \"Active\", \"last_reviewed_date\": \"2025-01-11\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 0,
+        "worst_invoice_id": "",
+        "trend": "insufficient_history",
+        "summary": "No invoices are currently past due, but the only settled invoice on record (INV001489, \u20ac195k) was paid 28 days late, a flag worth monitoring. Open exposure of \u20ac695.5k across five invoices runs to ~79% of the single \u20ac880k credit limit held by one insurer, so headroom is limited if late payment recurs.",
+        "concerns": [
+          "Only one settled invoice exists, so a reliable payment trend cannot yet be established",
+          "That single settled invoice was paid 28 days late relative to a 90-day term, indicating some payment friction despite generous terms",
+          "Open invoice exposure (\u20ac695.5k) is concentrated and represents ~79% of the sole insurer's \u20ac880k credit limit, leaving little buffer",
+          "Credit limit was last reviewed over a year ago (Jan 2025) and may not reflect current exposure levels"
+        ]
+      },
+      "error": "'' is not an open invoice at 0 days past due"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 0,
+        "worst_invoice_id": "INV001494",
+        "trend": "insufficient_history",
+        "summary": "No invoices are currently past due, but the only settled invoice on record (INV001489, \u20ac195k) was paid 28 days late, a flag worth monitoring. Open exposure of \u20ac695.5k across five invoices runs to ~79% of the single \u20ac880k credit limit held by one insurer, so headroom is limited if late payment recurs.",
+        "concerns": [
+          "Only one settled invoice exists, so a reliable payment trend cannot yet be established",
+          "That single settled invoice was paid 28 days late relative to a 90-day term, indicating some payment friction despite generous terms",
+          "Open invoice exposure (\\u20ac695.5k) is concentrated and represents ~79% of the sole insurer's \\u20ac880k credit limit, leaving little buffer",
+          "Credit limit was last reviewed over a year ago (Jan 2025) and may not reflect current exposure levels"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

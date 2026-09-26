@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "Only registry match is \"Marchetti Mills SpA\", a textiles company in Biella, which differs in sector, city, and business line from \"Marchetti Clinics SpA\", a Turin healthcare group; no valid match found."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Marchetti"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY011\", \"name\": \"Marchetti Mills SpA\", \"sector\": \"Textiles\", \"city\": \"Biella\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "Only registry match is \"Marchetti Mills SpA\", a textiles company in Biella, which differs in sector, city, and business line from \"Marchetti Clinics SpA\", a Turin healthcare group; no valid match found."
+      }
+    }
+  ],
+  "turns": 2
+}

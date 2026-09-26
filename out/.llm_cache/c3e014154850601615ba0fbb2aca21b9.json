@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "The only registry match, Oakhurst Components Ltd, is a Birmingham-based auto components manufacturer, distinct in sector, location, and name from Oakhurst Realty LLP, a Utrecht property developer. No genuine match exists in the registry."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Oakhurst"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY019\", \"name\": \"Oakhurst Components Ltd\", \"sector\": \"Auto Components\", \"city\": \"Birmingham\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "The only registry match, Oakhurst Components Ltd, is a Birmingham-based auto components manufacturer, distinct in sector, location, and name from Oakhurst Realty LLP, a Utrecht property developer. No genuine match exists in the registry."
+      }
+    }
+  ],
+  "turns": 2
+}

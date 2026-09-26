@@ -12,6 +12,8 @@ agent set the risk score - that is always the formula in ews/config.py.
 
 # Effort levels the Claude API accepts on the models below. Lower effort means fewer
 # tool calls and less thinking - cheaper and faster, less thorough.
+import os
+
 EFFORTS = ("low", "medium", "high", "xhigh", "max")
 
 AGENTS = {
@@ -79,6 +81,32 @@ AGENTS = {
 
 # On Opus models, re-run a request Claude declines on Anthropic's recommended
 # fallback model instead of failing the agent (server-side, one call).
+# Hard ceiling on model calls in one engine run. The agents are sequential, so this
+# is a spend cap, not a rate limit: once it is hit the LLM switches itself off and
+# every remaining item falls back to its rule-based path. A full pass is ~94 agent
+# runs; most submit in 2-5 turns, so 400 leaves headroom without letting a pathological
+# loop run up a bill.
+MAX_MODEL_CALLS = 400
+
+# Retries the SDK may make per call (429s and 5xx, with backoff). Each retry is a
+# billable call, so this is deliberately low.
+MAX_RETRIES = 2
+
+# Published per-million-token prices, for turning usage into a number on the screen.
+# An unlisted model falls back to the most expensive row, so a new model is never
+# reported as cheaper than it is.
+PRICING = {
+    "claude-opus-5":    (5.0, 25.0),
+    "claude-opus-4-8":  (5.0, 25.0),
+    "claude-sonnet-5":  (2.0, 10.0),
+    "claude-haiku-4-5": (1.0,  5.0),
+}
+DEFAULT_PRICE = (10.0, 50.0)
+
+# A call budget is a crude proxy for spend: one call with 80k input tokens costs far
+# more than fifty with 1.5k. This caps the tokens as well.
+MAX_MODEL_TOKENS = 4_000_000
+
 REFUSAL_FALLBACK = True
 
 # Characters of each tool result kept in the trace shown on the dashboard.
@@ -106,6 +134,36 @@ class SettingsError(ValueError):
     """ews/settings.py holds a value the engine cannot use."""
 
 
+def apply_overrides(agents: str | None = None, max_calls: int | None = None) -> None:
+    """Narrow which agents use Claude, and cap the run's model calls.
+
+    Read from EWS_AGENTS / EWS_MAX_CALLS as well as from arguments, because an
+    override that only one entry point honours is worse than none: `--agents news`
+    used to apply to `ews.run` and silently not to the harness, which then ran every
+    agent - including the expensive ones - on the default settings.
+    """
+    global MAX_MODEL_CALLS
+    agents = agents if agents is not None else os.environ.get("EWS_AGENTS")
+    if agents is not None:
+        wanted = {a.strip() for a in agents.split(",") if a.strip()}
+        unknown = wanted - set(AGENTS)
+        if unknown:
+            raise SettingsError(f"unknown agent(s): {sorted(unknown)}; known: {sorted(AGENTS)}")
+        for name, spec in AGENTS.items():
+            spec["enabled"] = name in wanted
+    raw = max_calls if max_calls is not None else os.environ.get("EWS_MAX_CALLS")
+    if raw is not None:
+        try:
+            MAX_MODEL_CALLS = int(raw)
+        except (TypeError, ValueError) as exc:
+            raise SettingsError(f"EWS_MAX_CALLS must be an integer, got {raw!r}") from exc
+    limits()
+
+
+def enabled_agents() -> list[str]:
+    return sorted(n for n, s in AGENTS.items() if s["enabled"])
+
+
 def _check(where: str, got: dict, schema: dict) -> None:
     missing = sorted(set(schema) - set(got))
     unknown = sorted(set(got) - set(schema))
@@ -123,8 +181,18 @@ def _check(where: str, got: dict, schema: dict) -> None:
             raise SettingsError(f"{where}.{key} must be {typ.__name__}, got {value!r}")
 
 
+def limits() -> None:
+    """The spend controls are settings too, and a bad value must fail loudly."""
+    for label, value, floor in (("MAX_MODEL_CALLS", MAX_MODEL_CALLS, 1),
+                                ("MAX_MODEL_TOKENS", MAX_MODEL_TOKENS, 1),
+                                ("MAX_RETRIES", MAX_RETRIES, 0)):
+        if isinstance(value, bool) or not isinstance(value, int) or value < floor:
+            raise SettingsError(f"{label} must be an int >= {floor}, got {value!r}")
+
+
 def agent(name: str) -> dict:
     """The validated settings for one agent."""
+    limits()
     if name not in AGENTS:
         raise SettingsError(f"no settings for agent {name!r}; known: {sorted(AGENTS)}")
     s = AGENTS[name]

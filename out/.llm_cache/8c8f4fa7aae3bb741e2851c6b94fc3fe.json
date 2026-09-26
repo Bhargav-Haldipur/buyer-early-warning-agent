@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY017",
+    "name": "Rheinfels Industries GmbH",
+    "severity": 4,
+    "category": "capacity_cut",
+    "reason": "Rheinfels Industries has cut its Duisburg unit from three shifts to one, halted contract worker recall, and slowed material procurement, citing weak order inflow in Chemicals\u2014signs of operational distress affecting near-term output and cash flow."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Rheinfels"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY017\", \"name\": \"Rheinfels Industries GmbH\", \"sector\": \"Chemicals\", \"city\": \"Duisburg\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY017",
+        "severity": 4,
+        "category": "capacity_cut",
+        "reason": "Rheinfels Industries has cut its Duisburg unit from three shifts to one, halted contract worker recall, and slowed material procurement, citing weak order inflow in Chemicals\u2014signs of operational distress affecting near-term output and cash flow."
+      }
+    }
+  ],
+  "turns": 2
+}

@@ -1,0 +1,41 @@
+{
+  "result": {
+    "trend": "improving",
+    "summary": "Falcon Electronics Supply BV has one open invoice (\u20ac187,500) not yet due. Settled invoices show late payments ranging 0-19 days, with a clear improvement from 19 days late in May to on-time in June. Exposure (\u20ac187.5k) is well within the single insurer's \u20ac900k credit limit, posing low current risk.",
+    "concerns": [
+      "Payment history shows intermittent late payments (5-19 days) rather than consistent on-time settlement",
+      "Credit line last reviewed in Sept 2024, may warrant refresh given recent payment volatility"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_invoices",
+      "input": {},
+      "result": "[{\"invoice_id\": \"INV000860\", \"client_id\": \"CL01\", \"invoice_date\": \"2026-06-02\", \"due_date\": \"2026-07-02\", \"amount_eur\": 187500.0, \"days_past_due\": 0}]"
+    },
+    {
+      "tool": "get_payment_history",
+      "input": {},
+      "result": "[{\"invoice_id\": \"INV000856\", \"client_id\": \"CL01\", \"due_date\": \"2026-04-19\", \"payment_date\": \"2026-04-27\", \"amount_eur\": 68000.0, \"days_late\": 8}, {\"invoice_id\": \"INV000855\", \"client_id\": \"CL01\", \"due_date\": \"2026-04-27\", \"payment_date\": \"2026-05-16\", \"amount_eur\": 238700.0, \"days_late\": 19}, {\"invoice_id\": \"INV000858\", \"client_id\": \"CL01\", \"due_date\": \"2026-05-04\", \"payment_date\": \"2026-05-09\", \"a"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"CL01\", \"credit_limit_eur\": 900000.0, \"payment_terms_days\": 30, \"limit_status\": \"Active\", \"last_reviewed_date\": \"2024-09-10\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 0,
+        "worst_invoice_id": "INV000860",
+        "trend": "improving",
+        "summary": "Falcon Electronics Supply BV has one open invoice (\u20ac187,500) not yet due. Settled invoices show late payments ranging 0-19 days, with a clear improvement from 19 days late in May to on-time in June. Exposure (\u20ac187.5k) is well within the single insurer's \u20ac900k credit limit, posing low current risk.",
+        "concerns": [
+          "Payment history shows intermittent late payments (5-19 days) rather than consistent on-time settlement",
+          "Credit line last reviewed in Sept 2024, may warrant refresh given recent payment volatility"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

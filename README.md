@@ -48,16 +48,49 @@ tool whose input code checks. Without Claude, each falls back to its rule-based 
 so the demo, harness and tests always work offline. To use Claude:
 
 ```bash
-pip install anthropic
+python3 -m venv .venv
+.venv/bin/pip install anthropic
 export ANTHROPIC_API_KEY=sk-ant-...
-python3 -m ews.run
+.venv/bin/python -m ews.run
 ```
+
+A venv is needed because Homebrew's Python is externally managed (PEP 668). Only the
+Claude path needs it &mdash; everything above runs on the system `python3`.
 
 Claude is picked up automatically once both are in place. To force the rule-based
 path back on:
 
 ```bash
 EWS_LLM=fallback python3 -m ews.run
+```
+
+### Controlling what it spends
+
+Nothing calls the API unless you ask it to, and three controls bound what happens when
+you do. All of them work on `ews.run` and `harness.evaluate` alike, and as env vars:
+
+```bash
+.venv/bin/python -m ews.run --agents news --max-calls 60
+EWS_AGENTS=news EWS_MAX_CALLS=60 .venv/bin/python -m harness.evaluate
+```
+
+| Control | Where | What it does |
+|---|---|---|
+| `--agents` / `EWS_AGENTS` | CLI or env | only these agents use Claude; the rest use rules |
+| `--max-calls` / `EWS_MAX_CALLS` | CLI or env | caps model calls for the run |
+| `MAX_MODEL_CALLS` | `ews/settings.py` | default call ceiling (400) |
+| `MAX_MODEL_TOKENS` | `ews/settings.py` | default token ceiling (4M) — a call cap is a crude proxy, since one call with 80k input costs fifty times one with 1.5k |
+| `max_turns` | `ews/settings.py` | model calls per agent run (12) |
+
+When either budget is reached the client switches itself off and everything remaining
+falls back to rules — the run completes, it just stops spending.
+
+Every run reports what it actually used, priced per model. Not an estimate:
+
+```
+spend (measured, not estimated):
+  claude-sonnet-5       4 calls      6,846 in       619 out  $0.02
+  TOTAL                  7,465 tokens                    $0.02
 ```
 
 Every agent run is cached to `out/.llm_cache/` by content hash, so re-runs cost nothing
@@ -128,17 +161,17 @@ severity-5 trap in Healthy.
 
 ### What it guards against
 
-**Wrong company.** The article names *Arcline Media Pvt Ltd*; the covered buyer is
-*Arcline Fabricators Limited*. Resolution is deliberately reluctant — the brand token
+**Wrong company.** The article names *Arcline Media BV*; the covered buyer is
+*Arcline Fabrications NV*. Resolution is deliberately reluctant — the brand token
 must match exactly one entity, and every remaining distinguishing word in the mention
 must appear in that entity's own registered name. It accepts `Arcline`, `Arcline Inds.`
-and `ARCLINE FABRICATORS LIMITED`; it refuses `Arcline Media Pvt Ltd`. Measured at
+and `ARCLINE FABRICATIONS NV`; it refuses `Arcline Media BV`. Measured at
 **33/33 genuine mentions resolved, 5/5 decoys refused.**
 
 **Trouble upstream.** A parent-company story fans out to every subsidiary one rung down
 the severity ladder — severe for the parent is moderate for the subsidiary. One story
 about Northpoint reaches both its subsidiaries; Westbridge absorbs it and stays Healthy
-because it pays on time, Chandra crosses into Watch because it is already 25 days
+because it pays on time, Marchetti crosses into Watch because it is already 25 days
 behind. Same article, different outcomes, decided by the books.
 
 **Invented numbers.** The case-file writer receives a facts dict and may use only those
@@ -167,7 +200,7 @@ awaits an underwriter.
 
 ### The dashboard
 
-Home → Client → Buyer, using TCS-Frontend's design tokens verbatim. Aldermont renders in
+Home → Client → Buyer, using TCS-Frontend's design tokens verbatim. Adlerhof renders in
 its real theme variation; insurers without a published variation fall back to the
 default. No colour appears outside `theme.css`, and a test enforces it. Each insurer
 sees only its own buyers — and no rival is named anywhere on the page, including in the
@@ -181,18 +214,36 @@ back to a row in a CSV.
 
 ## Results
 
-| Gate | Result |
-|---|---|
-| Defaulters flagged | **4/4** |
-| Survivors left Healthy | **16/16** |
-| Wobblers and the severity-5 trap | all Healthy |
-| Entity resolution — recall / decoys refused | **33/33** / **5/5** |
-| Severity agreement with labels | **32/32 exact** |
-| Demo replay, steps 1–8 | reproduces the planned scores |
-| Tests | **18/18** |
+Measured on both paths — the rule-based fallback, and the four agents on Claude.
 
-Baseline: Arcline **63.3** and Girikand **62.2** High Risk; Suvarna **42.7** and
-Emberline **37.2** Watch; 16 Healthy; 4 decoys refused.
+| Gate | Rules | Claude |
+|---|---|---|
+| Defaulters flagged | **4/4** | **4/4** |
+| Survivors left Healthy | **22/22** | **22/22** |
+| Wobblers and the three severity-5 traps | all Healthy | all Healthy |
+| Entity resolution — recall | **33/33** | **33/33** |
+| Entity resolution — **decoys refused** | **5/5** | **5/5** |
+| Severity agreement with labels | 32/32 | 29/32 — see below |
+| Parent fan-out | pass | pass |
+| Demo replay, steps 1–8 | pass | pass |
+| Case file figures traced to the engine | 26 templated | **4 model-written, 0 discarded** |
+| Tests | **79/79** | — |
+
+**The decoys held against a real model.** Given search tools and free rein to
+investigate, Claude still refused all five — including `Halberg Jewellers GmbH`
+against `Halberg Textiles GmbH`. That was the defence most likely to break.
+
+**The case-file guard passed its first real test.** Four Opus 5 drafts, every figure
+checked against the engine's own numbers, none discarded.
+
+**The three severity disagreements look like the labels being coarse, not the model
+being wrong.** The labels map `capacity_cut → 3` mechanically; Claude read *"cut from
+three shifts to one, halted contract worker recall, slowed material procurement"* and
+called it 4. That is what moves Maasland from 62.2 to 66.9 on the Claude path.
+
+Baseline on the rules path: Arcline **63.3** and Maasland **62.2** High Risk; Halberg
+**42.7** and Emberline **37.2** Watch; 22 Healthy; 4 decoys refused. On Claude the
+same four are flagged, with Maasland at **66.9**.
 
 Emberline sits **2.2 points** above the Watch line and is the binding constraint — any
 change to the half-life, the news ladder or the 65/35 split must be re-checked against

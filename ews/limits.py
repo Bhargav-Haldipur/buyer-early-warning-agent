@@ -9,9 +9,10 @@ from .loader import Loader
 
 def _insured(limit: float, client: dict) -> float:
     """Exposure the insurer actually carries on this line."""
-    indemnity = int(client["indemnity_pct"]) / 100
-    deductible = int(client["deductible_pct"]) / 100
-    return min(float(client["max_liability_inr"]), limit * indemnity * (1 - deductible))
+    # fractional percentages are legitimate on a policy (87.5%), so never int()
+    indemnity = float(client["indemnity_pct"]) / 100
+    deductible = float(client["deductible_pct"]) / 100
+    return min(float(client["max_liability_eur"]), limit * indemnity * (1 - deductible))
 
 
 def recommend(loader: Loader, verdicts: dict[str, dict]) -> list[dict]:
@@ -19,7 +20,7 @@ def recommend(loader: Loader, verdicts: dict[str, dict]) -> list[dict]:
     owed_by_line: dict[tuple[str, str], float] = defaultdict(float)
     for inv in loader.invoices():
         if inv["status"] == "Open":
-            owed_by_line[(inv["buyer_id"], inv["client_id"])] += float(inv["invoice_amount_inr"] or 0)
+            owed_by_line[(inv["buyer_id"], inv["client_id"])] += float(inv["invoice_amount_eur"] or 0)
 
     out = []
     for line in loader.credit_limits():
@@ -28,12 +29,12 @@ def recommend(loader: Loader, verdicts: dict[str, dict]) -> list[dict]:
         if verdict is None:
             continue
         client = clients[cid]
-        limit = float(line["credit_limit_inr"])
+        limit = float(line["credit_limit_eur"])
         owed = owed_by_line.get((bid, cid), 0.0)
         pd = verdict["pd"]
 
         insured_now = _insured(limit, client)
-        capped = insured_now >= float(client["max_liability_inr"]) - 1e-6
+        capped = insured_now >= float(client["max_liability_eur"]) - 1e-6
 
         if pd <= PD_TARGET:
             action, revised, why = "MAINTAIN", limit, "probability of default is within appetite"

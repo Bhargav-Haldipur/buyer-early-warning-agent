@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY015",
+    "name": "Vandermeer Polymers BV",
+    "severity": 5,
+    "category": "wage_delay",
+    "reason": "Workers at Vandermeer Polymers BV's Geleen plant staged a protest over weeks of delayed and partial wage payments, plus unremitted provident fund deductions, indicating acute cash flow distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Vandermeer"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY015\", \"name\": \"Vandermeer Polymers BV\", \"sector\": \"Plastics\", \"city\": \"Geleen\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY015"
+      },
+      "result": "{\"id\": \"BUY015\", \"kind\": \"buyer\", \"name\": \"Vandermeer Polymers BV\", \"short_name\": \"Vandermeer\", \"sector\": \"Plastics\", \"city\": \"Geleen\", \"size_band\": \"large\", \"parent\": {\"id\": \"PAR04\", \"name\": \"Vasterberg Industrier AB\"}}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY015",
+        "severity": 5,
+        "category": "wage_delay",
+        "reason": "Workers at Vandermeer Polymers BV's Geleen plant staged a protest over weeks of delayed and partial wage payments, plus unremitted provident fund deductions, indicating acute cash flow distress."
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY005",
+    "name": "Emberline Electricals Ltd",
+    "severity": 4,
+    "category": "vendor_payment_delay",
+    "reason": "Multiple vendors report sustained payment delays (60-100 days vs 45-day terms) and partial payments, with working capital described as stretched, indicating moderate financial stress though operations continue."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Emberline"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY005\", \"name\": \"Emberline Electricals Ltd\", \"sector\": \"Electrical Equipment\", \"city\": \"Coventry\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY005",
+        "severity": 4,
+        "category": "vendor_payment_delay",
+        "reason": "Multiple vendors report sustained payment delays (60-100 days vs 45-day terms) and partial payments, with working capital described as stretched, indicating moderate financial stress though operations continue."
+      }
+    }
+  ],
+  "turns": 2
+}

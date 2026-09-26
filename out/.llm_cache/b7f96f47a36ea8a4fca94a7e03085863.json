@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY010",
+    "name": "Bluestone Engineering Ltd",
+    "severity": 0,
+    "category": "higher_volumes",
+    "reason": "Article reports higher dispatch volumes and stable realisations for Bluestone Engineering Ltd, which is positive/neutral news with no indication of financial distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Bluestone"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY010\", \"name\": \"Bluestone Engineering Ltd\", \"sector\": \"Engineering\", \"city\": \"Leeds\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY010",
+        "severity": 0,
+        "category": "higher_volumes",
+        "reason": "Article reports higher dispatch volumes and stable realisations for Bluestone Engineering Ltd, which is positive/neutral news with no indication of financial distress."
+      }
+    }
+  ],
+  "turns": 2
+}

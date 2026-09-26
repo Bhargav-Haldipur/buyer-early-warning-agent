@@ -1,4 +1,4 @@
-client_id,client_name,sector,city,policy_id,overdue_reporting_window_days,indemnity_pct,deductible_pct,max_liability_inr
-CL01,Aldermont Trade Credit,Trade Credit Insurance,London,TCI-CL01-2025,30,90,10,150000000
-CL03,Calderwood Trade Credit,Trade Credit Insurance,Geneva,TCI-CL03-2025,30,85,15,80000000
-CL05,Thornbury Trade Credit,Trade Credit Insurance,Rotterdam,TCI-CL05-2025,30,85,10,60000000
+client_id,client_name,sector,city,policy_id,overdue_reporting_window_days,indemnity_pct,deductible_pct,max_liability_eur
+CL01,Adlerhof Trade Credit,Trade Credit Insurance,Frankfurt,TCI-CL01-2025,30,90,10,15000000
+CL03,Solvenza Trade Credit,Trade Credit Insurance,Milan,TCI-CL03-2025,30,85,15,8000000
+CL05,Nordhaven Trade Credit,Trade Credit Insurance,Copenhagen,TCI-CL05-2025,30,85,10,6000000
