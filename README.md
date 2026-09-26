@@ -118,7 +118,7 @@ The guardrails, with their defaults in `ews/settings.py`:
 | Payment Behaviour | settlement trend, concerns | must call `get_open_invoices` first; `must_match_ledger`; `max_concerns` | the score uses the ledger, never the agent |
 | News Intelligence | which entity an article is about, severity | must call `search_entities` first; `entity_must_be_looked_up`; `allowed_severities` | entity must be in the registry; parent fan-out |
 | Risk Adjudicator | agree / caveats / challenge, with cited evidence | must call `get_evidence` first; `require_real_citations`; `verify_figures`; `max_concerns` | cannot change the score |
-| Case File | the write-up | must call `get_verdict` and `get_limits` first; `verify_figures`; `figure_tolerance`; `run_for_bands` | template when the agent cannot produce a clean draft |
+| Case File | structured fields (bottom line, driver notes, lift/worsen triggers) + a four-paragraph narrative; header, limits, trace and evidence are filled by code | must call `get_verdict` and `get_limits` first; `verify_figures` over every field; `figure_tolerance`; `max_list_items`; `run_for_bands` | template when the agent cannot produce a clean draft |
 
 ---
 

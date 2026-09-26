@@ -382,6 +382,60 @@ def review_block(rv: dict | None) -> str:
               'the underwriter alongside it.</p>')
 
 
+def case_tab(r: dict) -> str:
+    """Structured case file first, for scanning; the narrative underneath."""
+    cf = r["case_file"]
+    f = cf["fields"]
+    h = f["header"]
+    assess = (f' &middot; adjudicator: <b>{e(ASSESS_LABEL[h["assessment"]])}</b>'
+              if h["assessment"] else "")
+    head = (f'<p class="overline">{band_pill(h["band"])} score <b>{h["score"]}</b> &middot; '
+            f'PD {h["pd"]*100:.1f}%{assess} &middot; as of {e(h["as_of"])}</p>')
+
+    rows = "".join(
+        f'<tr><td>{e(l["client_name"])}</td><td class="num">{money(l["current_limit"])}</td>'
+        f'<td class="num">{money(l["owed"])}</td><td class="num">{money(l["revised_limit"])}</td>'
+        f'<td class="num">{money(l["change"])}</td>'
+        f'<td>{action_pill(l["action"])}<br><span class="overline">{e(l["reason"])}</span></td></tr>'
+        for l in f["limit_actions"])
+    limits = (f'<table><thead><tr><th>Insurer</th><th class="num">Current limit</th>'
+              f'<th class="num">Owed</th><th class="num">Revised</th><th class="num">Change</th>'
+              f'<th>Action</th></tr></thead><tbody>{rows}</tbody></table>'
+              if rows else '<p class="body2">No credit limit lines.</p>')
+
+    drivers = "".join(
+        f'<dt>{e(d["driver"].capitalize())} &middot; {d["points"]} pts</dt>'
+        f'<dd>{e(d["note"])}'
+        + (f' <span class="overline">[{e(d["evidence_id"])}]</span>' if d["evidence_id"] else "")
+        + '</dd>' for d in f["drivers"])
+
+    def items(xs: list[str]) -> str:
+        return '<ul class="body2">' + "".join(f"<li>{e(x)}</li>" for x in xs) + "</ul>"
+
+    evidence = "".join(
+        f'<tr><td>{e(x["id"])}</td><td>{e(x["kind"].replace("_", " "))}</td>'
+        f'<td>{e(x["date"])}</td><td>{e(x["detail"])}</td></tr>' for x in f["evidence"])
+    evidence = (f'<table><thead><tr><th>Id</th><th>Kind</th><th>Date</th><th>Detail</th>'
+                f'</tr></thead><tbody>{evidence}</tbody></table>' if evidence else
+                '<p class="body2">No evidence recorded.</p>')
+
+    paras = "".join(f"<p>{e(p)}</p>" for p in cf["narrative"].split("\n\n") if p.strip())
+    note = (f'<p class="overline">Judgement and narrative written by '
+            f'{"the Case File agent" if cf["source"]=="llm" else "template"}; header, '
+            f'limits, trace and evidence filled from the engine'
+            + (f'; model output discarded &mdash; unverifiable figures {cf["rejected_numbers"]}'
+               if cf["rejected_numbers"] else "") + "</p>")
+    return (f'<div class="panel case">{head}<p class="bottom-line">{e(f["bottom_line"])}</p>'
+            f'<h3>Recommended limit action</h3>{limits}'
+            f'<h3>Why this band</h3><dl class="kv">{drivers}</dl>'
+            f'<div class="trace">{e(f["score_trace"])}</div>'
+            f'{review_block(r["verdict"].get("review"))}'
+            f'<div class="cf-split"><div><h3>What would lift it</h3>{items(f["lifts_it"])}</div>'
+            f'<div><h3>What would worsen it</h3>{items(f["worsens_it"])}</div></div>'
+            f'<h3>Narrative</h3>{paras}'
+            f'<h3>Evidence</h3>{evidence}{note}</div>')
+
+
 def agents_tab(r: dict, data: dict) -> str:
     v = r["verdict"]
     pay = next((x for x in r["evidence"] if x["kind"] == "payment_review"), None)
@@ -443,12 +497,7 @@ def buyer_page(bid: str, tab: str) -> bytes:
                          ("payments", "Payments"), ("news", "News"), ("agents", "Agents")])
 
     if tab == "case":
-        cf = r["case_file"]
-        paras = "".join(f"<p>{e(p)}</p>" for p in cf["text"].split("\n\n") if p.strip())
-        note = (f'<p class="overline">Written by {"the Case File agent" if cf["source"]=="llm" else "template"}'
-                + (f'; model output discarded &mdash; unverifiable figures {cf["rejected_numbers"]}'
-                   if cf["rejected_numbers"] else "") + "</p>")
-        inner = f'<div class="panel case">{paras}{note}</div>'
+        inner = case_tab(r)
 
     elif tab == "score":
         n = v["news"]

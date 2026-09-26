@@ -73,6 +73,8 @@ AGENTS = {
             "verify_figures": True,
             # how far a written figure may sit from the data value and still match
             "figure_tolerance": 0.051,
+            # most items the agent may list under lifts_it and under worsens_it
+            "max_list_items": 3,
             # bands that get an agent-written case file; the rest get the template
             "run_for_bands": ["Watch", "High Risk"],
         },
@@ -126,7 +128,7 @@ _GUARDRAILS = {
     "adjudicator": {"required_before_submit": list, "require_real_citations": bool,
                     "verify_figures": bool, "max_concerns": int},
     "casefile": {"required_before_submit": list, "verify_figures": bool,
-                 "figure_tolerance": float, "run_for_bands": list},
+                 "figure_tolerance": float, "max_list_items": int, "run_for_bands": list},
 }
 
 
@@ -210,6 +212,8 @@ def agent(name: str) -> dict:
         raise SettingsError("news allowed_severities must be a non-empty subset of 0, 3, 4, 5")
     if "run_for_bands" in g and not set(g["run_for_bands"]) <= {"Healthy", "Watch", "High Risk"}:
         raise SettingsError("casefile run_for_bands may only name Healthy, Watch, High Risk")
+    if g.get("max_list_items", 1) < 1:
+        raise SettingsError("casefile max_list_items must be at least 1")
     if g.get("max_concerns", 1) < 0 or g.get("figure_tolerance", 0) < 0:
         raise SettingsError(f"AGENTS[{name!r}]: limits must not be negative")
     return s

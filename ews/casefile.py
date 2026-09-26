@@ -1,13 +1,24 @@
 """Case File writer + the D10 guard.
 
-The Case File is the default tab, so the agent is never trusted with arithmetic. Every
+The Case File is the default tab and comes in two forms from one set of facts:
+
+  fields     - structured sections for the underwriter to scan: header, bottom line,
+               limit actions, drivers, adjudicator review, what would lift or worsen
+               it, evidence. Every figure in them is copied from the engine by code.
+  narrative  - four short paragraphs, the same story in prose.
+
+The agent writes only the judgement text - the bottom line, a note per driver, the
+lift/worsen triggers and the narrative - and is never trusted with arithmetic. Every
 numeric token it submits is checked against the data its tools returned; a draft with
 an unmatched figure is sent back to the agent, and if it cannot produce a clean one the
 template built from the same facts renders instead.
 """
 from __future__ import annotations
 
+import math
 import re
+
+from .config import AS_OF, BAND_HIGH, BAND_WATCH, DPD_KNEE, NEWS_HALF_LIFE_DAYS, W_NEWS, W_PAYMENT
 
 _NUM = re.compile(r"(?<![\w.])(\d[\d,]*(?:\.\d+)?)\s*(M|m|%)?")
 
@@ -69,7 +80,128 @@ def verify(text: str, facts: dict, tolerance: float = 0.051) -> list[str]:
     return bad
 
 
+# ---------------------------------------------------------------- facts
+def _dpd_for(payment_points: float) -> int | None:
+    """Smallest DPD whose payment score reaches `payment_points`; None if none can."""
+    if payment_points <= 0:
+        return 0
+    if payment_points > 100:
+        return None
+    if payment_points <= 40:
+        return math.ceil(payment_points / 40.0 * DPD_KNEE)
+    return math.ceil(DPD_KNEE + (payment_points - 40.0) / 2.0)
+
+
+def outlook(verdict: dict) -> dict:
+    """How far the buyer sits from the band lines, holding the news contribution fixed.
+
+    Computed here so the agent can talk about triggers without doing arithmetic.
+    """
+    score, band = verdict["score"], verdict["band"]
+    news_pts = verdict["news"]["weighted"]
+    up = {"Healthy": ("Watch", BAND_WATCH), "Watch": ("High Risk", BAND_HIGH)}.get(band)
+    down = {"Watch": ("Healthy", BAND_WATCH), "High Risk": ("Watch", BAND_HIGH)}.get(band)
+    out = {"next_band": None, "next_band_at": None, "points_to_next_band": None,
+           "dpd_for_next_band": None, "lower_band": None, "lower_band_below": None,
+           "points_to_lower_band": None, "news_alone_holds_band": False,
+           "news_half_life_days": NEWS_HALF_LIFE_DAYS}
+    if up:
+        name, at = up
+        out.update(next_band=name, next_band_at=at, points_to_next_band=round(at - score, 1),
+                   dpd_for_next_band=_dpd_for((at - news_pts) / W_PAYMENT))
+    if down:
+        name, below = down
+        out.update(lower_band=name, lower_band_below=below,
+                   points_to_lower_band=round(score - below, 1),
+                   news_alone_holds_band=news_pts >= below)
+    return out
+
+
+def build_facts(buyer: dict, verdict: dict, lines: list[dict],
+                items: list[dict] | None = None) -> dict:
+    v = verdict
+    items = items or []
+    pay_review = next((e["data"] for e in items if e["kind"] == "payment_review"), None)
+    if v["band"] == "Healthy":
+        lift = "No action required; the buyer is already in the Healthy band."
+    else:
+        need = v["payment"]["dpd"]
+        lift = (f"This clears if the {need}-day overdue balance is settled and no further "
+                f"negative news lands; news weight also decays with age.")
+    return {"buyer": buyer, "verdict": v, "limits": lines, "what_would_lift_it": lift,
+            "outlook": outlook(v), "as_of": AS_OF.isoformat(),
+            "payment_trend": pay_review["trend"] if pay_review else None,
+            "payment_summary": pay_review["summary"] if pay_review else None}
+
+
+# ---------------------------------------------------------------- the rules path
+def _headline_action(lines: list[dict]) -> str:
+    acts = {l["action"] for l in lines}
+    return next((a for a in ("FREEZE", "REDUCE", "MAINTAIN") if a in acts), "NO LIMITS")
+
+
+def template_judgement(facts: dict) -> dict:
+    """The agent-written parts, rendered from rules. Same shape as a submission."""
+    v, o, lim = facts["verdict"], facts["outlook"], facts["limits"]
+    pay, news = v["payment"], v["news"]
+    name = facts["buyer"]["buyer_name"]
+    action = _headline_action(lim)
+
+    bottom = {"FREEZE": "Freeze cover", "REDUCE": "Reduce cover",
+              "MAINTAIN": "Maintain cover", "NO LIMITS": "No limit lines to act on"}[action]
+    bottom += f": {name} scores {v['score']} and sits in {v['band']}"
+    if pay["dpd"]:
+        bottom += f", with its worst open invoice {pay['dpd']} days past due"
+    bottom += "."
+
+    if pay["dpd"]:
+        pnote = (f"Worst open invoice is {pay['dpd']} days past due, contributing "
+                 f"{pay['weighted']} points.")
+    else:
+        pnote = "Nothing is overdue."
+    if facts["payment_trend"] and facts["payment_trend"] != "insufficient_history":
+        pnote += f" Settlement trend: {facts['payment_trend'].replace('_', ' ')}."
+
+    if news["severity"]:
+        via = f" via its parent {news['parent_name']}" if news["via_parent"] else ""
+        nnote = (f"Severity {news['severity']} ({news['category']}){via}, "
+                 f"{news['age_days']} days old, contributing {news['weighted']} points "
+                 f"after decay.")
+    else:
+        nnote = "No negative news has been matched to this buyer."
+
+    if v["band"] == "Healthy":
+        lifts = [facts["what_would_lift_it"]]
+    else:
+        lifts = [f"The score must fall {o['points_to_lower_band']} points, below "
+                 f"{o['lower_band_below']}, to reach {o['lower_band']}."]
+        if pay["dpd"]:
+            lifts.append(f"Settling the {pay['dpd']}-day overdue balance removes up to "
+                         f"{pay['weighted']} points.")
+        if o["news_alone_holds_band"]:
+            lifts.append("News alone holds the buyer in this band until it decays.")
+        elif news["severity"]:
+            lifts.append(f"News weight halves every {o['news_half_life_days']} days.")
+
+    if o["next_band"] is None:
+        worsens = ["Already in the highest band; further overdue days or new severe news "
+                   "raise the probability of default."]
+    else:
+        worsens = [f"A rise of {o['points_to_next_band']} points moves it to "
+                   f"{o['next_band']} (score {o['next_band_at']})."]
+        if o["dpd_for_next_band"] is not None:
+            worsens.append(f"On payment alone, that happens when the worst invoice reaches "
+                           f"{o['dpd_for_next_band']} days past due.")
+        else:
+            worsens.append("Payment alone cannot move it there; it would take new "
+                           "negative news too.")
+
+    return {"bottom_line": bottom, "payment_note": pnote, "news_note": nnote,
+            "lifts_it": lifts, "worsens_it": worsens}
+
+
 def template(facts: dict) -> str:
+    """The four-paragraph narrative, rendered from rules."""
     v, lim = facts["verdict"], facts["limits"]
     news = v["news"]
     if news["severity"]:
@@ -90,22 +222,56 @@ def template(facts: dict) -> str:
     )
 
 
-def build_facts(buyer: dict, verdict: dict, lines: list[dict]) -> dict:
-    v = verdict
-    if v["band"] == "Healthy":
-        lift = "No action required; the buyer is already in the Healthy band."
-    else:
-        need = v["payment"]["dpd"]
-        lift = (f"This clears if the {need}-day overdue balance is settled and no further "
-                f"negative news lands; news weight also decays with age.")
-    return {"buyer": buyer, "verdict": v, "limits": lines, "what_would_lift_it": lift}
+# ---------------------------------------------------------------- assembly
+def _fields(facts: dict, judgement: dict, items: list[dict]) -> dict:
+    """The structured case file: code-built sections plus the judgement text."""
+    b, v = facts["buyer"], facts["verdict"]
+    pay, news = v["payment"], v["news"]
+    pay_ev = next((e["source"] for e in items if e["kind"] == "payment"
+                   and e["data"].get("client_id") == pay["worst_line"]), None)
+    rv = v.get("review")
+    return {
+        "header": {
+            "buyer_id": b["buyer_id"], "buyer_name": b["buyer_name"],
+            "sector": b.get("sector"), "city": b.get("city"),
+            "parent_id": b.get("parent_id") or None,
+            "score": v["score"], "band": v["band"], "pd": v["pd"],
+            "assessment": rv["assessment"] if rv else None,
+            "as_of": facts["as_of"],
+        },
+        "bottom_line": judgement["bottom_line"],
+        "limit_actions": [
+            {k: l[k] for k in ("client_name", "current_limit", "owed", "revised_limit",
+                               "change", "action", "reason")}
+            for l in facts["limits"]],
+        "drivers": [
+            {"driver": "payment", "weight": W_PAYMENT, "points": pay["weighted"],
+             "dpd": pay["dpd"], "trend": facts["payment_trend"], "evidence_id": pay_ev,
+             "note": judgement["payment_note"]},
+            {"driver": "news", "weight": W_NEWS, "points": news["weighted"],
+             "severity": news["severity"], "category": news["category"],
+             "age_days": news["age_days"], "via_parent": news["via_parent"],
+             "evidence_id": news["article_id"] if news["severity"] else None,
+             "note": judgement["news_note"]},
+        ],
+        "score_trace": v["trace"],
+        "review": ({k: rv[k] for k in ("assessment", "rationale", "concerns")}
+                   if rv else None),
+        "lifts_it": list(judgement["lifts_it"]),
+        "worsens_it": list(judgement["worsens_it"]),
+        "outlook": facts["outlook"],
+        "evidence": [{"id": e["source"], "kind": e["kind"], "date": e["date"],
+                      "detail": e["detail"]}
+                     for e in items if e["kind"] != "resolution"],
+    }
 
 
 def write(llm, buyer: dict, verdict: dict, lines: list[dict], items: list[dict] | None = None,
           articles: dict[str, dict] | None = None) -> dict:
     """The Case File agent (agents/casefile.md), with the D10 guard as its submit check.
 
-    Without Claude (and for every Healthy buyer) the template renders instead.
+    Returns {"narrative", "fields", "source", "rejected_numbers", "agent"}. Without
+    Claude (and for every band outside run_for_bands) the template renders instead.
     """
     from .agents import definition
     from .agents.runtime import Tool, attempt
@@ -113,8 +279,8 @@ def write(llm, buyer: dict, verdict: dict, lines: list[dict], items: list[dict] 
 
     spec = definition.load("casefile")
     guard = spec.guardrails
-    facts = build_facts(buyer, verdict, lines)
     items, articles = items or [], articles or {}
+    facts = build_facts(buyer, verdict, lines, items)
     sources = {e["source"] for e in items}
     view = evidence_view(items)
     guard_facts = {"facts": facts, "evidence": view,
@@ -127,26 +293,55 @@ def write(llm, buyer: dict, verdict: dict, lines: list[dict], items: list[dict] 
         return {k: a[k] for k in ("article_id", "published_date", "publication",
                                   "headline", "body")}
 
-    def submit(text: str) -> dict:
-        bad = (verify(text, guard_facts, guard["figure_tolerance"])
-               if guard["verify_figures"] else [])
-        if bad:
-            raise ValueError(f"these figures are not in the data: {bad}. Use only the "
-                             f"numbers the tools returned, then resubmit")
-        return {"text": text.strip(), "source": "llm", "rejected_numbers": []}
+    def submit(narrative: str, bottom_line: str, payment_note: str, news_note: str,
+               lifts_it: list[str], worsens_it: list[str]) -> dict:
+        cap = guard["max_list_items"]
+        for label, xs in (("lifts_it", lifts_it), ("worsens_it", worsens_it)):
+            if not 1 <= len(xs) <= cap:
+                raise ValueError(f"{label} needs 1 to {cap} items; keep the ones that matter most")
+        if not bottom_line.strip() or not narrative.strip():
+            raise ValueError("bottom_line and narrative must not be empty")
+        if guard["verify_figures"]:
+            text = " ".join([narrative, bottom_line, payment_note, news_note,
+                             *lifts_it, *worsens_it])
+            bad = verify(text, guard_facts, guard["figure_tolerance"])
+            if bad:
+                raise ValueError(f"these figures are not in the data: {bad}. Use only the "
+                                 f"numbers the tools returned, then resubmit")
+        return {"narrative": narrative.strip(), "source": "llm", "rejected_numbers": [],
+                "judgement": {"bottom_line": bottom_line.strip(),
+                              "payment_note": payment_note.strip(),
+                              "news_note": news_note.strip(),
+                              "lifts_it": [x.strip() for x in lifts_it],
+                              "worsens_it": [x.strip() for x in worsens_it]}}
 
+    def rules() -> dict:
+        return {"narrative": template(facts), "source": "template", "rejected_numbers": [],
+                "judgement": template_judgement(facts)}
+
+    string_list = {"type": "array", "items": {"type": "string"}}
     run = attempt(
-        llm, lambda: {"text": template(facts), "source": "template", "rejected_numbers": []},
+        llm, rules,
         spec=spec,
         task=f"Write the case file for {buyer['buyer_name']} ({buyer['buyer_id']}).",
         tools=[
             Tool("get_verdict", {}, lambda: verdict),
             Tool("get_limits", {}, lambda: lines or [{"note": "no limit lines"}]),
+            Tool("get_outlook", {}, lambda: facts["outlook"]),
             Tool("get_evidence", {}, lambda: view or [{"note": "no evidence"}]),
             Tool("get_article", {"article_id": {"type": "string"}}, get_article),
-            Tool("submit_case_file", {"text": {"type": "string"}}, submit),
+            Tool("submit_case_file", {
+                "narrative": {"type": "string", "description": "four short paragraphs"},
+                "bottom_line": {"type": "string", "description": "one or two sentences"},
+                "payment_note": {"type": "string", "description": "one sentence"},
+                "news_note": {"type": "string", "description": "one sentence"},
+                "lifts_it": string_list,
+                "worsens_it": string_list}, submit),
         ],
         cache_payload={"facts": facts, "evidence": view},
     )
-    return {**run["result"], "agent": {k: run[k] for k in
-                                       ("mode", "turns", "cached", "trace", "error")}}
+    res = run["result"]
+    return {"narrative": res["narrative"],
+            "fields": _fields(facts, res["judgement"], items),
+            "source": res["source"], "rejected_numbers": res["rejected_numbers"],
+            "agent": {k: run[k] for k in ("mode", "turns", "cached", "trace", "error")}}

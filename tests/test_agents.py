@@ -89,9 +89,16 @@ def policy(system, messages):
         if rounds == 0:
             return _resp(_call("get_verdict", {}), _call("get_limits", {}))
         v = _results(messages)[0]
-        return _resp(_call("submit_case_file", {
-            "text": f"The buyer scores {v['score']} and sits in {v['band']}."}))
+        return _resp(_call("submit_case_file", _case_file(
+            f"The buyer scores {v['score']} and sits in {v['band']}.")))
     raise AssertionError("unknown agent")
+
+
+def _case_file(narrative: str, **over) -> dict:
+    return {"narrative": narrative, "bottom_line": "Act on the recommendation.",
+            "payment_note": "Reviewed.", "news_note": "Reviewed.",
+            "lifts_it": ["Settle the overdue balance."],
+            "worsens_it": ["Further overdue days."], **over}
 
 
 ECHO = Tool("echo", {"x": {"type": "string"}}, lambda x: {"echo": x})
@@ -321,16 +328,67 @@ class EndToEnd(unittest.TestCase):
             if rounds == 0:
                 return _resp(_call("get_verdict", {}), _call("get_limits", {}))
             if rounds == 1:
-                return _resp(_call("submit_case_file", {"text": "It scores 99.9 today."}, 1))
+                return _resp(_call("submit_case_file", _case_file("It scores 99.9 today."), 1))
             v = json.loads(messages[2]["content"][0]["content"])
             return _resp(_call("submit_case_file",
-                               {"text": f"It scores {v['score']} today."}, 2))
+                               _case_file(f"It scores {v['score']} today."), 2))
 
         out = engine.run(llm=ScriptedLLM(script))
         cf = next(r["case_file"] for r in out["buyers"] if r["verdict"]["band"] != "Healthy")
         self.assertEqual(cf["source"], "llm")
         rejected = [t for t in cf["agent"]["trace"] if "error" in t]
         self.assertTrue(rejected and "99.9" in rejected[0]["error"])
+
+    def test_case_file_has_fields_and_narrative_on_both_paths(self):
+        for llm in (FallbackLLM(cache=False), ScriptedLLM(policy)):
+            for r in engine.run(llm=llm)["buyers"]:
+                cf, v = r["case_file"], r["verdict"]
+                self.assertTrue(cf["narrative"].strip())
+                f = cf["fields"]
+                self.assertEqual((f["header"]["score"], f["header"]["band"]), (v["score"], v["band"]))
+                self.assertEqual(f["score_trace"], v["trace"])
+                self.assertEqual([l["revised_limit"] for l in f["limit_actions"]],
+                                 [l["revised_limit"] for l in r["limits"]])
+                self.assertEqual([d["points"] for d in f["drivers"]],
+                                 [v["payment"]["weighted"], v["news"]["weighted"]])
+                self.assertTrue(f["bottom_line"] and f["lifts_it"] and f["worsens_it"])
+
+    def test_invented_figure_in_a_judgement_field_is_sent_back(self):
+        def script(system, messages):
+            if not system.startswith("You are the Case File"):
+                return policy(system, messages)
+            rounds = sum(1 for m in messages if m["role"] == "assistant")
+            if rounds == 0:
+                return _resp(_call("get_verdict", {}), _call("get_limits", {}))
+            if rounds == 1:
+                return _resp(_call("submit_case_file", _case_file(
+                    "Fine.", worsens_it=["Moves up at 77.7 days."]), 1))
+            return _resp(_call("submit_case_file", _case_file("Fine."), 2))
+
+        out = engine.run(llm=ScriptedLLM(script))
+        cf = next(r["case_file"] for r in out["buyers"] if r["verdict"]["band"] != "Healthy")
+        self.assertEqual(cf["source"], "llm")
+        self.assertEqual(cf["fields"]["worsens_it"], ["Further overdue days."])
+        rejected = [t for t in cf["agent"]["trace"] if "error" in t]
+        self.assertTrue(rejected and "77.7" in rejected[0]["error"])
+
+
+class Outlook(unittest.TestCase):
+    def test_dpd_trigger_reaches_the_next_band(self):
+        from ews.casefile import outlook
+        from ews.config import W_NEWS, W_PAYMENT, band, payment_score
+        for r in engine.run(llm=FallbackLLM(cache=False))["buyers"]:
+            v = r["verdict"]
+            o = outlook(v)
+            if o["dpd_for_next_band"] is None:
+                continue
+            news = v["news"]["raw"]
+            at = o["dpd_for_next_band"]
+            self.assertEqual(band(W_PAYMENT * payment_score(at) + W_NEWS * news), o["next_band"])
+            if at > 0:
+                self.assertNotEqual(band(W_PAYMENT * payment_score(at - 1) + W_NEWS * news),
+                                    o["next_band"])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

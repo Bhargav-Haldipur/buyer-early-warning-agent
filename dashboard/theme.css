@@ -224,3 +224,7 @@ th.sortable.desc::after { content: " \25BC"; font-size: .6rem; }
 .dot.high { background: var(--theme-red-500); }
 .dot.watch { background: var(--theme-orange-700); }
 .dot.healthy { background: var(--theme-green-900); }
+
+/* case file */
+.case .bottom-line { font-size: 1.0625rem; font-weight: 600; line-height: 1.6rem; margin: .25rem 0 1rem; }
+.cf-split { display: grid; gap: 0 1.5rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
