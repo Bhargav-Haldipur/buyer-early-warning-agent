@@ -97,7 +97,7 @@ A deterministic spine, agents at the leaves, one typed Evidence Store.
 | 1 | Payment Behaviour | settlement trend and concerns | the ledger: the worst Open invoice is the score input, never the model's |
 | 2 | News Intelligence | which entity an article is about, and its severity | the entity registry and the parent fan-out |
 | 3 | Risk Adjudicator | agree / caveats / challenge, with cited evidence | the score formula and the bands — the agent cannot change either |
-| 4 | Case File | the write-up | every figure it writes is checked; a bad draft is sent back, then templated |
+| 4 | Case File | the draft case file an underwriter reviews and approves | every figure it writes is checked; a bad draft is sent back, then templated |
 
 *Originally three, each a fixed prompt call. See D12.*
 
@@ -455,7 +455,7 @@ Healthy.
 
 | Tab | Shows |
 |---|---|
-| **Case File** (default) | LLM-written summary: how the buyer is doing, why it is flagged, what would lift it — every figure guarded by D10 |
+| **Case File** (default) | LLM-written draft for the underwriter to review and approve: how the buyer is doing, why it is flagged, what would lift it — every figure guarded by D10 |
 | **Score** | Payment × 0.65 + News × 0.35, the invoice and the article behind each, and the decay applied |
 | **Limit** | current limit, owed, revised limit, action, expected loss before and after |
 | **Payments** | every invoice, oldest unpaid highlighted |

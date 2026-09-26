@@ -6,9 +6,10 @@ from __future__ import annotations
 
 import html
 import json
+import threading
 import traceback
 import urllib.parse
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from ews import run as engine
@@ -31,13 +32,15 @@ SWAP_STEP = "Payment data updates: Kessler moves from 25 to 40 days past due"
 
 STATE = {"step": 0, "swap": False}
 _CACHE: dict[tuple[int, bool], dict] = {}
+_LOCK = threading.Lock()
 
 
 def snapshot() -> dict:
     key = (STATE["step"], STATE["swap"])
-    if key not in _CACHE:
-        _CACHE[key] = engine.run(demo_steps=key[0], swap_invoices=key[1])
-    return _CACHE[key]
+    with _LOCK:  # one engine run at a time now that requests are threaded
+        if key not in _CACHE:
+            _CACHE[key] = engine.run(demo_steps=key[0], swap_invoices=key[1])
+        return _CACHE[key]
 
 
 # ---------------------------------------------------------------- helpers
@@ -61,6 +64,19 @@ def band_pill(band: str) -> str:
 
 def action_pill(action: str) -> str:
     return f'<span class="pill {action.lower()}">{e(action)}</span>'
+
+
+def news_cell(news: dict) -> str:
+    """Severity badge + the category as a two-word title; headline on hover."""
+    sev = news["severity"]
+    if not sev:
+        return '<span class="muted">&mdash;</span>'
+    cls = "high" if sev >= 4 else "watch" if sev == 3 else "maintain"
+    title = news["category"].replace("_", " ").capitalize()
+    parent = ' <span class="overline">via parent</span>' if news["via_parent"] else ""
+    headline = news.get("headline") or ""
+    return (f'<span class="newscell" title="{e(headline)}"><span class="pill {cls}">Sev {sev}</span> '
+            f'<strong>{e(title)}</strong>{parent}</span>')
 
 
 def gauge(score: float, band: str) -> str:
@@ -127,8 +143,16 @@ def mini_gauge(score: float, band: str) -> str:
             f'</svg>')
 
 
-def page(title: str, body: str, theme: str = "") -> bytes:
+BRAND_MARK = ('<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" '
+              'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+              '<path d="M1.5 9h3l2-5 3 8 2-4h3"/></svg>')
+
+
+def page(title: str, body: str, theme: str = "", nav: str = "home") -> bytes:
     attr = f' data-theme="{e(theme)}"' if theme else ""
+
+    def on(key: str) -> str:
+        return ' class="on"' if key == nav else ""
     return f"""<!doctype html>
 <html lang="en"{attr}><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -137,7 +161,11 @@ def page(title: str, body: str, theme: str = "") -> bytes:
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/theme.css">
 </head><body>
-<div class="banner">{BANNER}</div>
+<header class="head"><div class="banner">{BANNER}</div>
+<nav class="topbar"><div class="topbar-in">
+<a class="brand" href="/"><span class="brand-mark">{BRAND_MARK}</span>Buyer Early Warning and Limit Review</a>
+<div class="topnav"><a href="/"{on("home")}>Insurers</a><a href="/demo"{on("demo")}>Live demo</a></div>
+</div></nav></header>
 <div class="wrap">{body}
 <footer>
   <b>{BANNER}</b><br>
@@ -184,17 +212,18 @@ def home() -> bytes:
     cards = []
     for c in data["clients"]:
         b = c["bands"]
-        counts = " ".join(f'{band_pill(k)} <b>{b.get(k, 0)}</b>'
-                          for k in ("High Risk", "Watch", "Healthy"))
+        counts = "".join(f'<span><i class="dot {cls}"></i>{k} <b>{b.get(k, 0)}</b></span>'
+                         for k, cls in (("High Risk", "high"), ("Watch", "watch"),
+                                        ("Healthy", "healthy")))
         cards.append(f"""<a class="card" href="/client/{e(c['client_id'])}">
 <h4>{e(c['client_name'])}</h4>
 <div class="overline">{e(c['city'])}</div>
+<span class="go">&rarr;</span>
 <div class="metric"><span>Buyers</span><b>{c['buyers']}</b></div>
-<div class="metric"><span>Bands</span><span class="bands">{counts}</span></div></a>""")
+<div class="legend">{counts}</div></a>""")
 
     bands = {k: sum(1 for r in data["buyers"] if r["verdict"]["band"] == k)
              for k in ("High Risk", "Watch", "Healthy")}
-    engine_label = "Claude agents" if data["llm"] == "claude" else "rules engine"
 
     def stat(figure, label, dot=""):
         mark = f'<span class="dot {dot}"></span>' if dot else ""
@@ -205,16 +234,16 @@ def home() -> bytes:
              stat(bands["High Risk"], "High risk", dot="high"),
              stat(bands["Watch"], "Watch", dot="watch")]
 
-    return page("Buyer Early Warning", f"""
+    return page("Buyer Early Warning and Limit Review", f"""
 <div class="hero">
-<p class="masthead">Buyer Early Warning</p>
+<p class="masthead">Buyer Early Warning and Limit Review</p>
 <h1>Today&rsquo;s risk across every insurer</h1>
-<p class="lede">Every covered buyer is scored each day on how it pays and what is
-written about it. Anything that leaves Healthy surfaces here with the limit action it
-warrants &mdash; while there is still limit to cut.</p>
+<p class="lede">Each covered buyer gets a daily risk score from how late it pays
+(65%) and what the news says about it (35%). Open an insurer to see its High Risk and
+Watch buyers, each with a recommended limit action &mdash; freeze or reduce &mdash;
+while there is still limit to cut.</p>
 <div class="statrow">{"".join(tiles)}</div>
-<p class="meta">As of {e(data['as_of'])} &middot; <span class="engine">{engine_label}</span>
-&middot; {len(data['clients'])} insurers &middot; <a href="/demo">Live demo &rsaquo;</a></p>
+<p class="meta">{len(data['clients'])} insurers &middot; <a href="/demo">Live demo &rsaquo;</a></p>
 </div>
 <h2>Insurers</h2>
 <div class="cards">{"".join(cards)}</div>""")
@@ -242,7 +271,7 @@ def demo_page() -> bytes:
                  f'<th>Named in the article</th><th>Headline</th><th></th></tr></thead>'
                  f'<tbody>{refused}</tbody></table>') if refused else ""
 
-    return page("Live demo", f"""
+    return page("Live demo", nav="demo", body=f"""
 {crumbs(("Home", "/"), ("Live demo", None))}
 <h1>Live demo</h1>
 <p class="sub">As of {e(data['as_of'])} &middot; scoring engine: {e(data['llm'])}</p>
@@ -264,9 +293,7 @@ def client_page(cid: str) -> bytes:
         line = next(l for l in r["limits"] if l["client_id"] == cid)
         v = r["verdict"]
         news = v["news"]
-        label = "&mdash;" if not news["severity"] else (
-            f'sev {news["severity"]} {e(news["category"])}'
-            + (" (parent)" if news["via_parent"] else ""))
+        label = news_cell(news)
         rank = {"High Risk": 0, "Watch": 1, "Healthy": 2}[v["band"]]
         act_rank = {"FREEZE": 0, "REDUCE": 1}.get(line["action"], 2)
         rows.append(
@@ -390,7 +417,8 @@ def case_tab(r: dict) -> str:
     assess = (f' &middot; adjudicator: <b>{e(ASSESS_LABEL[h["assessment"]])}</b>'
               if h["assessment"] else "")
     head = (f'<p class="overline">{band_pill(h["band"])} score <b>{h["score"]}</b> &middot; '
-            f'PD {h["pd"]*100:.1f}%{assess} &middot; as of {e(h["as_of"])}</p>')
+            f'PD {h["pd"]*100:.1f}%{assess} &middot; as of {e(h["as_of"])} &middot; '
+            f'<b>draft for underwriter review and approval</b></p>')
 
     rows = "".join(
         f'<tr><td>{e(l["client_name"])}</td><td class="num">{money(l["current_limit"])}</td>'
@@ -402,12 +430,6 @@ def case_tab(r: dict) -> str:
               f'<th class="num">Owed</th><th class="num">Revised</th><th class="num">Change</th>'
               f'<th>Action</th></tr></thead><tbody>{rows}</tbody></table>'
               if rows else '<p class="body2">No credit limit lines.</p>')
-
-    drivers = "".join(
-        f'<dt>{e(d["driver"].capitalize())} &middot; {d["points"]} pts</dt>'
-        f'<dd>{e(d["note"])}'
-        + (f' <span class="overline">[{e(d["evidence_id"])}]</span>' if d["evidence_id"] else "")
-        + '</dd>' for d in f["drivers"])
 
     def items(xs: list[str]) -> str:
         return '<ul class="body2">' + "".join(f"<li>{e(x)}</li>" for x in xs) + "</ul>"
@@ -422,14 +444,11 @@ def case_tab(r: dict) -> str:
     paras = "".join(f"<p>{e(p)}</p>" for p in cf["narrative"].split("\n\n") if p.strip())
     note = (f'<p class="overline">Judgement and narrative written by '
             f'{"the Case File agent" if cf["source"]=="llm" else "template"}; header, '
-            f'limits, trace and evidence filled from the engine'
+            f'limits and evidence filled from the engine'
             + (f'; model output discarded &mdash; unverifiable figures {cf["rejected_numbers"]}'
                if cf["rejected_numbers"] else "") + "</p>")
     return (f'<div class="panel case">{head}<p class="bottom-line">{e(f["bottom_line"])}</p>'
             f'<h3>Recommended limit action</h3>{limits}'
-            f'<h3>Why this band</h3><dl class="kv">{drivers}</dl>'
-            f'<div class="trace">{e(f["score_trace"])}</div>'
-            f'{review_block(r["verdict"].get("review"))}'
             f'<div class="cf-split"><div><h3>What would lift it</h3>{items(f["lifts_it"])}</div>'
             f'<div><h3>What would worsen it</h3>{items(f["worsens_it"])}</div></div>'
             f'<h3>Narrative</h3>{paras}'
@@ -642,7 +661,7 @@ def main(port: int = 8000) -> None:
     print("warming the engine...")
     snapshot()
     print(f"dashboard on http://localhost:{port}  (Ctrl-C to stop)")
-    HTTPServer(("127.0.0.1", port), Handler).serve_forever()
+    ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()
 
 
 if __name__ == "__main__":

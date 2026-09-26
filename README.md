@@ -118,7 +118,7 @@ The guardrails, with their defaults in `ews/settings.py`:
 | Payment Behaviour | settlement trend, concerns | must call `get_open_invoices` first; `must_match_ledger`; `max_concerns` | the score uses the ledger, never the agent |
 | News Intelligence | which entity an article is about, severity | must call `search_entities` first; `entity_must_be_looked_up`; `allowed_severities` | entity must be in the registry; parent fan-out |
 | Risk Adjudicator | agree / caveats / challenge, with cited evidence | must call `get_evidence` first; `require_real_citations`; `verify_figures`; `max_concerns` | cannot change the score |
-| Case File | structured fields (bottom line, driver notes, lift/worsen triggers) + a four-paragraph narrative; header, limits, trace and evidence are filled by code | must call `get_verdict` and `get_limits` first; `verify_figures` over every field; `figure_tolerance`; `max_list_items`; `run_for_bands` | template when the agent cannot produce a clean draft |
+| Case File | a draft for the underwriter to review and approve: structured fields (bottom line, driver notes, lift/worsen triggers) + a four-paragraph narrative; header, limits, trace and evidence are filled by code | must call `get_verdict` and `get_limits` first; `verify_figures` over every field; `figure_tolerance`; `max_list_items`; `run_for_bands` | template when the agent cannot produce a clean draft |
 
 ---
 
@@ -209,6 +209,11 @@ footer.
 The buyer page has five tabs: the **Case File** is the story, and **Score**, **Limit**,
 **Payments** and **News** are the evidence behind it, so every figure can be traced
 back to a row in a CSV.
+
+The Case File is a draft for an underwriter, not a decision. The underwriter reviews it
+and approves, amends or rejects the recommended limit action; nothing changes on an
+insurer's book until they do. The prototype shows the file but does not yet record the
+underwriter's decision.
 
 ---
 
