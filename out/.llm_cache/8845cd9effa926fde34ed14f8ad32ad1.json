@@ -1,0 +1,91 @@
+{
+  "result": {
+    "narrative": "Kessler Traders GmbH is showing distress on both fronts at once. The ledger from Adlerhof Trade Credit (CL01) shows three open invoices, the worst 40 days past due (INV001567, EUR 86,900), within EUR 189,100 of open exposure against a EUR 430,000 credit limit. That sits on top of settled invoices paid 46 and 55 days late, with only a brief improvement to 10 days late in between, so the trend is recorded as deteriorating. Five days ago, workers at the Essen facility protested over delayed wages, with union representatives warning of further action if dues are not cleared \u2014 payroll arrears alongside trade arrears points to acute cash strain rather than a purely administrative delay.\n\nThe score of 65.0 puts the buyer in High Risk, with a PD of 0.61. It is built as 0.65 x 60.0 on the payment leg (40 DPD, contributing 39.0 points) plus 0.35 x 74.3 on the news leg (severity 5, unpaid wages, contributing 26.0 points). The adjudicator agreed with the band but attached caveats: the payment data is dated 2026-08-31 while the news is dated 2026-09-20, so the 40 DPD input is roughly three weeks stale and if INV001567 is still unsettled the score understates risk; the EUR 189,100 exposure and 44% utilization blend the overdue invoice with two invoices not yet due, so only EUR 86,900 is actually delinquent; the payment picture rests on a single reporting client with no corroborating trade data; and the news is a single-source report with no figures on the size or duration of the wage arrears.\n\nThe recommendation is to REDUCE the Adlerhof Trade Credit limit from EUR 430,000 to EUR 189,100, sizing the line to current owed and bringing expected loss from EUR 212,463 to EUR 93,434 against the 25% appetite target. Note the limit was last reviewed in Oct 2024 and predates this deterioration. Given the adjudicator's caveats, refresh the CL01 ledger and confirm the 40-day arrears is not a contested bilateral dispute before the cut is finalised.\n\nThe buyer needs to shed 5.0 points to fall below 60.0 and into Watch. The news leg alone does not hold the band, so clearing INV001567 and bringing the worst open item current would do most of the work; confirmation that the Essen wage arrears have been paid and the union action resolved would support it. High Risk is the top band here, so there is no further step up, but a refreshed ledger confirming worsening arrears or a second wage-arrears report would entrench the current position.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Reduce the Adlerhof Trade Credit limit from EUR 430,000 to EUR 189,100: a 40-day overdue invoice on a chronically late payer plus a 5-day-old wage-arrears protest put the buyer at 65.0, High Risk, PD 0.61. The adjudicator agreed with the band but flagged that the payment data is roughly three weeks stale and single-sourced \u2014 refresh the ledger before finalising.",
+      "payment_note": "Three open invoices with CL01, the worst 40 days past due (INV001567, EUR 86,900) within EUR 189,100 of open exposure, following settled invoices at 46 and 55 days late and a brief improvement to 10 days \u2014 the trend is recorded as deteriorating.",
+      "news_note": "One direct entity match five days old: Trade Ledger reports workers at the Essen facility protesting over delayed wages with union warnings of further action, rated severity 5 (unpaid wages) for a raw news score of 74.3, though it is a single uncorroborated report with no figures on the arrears.",
+      "lifts_it": [
+        "Settlement of INV001567 (EUR 86,900) and the worst open item brought current \u2014 5.0 points takes the score below 60.0 into Watch",
+        "Confirmation the Essen wage arrears are cleared and union action resolved",
+        "Corroborating trade-payment data from a second supplier showing on-time settlement"
+      ],
+      "worsens_it": [
+        "Refreshed CL01 ledger showing INV001567 still unpaid and arrears beyond 40 days (High Risk is the top band \u2014 no higher step)",
+        "A second outlet confirming or escalating the wage arrears",
+        "The two not-yet-due invoices falling past due, moving more of the EUR 189,100 into delinquency"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY023\", \"score\": 65.0, \"band\": \"High Risk\", \"pd\": 0.61, \"payment\": {\"dpd\": 40, \"raw\": 60.0, \"weighted\": 39.0, \"worst_line\": \"CL01\"}, \"news\": {\"severity\": 5, \"category\": \"unpaid_wages\", \"article_id\": \"NWSDEMO06\", \"age_days\": 5, \"headline\": \"Workers at Kessler Traders plant protest over delayed wages\", \"via_parent\": false, \"parent_name\": null, \"raw\": 74.3, \"weighted\": 26.0}, \"trace\": "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM0040\", \"buyer_id\": \"BUY023\", \"client_id\": \"CL01\", \"client_name\": \"Adlerhof Trade Credit\", \"current_limit\": 430000, \"owed\": 189100, \"revised_limit\": 189100, \"change\": -240900, \"action\": \"REDUCE\", \"reason\": \"cut to the limit where expected loss meets 25% appetite\", \"pd\": 0.61, \"pd_target\": 0.25, \"max_liability_binds\": false, \"expected_loss_before\": 212463, \"expected_loss_after\": 93"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": null, \"next_band_at\": null, \"points_to_next_band\": null, \"dpd_for_next_band\": null, \"lower_band\": \"Watch\", \"lower_band_below\": 60.0, \"points_to_lower_band\": 5.0, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"INV001567\", \"kind\": \"payment\", \"date\": \"2026-08-31\", \"detail\": \"3 open invoice(s) with CL01; worst is 40 days past due\", \"data\": {\"client_id\": \"CL01\", \"dpd\": 40, \"owed\": 189100.0, \"open_count\": 3}}, {\"id\": \"INV001567\", \"kind\": \"payment_review\", \"date\": \"2026-08-31\", \"detail\": \"Kessler Traders GmbH currently has an invoice 40 days past due (INV001567, \\u20ac86,900) alongside two invoices n"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "NWSDEMO06"
+      },
+      "result": "{\"article_id\": \"NWSDEMO06\", \"published_date\": \"2026-09-20\", \"publication\": \"Trade Ledger\", \"headline\": \"Workers at Kessler Traders plant protest over delayed wages\", \"body\": \"Workers at Kessler Traders GmbH's Essen facility staged a protest this week over delayed wage payments, with union representatives warning of further action if dues are not cleared.\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Kessler Traders GmbH is showing distress on both fronts at once. The ledger from Adlerhof Trade Credit (CL01) shows three open invoices, the worst 40 days past due (INV001567, EUR 86,900), within EUR 189,100 of open exposure against a EUR 430,000 limit. That sits on top of settled invoices paid 46 and 55 days late, with only a brief improvement to 10 days late in between, so the trend is recorded as deteriorating. Five days ago, workers at the Essen facility protested over delayed wages, with union representatives warning of further action if dues are not cleared \u2014 payroll arrears alongside trade arrears points to acute cash strain rather than a purely administrative delay.\n\nThe score of 65.0 puts the buyer in High Risk, with a PD of 0.61. It is built as 0.65 x 60.0 on the payment leg (40 DPD, contributing 39.0 points) plus 0.35 x 74.3 on the news leg (severity 5, unpaid wages, contributing 26.0 points). The adjudicator agreed with the band but attached caveats: the payment data is dated 2026-08-31 while the news is dated 2026-09-20, so the 40 DPD input is roughly three weeks stale and if INV001567 is still unsettled the score understates risk; the EUR 189,100 exposure and 44% utilization blend the overdue invoice with two not yet due, so only EUR 86,900 is actually delinquent; the payment picture rests on a single reporting client with no corroborating trade data; and the news is a single-source report with no figures on the size or duration of the wage arrears.\n\nThe recommendation is to REDUCE the Adlerhof Trade Credit limit from EUR 430,000 to EUR 189,100, a cut of EUR 240,900, sizing the line to current owed and bringing expected loss from EUR 212,463 to EUR 93,434 against the 25% appetite target. Note the limit was last reviewed in Oct 2024 and predates this deterioration. Given the adjudicator's caveats, refresh the CL01 ledger and confirm the 40-day arrears is not a contested bilateral dispute before the cut is finalised.\n\nThe buyer needs to shed 5.0 points to fall below 60.0 and into Watch. The news leg alone does not hold the band, so clearing INV001567 and bringing the worst open item current would do most of the work; confirmation that the Essen wage arrears have been paid and the union action resolved would support it. High Risk is the top band here, so there is no further step up, but a stale ledger confirming worsening arrears or a second wage-arrears report would entrench the current position.",
+        "bottom_line": "Reduce the Adlerhof Trade Credit limit from EUR 430,000 to EUR 189,100 (-EUR 240,900): a 40-day overdue invoice on a chronically late payer plus a 5-day-old wage-arrears protest put the buyer at 65.0, High Risk, PD 0.61. The adjudicator agreed with the band but flagged that the payment data is roughly three weeks stale and single-sourced \u2014 refresh the ledger before finalising.",
+        "payment_note": "Three open invoices with CL01, the worst 40 days past due (INV001567, EUR 86,900) within EUR 189,100 open exposure, following settled invoices at 46 and 55 days late and a brief improvement to 10 days \u2014 the trend is recorded as deteriorating.",
+        "news_note": "One direct entity match five days old: Trade Ledger reports workers at the Essen facility protesting over delayed wages with union warnings of further action, rated severity 5 (unpaid wages) for a raw news score of 74.3, though it is a single uncorroborated report with no figures on the arrears.",
+        "lifts_it": [
+          "Settlement of INV001567 (EUR 86,900) and the worst open item brought current \u2014 5.0 points takes the score below 60.0 into Watch",
+          "Confirmation the Essen wage arrears are cleared and union action resolved",
+          "Corroborating trade-payment data from a second supplier showing on-time settlement"
+        ],
+        "worsens_it": [
+          "Refreshed CL01 ledger showing INV001567 still unpaid and arrears beyond 40 days (High Risk is the top band \u2014 no higher step)",
+          "A second outlet confirming or escalating the wage arrears",
+          "The two not-yet-due invoices falling past due, moving more of the EUR 189,100 into delinquency"
+        ]
+      },
+      "error": "these figures are not in the data: ['240,900,', '240,900']. Use only the numbers the tools returned, then resubmit"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Kessler Traders GmbH is showing distress on both fronts at once. The ledger from Adlerhof Trade Credit (CL01) shows three open invoices, the worst 40 days past due (INV001567, EUR 86,900), within EUR 189,100 of open exposure against a EUR 430,000 credit limit. That sits on top of settled invoices paid 46 and 55 days late, with only a brief improvement to 10 days late in between, so the trend is recorded as deteriorating. Five days ago, workers at the Essen facility protested over delayed wages, with union representatives warning of further action if dues are not cleared \u2014 payroll arrears alongside trade arrears points to acute cash strain rather than a purely administrative delay.\n\nThe score of 65.0 puts the buyer in High Risk, with a PD of 0.61. It is built as 0.65 x 60.0 on the payment leg (40 DPD, contributing 39.0 points) plus 0.35 x 74.3 on the news leg (severity 5, unpaid wages, contributing 26.0 points). The adjudicator agreed with the band but attached caveats: the payment data is dated 2026-08-31 while the news is dated 2026-09-20, so the 40 DPD input is roughly three weeks stale and if INV001567 is still unsettled the score understates risk; the EUR 189,100 exposure and 44% utilization blend the overdue invoice with two invoices not yet due, so only EUR 86,900 is actually delinquent; the payment picture rests on a single reporting client with no corroborating trade data; and the news is a single-source report with no figures on the size or duration of the wage arrears.\n\nThe recommendation is to REDUCE the Adlerhof Trade Credit limit from EUR 430,000 to EUR 189,100, sizing the line to current owed and bringing expected loss from EUR 212,463 to EUR 93,434 against the 25% appetite target. Note the limit was last reviewed in Oct 2024 and predates this deterioration. Given the adjudicator's caveats, refresh the CL01 ledger and confirm the 40-day arrears is not a contested bilateral dispute before the cut is finalised.\n\nThe buyer needs to shed 5.0 points to fall below 60.0 and into Watch. The news leg alone does not hold the band, so clearing INV001567 and bringing the worst open item current would do most of the work; confirmation that the Essen wage arrears have been paid and the union action resolved would support it. High Risk is the top band here, so there is no further step up, but a refreshed ledger confirming worsening arrears or a second wage-arrears report would entrench the current position.",
+        "bottom_line": "Reduce the Adlerhof Trade Credit limit from EUR 430,000 to EUR 189,100: a 40-day overdue invoice on a chronically late payer plus a 5-day-old wage-arrears protest put the buyer at 65.0, High Risk, PD 0.61. The adjudicator agreed with the band but flagged that the payment data is roughly three weeks stale and single-sourced \u2014 refresh the ledger before finalising.",
+        "payment_note": "Three open invoices with CL01, the worst 40 days past due (INV001567, EUR 86,900) within EUR 189,100 of open exposure, following settled invoices at 46 and 55 days late and a brief improvement to 10 days \u2014 the trend is recorded as deteriorating.",
+        "news_note": "One direct entity match five days old: Trade Ledger reports workers at the Essen facility protesting over delayed wages with union warnings of further action, rated severity 5 (unpaid wages) for a raw news score of 74.3, though it is a single uncorroborated report with no figures on the arrears.",
+        "lifts_it": [
+          "Settlement of INV001567 (EUR 86,900) and the worst open item brought current \u2014 5.0 points takes the score below 60.0 into Watch",
+          "Confirmation the Essen wage arrears are cleared and union action resolved",
+          "Corroborating trade-payment data from a second supplier showing on-time settlement"
+        ],
+        "worsens_it": [
+          "Refreshed CL01 ledger showing INV001567 still unpaid and arrears beyond 40 days (High Risk is the top band \u2014 no higher step)",
+          "A second outlet confirming or escalating the wage arrears",
+          "The two not-yet-due invoices falling past due, moving more of the EUR 189,100 into delinquency"
+        ]
+      }
+    }
+  ],
+  "turns": 4
+}

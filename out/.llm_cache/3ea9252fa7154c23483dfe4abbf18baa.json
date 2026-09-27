@@ -1,0 +1,71 @@
+{
+  "result": {
+    "narrative": "Oakhurst Components Ltd sits at a score of 47.7 (Watch) with a PD of 0.3767. The payment file with Nordhaven Trade Credit (CL05) shows five open invoices totalling EUR 1,549,800, of which one (INV001413, EUR 329,100) is 25 days past due and four totalling EUR 1,220,700 are not yet due. That open exposure already exceeds the EUR 1,450,000 limit held on the buyer by roughly EUR 99,800. Only one settled invoice exists, paid on time, so the review records the trend as insufficient_history. Against that sits a news hit dated 2026-09-20: workers at the Birmingham plant protested over delayed wages, with unions warning of further action.\n\nThe band is driven mainly by the news leg. The trace is 0.65 x 33.3 (payment, 25 DPD) + 0.35 x 74.3 (news) = 47.7, so news contributes 26.0 points against 21.7 from payment. The adjudicator agreed with caveats and should be read before signing: the Watch placement turns almost entirely on one uncorroborated two-sentence article from a single publication, and without it the payment score of 21.7 alone would fall in the Healthy band. The adjudicator also notes the payment score reads only DPD and is structurally blind to the limit breach, and that the payment snapshot (2026-08-31) predates the wage-delay report by about three weeks, so the 33.3 payment input may understate current condition. The recommendation is to refresh the payment position and seek a second source on the wage report before the score goes out.\n\nThe limit action is a FREEZE on LIM0036 with Nordhaven Trade Credit: current limit EUR 1,450,000, revised limit EUR 1,450,000, change 0. The buyer is already owed at or above the limit, so there is nothing left to cut; expected loss is EUR 417,854 both before and after. PD of 0.3767 is above the 0.25 target and max liability does not bind. The practical effect is to stop new exposure while the EUR 1,220,700 not-yet-due pipeline runs off.\n\nTo move down, the score needs to fall 12.7 points below 35.0 into Healthy. The clearest routes are settlement of the EUR 329,100 past-due invoice and open exposure returning under the EUR 1,450,000 limit, plus the news signal failing to corroborate or decaying (half-life 365 days, so time alone is slow here). Note that news alone does not hold the band, so a clean payment refresh plus a second source that does not support the wage-delay report would materially change the picture.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Freeze the EUR 1,450,000 line with Nordhaven Trade Credit \u2014 open exposure of EUR 1,549,800 is already above the limit, so there is nothing left to cut. The adjudicator agreed with caveats: the Watch band rests almost entirely on one uncorroborated article, and the payment snapshot predates it by three weeks, so refresh the payment position and seek a second source before issuing.",
+      "payment_note": "One invoice (INV001413, EUR 329,100) is 25 days past due and four others totalling EUR 1,220,700 are not yet due, taking open exposure to EUR 1,549,800 against a EUR 1,450,000 limit; with only one settled invoice on file the trend is recorded as insufficient_history.",
+      "news_note": "A single severity 5 wage_delay article from Business Dispatch (2026-09-20, 5 days old) reports workers protesting delayed wages at the Birmingham plant with unions warning of further action \u2014 a direct entity match, but uncorroborated and only two sentences long, and it supplies 26.0 of the 47.7 score.",
+      "lifts_it": [
+        "Score falling 12.7 points below 35.0 into Healthy",
+        "Settlement of the EUR 329,100 past-due invoice and exposure returning under the EUR 1,450,000 limit",
+        "A second source failing to corroborate the wage-delay report (news alone does not hold the band)"
+      ],
+      "worsens_it": [
+        "DPD reaching 37 days, which takes the score to 60.0 and High Risk (12.3 points away)",
+        "Any of the EUR 1,220,700 not-yet-due pipeline falling past due",
+        "Further or corroborating reports of wage arrears at the Birmingham plant"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY019\", \"score\": 47.7, \"band\": \"Watch\", \"pd\": 0.3767, \"payment\": {\"dpd\": 25, \"raw\": 33.3, \"weighted\": 21.7, \"worst_line\": \"CL05\"}, \"news\": {\"severity\": 5, \"category\": \"wage_delay\", \"article_id\": \"NWSDEMO04\", \"age_days\": 5, \"headline\": \"Workers at Oakhurst Components plant protest over delayed wages\", \"via_parent\": false, \"parent_name\": null, \"raw\": 74.3, \"weighted\": 26.0}, \"trace\": "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM0036\", \"buyer_id\": \"BUY019\", \"client_id\": \"CL05\", \"client_name\": \"Nordhaven Trade Credit\", \"current_limit\": 1450000, \"owed\": 1549800, \"revised_limit\": 1450000, \"change\": 0, \"action\": \"FREEZE\", \"reason\": \"already owed at or above the limit - nothing left to cut\", \"pd\": 0.3767, \"pd_target\": 0.25, \"max_liability_binds\": false, \"expected_loss_before\": 417854, \"expected_loss_after\": 4"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 60.0, \"points_to_next_band\": 12.3, \"dpd_for_next_band\": 37, \"lower_band\": \"Healthy\", \"lower_band_below\": 35.0, \"points_to_lower_band\": 12.7, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"INV001413\", \"kind\": \"payment\", \"date\": \"2026-08-31\", \"detail\": \"5 open invoice(s) with CL05; worst is 25 days past due\", \"data\": {\"client_id\": \"CL05\", \"dpd\": 25, \"owed\": 1549800.0, \"open_count\": 5}}, {\"id\": \"INV001413\", \"kind\": \"payment_review\", \"date\": \"2026-08-31\", \"detail\": \"Oakhurst Components has one invoice (INV001413, \\u20ac329,100) 25 days past due, while four others totaling \\u20"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "NWSDEMO04"
+      },
+      "result": "{\"article_id\": \"NWSDEMO04\", \"published_date\": \"2026-09-20\", \"publication\": \"Business Dispatch\", \"headline\": \"Workers at Oakhurst Components plant protest over delayed wages\", \"body\": \"Workers at Oakhurst Components Ltd's Birmingham plant staged a protest this week over delayed wage payments, with union representatives warning of further action if dues are not cleared.\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Oakhurst Components Ltd sits at a score of 47.7 (Watch) with a PD of 0.3767. The payment file with Nordhaven Trade Credit (CL05) shows five open invoices totalling EUR 1,549,800, of which one (INV001413, EUR 329,100) is 25 days past due and four totalling EUR 1,220,700 are not yet due. That open exposure already exceeds the EUR 1,450,000 limit held on the buyer by roughly EUR 99,800. Only one settled invoice exists, paid on time, so the review records the trend as insufficient_history. Against that sits a news hit dated 2026-09-20: workers at the Birmingham plant protested over delayed wages, with unions warning of further action.\n\nThe band is driven mainly by the news leg. The trace is 0.65 x 33.3 (payment, 25 DPD) + 0.35 x 74.3 (news) = 47.7, so news contributes 26.0 points against 21.7 from payment. The adjudicator agreed with caveats and should be read before signing: the Watch placement turns almost entirely on one uncorroborated two-sentence article from a single publication, and without it the payment score of 21.7 alone would fall in the Healthy band. The adjudicator also notes the payment score reads only DPD and is structurally blind to the limit breach, and that the payment snapshot (2026-08-31) predates the wage-delay report by about three weeks, so the 33.3 payment input may understate current condition. The recommendation is to refresh the payment position and seek a second source on the wage report before the score goes out.\n\nThe limit action is a FREEZE on LIM0036 with Nordhaven Trade Credit: current limit EUR 1,450,000, revised limit EUR 1,450,000, change 0. The buyer is already owed at or above the limit, so there is nothing left to cut; expected loss is EUR 417,854 both before and after. PD of 0.3767 is above the 0.25 target and max liability does not bind. The practical effect is to stop new exposure while the EUR 1,220,700 not-yet-due pipeline runs off.\n\nTo move down, the score needs to fall 12.7 points below 35.0 into Healthy. The clearest routes are settlement of the EUR 329,100 past-due invoice and open exposure returning under the EUR 1,450,000 limit, plus the news signal failing to corroborate or decaying (half-life 365 days, so time alone is slow here). Note that news alone does not hold the band, so a clean payment refresh plus a second source that does not support the wage-delay report would materially change the picture.",
+        "bottom_line": "Freeze the EUR 1,450,000 line with Nordhaven Trade Credit \u2014 open exposure of EUR 1,549,800 is already above the limit, so there is nothing left to cut. The adjudicator agreed with caveats: the Watch band rests almost entirely on one uncorroborated article, and the payment snapshot predates it by three weeks, so refresh the payment position and seek a second source before issuing.",
+        "payment_note": "One invoice (INV001413, EUR 329,100) is 25 days past due and four others totalling EUR 1,220,700 are not yet due, taking open exposure to EUR 1,549,800 against a EUR 1,450,000 limit; with only one settled invoice on file the trend is recorded as insufficient_history.",
+        "news_note": "A single severity 5 wage_delay article from Business Dispatch (2026-09-20, 5 days old) reports workers protesting delayed wages at the Birmingham plant with unions warning of further action \u2014 a direct entity match, but uncorroborated and only two sentences long, and it supplies 26.0 of the 47.7 score.",
+        "lifts_it": [
+          "Score falling 12.7 points below 35.0 into Healthy",
+          "Settlement of the EUR 329,100 past-due invoice and exposure returning under the EUR 1,450,000 limit",
+          "A second source failing to corroborate the wage-delay report (news alone does not hold the band)"
+        ],
+        "worsens_it": [
+          "DPD reaching 37 days, which takes the score to 60.0 and High Risk (12.3 points away)",
+          "Any of the EUR 1,220,700 not-yet-due pipeline falling past due",
+          "Further or corroborating reports of wage arrears at the Birmingham plant"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

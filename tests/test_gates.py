@@ -131,6 +131,33 @@ class Integrity(unittest.TestCase):
         with self.assertRaises(DataError):
             Loader(self._corrupt(m)).validate()
 
+    def test_the_demo_swap_file_changes_only_the_one_invoice(self):
+        """demo/invoices_after_payment_demo.csv is a drop-in replacement for
+        invoices.csv, so it must hold every row of it and differ in exactly one.
+
+        It drifted once: six buyers added to invoices.csv were never added here, so
+        demo step 8 silently dropped their invoices and sent four scores to 0.0. Every
+        one of them was Healthy either way, so no other gate noticed.
+        """
+        base = {r["invoice_id"]: r for r in self._rows(ROOT / "data" / "invoices.csv")}
+        swap = {r["invoice_id"]: r
+                for r in self._rows(ROOT / "data" / "demo" / "invoices_after_payment_demo.csv")}
+        self.assertEqual(set(base), set(swap), "the swap file is not the same invoice set")
+        differ = sorted(k for k in swap if base[k] != swap[k])
+        self.assertEqual(differ, ["INV001567"], "step 8 must move one invoice and no other")
+        self.assertEqual((base["INV001567"]["days_past_due"],
+                          swap["INV001567"]["days_past_due"]), ("25", "40"))
+
+    def test_step_8_moves_one_buyer_and_no_other(self):
+        """The same guarantee at the level the room actually sees: a score on screen."""
+        before = {r["buyer_id"]: r["verdict"]["score"]
+                  for r in engine.run(demo_steps=7, llm=FallbackLLM(cache=False))["buyers"]}
+        after = {r["buyer_id"]: r["verdict"]["score"]
+                 for r in engine.run(demo_steps=7, swap_invoices=True,
+                                     llm=FallbackLLM(cache=False))["buyers"]}
+        moved = sorted(b for b in before if before[b] != after[b])
+        self.assertEqual(moved, ["BUY023"], "only Kessler may move when payment data updates")
+
 
 class Determinism(unittest.TestCase):
     def test_same_inputs_give_identical_output(self):

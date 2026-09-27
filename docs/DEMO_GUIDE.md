@@ -25,9 +25,9 @@ engine. Every score below is reproduced by `python3 -m harness.evaluate`.
 
 **Steps 5 and 6 are the pair.** The same wage-protest story, published on the same
 day, on names differing by a single word. One is refused, one is accepted. That is
-entity resolution earning its place — and it is the defence that matters most, because
-13 of the articles in the full dataset are about companies that merely share a brand
-token with a covered buyer.
+entity resolution earning its place — and it is the defence that matters most: five of
+the 38 articles in play are about companies that merely share a brand token with a
+covered buyer, and every one of them has to be refused.
 
 **Step 7 is the fusion argument.** One parent story reaches both subsidiaries at the
 same stepped-down severity. Westbridge absorbs it and stays Healthy because it pays on

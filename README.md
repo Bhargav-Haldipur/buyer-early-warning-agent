@@ -273,3 +273,4 @@ it first.
 | `data/` | the synthetic dataset; `data/demo/` drives the live demo |
 | `docs/PLAN.md` | the specification this was built from, with every decision and its evidence |
 | `docs/DEMO_GUIDE.md` | the live demo script |
+| `docs/WALKTHROUGH.md` | what every file does, and where each number on screen comes from |

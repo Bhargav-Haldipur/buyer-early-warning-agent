@@ -1,0 +1,91 @@
+{
+  "result": {
+    "narrative": "Larsson Distributors AB, a Gothenburg-based pharma distributor, is paying its suppliers progressively later. One invoice with Solvenza Trade Credit (CL03) is 25 days past due at \u20ac69.2k, with three more invoices due shortly, taking total open exposure to ~\u20ac202.8k against a \u20ac270k limit \u2014 75% utilisation and little headroom. Settled history shows lateness worsening from 13 to 20 days on the last two paid invoices, so the current 25 DPD continues an established slippage pattern rather than being a one-off. A 20 September article in Trade Ledger reports that multiple suppliers say the company has fallen behind on scheduled payments over the past quarter.\n\nThe score is 37.3, placing the buyer in the Watch band: 0.65 x 33.3 (payment, 25 DPD) + 0.35 x 44.6 (news) = 37.3, with a PD of 0.2727. Payment contributes 21.7 weighted and news 15.6. The adjudicator agreed with caveats. The caveats matter: the news item is a single uncorroborated one-sentence report with no named vendors, amounts or company response, yet it carries 15.6 of the score; and because the score sits only 2.3 points above the 35 Healthy line, the buyer would mechanically fall into Healthy as that article decays even with no real improvement in payment behaviour. The adjudicator also notes the payment component is a point-in-time DPD reading that does not reward the deteriorating trend, and that the two streams are measuring the same underlying behaviour \u2014 corroborative, not two independent risk drivers. Their conclusion is a firm Watch with a downgrade bias, not a borderline case likely to self-resolve.\n\nThe recommendation is to REDUCE the Solvenza Trade Credit line (LIM0029) from a current limit of 270000 to a revised limit of 247525, being the limit at which expected loss meets the 25% appetite against a PD of 0.2727 versus a target of 0.25. Expected loss falls from 53197 to 48769; the maximum liability constraint does not bind. Note that with 202800 already owed, the revised limit still sits above current exposure. The adjudicator flags that the \u20ac270k limit was last reviewed in Aug 2024 and the payment review itself calls it potentially outdated, so the line warrants re-underwriting rather than a mechanical trim.\n\nTo move down to Healthy the score needs to fall 2.3 points below the 35.0 line \u2014 but on the adjudicator's caveat that should come from genuine improvement, not news decay (half-life 365 days). Clearing the \u20ac69.2k overdue invoice, seeing the three near-due invoices settle on time and reversing the 13-to-20-day lateness trend would do it; corroborated confirmation that the vendor arrears report is unfounded would also weaken the news leg. On the downside, High Risk sits at 60.0, 22.7 points away, which would require the worst line to reach 45 DPD; the three invoices due shortly going overdue, or a second corroborated vendor or liquidity report, are the things to watch.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Reduce the Solvenza Trade Credit limit from 270000 to 247525 on a Watch score of 37.3, driven by a 25 DPD invoice against a worsening settlement trend and vendor-arrears reporting. The adjudicator agreed with caveats: the score sits just 2.3 points above the Healthy line and leans on a single uncorroborated article, so treat this as a firm Watch with downgrade bias and re-underwrite the Aug 2024 limit rather than let the band improve on news decay.",
+      "payment_note": "One invoice is 25 days past due (INV001137, \u20ac69.2k) with three more due shortly, totalling ~\u20ac202.8k against a \u20ac270k limit, and settled history shows lateness deteriorating from 13 to 20 days on the last two paid invoices.",
+      "news_note": "One severity 4 item, 5 days old and direct to the entity: Trade Ledger reports multiple suppliers say Larsson Distributors has fallen behind on scheduled payments over the past quarter, though the adjudicator notes it is a single uncorroborated one-sentence report with no named vendors, amounts or company response.",
+      "lifts_it": [
+        "The \u20ac69.2k overdue invoice cleared and the three near-due invoices settling on time (2.3 points takes it below the 35.0 Healthy line)",
+        "Settled-invoice lateness reversing the 13-to-20-day trend",
+        "Corroborated confirmation that the vendor-arrears report is unfounded \u2014 not decay of the article alone"
+      ],
+      "worsens_it": [
+        "Worst line slipping to 45 DPD, which would reach High Risk at 60.0 (22.7 points away)",
+        "The three invoices due shortly going overdue, pushing exposure past the 75% utilisation already on the \u20ac270k limit",
+        "A second, corroborated vendor-arrears or liquidity report"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY016\", \"score\": 37.3, \"band\": \"Watch\", \"pd\": 0.2727, \"payment\": {\"dpd\": 25, \"raw\": 33.3, \"weighted\": 21.7, \"worst_line\": \"CL03\"}, \"news\": {\"severity\": 4, \"category\": \"unpaid_vendors\", \"article_id\": \"NWSDEMO03\", \"age_days\": 5, \"headline\": \"Vendors say Larsson Distributors has fallen behind on payments\", \"via_parent\": false, \"parent_name\": null, \"raw\": 44.6, \"weighted\": 15.6}, \"trace"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM0029\", \"buyer_id\": \"BUY016\", \"client_id\": \"CL03\", \"client_name\": \"Solvenza Trade Credit\", \"current_limit\": 270000, \"owed\": 202800, \"revised_limit\": 247525, \"change\": -22475, \"action\": \"REDUCE\", \"reason\": \"cut to the limit where expected loss meets 25% appetite\", \"pd\": 0.2727, \"pd_target\": 0.25, \"max_liability_binds\": false, \"expected_loss_before\": 53197, \"expected_loss_after\": 48"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 60.0, \"points_to_next_band\": 22.7, \"dpd_for_next_band\": 45, \"lower_band\": \"Healthy\", \"lower_band_below\": 35.0, \"points_to_lower_band\": 2.3, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"INV001137\", \"kind\": \"payment\", \"date\": \"2026-08-31\", \"detail\": \"4 open invoice(s) with CL03; worst is 25 days past due\", \"data\": {\"client_id\": \"CL03\", \"dpd\": 25, \"owed\": 202800.0, \"open_count\": 4}}, {\"id\": \"INV001137\", \"kind\": \"payment_review\", \"date\": \"2026-08-31\", \"detail\": \"Larsson Distributors AB has one invoice 25 days past due (INV001137, \\u20ac69.2k) with three more due shortly, to"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "NWSDEMO03"
+      },
+      "result": "{\"article_id\": \"NWSDEMO03\", \"published_date\": \"2026-09-20\", \"publication\": \"Trade Ledger\", \"headline\": \"Vendors say Larsson Distributors has fallen behind on payments\", \"body\": \"Multiple suppliers to Larsson Distributors AB say the Gothenburg-based pharma distributor has fallen behind on scheduled payments over the past quarter, raising concerns among its vendor base.\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Larsson Distributors AB, a Gothenburg-based pharma distributor, is paying its suppliers progressively later. One invoice with Solvenza Trade Credit (CL03) is 25 days past due at \u20ac69.2k, with three more invoices due shortly, taking total open exposure to ~\u20ac202.8k against a \u20ac270k limit \u2014 75% utilisation and little headroom. Settled history shows lateness worsening from 13 to 20 days on the last two paid invoices, so the current 25 DPD continues an established slippage pattern rather than being a one-off. A 20 September article in Trade Ledger reports that multiple suppliers say the company has fallen behind on scheduled payments over the past quarter.\n\nThe score is 37.3, placing the buyer in the Watch band: 0.65 x 33.3 (payment, 25 DPD) + 0.35 x 44.6 (news) = 37.3, with a PD of 0.2727. Payment contributes 21.7 weighted and news 15.6. The adjudicator agreed with caveats. The caveats matter: the news item is a single uncorroborated one-sentence report with no named vendors, amounts or company response, yet it carries 15.6 of the score; and because the score sits only 2.3 points above the 35 Healthy line, the buyer would mechanically fall into Healthy as that article decays even with no real improvement in payment behaviour. The adjudicator also notes the payment component is a point-in-time DPD reading that does not reward the deteriorating trend, and that the two streams are measuring the same underlying behaviour \u2014 corroborative, not two independent risk drivers. Their conclusion is a firm Watch with a downgrade bias, not a borderline case likely to self-resolve.\n\nThe recommendation is to REDUCE the Solvenza Trade Credit line (LIM0029) from \u20ac270,000 to \u20ac247,525, a cut of \u20ac22,475, being the limit at which expected loss meets the 25% appetite against a PD of 0.2727 versus a target of 0.25. Expected loss falls from \u20ac53,197 to \u20ac48,769; the maximum liability constraint does not bind. Note that with \u20ac202,800 already owed, the revised limit still sits above current exposure. The adjudicator flags that the \u20ac270k limit was last reviewed in Aug 2024 and the payment review itself calls it potentially outdated, so the line warrants re-underwriting rather than a mechanical trim.\n\nTo move down to Healthy the score needs to fall 2.3 points below the 35.0 line \u2014 but on the adjudicator's caveat that should come from genuine improvement, not news decay (half-life 365 days). Clearing the \u20ac69.2k overdue invoice, seeing the three near-due invoices settle on time and reversing the 13-to-20-day lateness trend would do it; corroborated confirmation that the vendor arrears report is unfounded would also weaken the news leg. On the downside, High Risk sits at 60.0, 22.7 points away, which would require the worst line to reach 45 DPD; the three invoices due shortly going overdue, or a second corroborated vendor or liquidity report, are the things to watch.",
+        "bottom_line": "Reduce the Solvenza Trade Credit limit from \u20ac270,000 to \u20ac247,525 (-\u20ac22,475) on a Watch score of 37.3, driven by a 25 DPD invoice against a worsening settlement trend and vendor-arrears reporting. The adjudicator agreed with caveats: the score sits just 2.3 points above the Healthy line and leans on a single uncorroborated article, so treat this as a firm Watch with downgrade bias and re-underwrite the Aug 2024 limit rather than let the band improve on news decay.",
+        "payment_note": "One invoice is 25 days past due (INV001137, \u20ac69.2k) with three more due shortly, totalling ~\u20ac202.8k against a \u20ac270k limit, and settled history shows lateness deteriorating from 13 to 20 days on the last two paid invoices.",
+        "news_note": "One severity 4 item, 5 days old and direct to the entity: Trade Ledger reports multiple suppliers say Larsson Distributors has fallen behind on scheduled payments over the past quarter, though the adjudicator notes it is a single uncorroborated one-sentence report with no named vendors, amounts or company response.",
+        "lifts_it": [
+          "The \u20ac69.2k overdue invoice cleared and the three near-due invoices settling on time (2.3 points takes it below the 35.0 Healthy line)",
+          "Settled-invoice lateness reversing the 13-to-20-day trend",
+          "Corroborated confirmation that the vendor-arrears report is unfounded \u2014 not decay of the article alone"
+        ],
+        "worsens_it": [
+          "Worst line slipping to 45 DPD, which would reach High Risk at 60.0 (22.7 points away)",
+          "The three invoices due shortly going overdue, pushing exposure past the 75% utilisation already on the \u20ac270k limit",
+          "A second, corroborated vendor-arrears or liquidity report"
+        ]
+      },
+      "error": "these figures are not in the data: ['22,475,', '22,475']. Use only the numbers the tools returned, then resubmit"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Larsson Distributors AB, a Gothenburg-based pharma distributor, is paying its suppliers progressively later. One invoice with Solvenza Trade Credit (CL03) is 25 days past due at \u20ac69.2k, with three more invoices due shortly, taking total open exposure to ~\u20ac202.8k against a \u20ac270k limit \u2014 75% utilisation and little headroom. Settled history shows lateness worsening from 13 to 20 days on the last two paid invoices, so the current 25 DPD continues an established slippage pattern rather than being a one-off. A 20 September article in Trade Ledger reports that multiple suppliers say the company has fallen behind on scheduled payments over the past quarter.\n\nThe score is 37.3, placing the buyer in the Watch band: 0.65 x 33.3 (payment, 25 DPD) + 0.35 x 44.6 (news) = 37.3, with a PD of 0.2727. Payment contributes 21.7 weighted and news 15.6. The adjudicator agreed with caveats. The caveats matter: the news item is a single uncorroborated one-sentence report with no named vendors, amounts or company response, yet it carries 15.6 of the score; and because the score sits only 2.3 points above the 35 Healthy line, the buyer would mechanically fall into Healthy as that article decays even with no real improvement in payment behaviour. The adjudicator also notes the payment component is a point-in-time DPD reading that does not reward the deteriorating trend, and that the two streams are measuring the same underlying behaviour \u2014 corroborative, not two independent risk drivers. Their conclusion is a firm Watch with a downgrade bias, not a borderline case likely to self-resolve.\n\nThe recommendation is to REDUCE the Solvenza Trade Credit line (LIM0029) from a current limit of 270000 to a revised limit of 247525, being the limit at which expected loss meets the 25% appetite against a PD of 0.2727 versus a target of 0.25. Expected loss falls from 53197 to 48769; the maximum liability constraint does not bind. Note that with 202800 already owed, the revised limit still sits above current exposure. The adjudicator flags that the \u20ac270k limit was last reviewed in Aug 2024 and the payment review itself calls it potentially outdated, so the line warrants re-underwriting rather than a mechanical trim.\n\nTo move down to Healthy the score needs to fall 2.3 points below the 35.0 line \u2014 but on the adjudicator's caveat that should come from genuine improvement, not news decay (half-life 365 days). Clearing the \u20ac69.2k overdue invoice, seeing the three near-due invoices settle on time and reversing the 13-to-20-day lateness trend would do it; corroborated confirmation that the vendor arrears report is unfounded would also weaken the news leg. On the downside, High Risk sits at 60.0, 22.7 points away, which would require the worst line to reach 45 DPD; the three invoices due shortly going overdue, or a second corroborated vendor or liquidity report, are the things to watch.",
+        "bottom_line": "Reduce the Solvenza Trade Credit limit from 270000 to 247525 on a Watch score of 37.3, driven by a 25 DPD invoice against a worsening settlement trend and vendor-arrears reporting. The adjudicator agreed with caveats: the score sits just 2.3 points above the Healthy line and leans on a single uncorroborated article, so treat this as a firm Watch with downgrade bias and re-underwrite the Aug 2024 limit rather than let the band improve on news decay.",
+        "payment_note": "One invoice is 25 days past due (INV001137, \u20ac69.2k) with three more due shortly, totalling ~\u20ac202.8k against a \u20ac270k limit, and settled history shows lateness deteriorating from 13 to 20 days on the last two paid invoices.",
+        "news_note": "One severity 4 item, 5 days old and direct to the entity: Trade Ledger reports multiple suppliers say Larsson Distributors has fallen behind on scheduled payments over the past quarter, though the adjudicator notes it is a single uncorroborated one-sentence report with no named vendors, amounts or company response.",
+        "lifts_it": [
+          "The \u20ac69.2k overdue invoice cleared and the three near-due invoices settling on time (2.3 points takes it below the 35.0 Healthy line)",
+          "Settled-invoice lateness reversing the 13-to-20-day trend",
+          "Corroborated confirmation that the vendor-arrears report is unfounded \u2014 not decay of the article alone"
+        ],
+        "worsens_it": [
+          "Worst line slipping to 45 DPD, which would reach High Risk at 60.0 (22.7 points away)",
+          "The three invoices due shortly going overdue, pushing exposure past the 75% utilisation already on the \u20ac270k limit",
+          "A second, corroborated vendor-arrears or liquidity report"
+        ]
+      }
+    }
+  ],
+  "turns": 4
+}

@@ -1,0 +1,91 @@
+{
+  "result": {
+    "narrative": "Kessler Traders GmbH is showing cash-flow strain on two fronts at once. Three invoices are open with Adlerhof Trade Credit for EUR 189,100, the worst of them (INV001567, EUR 86,900) at 25 days past due against 45-day terms, and a Trade Ledger report dated 2026-09-20 describes workers at the Essen facility protesting over delayed wages, with union representatives warning of further action. The payment file is labelled \"improving\" \u2014 days-late fell from 46 and 55 days on the two oldest settled invoices to 10 days on the most recent \u2014 but that read rests on only three settled invoices and is contradicted by the only live position.\n\nThe score is 47.7, placing the buyer in the Watch band: 0.65 x 33.3 (payment, 25 DPD) + 0.35 x 74.3 (news) = 47.7, with PD at 0.3767. The severity-5 unpaid-wages article contributes 26.0 of the 47.7. The adjudicator agreed with caveats: the two inputs are not independent \u2014 delayed payroll and a past-due invoice describe the same strain \u2014 so 47.7 likely sits at the conservative end of what the evidence implies. The adjudicator also flagged that the news component rests on a single two-sentence, uncorroborated article which will decay with age (base 75.0, already 74.29 at 5 days), so the buyer will drift back toward Healthy automatically even if the wage arrears are never cleared.\n\nThe recommendation is to REDUCE the Adlerhof Trade Credit line from EUR 430,000 to EUR 285,373, cutting expected loss from EUR 131,205 to EUR 87,075 and aligning exposure with the 25% appetite target against a PD of 0.3767. The revised limit still sits above the EUR 189,100 currently owed. The adjudicator separately urges refreshing the line regardless of band: it has not been reviewed since 2024-10-24, and the undrawn headroom remains available to a buyer now showing both payroll distress and a past-due position.\n\nThe band would ease if the 25-day past-due item is settled and payroll status is actively confirmed clear rather than assumed from silence \u2014 news alone does not hold this buyer in Watch, and 12.7 points would return it to Healthy below 35.0. Against that, DPD reaching 37 days would carry the score to the High Risk line at 60.0, 12.3 points away.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Reduce the Adlerhof Trade Credit line from EUR 430,000 to EUR 285,373 on a Watch-band score of 47.7, driven by a 25 DPD position and a severity-5 unpaid-wages report. The adjudicator agreed with caveats: the two signals are not independent, 26.0 of the score rests on one uncorroborated article that will decay on its own, and the line has not been reviewed since 2024-10-24.",
+      "payment_note": "Three invoices are open for EUR 189,100 with the worst at 25 days past due; settlement was trending better (46 and 55 days late falling to 10 days on the most recent settled invoice) but that trend rests on only three invoices and is contradicted by the current past-due item.",
+      "news_note": "One severity-5 article dated 2026-09-20 from Trade Ledger reports workers protesting delayed wages at the Essen plant, correctly attributed to this buyer and not routed via a parent, but it is a two-sentence report from a single publication with no corroborating source.",
+      "lifts_it": [
+        "Settlement of the 25 DPD item (INV001567, EUR 86,900) \u2014 news alone does not hold the Watch band",
+        "Confirmed evidence the wage arrears are cleared, rather than letting the news component decay unchecked",
+        "12.7 points of score improvement returns the buyer to Healthy below 35.0"
+      ],
+      "worsens_it": [
+        "DPD reaching 37 days takes the score to the High Risk line at 60.0 (12.3 points away)",
+        "Corroborating or escalating reports on the Essen payroll dispute, including the threatened further union action",
+        "Drawdown against the unreviewed EUR 430,000 line, which leaves headroom above the EUR 189,100 owed"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY023\", \"score\": 47.7, \"band\": \"Watch\", \"pd\": 0.3767, \"payment\": {\"dpd\": 25, \"raw\": 33.3, \"weighted\": 21.7, \"worst_line\": \"CL01\"}, \"news\": {\"severity\": 5, \"category\": \"unpaid_wages\", \"article_id\": \"NWSDEMO06\", \"age_days\": 5, \"headline\": \"Workers at Kessler Traders plant protest over delayed wages\", \"via_parent\": false, \"parent_name\": null, \"raw\": 74.3, \"weighted\": 26.0}, \"trace\": \"0"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM0040\", \"buyer_id\": \"BUY023\", \"client_id\": \"CL01\", \"client_name\": \"Adlerhof Trade Credit\", \"current_limit\": 430000, \"owed\": 189100, \"revised_limit\": 285373, \"change\": -144627, \"action\": \"REDUCE\", \"reason\": \"cut to the limit where expected loss meets 25% appetite\", \"pd\": 0.3767, \"pd_target\": 0.25, \"max_liability_binds\": false, \"expected_loss_before\": 131205, \"expected_loss_after\": "
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 60.0, \"points_to_next_band\": 12.3, \"dpd_for_next_band\": 37, \"lower_band\": \"Healthy\", \"lower_band_below\": 35.0, \"points_to_lower_band\": 12.7, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"INV001567\", \"kind\": \"payment\", \"date\": \"2026-08-31\", \"detail\": \"3 open invoice(s) with CL01; worst is 25 days past due\", \"data\": {\"client_id\": \"CL01\", \"dpd\": 25, \"owed\": 189100.0, \"open_count\": 3}}, {\"id\": \"INV001567\", \"kind\": \"payment_review\", \"date\": \"2026-08-31\", \"detail\": \"Kessler Traders GmbH shows a clear improvement in settlement behavior: days-late fell from 46 and 55 days on the "
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "NWSDEMO06"
+      },
+      "result": "{\"article_id\": \"NWSDEMO06\", \"published_date\": \"2026-09-20\", \"publication\": \"Trade Ledger\", \"headline\": \"Workers at Kessler Traders plant protest over delayed wages\", \"body\": \"Workers at Kessler Traders GmbH's Essen facility staged a protest this week over delayed wage payments, with union representatives warning of further action if dues are not cleared.\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Kessler Traders GmbH is showing cash-flow strain on two fronts at once. Three invoices are open with Adlerhof Trade Credit for EUR 189,100, the worst of them (INV001567, EUR 86,900) at 25 days past due against 45-day terms, and a Trade Ledger report dated 2026-09-20 describes workers at the Essen facility protesting over delayed wages, with union representatives warning of further action. The payment file is labelled \"improving\" \u2014 days-late fell from 46 and 55 days on the two oldest settled invoices to 10 days on the most recent \u2014 but that read rests on only three settled invoices and is contradicted by the only live position.\n\nThe score is 47.7, placing the buyer in the Watch band: 0.65 x 33.3 (payment, 25 DPD) + 0.35 x 74.3 (news) = 47.7, with PD at 0.3767. The severity-5 unpaid-wages article contributes 26.0 of the 47.7. The adjudicator agreed with caveats: the two inputs are not independent \u2014 delayed payroll and a past-due invoice describe the same strain \u2014 so 47.7 likely sits at the conservative end of what the evidence implies. The adjudicator also flagged that the news component rests on a single two-sentence, uncorroborated article which will decay with age (base 75.0, already 74.29 at 5 days), so the buyer will drift back toward Healthy automatically even if the wage arrears are never cleared.\n\nThe recommendation is to REDUCE the Adlerhof Trade Credit line from EUR 430,000 to EUR 285,373, a cut of EUR 144,627, bringing expected loss from EUR 131,205 to EUR 87,075 and aligning exposure with the 25% appetite target against a PD of 0.3767. The revised limit still sits above the EUR 189,100 currently owed. The adjudicator separately urges refreshing the line regardless of band: it has not been reviewed since 2024-10-24, and the undrawn headroom remains available to a buyer now showing both payroll distress and a past-due position.\n\nThe band would ease if the 25-day past-due item is settled and payroll status is actively confirmed clear rather than assumed from silence \u2014 news alone does not hold this buyer in Watch, and 12.7 points would return it to Healthy below 35.0. Against that, DPD reaching 37 days would carry the score to the High Risk line at 60.0, 12.3 points away.",
+        "bottom_line": "Reduce the Adlerhof Trade Credit line from EUR 430,000 to EUR 285,373 (-EUR 144,627) on a Watch-band score of 47.7, driven by a 25 DPD position and a severity-5 unpaid-wages report. The adjudicator agreed with caveats: the two signals are not independent, 26.0 of the score rests on one uncorroborated article that will decay on its own, and the line has not been reviewed since 2024-10-24.",
+        "payment_note": "Three invoices are open for EUR 189,100 with the worst at 25 days past due; settlement was trending better (46 and 55 days late falling to 10 days on the most recent settled invoice) but that trend rests on only three invoices and is contradicted by the current past-due item.",
+        "news_note": "One severity-5 article dated 2026-09-20 from Trade Ledger reports workers protesting delayed wages at the Essen plant, correctly attributed to this buyer and not routed via a parent, but it is a two-sentence report from a single publication with no corroborating source.",
+        "lifts_it": [
+          "Settlement of the 25 DPD item (INV001567, EUR 86,900) \u2014 news alone does not hold the Watch band",
+          "Confirmed evidence the wage arrears are cleared, rather than letting the news component decay unchecked",
+          "12.7 points of score improvement returns the buyer to Healthy below 35.0"
+        ],
+        "worsens_it": [
+          "DPD reaching 37 days takes the score to the High Risk line at 60.0 (12.3 points away)",
+          "Corroborating or escalating reports on the Essen payroll dispute, including the threatened further union action",
+          "Drawdown against the unreviewed EUR 430,000 line, which leaves headroom above the EUR 189,100 owed"
+        ]
+      },
+      "error": "these figures are not in the data: ['144,627,', '144,627']. Use only the numbers the tools returned, then resubmit"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Kessler Traders GmbH is showing cash-flow strain on two fronts at once. Three invoices are open with Adlerhof Trade Credit for EUR 189,100, the worst of them (INV001567, EUR 86,900) at 25 days past due against 45-day terms, and a Trade Ledger report dated 2026-09-20 describes workers at the Essen facility protesting over delayed wages, with union representatives warning of further action. The payment file is labelled \"improving\" \u2014 days-late fell from 46 and 55 days on the two oldest settled invoices to 10 days on the most recent \u2014 but that read rests on only three settled invoices and is contradicted by the only live position.\n\nThe score is 47.7, placing the buyer in the Watch band: 0.65 x 33.3 (payment, 25 DPD) + 0.35 x 74.3 (news) = 47.7, with PD at 0.3767. The severity-5 unpaid-wages article contributes 26.0 of the 47.7. The adjudicator agreed with caveats: the two inputs are not independent \u2014 delayed payroll and a past-due invoice describe the same strain \u2014 so 47.7 likely sits at the conservative end of what the evidence implies. The adjudicator also flagged that the news component rests on a single two-sentence, uncorroborated article which will decay with age (base 75.0, already 74.29 at 5 days), so the buyer will drift back toward Healthy automatically even if the wage arrears are never cleared.\n\nThe recommendation is to REDUCE the Adlerhof Trade Credit line from EUR 430,000 to EUR 285,373, cutting expected loss from EUR 131,205 to EUR 87,075 and aligning exposure with the 25% appetite target against a PD of 0.3767. The revised limit still sits above the EUR 189,100 currently owed. The adjudicator separately urges refreshing the line regardless of band: it has not been reviewed since 2024-10-24, and the undrawn headroom remains available to a buyer now showing both payroll distress and a past-due position.\n\nThe band would ease if the 25-day past-due item is settled and payroll status is actively confirmed clear rather than assumed from silence \u2014 news alone does not hold this buyer in Watch, and 12.7 points would return it to Healthy below 35.0. Against that, DPD reaching 37 days would carry the score to the High Risk line at 60.0, 12.3 points away.",
+        "bottom_line": "Reduce the Adlerhof Trade Credit line from EUR 430,000 to EUR 285,373 on a Watch-band score of 47.7, driven by a 25 DPD position and a severity-5 unpaid-wages report. The adjudicator agreed with caveats: the two signals are not independent, 26.0 of the score rests on one uncorroborated article that will decay on its own, and the line has not been reviewed since 2024-10-24.",
+        "payment_note": "Three invoices are open for EUR 189,100 with the worst at 25 days past due; settlement was trending better (46 and 55 days late falling to 10 days on the most recent settled invoice) but that trend rests on only three invoices and is contradicted by the current past-due item.",
+        "news_note": "One severity-5 article dated 2026-09-20 from Trade Ledger reports workers protesting delayed wages at the Essen plant, correctly attributed to this buyer and not routed via a parent, but it is a two-sentence report from a single publication with no corroborating source.",
+        "lifts_it": [
+          "Settlement of the 25 DPD item (INV001567, EUR 86,900) \u2014 news alone does not hold the Watch band",
+          "Confirmed evidence the wage arrears are cleared, rather than letting the news component decay unchecked",
+          "12.7 points of score improvement returns the buyer to Healthy below 35.0"
+        ],
+        "worsens_it": [
+          "DPD reaching 37 days takes the score to the High Risk line at 60.0 (12.3 points away)",
+          "Corroborating or escalating reports on the Essen payroll dispute, including the threatened further union action",
+          "Drawdown against the unreviewed EUR 430,000 line, which leaves headroom above the EUR 189,100 owed"
+        ]
+      }
+    }
+  ],
+  "turns": 4
+}
