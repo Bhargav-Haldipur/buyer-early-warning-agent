@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "The only registry match, \"Larsson Distributors AB,\" is a pharma distributor in Gothenburg, whereas the article concerns a Stockholm dental clinic chain, \"Larsson Dental Group AB\" - a different business and location, so no covered entity matches."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsson"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY016\", \"name\": \"Larsson Distributors AB\", \"sector\": \"Pharma Distribution\", \"city\": \"Gothenburg\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "The only registry match, \"Larsson Distributors AB,\" is a pharma distributor in Gothenburg, whereas the article concerns a Stockholm dental clinic chain, \"Larsson Dental Group AB\" - a different business and location, so no covered entity matches."
+      }
+    }
+  ],
+  "turns": 2
+}

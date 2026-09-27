@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "The mentioned entity field contains a script injection string, not a real company name, and no covered entity matches it; the article lacks any identifiable subject to assess."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "script"
+      },
+      "result": "[{\"note\": \"no covered entity shares a word with 'script'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "The mentioned entity field contains a script injection string, not a real company name, and no covered entity matches it; the article lacks any identifiable subject to assess."
+      }
+    }
+  ],
+  "turns": 2
+}

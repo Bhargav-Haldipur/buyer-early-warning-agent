@@ -274,3 +274,4 @@ it first.
 | `docs/PLAN.md` | the specification this was built from, with every decision and its evidence |
 | `docs/DEMO_GUIDE.md` | the live demo script |
 | `docs/WALKTHROUGH.md` | what every file does, and where each number on screen comes from |
+| `docs/PRESENTATION.md` | the five minutes: the video script, the live demo, and the Q&A |

@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "Nordkrans Yachting Ltd (Southampton leisure-boat charter) does not match the only registry entity found, Nordkrans Steel Traders AB (Malmo steel trading), a different sector and location."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Nordkrans"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY014\", \"name\": \"Nordkrans Steel Traders AB\", \"sector\": \"Steel Trading\", \"city\": \"Malmo\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "Nordkrans Yachting Ltd (Southampton leisure-boat charter) does not match the only registry entity found, Nordkrans Steel Traders AB (Malmo steel trading), a different sector and location."
+      }
+    }
+  ],
+  "turns": 2
+}

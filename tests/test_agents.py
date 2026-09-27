@@ -1,4 +1,14 @@
 """The agent loop and its guards, driven by a scripted client - no network, no key."""
+# Tests never reach the network. The documented way to run this project exports
+# ANTHROPIC_API_KEY, and several tests drive the full engine through get_llm(), which
+# picks Claude whenever credentials are in the environment - so without this the suite
+# bills real money and takes minutes. It sits in each module rather than in
+# tests/__init__.py because `unittest discover -s tests` imports these as top-level
+# modules and never runs the package __init__. Tests that want a model pass a stub.
+import os
+
+os.environ["EWS_LLM"] = "fallback"
+
 import json
 import unittest
 from types import SimpleNamespace

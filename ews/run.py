@@ -22,8 +22,19 @@ from .loader import Loader
 OUT_DIR = Path(__file__).resolve().parent.parent / "out" / "runs"
 
 
-def run(demo_steps: int = 0, swap_invoices: bool = False, llm=None, cache: bool = True) -> dict:
-    loader = Loader(demo_steps=demo_steps, swap_invoices=swap_invoices)
+def run(demo_steps: int = 0, swap_invoices: bool = False, llm=None, cache: bool = True,
+        extra_articles: list[dict] | None = None,
+        dpd_overrides: dict[str, int] | None = None, commentary: bool = True) -> dict:
+    """commentary=False skips the two agents that only write prose about a verdict.
+
+    The score is the D5 formula in code, so it is byte-identical either way; what is
+    lost is the adjudicator's review and an agent-written case file, which fall to the
+    template. The live sandbox uses it because those two run on Opus and a buyer that
+    has just moved bands misses the cache on both - ninety seconds of silence in front
+    of a room, to render commentary nobody is reading at that moment.
+    """
+    loader = Loader(demo_steps=demo_steps, swap_invoices=swap_invoices,
+                    extra_articles=extra_articles, dpd_overrides=dpd_overrides)
     loader.validate()          # fail on an inconsistent dataset, not halfway through scoring
     llm = llm or get_llm(cache=cache)
     store = EvidenceStore()
@@ -38,7 +49,7 @@ def run(demo_steps: int = 0, swap_invoices: bool = False, llm=None, cache: bool 
         v = adjudicator.adjudicate(bid, payments[bid], newsvals[bid])
         v["review"] = adjudicator.review(buyers[bid], v,
                                          [e.to_dict() for e in store.for_buyer(bid)],
-                                         articles, llm)
+                                         articles, llm) if commentary else None
         verdicts[bid] = v
     limit_lines = recommend(loader, verdicts)
     by_buyer: dict[str, list[dict]] = defaultdict(list)
@@ -51,7 +62,8 @@ def run(demo_steps: int = 0, swap_invoices: bool = False, llm=None, cache: bool 
         lines = by_buyer.get(bid, [])
         items = [e.to_dict() for e in store.for_buyer(bid)]
         # bands outside settings.py run_for_bands (Healthy, by default) get the template
-        cf = casefile.write(llm if verdict["band"] in write_for else _RULES, buyers[bid],
+        cf = casefile.write(llm if commentary and verdict["band"] in write_for else _RULES,
+                            buyers[bid],
                             verdict, lines, items, articles)
         records.append({
             **{k: buyers[bid][k] for k in
@@ -87,6 +99,11 @@ def run(demo_steps: int = 0, swap_invoices: bool = False, llm=None, cache: bool 
         "spend": llm.spend() if hasattr(llm, "spend") else None,
         "demo_steps": demo_steps,
         "swap_invoices": swap_invoices,
+        "commentary": commentary,
+        # what the live sandbox added on top of the shipped dataset, so a run is
+        # reproducible from its own output
+        "live_articles": [a["article_id"] for a in (extra_articles or [])],
+        "dpd_overrides": dict(dpd_overrides or {}),
         "clients": clients,
         "buyers": records,
         "refusals": [e.to_dict() for e in store.of_kind("resolution")],

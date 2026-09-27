@@ -1,4 +1,14 @@
 """Mechanical gates: leakage, determinism, the formulae, the case-file guard, theme."""
+# Tests never reach the network. The documented way to run this project exports
+# ANTHROPIC_API_KEY, and several tests drive the full engine through get_llm(), which
+# picks Claude whenever credentials are in the environment - so without this the suite
+# bills real money and takes minutes. It sits in each module rather than in
+# tests/__init__.py because `unittest discover -s tests` imports these as top-level
+# modules and never runs the package __init__. Tests that want a model pass a stub.
+import os
+
+os.environ["EWS_LLM"] = "fallback"
+
 import json
 import re
 import subprocess
@@ -598,3 +608,116 @@ class LoaderWithoutDemoFiles(unittest.TestCase):
         with self.assertRaises(ValueError) as ctx:
             Loader(self._without_demo(), demo_steps=3)
         self.assertIn("demo_articles_to_add.csv", str(ctx.exception))
+
+
+class LiveInput(unittest.TestCase):
+    """The sandbox takes input nobody prepared, so every way of getting it wrong
+    has to leave the demo standing."""
+
+    def setUp(self):
+        import dashboard.server as S
+        self.S = S
+        S.LIVE.update(articles=[], dpd={}, last=None)
+        S._LIVE_CACHE.clear()
+        self.addCleanup(lambda: S.LIVE.update(articles=[], dpd={}, last=None))
+
+    def _story(self, **kw):
+        base = {"mention": "Oakhurst Components Ltd", "headline": "Wage protest",
+                "body": "Staff protested over delayed wages.", "date": "2026-09-20"}
+        self.S.add_story({k: [v] for k, v in {**base, **kw}.items()})
+        return self.S.LIVE["last"]
+
+    def test_a_genuine_story_moves_the_named_buyer(self):
+        moves = self._story()["moves"]
+        self.assertEqual([m["buyer_id"] for m in moves], ["BUY019"])
+        self.assertTrue(moves[0]["crossed"])
+
+    def test_a_near_miss_name_moves_nothing(self):
+        self.assertEqual(self._story(mention="Oakhurst Realty LLP")["moves"], [])
+
+    def test_a_story_the_run_could_not_have_seen_is_refused(self):
+        last = self._story(date="2026-12-01")
+        self.assertIn("snapshot", last["error"])
+        self.assertEqual(self.S.LIVE["articles"], [], "a refused story must not be kept")
+
+    def test_a_rejected_input_leaves_the_previous_state_intact(self):
+        self._story()
+        self._story(headline="")                      # rejected
+        self.assertEqual(len(self.S.LIVE["articles"]), 1)
+
+    def test_the_ledger_lever_crosses_a_band(self):
+        self.S.set_dpd({"buyer_id": ["BUY019"], "dpd": ["45"]})
+        m = self.S.LIVE["last"]["moves"]
+        self.assertEqual((m[0]["buyer_id"], m[0]["to_band"]), ("BUY019", "Watch"))
+
+    def test_the_two_signals_together_reach_a_band_neither_reaches_alone(self):
+        """The fusion argument, as a number: at 45 days past due this buyer is Watch on
+        payment alone and High Risk once the wage story lands. Payment alone would not
+        get there until 57 days - the news is worth twelve days of lead time."""
+        self.S.set_dpd({"buyer_id": ["BUY019"], "dpd": ["45"]})
+        self.assertEqual(self.S.LIVE["last"]["moves"][0]["to_band"], "Watch")
+        self._story()
+        self.assertEqual(self.S.LIVE["last"]["moves"][0]["to_band"], "High Risk")
+
+        self.S.LIVE.update(articles=[], dpd={}, last=None)
+        self.S.set_dpd({"buyer_id": ["BUY019"], "dpd": ["57"]})
+        self.assertEqual(self.S.LIVE["last"]["moves"][0]["to_band"], "High Risk")
+
+    def test_a_bad_dpd_is_refused_not_applied(self):
+        self.S.set_dpd({"buyer_id": ["BUY019"], "dpd": ["nope"]})
+        self.assertTrue(self.S.LIVE["last"]["error"])
+        self.assertEqual(self.S.LIVE["dpd"], {})
+
+    def test_an_out_of_range_dpd_is_refused(self):
+        self.S.set_dpd({"buyer_id": ["BUY019"], "dpd": ["9999"]})
+        self.assertTrue(self.S.LIVE["last"]["error"])
+        self.assertEqual(self.S.LIVE["dpd"], {})
+
+    def test_an_override_does_not_leak_into_the_next_loader(self):
+        """table() hands back a cached list; an override must copy before writing."""
+        def worst(loader):
+            return max(int(i["days_past_due"] or 0) for i in loader.invoices()
+                       if i["buyer_id"] == "BUY019" and i["status"] == "Open")
+        self.assertEqual(worst(Loader(dpd_overrides={"BUY019": 99})), 99)
+        self.assertEqual(worst(Loader()), 25)
+
+    def test_live_input_never_reaches_the_shipped_dataset(self):
+        self._story()
+        self.assertEqual(len(Loader().news()), 31)
+
+    def test_typed_html_is_escaped_on_the_page(self):
+        self._story(mention="<script>alert(1)</script>")
+        self.assertNotIn("<script>alert(1)</script>", self.S.live_page().decode())
+
+    def test_a_buyer_opened_from_the_sandbox_shows_the_sandbox_score(self):
+        """Clicking through must not contradict, on the next screen, the number the
+        room just watched move."""
+        self._story()
+        live = self.S.buyer_page("BUY019", "score", live=True).decode()
+        scripted = self.S.buyer_page("BUY019", "score", live=False).decode()
+        self.assertIn("47.7", live)
+        self.assertIn("Live sandbox view", live)
+        self.assertNotIn("Live sandbox view", scripted)
+        self.assertIn("21.7", scripted)
+
+    def test_skipping_commentary_does_not_move_a_single_score(self):
+        from ews.llm import FallbackLLM
+        full = {r["buyer_id"]: r["verdict"]["score"]
+                for r in engine.run(llm=FallbackLLM(cache=False))["buyers"]}
+        quick = {r["buyer_id"]: r["verdict"]["score"]
+                 for r in engine.run(llm=FallbackLLM(cache=False), commentary=False)["buyers"]}
+        self.assertEqual(full, quick)
+
+
+class TestsStayOffline(unittest.TestCase):
+    """The documented way to run this project exports ANTHROPIC_API_KEY, and several
+    tests drive the full engine. Without the guard in tests/__init__.py the suite bills
+    real money on the machine of anyone following the README."""
+
+    def test_the_suite_cannot_reach_claude(self):
+        from ews.llm import ClaudeLLM, get_llm
+        self.assertNotIsInstance(get_llm(cache=False), ClaudeLLM)
+
+    def test_no_test_resolves_its_own_model_from_the_environment(self):
+        import os
+        self.assertEqual(os.environ.get("EWS_LLM"), "fallback")

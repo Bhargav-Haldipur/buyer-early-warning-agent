@@ -9,11 +9,14 @@ import json
 import threading
 import traceback
 import urllib.parse
+from datetime import date
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from ews import run as engine
 from ews.agents import definition
+from ews.config import AS_OF
+from ews.loader import DataError, Loader
 
 HERE = Path(__file__).resolve().parent
 BANNER = "HACKATHON PROTOTYPE &middot; SYNTHETIC DATA"
@@ -33,6 +36,46 @@ SWAP_STEP = "Payment data updates: Kessler moves from 25 to 40 days past due"
 STATE = {"step": 0, "swap": False}
 _CACHE: dict[tuple[int, bool], dict] = {}
 _LOCK = threading.Lock()
+
+# ---------------------------------------------------------------- live sandbox
+# Input nobody prepared: a story typed in the room, an invoice aged by hand. It goes
+# through exactly the same engine.run() as the shipped dataset - there is no second
+# code path for it, which is the only reason showing it proves anything.
+LIVE: dict = {"articles": [], "dpd": {}, "last": None}
+_LIVE_CACHE: dict[str, dict] = {}
+
+
+def live_run(articles: list[dict], dpd: dict) -> dict:
+    # commentary=False: the News agent still runs live on the typed story, but the two
+    # Opus agents that only write prose are skipped. Scores are identical - they come
+    # from the formula - and the round trip drops from ~100s to under ten.
+    key = json.dumps([articles, dpd], sort_keys=True)
+    with _LOCK:
+        if key not in _LIVE_CACHE:
+            _LIVE_CACHE[key] = engine.run(extra_articles=articles, dpd_overrides=dpd,
+                                          commentary=False)
+        return _LIVE_CACHE[key]
+
+
+def live_now() -> dict:
+    return live_run(LIVE["articles"], LIVE["dpd"])
+
+
+def moves_between(before: dict, after: dict) -> list[dict]:
+    """Every buyer whose score changed, biggest move first."""
+    was = {r["buyer_id"]: r["verdict"] for r in before["buyers"]}
+    out = []
+    for r in after["buyers"]:
+        b = was.get(r["buyer_id"])
+        if b is None or b["score"] == r["verdict"]["score"]:
+            continue
+        v = r["verdict"]
+        out.append({"buyer_id": r["buyer_id"], "name": r["short_name"],
+                    "from_score": b["score"], "to_score": v["score"],
+                    "from_band": b["band"], "to_band": v["band"],
+                    "delta": round(v["score"] - b["score"], 1),
+                    "crossed": b["band"] != v["band"]})
+    return sorted(out, key=lambda m: -abs(m["delta"]))
 
 
 def snapshot() -> dict:
@@ -164,7 +207,7 @@ def page(title: str, body: str, theme: str = "", nav: str = "home") -> bytes:
 <header class="head"><div class="banner">{BANNER}</div>
 <nav class="topbar"><div class="topbar-in">
 <a class="brand" href="/"><span class="brand-mark">{BRAND_MARK}</span>Buyer Early Warning and Limit Review</a>
-<div class="topnav"><a href="/"{on("home")}>Insurers</a><a href="/demo"{on("demo")}>Live demo</a></div>
+<div class="topnav"><a href="/"{on("home")}>Insurers</a><a href="/demo"{on("demo")}>Scripted demo</a><a href="/live"{on("live")}>Live input</a></div>
 </div></nav></header>
 <div class="wrap">{body}
 <footer>
@@ -502,16 +545,20 @@ def agents_tab(r: dict, data: dict) -> str:
     return "".join(out)
 
 
-def buyer_page(bid: str, tab: str) -> bytes:
-    data = snapshot()
+def buyer_page(bid: str, tab: str, live: bool = False) -> bytes:
+    # A buyer opened from the sandbox must show the sandbox's numbers. Rendering the
+    # scripted demo's instead would contradict, on the next click, the score the room
+    # just watched move.
+    data = live_now() if live else snapshot()
     r = next((x for x in data["buyers"] if x["buyer_id"] == bid), None)
     if r is None:
         return page("Not found", "<h1>Unknown buyer</h1>")
     v, cid = r["verdict"], (r["limits"][0]["client_id"] if r["limits"] else "")
     client_name = r["limits"][0]["client_name"] if r["limits"] else "&mdash;"
 
+    q = "&live=1" if live else ""
     tabs = "".join(
-        f'<a class="{"on" if tab==t else ""}" href="/buyer/{e(bid)}?tab={t}">{label}</a>'
+        f'<a class="{"on" if tab==t else ""}" href="/buyer/{e(bid)}?tab={t}{q}">{label}</a>'
         for t, label in [("case", "Case File"), ("score", "Score"), ("limit", "Limit"),
                          ("payments", "Payments"), ("news", "News"), ("agents", "Agents")])
 
@@ -592,11 +639,242 @@ def buyer_page(bid: str, tab: str) -> bytes:
                  f'<tbody>{rows}{refused}</tbody></table>'
                  if rows or refused else '<div class="panel">No news matched to this buyer.</div>')
 
+    banner = ('<div class="panel result"><b>Live sandbox view.</b> This buyer is scored '
+              'from the story and ledger edits made on the Live input page. The '
+              'adjudicator review and the agent-written case file are skipped here so the '
+              'sandbox answers in seconds &mdash; the score is the formula and is '
+              'unaffected.</div>' if live else "")
     return page(r["buyer_name"], f"""
 {crumbs(("Home", "/"), (client_name, f"/client/{cid}"), (r["short_name"], None))}
+{banner}
 <h1>{e(r["buyer_name"])}</h1>
 <p class="sub">{e(r["sector"])} &middot; {e(r["city"])} &middot; score {v['score']} {band_pill(v['band'])}</p>
 <div class="tabs">{tabs}</div>{inner}""", theme=cid)
+
+
+# ---------------------------------------------------------------- live page
+def _article_trace(data: dict, article_id: str) -> tuple[str, str]:
+    """What the news agent concluded about one article, and how it got there."""
+    for r in data["buyers"]:
+        for ev in r["evidence"]:
+            if ev["source"] == article_id and ev["kind"] in ("news", "parent"):
+                d = ev["data"]
+                via = f' via its parent {e(d["entity"])}' if d["via_parent"] else ""
+                return (f'<span class="pill high">matched</span> '
+                        f'<b>{e(d["entity"])}</b>{via} &middot; severity '
+                        f'{d.get("parent_severity", d["severity"])} ({e(d["category"])})'
+                        f'<br><span class="body2">{e(d.get("reason", ""))}</span>',
+                        trace_list(d.get("agent")))
+    for x in data["refusals"]:
+        if x["source"] == article_id:
+            d = x["data"]
+            return (f'<span class="pill refused">refused</span> nothing scored &mdash; no '
+                    f'covered company matched &ldquo;{e(d["mention"])}&rdquo;'
+                    f'<br><span class="body2">{e(d.get("reason", ""))}</span>',
+                    trace_list(d.get("agent")))
+    return ('<span class="pill maintain">no entity matched</span>', "")
+
+
+def result_panel() -> str:
+    last = LIVE["last"]
+    if not last:
+        return ""
+    if last.get("error"):
+        return (f'<div class="panel result"><h3>Rejected</h3>'
+                f'<p class="body2">{e(last["error"])}</p>'
+                f'<p class="overline">Nothing changed. The dataset is only ever '
+                f'written to through a check that can say no.</p></div>')
+
+    rows = "".join(
+        f'<div class="move {"crossed" if m["crossed"] else ""}">'
+        f'<a href="/buyer/{e(m["buyer_id"])}?live=1"><b>{e(m["name"])}</b></a>'
+        f'<span class="from">{m["from_score"]} {band_pill(m["from_band"])}</span>'
+        f'<span class="arrow">&rarr;</span>'
+        f'<span class="to">{m["to_score"]} {band_pill(m["to_band"])}</span>'
+        f'<span class="overline">{m["delta"]:+.1f}</span></div>' for m in last["moves"])
+    if not rows:
+        rows = ('<p class="body2">No score moved. That is a result, not a failure &mdash; '
+                'the engine read it and it changed nothing.</p>')
+
+    trace = ""
+    if last.get("verdict"):
+        concl, calls = last["verdict"]
+        trace = (f'<h3>What the News agent decided</h3><p>{concl}</p>'
+                 f'{calls or "<p class=\'overline\'>Rule-based path &mdash; no tool calls.</p>"}')
+    return (f'<div class="panel result"><h3>{e(last["title"])}</h3>{rows}{trace}</div>')
+
+
+def live_inputs_block() -> str:
+    if not LIVE["articles"] and not LIVE["dpd"]:
+        return ('<p class="overline">Nothing added yet &mdash; the engine is running on the '
+                'shipped dataset exactly as it ships.</p>')
+    arts = "".join(
+        f'<tr><td>{e(a["article_id"])}</td><td>{e(a["published_date"])}</td>'
+        f'<td>{e(a["mentioned_entity_as_written"])}</td><td>{e(a["headline"])}</td></tr>'
+        for a in LIVE["articles"])
+    arts = (f'<table><thead><tr><th>Id</th><th>Date</th><th>Company named</th>'
+            f'<th>Headline</th></tr></thead><tbody>{arts}</tbody></table>' if arts else "")
+    names = Loader().buyers_by_id()
+    dpd = "".join(
+        f'<tr><td>{e(names[b]["short_name"]) if b in names else e(b)}</td>'
+        f'<td class="num">{d} days past due</td></tr>' for b, d in sorted(LIVE["dpd"].items()))
+    dpd = (f'<table><thead><tr><th>Buyer</th><th class="num">Worst open invoice</th>'
+           f'</tr></thead><tbody>{dpd}</tbody></table>' if dpd else "")
+    return arts + dpd
+
+
+def live_page() -> bytes:
+    data = live_now()
+    buyers = sorted(Loader().buyers(), key=lambda b: b["short_name"])
+    options = "".join(
+        f'<option value="{e(b["buyer_id"])}">{e(b["short_name"])} &mdash; {e(b["sector"])}, '
+        f'{e(b["city"])}</option>' for b in buyers)
+
+    # Registered names, click-to-fill. Typing "Nordkrans Steel Traders AB" correctly in
+    # front of a room is a risk with no upside; the field stays free text, so a name that
+    # is not on this list still goes through exactly as typed.
+    chips = "".join(f'<button type="button" class="chip namechip" '
+                    f'data-name="{e(b["buyer_name"])}">{e(b["short_name"])}</button>'
+                    for b in buyers)
+
+    flagged = [r for r in data["buyers"] if r["verdict"]["band"] != "Healthy"]
+    rows = "".join(
+        f'<tr><td><a href="/buyer/{e(r["buyer_id"])}?live=1">{e(r["short_name"])}</a></td>'
+        f'<td class="num">{r["verdict"]["score"]}</td><td>{band_pill(r["verdict"]["band"])}</td>'
+        f'<td class="num">{r["verdict"]["payment"]["dpd"]}</td>'
+        f'<td>{news_cell(r["verdict"]["news"])}</td></tr>' for r in flagged)
+
+    return page("Live input", nav="live", body=f"""
+{crumbs(("Home", "/"), ("Live input", None))}
+<h1>Live input</h1>
+<p class="sub">Type a story that has never been seen, or age an invoice by hand. Both go
+through the same engine as the shipped data &mdash; there is no separate path for them.
+Snapshot is {e(AS_OF.isoformat())}. The News agent runs live on what you type; the two
+Opus agents that only write prose are skipped here so this answers in seconds.</p>
+
+{result_panel()}
+
+<div class="live-grid">
+<form class="panel live-form" method="post" action="/live/story">
+  <h3>Publish a story</h3>
+  <label>Company, exactly as the article names it
+    <input name="mention" id="mention" required placeholder="Oakhurst Components Ltd"
+           autocomplete="off"></label>
+  <div class="namechips">{chips}</div>
+  <p class="overline">Click to fill, or type anything. To see a refusal, keep the first
+  word and change the business &mdash; &ldquo;Larsson <b>Dental Group</b> AB&rdquo; is not
+  &ldquo;Larsson <b>Distributors</b> AB&rdquo;.</p>
+  <label>Headline
+    <input name="headline" required placeholder="Workers protest over delayed wages"
+           autocomplete="off"></label>
+  <label>Body <span class="overline">what the agent actually reads</span>
+    <textarea name="body" rows="3" required
+      placeholder="Staff staged a protest over three months of delayed wages, unions said."></textarea></label>
+  <label>Published <input type="date" name="date" value="{e(AS_OF.isoformat())}"
+           max="{e(AS_OF.isoformat())}"></label>
+  <button class="btn" type="submit">Publish &amp; re-run</button>
+  <p class="overline">The News agent searches the registry, checks sector and city, and
+  decides. A name it cannot place is refused.</p>
+</form>
+
+<form class="panel live-form" method="post" action="/live/ledger">
+  <h3>Age an invoice</h3>
+  <label>Buyer<select name="buyer_id">{options}</select></label>
+  <label>Worst open invoice is now
+    <input type="number" name="dpd" min="0" max="365" value="45" required> days past due</label>
+  <button class="btn" type="submit">Update ledger &amp; re-run</button>
+  <p class="overline">Payment carries 65% of the score and is the only signal that can
+  cross a band line on its own. News alone tops out at 26 points; Watch starts at 35.</p>
+</form>
+</div>
+
+<h2>What has been added</h2>
+{live_inputs_block()}
+<p style="margin:.9rem 0"><a class="btn ghost" href="/live/reset">Reset to the shipped
+dataset</a></p>
+
+<h2>Flagged right now</h2>
+{f'<table><thead><tr><th>Buyer</th><th class="num">Score</th><th>Band</th>'
+ f'<th class="num">DPD</th><th>Worst news</th></tr></thead><tbody>{rows}</tbody></table>'
+ if rows else '<div class="panel">Nothing flagged.</div>'}
+
+<script>
+document.querySelectorAll('.namechip').forEach(c => c.addEventListener('click', () => {{
+  const m = document.getElementById('mention');
+  m.value = c.dataset.name; m.focus();
+}}));
+document.querySelectorAll('form.live-form').forEach(f => f.addEventListener('submit', () => {{
+  const b = f.querySelector('button');
+  b.disabled = true;
+  b.textContent = 'The agent is investigating\u2026';
+}}));
+</script>""")
+
+
+# ---------------------------------------------------------------- live actions
+def _apply(title: str, mutate) -> None:
+    """Run one live action: snapshot before, mutate, re-run, record what moved.
+
+    Anything the engine refuses leaves LIVE untouched and the reason on the page -
+    a bad input must never be able to take the demo down mid-sentence.
+    """
+    before = live_now()
+    keep = (list(LIVE["articles"]), dict(LIVE["dpd"]))
+    try:
+        new_id = mutate()
+        after = live_now()
+    except (DataError, ValueError, KeyError) as exc:
+        LIVE["articles"], LIVE["dpd"] = keep
+        LIVE["last"] = {"title": title, "error": str(exc), "moves": []}
+        return
+    LIVE["last"] = {"title": title, "moves": moves_between(before, after),
+                    "verdict": _article_trace(after, new_id) if new_id else None}
+
+
+def add_story(form: dict) -> None:
+    mention = (form.get("mention", [""])[0] or "").strip()
+    headline = (form.get("headline", [""])[0] or "").strip()
+    body = (form.get("body", [""])[0] or "").strip()
+    when = (form.get("date", [""])[0] or AS_OF.isoformat()).strip()
+
+    def mutate() -> str:
+        if not (mention and headline and body):
+            raise ValueError("company, headline and body are all required")
+        try:
+            published = date.fromisoformat(when)
+        except ValueError as exc:
+            raise ValueError(f"cannot read {when!r} as a date") from exc
+        if published > AS_OF:
+            raise ValueError(
+                f"this run is a snapshot of {AS_OF.isoformat()}, so a story dated "
+                f"{published.isoformat()} would score zero - the engine refuses news it "
+                f"could not have seen. Pick a date on or before {AS_OF.isoformat()}.")
+        aid = f"LIVE{len(LIVE['articles']) + 1:02d}"
+        LIVE["articles"].append({
+            "article_id": aid, "published_date": published.isoformat(),
+            "publication": "Live input", "headline": headline, "body": body,
+            "mentioned_entity_as_written": mention})
+        return aid
+
+    _apply(f"Published: {headline}", mutate)
+
+
+def set_dpd(form: dict) -> None:
+    bid = (form.get("buyer_id", [""])[0] or "").strip()
+    raw = (form.get("dpd", [""])[0] or "").strip()
+
+    def mutate() -> str:
+        if bid not in Loader().buyers_by_id():
+            raise ValueError(f"no buyer {bid!r}")
+        try:
+            LIVE["dpd"][bid] = int(raw)
+        except ValueError as exc:
+            raise ValueError(f"days past due must be a whole number, got {raw!r}") from exc
+        Loader(dpd_overrides=LIVE["dpd"]).invoices()      # validate before re-running
+        return ""
+
+    name = Loader().buyers_by_id().get(bid, {}).get("short_name", bid)
+    _apply(f"Ledger updated: {name} now {raw} days past due", mutate)
 
 
 # ---------------------------------------------------------------- routing
@@ -615,6 +893,23 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(303)
         self.send_header("Location", to)
         self.end_headers()
+
+    def do_POST(self):                # noqa: N802
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+            form = urllib.parse.parse_qs(self.rfile.read(length).decode("utf-8"))
+            path = urllib.parse.urlparse(self.path).path
+            if path == "/live/story":
+                add_story(form)
+            elif path == "/live/ledger":
+                set_dpd(form)
+            else:
+                return self._send(page("Not found", "<h1>Not found</h1>"), code=404)
+            self._redirect("/live")                  # POST-redirect-GET: no re-submit
+        except Exception as exc:                                   # noqa: BLE001
+            traceback.print_exc()
+            self._send(page("Error", f"<h1>Something went wrong</h1>"
+                                     f'<div class="panel"><code>{e(exc)}</code></div>'), code=500)
 
     def do_GET(self):                 # noqa: N802
         try:
@@ -636,12 +931,18 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(home())
         if url.path == "/demo":
             return self._send(demo_page())
+        if url.path == "/live":
+            return self._send(live_page())
+        if url.path == "/live/reset":
+            LIVE.update(articles=[], dpd={}, last=None)
+            return self._redirect("/live")
         if parts[:1] == ["client"] and len(parts) == 2:
             body = client_page(parts[1])
             return self._send(body, code=404 if b"Unknown insurer" in body else 200)
         if parts[:1] == ["buyer"] and len(parts) == 2:
             tab = query.get("tab", ["case"])[0]
-            body = buyer_page(parts[1], tab if tab in TABS else "case")
+            body = buyer_page(parts[1], tab if tab in TABS else "case",
+                              live=query.get("live", ["0"])[0] == "1")
             return self._send(body, code=404 if b"Unknown buyer" in body else 200)
         if url.path == "/demo/next":
             if STATE["step"] < len(DEMO_STEPS):

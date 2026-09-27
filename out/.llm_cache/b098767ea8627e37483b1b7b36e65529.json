@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY019",
+    "name": "Oakhurst Components Ltd",
+    "severity": 5,
+    "category": "wage_delay",
+    "reason": "Article reports staff protesting over delayed wages at Oakhurst Components Ltd, matching the registered buyer exactly; unpaid wages indicate severe financial distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Oakhurst"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY019\", \"name\": \"Oakhurst Components Ltd\", \"sector\": \"Auto Components\", \"city\": \"Birmingham\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY019",
+        "severity": 5,
+        "category": "wage_delay",
+        "reason": "Article reports staff protesting over delayed wages at Oakhurst Components Ltd, matching the registered buyer exactly; unpaid wages indicate severe financial distress."
+      }
+    }
+  ],
+  "turns": 2
+}

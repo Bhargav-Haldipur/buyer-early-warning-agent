@@ -1,0 +1,105 @@
+{
+  "result": {
+    "narrative": "Nordkrans Steel Traders AB is showing a clear cash-flow deterioration against an otherwise clean trading history. One invoice with Nordhaven Trade Credit, INV000982 at \u20ac150,700, is 45 days past due, with a further \u20ac67,900 invoice not yet due, taking total exposure to \u20ac218,600 across two open items. The settled history behind this is benign \u2014 0, 3, 0 then 13 days late over the last four invoices \u2014 so the current 45-day item is a sharp break from a pattern whose worst prior lateness was 13 days. A 20 September report that the company has missed payroll for a second consecutive month, with union talks stalled, points to the same underlying cash strain.\n\nThe score is 71.5 (High Risk, PD 0.714), from 0.65 x 70.0 on the payment leg plus 0.35 x 74.3 on the news leg. The adjudicator agreed with caveats and the caveats matter to how this file is read: the payment leg alone scores 45.5, which is Watch, so the band placement turns entirely on the severity-5 payroll item, which contributes 26.0 of the 71.5. That item is single-sourced to three workers at the Malmo yard, carries the publication \"Live input\" rather than a named outlet, and has no company, management or union confirmation. The adjudicator held the band but asked that it be re-tested against a second source before the verdict is relied on externally, and noted the payment and news inputs are not drawn from a common as-of date \u2014 the 45 DPD figure is dated 2026-08-31 against news dated 2026-09-20, so if the invoice is still unpaid the payment leg is conservative.\n\nThe recommendation for Nordhaven Trade Credit is to REDUCE the limit from \u20ac1,460,000 to \u20ac511,204, being the limit at which expected loss meets the 25% appetite against a PD of 0.714; expected loss falls from \u20ac797,467 to \u20ac279,225. The adjudicator's third caveat supports acting now regardless of how corroboration resolves: the \u20ac1,460,000 limit has not been reviewed since Nov 2024 despite the slippage, and current exposure of \u20ac218,600 sits well inside it, so undrawn headroom far exceeds the amount currently at risk. Note the revised limit still sits above present exposure, so the action removes headroom rather than forcing a reduction in current trading.\n\nTo move down, the buyer needs 11.5 points to fall below 60.0 and reach Watch. The cleanest route is settlement of INV000982 and a return to the prior sub-13-day pattern, which would pull down the dominant payment leg. The news leg would also need to ease: the payroll report decays on a 365-day half-life, and the outlook confirms news alone does not hold the band, so if a second source fails to corroborate LIVE01 and payments recover, the case for High Risk falls away quickly. Re-test the payroll claim against a named outlet and refresh the DPD to a current as-of date before the next review.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Reduce the Nordhaven Trade Credit limit from \u20ac1,460,000 to \u20ac511,204: a \u20ac150,700 invoice at 45 days past due against a previously clean record, plus a report of a second consecutive missed payroll, put the buyer at 71.5 (High Risk, PD 0.714). The adjudicator agreed with caveats \u2014 the band rests entirely on a single uncorroborated news item, since payment evidence alone scores 45.5 (Watch) \u2014 but supports the limit cut regardless, as the limit has not been reviewed since Nov 2024.",
+      "payment_note": "Two open invoices totalling \u20ac218,600 with CL05, the worst being INV000982 at \u20ac150,700 and 45 days past due, against a deteriorating but previously mild settled trend of 0, 3, 0 then 13 days late over the last four invoices.",
+      "news_note": "One severity-5 item dated 20 September reports a second consecutive missed payroll with stalled union talks, but it is single-sourced to three workers at the Malmo yard and published as \"Live input\" with no company or union confirmation; the only other coverage is two severity-0 items from 2024 and 2025 on capacity expansion and a Nordic distribution tie-up.",
+      "lifts_it": [
+        "Settlement of INV000982 (\u20ac150,700) and a return to the prior sub-13-day payment pattern",
+        "A second source failing to corroborate the LIVE01 payroll claim \u2014 news alone does not hold the band",
+        "11.5 points of improvement takes the score below 60.0 into Watch; the payroll item also decays on a 365-day half-life"
+      ],
+      "worsens_it": [
+        "No higher band exists above High Risk in the outlook, so watch instead for entrenchment: corroboration of the payroll miss by a named outlet",
+        "INV000982 still unpaid \u2014 the 45 DPD figure is dated 2026-08-31, older than the 20 September news, so current DPD may be understated",
+        "Drawdown into the undrawn headroom between \u20ac218,600 exposure and the \u20ac1,460,000 limit before the reduction is actioned"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY014\", \"score\": 71.5, \"band\": \"High Risk\", \"pd\": 0.714, \"payment\": {\"dpd\": 45, \"raw\": 70.0, \"weighted\": 45.5, \"worst_line\": \"CL05\"}, \"news\": {\"severity\": 5, \"category\": \"unpaid_wages\", \"article_id\": \"LIVE01\", \"age_days\": 5, \"headline\": \"Steel trader misses payroll for a second month\", \"via_parent\": false, \"parent_name\": null, \"raw\": 74.3, \"weighted\": 26.0}, \"trace\": \"0.65 x 70.0 (p"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM0025\", \"buyer_id\": \"BUY014\", \"client_id\": \"CL05\", \"client_name\": \"Nordhaven Trade Credit\", \"current_limit\": 1460000, \"owed\": 218600, \"revised_limit\": 511204, \"change\": -948796, \"action\": \"REDUCE\", \"reason\": \"cut to the limit where expected loss meets 25% appetite\", \"pd\": 0.714, \"pd_target\": 0.25, \"max_liability_binds\": false, \"expected_loss_before\": 797467, \"expected_loss_after\":"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": null, \"next_band_at\": null, \"points_to_next_band\": null, \"dpd_for_next_band\": null, \"lower_band\": \"Watch\", \"lower_band_below\": 60.0, \"points_to_lower_band\": 11.5, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"INV000982\", \"kind\": \"payment\", \"date\": \"2026-08-31\", \"detail\": \"2 open invoice(s) with CL05; worst is 45 days past due\", \"data\": {\"client_id\": \"CL05\", \"dpd\": 45, \"owed\": 218600.0, \"open_count\": 2}}, {\"id\": \"INV000982\", \"kind\": \"payment_review\", \"date\": \"2026-08-31\", \"detail\": \"Nordkrans Steel Traders AB has one invoice (INV000982, \\u20ac150,700) now 45 days past due, alongside a current \\"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "LIVE01"
+      },
+      "result": "{\"article_id\": \"LIVE01\", \"published_date\": \"2026-09-20\", \"publication\": \"Live input\", \"headline\": \"Steel trader misses payroll for a second month\", \"body\": \"Nordkrans Steel Traders AB has missed payroll for a second consecutive month, three workers at its Malmo yard told this paper. Union talks with management have stalled.\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "NWS0028"
+      },
+      "result": "{\"article_id\": \"NWS0028\", \"published_date\": \"2025-05-15\", \"publication\": \"The Commerce Wire\", \"headline\": \"Nordkrans signs distribution tie-up for Nordic markets\", \"body\": \"Nordkrans has entered into a distribution arrangement covering Nordic markets, the company said.\\n\\nUnder the arrangement, a regional distributor will handle secondary sales for part of the company's Steel Trading range. The co"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "NWS0027"
+      },
+      "result": "{\"article_id\": \"NWS0027\", \"published_date\": \"2024-07-30\", \"publication\": \"Regional Commerce Review\", \"headline\": \"Nordkrans commissions new line at Malmo facility\", \"body\": \"Nordkrans has commissioned an additional production line at its Malmo facility, taking installed capacity higher in the Steel Trading segment.\\n\\nThe company said the line was funded through a mix of internal accruals and a te"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Nordkrans Steel Traders AB is showing a clear cash-flow deterioration against an otherwise clean trading history. One invoice with Nordhaven Trade Credit, INV000982 at \u20ac150,700, is 45 days past due, with a further \u20ac67,900 invoice not yet due, taking total exposure to \u20ac218,600 across two open items. The settled history behind this is benign \u2014 0, 3, 0 then 13 days late over the last four invoices \u2014 so the current 45-day item is a sharp break from a pattern whose worst prior lateness was 13 days. A 20 September report that the company has missed payroll for a second consecutive month, with union talks stalled, points to the same underlying cash strain.\n\nThe score is 71.5 (High Risk, PD 0.714), from 0.65 x 70.0 on the payment leg plus 0.35 x 74.3 on the news leg. The adjudicator agreed with caveats and the caveats matter to how this file is read: the payment leg alone scores 45.5, which is Watch, so the band placement turns entirely on the severity-5 payroll item, which contributes 26.0 of the 71.5. That item is single-sourced to three workers at the Malmo yard, carries the publication \"Live input\" rather than a named outlet, and has no company, management or union confirmation. The adjudicator held the band but asked that it be re-tested against a second source before the verdict is relied on externally, and noted the payment and news inputs are not drawn from a common as-of date \u2014 the 45 DPD figure is dated 2026-08-31 against news dated 2026-09-20, so if the invoice is still unpaid the payment leg is conservative.\n\nThe recommendation for Nordhaven Trade Credit is to REDUCE the limit from \u20ac1,460,000 to \u20ac511,204, a cut of \u20ac948,796, being the limit at which expected loss meets the 25% appetite against a PD of 0.714; expected loss falls from \u20ac797,467 to \u20ac279,225. The adjudicator's third caveat supports acting now regardless of how corroboration resolves: the \u20ac1.46M limit has not been reviewed since Nov 2024 despite the slippage, and current exposure of \u20ac218,600 sits well inside it, so undrawn headroom far exceeds the amount currently at risk. Note the revised limit still sits above present exposure, so the action removes headroom rather than forcing a reduction in current trading.\n\nTo move down, the buyer needs 11.5 points to fall below 60.0 and reach Watch. The cleanest route is settlement of INV000982 and a return to the prior sub-13-day pattern, which would pull down the dominant payment leg. The news leg would also need to ease: the payroll report decays on a 365-day half-life, and the outlook confirms news alone does not hold the band, so if a second source fails to corroborate LIVE01 and payments recover, the case for High Risk falls away quickly. Re-test the payroll claim against a named outlet and refresh the DPD to a current as-of date before the next review.",
+        "bottom_line": "Reduce the Nordhaven Trade Credit limit from \u20ac1,460,000 to \u20ac511,204 (-\u20ac948,796): a \u20ac150,700 invoice at 45 days past due against a previously clean record, plus a report of a second consecutive missed payroll, put the buyer at 71.5 (High Risk, PD 0.714). The adjudicator agreed with caveats \u2014 the band rests entirely on a single uncorroborated news item, since payment evidence alone scores 45.5 (Watch) \u2014 but supports the limit cut regardless, as the limit has not been reviewed since Nov 2024.",
+        "payment_note": "Two open invoices totalling \u20ac218,600 with CL05, the worst being INV000982 at \u20ac150,700 and 45 days past due, against a deteriorating but previously mild settled trend of 0, 3, 0 then 13 days late over the last four invoices.",
+        "news_note": "One severity-5 item dated 20 September reports a second consecutive missed payroll with stalled union talks, but it is single-sourced to three workers at the Malmo yard and published as \"Live input\" with no company or union confirmation; the only other coverage is two severity-0 items from 2024 and 2025 on capacity expansion and a Nordic distribution tie-up.",
+        "lifts_it": [
+          "Settlement of INV000982 (\u20ac150,700) and a return to the prior sub-13-day payment pattern</br>",
+          "A second source failing to corroborate the LIVE01 payroll claim \u2014 news alone does not hold the band",
+          "11.5 points of improvement takes the score below 60.0 into Watch; the payroll item also decays on a 365-day half-life"
+        ],
+        "worsens_it": [
+          "No higher band exists above High Risk in the outlook, so watch instead for entrenchment: corroboration of the payroll miss by a named outlet",
+          "INV000982 still unpaid \u2014 the 45 DPD figure is dated 2026-08-31, older than the 20 September news, so current DPD may be understated",
+          "Drawdown into the undrawn headroom between \u20ac218,600 exposure and the \u20ac1,460,000 limit before the reduction is actioned"
+        ]
+      },
+      "error": "these figures are not in the data: ['948,796,', '948,796']. Use only the numbers the tools returned, then resubmit"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Nordkrans Steel Traders AB is showing a clear cash-flow deterioration against an otherwise clean trading history. One invoice with Nordhaven Trade Credit, INV000982 at \u20ac150,700, is 45 days past due, with a further \u20ac67,900 invoice not yet due, taking total exposure to \u20ac218,600 across two open items. The settled history behind this is benign \u2014 0, 3, 0 then 13 days late over the last four invoices \u2014 so the current 45-day item is a sharp break from a pattern whose worst prior lateness was 13 days. A 20 September report that the company has missed payroll for a second consecutive month, with union talks stalled, points to the same underlying cash strain.\n\nThe score is 71.5 (High Risk, PD 0.714), from 0.65 x 70.0 on the payment leg plus 0.35 x 74.3 on the news leg. The adjudicator agreed with caveats and the caveats matter to how this file is read: the payment leg alone scores 45.5, which is Watch, so the band placement turns entirely on the severity-5 payroll item, which contributes 26.0 of the 71.5. That item is single-sourced to three workers at the Malmo yard, carries the publication \"Live input\" rather than a named outlet, and has no company, management or union confirmation. The adjudicator held the band but asked that it be re-tested against a second source before the verdict is relied on externally, and noted the payment and news inputs are not drawn from a common as-of date \u2014 the 45 DPD figure is dated 2026-08-31 against news dated 2026-09-20, so if the invoice is still unpaid the payment leg is conservative.\n\nThe recommendation for Nordhaven Trade Credit is to REDUCE the limit from \u20ac1,460,000 to \u20ac511,204, being the limit at which expected loss meets the 25% appetite against a PD of 0.714; expected loss falls from \u20ac797,467 to \u20ac279,225. The adjudicator's third caveat supports acting now regardless of how corroboration resolves: the \u20ac1,460,000 limit has not been reviewed since Nov 2024 despite the slippage, and current exposure of \u20ac218,600 sits well inside it, so undrawn headroom far exceeds the amount currently at risk. Note the revised limit still sits above present exposure, so the action removes headroom rather than forcing a reduction in current trading.\n\nTo move down, the buyer needs 11.5 points to fall below 60.0 and reach Watch. The cleanest route is settlement of INV000982 and a return to the prior sub-13-day pattern, which would pull down the dominant payment leg. The news leg would also need to ease: the payroll report decays on a 365-day half-life, and the outlook confirms news alone does not hold the band, so if a second source fails to corroborate LIVE01 and payments recover, the case for High Risk falls away quickly. Re-test the payroll claim against a named outlet and refresh the DPD to a current as-of date before the next review.",
+        "bottom_line": "Reduce the Nordhaven Trade Credit limit from \u20ac1,460,000 to \u20ac511,204: a \u20ac150,700 invoice at 45 days past due against a previously clean record, plus a report of a second consecutive missed payroll, put the buyer at 71.5 (High Risk, PD 0.714). The adjudicator agreed with caveats \u2014 the band rests entirely on a single uncorroborated news item, since payment evidence alone scores 45.5 (Watch) \u2014 but supports the limit cut regardless, as the limit has not been reviewed since Nov 2024.",
+        "payment_note": "Two open invoices totalling \u20ac218,600 with CL05, the worst being INV000982 at \u20ac150,700 and 45 days past due, against a deteriorating but previously mild settled trend of 0, 3, 0 then 13 days late over the last four invoices.",
+        "news_note": "One severity-5 item dated 20 September reports a second consecutive missed payroll with stalled union talks, but it is single-sourced to three workers at the Malmo yard and published as \"Live input\" with no company or union confirmation; the only other coverage is two severity-0 items from 2024 and 2025 on capacity expansion and a Nordic distribution tie-up.",
+        "lifts_it": [
+          "Settlement of INV000982 (\u20ac150,700) and a return to the prior sub-13-day payment pattern",
+          "A second source failing to corroborate the LIVE01 payroll claim \u2014 news alone does not hold the band",
+          "11.5 points of improvement takes the score below 60.0 into Watch; the payroll item also decays on a 365-day half-life"
+        ],
+        "worsens_it": [
+          "No higher band exists above High Risk in the outlook, so watch instead for entrenchment: corroboration of the payroll miss by a named outlet",
+          "INV000982 still unpaid \u2014 the 45 DPD figure is dated 2026-08-31, older than the 20 September news, so current DPD may be understated",
+          "Drawdown into the undrawn headroom between \u20ac218,600 exposure and the \u20ac1,460,000 limit before the reduction is actioned"
+        ]
+      }
+    }
+  ],
+  "turns": 4
+}

@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "The only registry match for 'Oakhurst' is 'Oakhurst Components Ltd', a different line of business (auto components vs. realty) from the article's 'Oakhurst Realty LLP', so no confident entity match exists."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Oakhurst"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY019\", \"name\": \"Oakhurst Components Ltd\", \"sector\": \"Auto Components\", \"city\": \"Birmingham\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "The only registry match for 'Oakhurst' is 'Oakhurst Components Ltd', a different line of business (auto components vs. realty) from the article's 'Oakhurst Realty LLP', so no confident entity match exists."
+      }
+    }
+  ],
+  "turns": 2
+}
