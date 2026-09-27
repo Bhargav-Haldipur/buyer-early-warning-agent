@@ -45,20 +45,8 @@ LIVE: dict = {"articles": [], "dpd": {}, "last": None}
 _LIVE_CACHE: dict[str, dict] = {}
 
 
-def live_run(articles: list[dict], dpd: dict) -> dict:
-    # commentary=False: the News agent still runs live on the typed story, but the two
-    # Opus agents that only write prose are skipped. Scores are identical - they come
-    # from the formula - and the round trip drops from ~100s to under ten.
-    key = json.dumps([articles, dpd], sort_keys=True)
-    with _LOCK:
-        if key not in _LIVE_CACHE:
-            _LIVE_CACHE[key] = engine.run(extra_articles=articles, dpd_overrides=dpd,
-                                          commentary=False)
-        return _LIVE_CACHE[key]
-
-
-def live_now() -> dict:
-    return live_run(LIVE["articles"], LIVE["dpd"])
+def live_active() -> bool:
+    return bool(LIVE["articles"] or LIVE["dpd"])
 
 
 def moves_between(before: dict, after: dict) -> list[dict]:
@@ -79,10 +67,27 @@ def moves_between(before: dict, after: dict) -> list[dict]:
 
 
 def snapshot() -> dict:
-    key = (STATE["step"], STATE["swap"])
+    """The one run every page renders from.
+
+    Sandbox input composes with the scripted demo rather than living beside it: an
+    earlier version kept two snapshots, so a buyer opened from /live showed the sandbox
+    score while the insurer page behind it still showed the shipped one. Two views of
+    the same buyer disagreeing mid-demo is worse than any feature they bought.
+
+    While sandbox input is in play the run skips commentary - the News agent still runs
+    live on the typed story, but the two Opus agents that only write prose are not worth
+    ninety seconds of silence. Scores are identical either way; they come from the
+    formula, not from an agent.
+    """
+    live = live_active()
+    key = (STATE["step"], STATE["swap"],
+           json.dumps(LIVE["articles"], sort_keys=True), json.dumps(LIVE["dpd"], sort_keys=True))
     with _LOCK:  # one engine run at a time now that requests are threaded
         if key not in _CACHE:
-            _CACHE[key] = engine.run(demo_steps=key[0], swap_invoices=key[1])
+            _CACHE[key] = engine.run(
+                demo_steps=STATE["step"], swap_invoices=STATE["swap"],
+                extra_articles=LIVE["articles"] or None, dpd_overrides=LIVE["dpd"] or None,
+                commentary=not live)
         return _CACHE[key]
 
 
@@ -249,6 +254,25 @@ def demo_panel() -> str:
             f'{nxt}<a class="btn ghost" href="/demo/reset">Reset</a></div></div>')
 
 
+def live_banner() -> str:
+    """Shown on every page while sandbox input is in play, so no screen can imply the
+    numbers on it are the shipped dataset's."""
+    if not live_active():
+        return ""
+    bits = []
+    if LIVE["articles"]:
+        bits.append(f'{len(LIVE["articles"])} published '
+                    f'{"story" if len(LIVE["articles"]) == 1 else "stories"}')
+    if LIVE["dpd"]:
+        bits.append(f'{len(LIVE["dpd"])} ledger '
+                    f'{"edit" if len(LIVE["dpd"]) == 1 else "edits"}')
+    return ('<div class="panel result"><b>Live input in play</b> &mdash; '
+            f'{" and ".join(bits)} on top of the shipped dataset. Every page reflects it. '
+            'The adjudicator review and the agent-written case file are skipped while the '
+            'sandbox is active so it answers in seconds; the score is the formula and is '
+            'unaffected. <a href="/live">Live input &rsaquo;</a></div>')
+
+
 # ---------------------------------------------------------------- pages
 def home() -> bytes:
     data = snapshot()
@@ -278,6 +302,7 @@ def home() -> bytes:
              stat(bands["Watch"], "Watch", dot="watch")]
 
     return page("Buyer Early Warning and Limit Review", f"""
+{live_banner()}
 <div class="hero">
 <p class="masthead">Buyer Early Warning and Limit Review</p>
 <h1>Today&rsquo;s risk across every insurer</h1>
@@ -371,6 +396,7 @@ def client_page(cid: str) -> bytes:
                     if client["actions_pending"] else "")
     return page(client["client_name"], f"""
 {crumbs(("Home", "/"), (client["client_name"], None))}
+{live_banner()}
 <h1>{e(client["client_name"])}</h1>
 <p class="sub">{client['buyers']} buyers &middot; {money(client['expected_loss'])} expected loss
 {actions_note}. This insurer sees only its own buyers.</p>
@@ -545,20 +571,17 @@ def agents_tab(r: dict, data: dict) -> str:
     return "".join(out)
 
 
-def buyer_page(bid: str, tab: str, live: bool = False) -> bytes:
-    # A buyer opened from the sandbox must show the sandbox's numbers. Rendering the
-    # scripted demo's instead would contradict, on the next click, the score the room
-    # just watched move.
-    data = live_now() if live else snapshot()
+def buyer_page(bid: str, tab: str) -> bytes:
+    data = snapshot()
+    live = live_active()
     r = next((x for x in data["buyers"] if x["buyer_id"] == bid), None)
     if r is None:
         return page("Not found", "<h1>Unknown buyer</h1>")
     v, cid = r["verdict"], (r["limits"][0]["client_id"] if r["limits"] else "")
     client_name = r["limits"][0]["client_name"] if r["limits"] else "&mdash;"
 
-    q = "&live=1" if live else ""
     tabs = "".join(
-        f'<a class="{"on" if tab==t else ""}" href="/buyer/{e(bid)}?tab={t}{q}">{label}</a>'
+        f'<a class="{"on" if tab==t else ""}" href="/buyer/{e(bid)}?tab={t}">{label}</a>'
         for t, label in [("case", "Case File"), ("score", "Score"), ("limit", "Limit"),
                          ("payments", "Payments"), ("news", "News"), ("agents", "Agents")])
 
@@ -639,11 +662,7 @@ def buyer_page(bid: str, tab: str, live: bool = False) -> bytes:
                  f'<tbody>{rows}{refused}</tbody></table>'
                  if rows or refused else '<div class="panel">No news matched to this buyer.</div>')
 
-    banner = ('<div class="panel result"><b>Live sandbox view.</b> This buyer is scored '
-              'from the story and ledger edits made on the Live input page. The '
-              'adjudicator review and the agent-written case file are skipped here so the '
-              'sandbox answers in seconds &mdash; the score is the formula and is '
-              'unaffected.</div>' if live else "")
+    banner = live_banner()
     return page(r["buyer_name"], f"""
 {crumbs(("Home", "/"), (client_name, f"/client/{cid}"), (r["short_name"], None))}
 {banner}
@@ -687,7 +706,7 @@ def result_panel() -> str:
 
     rows = "".join(
         f'<div class="move {"crossed" if m["crossed"] else ""}">'
-        f'<a href="/buyer/{e(m["buyer_id"])}?live=1"><b>{e(m["name"])}</b></a>'
+        f'<a href="/buyer/{e(m["buyer_id"])}"><b>{e(m["name"])}</b></a>'
         f'<span class="from">{m["from_score"]} {band_pill(m["from_band"])}</span>'
         f'<span class="arrow">&rarr;</span>'
         f'<span class="to">{m["to_score"]} {band_pill(m["to_band"])}</span>'
@@ -724,7 +743,7 @@ def live_inputs_block() -> str:
 
 
 def live_page() -> bytes:
-    data = live_now()
+    data = snapshot()
     buyers = sorted(Loader().buyers(), key=lambda b: b["short_name"])
     options = "".join(
         f'<option value="{e(b["buyer_id"])}">{e(b["short_name"])} &mdash; {e(b["sector"])}, '
@@ -739,7 +758,7 @@ def live_page() -> bytes:
 
     flagged = [r for r in data["buyers"] if r["verdict"]["band"] != "Healthy"]
     rows = "".join(
-        f'<tr><td><a href="/buyer/{e(r["buyer_id"])}?live=1">{e(r["short_name"])}</a></td>'
+        f'<tr><td><a href="/buyer/{e(r["buyer_id"])}">{e(r["short_name"])}</a></td>'
         f'<td class="num">{r["verdict"]["score"]}</td><td>{band_pill(r["verdict"]["band"])}</td>'
         f'<td class="num">{r["verdict"]["payment"]["dpd"]}</td>'
         f'<td>{news_cell(r["verdict"]["news"])}</td></tr>' for r in flagged)
@@ -757,12 +776,13 @@ Opus agents that only write prose are skipped here so this answers in seconds.</
 <div class="live-grid">
 <form class="panel live-form" method="post" action="/live/story">
   <h3>Publish a story</h3>
-  <label>Company, exactly as the article names it
-    <input name="mention" id="mention" required placeholder="Oakhurst Components Ltd"
+  <label>Company as the article names it <span class="overline">optional</span>
+    <input name="mention" id="mention" placeholder="leave blank and the agent reads it out of the body"
            autocomplete="off"></label>
   <div class="namechips">{chips}</div>
-  <p class="overline">Click to fill, or type anything. To see a refusal, keep the first
-  word and change the business &mdash; &ldquo;Larsson <b>Dental Group</b> AB&rdquo; is not
+  <p class="overline">Click to fill, or type anything, or <b>leave it empty</b> &mdash; the
+  agent reads the body and finds the company itself. To see a refusal, keep the first word
+  and change the business: &ldquo;Larsson <b>Dental Group</b> AB&rdquo; is not
   &ldquo;Larsson <b>Distributors</b> AB&rdquo;.</p>
   <label>Headline
     <input name="headline" required placeholder="Workers protest over delayed wages"
@@ -818,11 +838,11 @@ def _apply(title: str, mutate) -> None:
     Anything the engine refuses leaves LIVE untouched and the reason on the page -
     a bad input must never be able to take the demo down mid-sentence.
     """
-    before = live_now()
+    before = snapshot()
     keep = (list(LIVE["articles"]), dict(LIVE["dpd"]))
     try:
         new_id = mutate()
-        after = live_now()
+        after = snapshot()
     except (DataError, ValueError, KeyError) as exc:
         LIVE["articles"], LIVE["dpd"] = keep
         LIVE["last"] = {"title": title, "error": str(exc), "moves": []}
@@ -838,8 +858,10 @@ def add_story(form: dict) -> None:
     when = (form.get("date", [""])[0] or AS_OF.isoformat()).strip()
 
     def mutate() -> str:
-        if not (mention and headline and body):
-            raise ValueError("company, headline and body are all required")
+        # the company is optional: the agent finds it in the body. Offline the
+        # rule-based resolver needs it and will refuse - which is the honest answer.
+        if not (headline and body):
+            raise ValueError("a headline and a body are required")
         try:
             published = date.fromisoformat(when)
         except ValueError as exc:
@@ -942,7 +964,7 @@ class Handler(BaseHTTPRequestHandler):
         if parts[:1] == ["buyer"] and len(parts) == 2:
             tab = query.get("tab", ["case"])[0]
             body = buyer_page(parts[1], tab if tab in TABS else "case",
-                              live=query.get("live", ["0"])[0] == "1")
+                              )
             return self._send(body, code=404 if b"Unknown buyer" in body else 200)
         if url.path == "/demo/next":
             if STATE["step"] < len(DEMO_STEPS):

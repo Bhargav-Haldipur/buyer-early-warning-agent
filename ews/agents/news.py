@@ -169,9 +169,14 @@ def assess(loader: Loader, llm, store) -> dict[str, dict]:
         if d["kind"] == "none":
             store.add(Evidence(
                 kind="resolution", buyer_id="",
-                detail=f"refused '{art['mentioned_entity_as_written']}' - {d['reason']}",
+                detail=(f"refused '{art['mentioned_entity_as_written']}' - {d['reason']}"
+                        if art.get("mentioned_entity_as_written")
+                        else f"refused - {d['reason']}"),
                 source=art["article_id"], date=art["published_date"],
-                data={"resolved": False, "mention": art["mentioned_entity_as_written"],
+                data={"resolved": False,
+                      # falls back to the headline so a story typed without a named
+                      # company still reads as something on the refusals table
+                      "mention": art["mentioned_entity_as_written"] or art["headline"],
                       "headline": art["headline"], "reason": d["reason"], "agent": d["agent"]},
             ))
             continue

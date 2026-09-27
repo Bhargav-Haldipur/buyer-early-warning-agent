@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "Larsson Dental Group AB (Stockholm dental clinics) does not match any registered entity; the only similarly-named entity, Larsson Distributors AB, is a Gothenburg pharma distributor in a different line of business."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsson Dental Group"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY016\", \"name\": \"Larsson Distributors AB\", \"sector\": \"Pharma Distribution\", \"city\": \"Gothenburg\"}, {\"kind\": \"parent\", \"id\": \"PAR02\", \"name\": \"Delacroix Group SA\", \"sector\": \"holding company\", \"city\": \"Brussels\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "Larsson Dental Group AB (Stockholm dental clinics) does not match any registered entity; the only similarly-named entity, Larsson Distributors AB, is a Gothenburg pharma distributor in a different line of business."
+      }
+    }
+  ],
+  "turns": 2
+}

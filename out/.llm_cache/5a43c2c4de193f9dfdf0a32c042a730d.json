@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "Larsson Dental Group AB (Stockholm dental clinics) does not match the registered Larsson Distributors AB (Gothenburg pharma distribution) - different sector and city, so no covered entity is identified."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsson"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY016\", \"name\": \"Larsson Distributors AB\", \"sector\": \"Pharma Distribution\", \"city\": \"Gothenburg\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "Larsson Dental Group AB (Stockholm dental clinics) does not match the registered Larsson Distributors AB (Gothenburg pharma distribution) - different sector and city, so no covered entity is identified."
+      }
+    }
+  ],
+  "turns": 2
+}

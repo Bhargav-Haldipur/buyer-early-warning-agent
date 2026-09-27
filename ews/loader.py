@@ -16,10 +16,13 @@ ENGINE_TABLES = frozenset(
     {"clients", "buyers", "credit_limits", "invoices", "news_articles", "parent_companies"}
 )
 HARNESS_ONLY = frozenset({"ground_truth", "payment_behaviour_monthly"})
-# What a story typed into the live sandbox must carry to go through the same
-# pipeline as a shipped one. Nothing here is optional: the news agent reads all of it.
-LIVE_ARTICLE_FIELDS = ("article_id", "published_date", "publication", "headline",
-                       "body", "mentioned_entity_as_written")
+# What a story typed into the live sandbox must carry to go through the same pipeline
+# as a shipped one. `mentioned_entity_as_written` is deliberately NOT here: the agent
+# reads the body and finds the company itself, so the field is a convenience the
+# dataset happens to carry, not an input the system depends on. The rule-based
+# fallback does depend on it - see FallbackLLM.resolve - so a story typed without one
+# resolves on Claude and refuses offline. That is the honest behaviour, not a bug.
+LIVE_ARTICLE_FIELDS = ("article_id", "published_date", "publication", "headline", "body")
 # An invoice more than a year overdue is a data-entry slip, not a risk signal.
 MAX_LIVE_DPD = 365
 

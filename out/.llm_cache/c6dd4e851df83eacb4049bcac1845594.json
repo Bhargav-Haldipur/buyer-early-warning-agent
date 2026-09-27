@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY016",
+    "name": "Larsson Distributors AB",
+    "severity": 5,
+    "category": "unpaid_wages",
+    "reason": "Article reports Larsson Distributors AB has missed payroll for a second consecutive month at its Gothenburg depot, a severe sign of cash flow distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsson"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY016\", \"name\": \"Larsson Distributors AB\", \"sector\": \"Pharma Distribution\", \"city\": \"Gothenburg\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY016"
+      },
+      "result": "{\"id\": \"BUY016\", \"kind\": \"buyer\", \"name\": \"Larsson Distributors AB\", \"short_name\": \"Larsson\", \"sector\": \"Pharma Distribution\", \"city\": \"Gothenburg\", \"size_band\": \"small\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY016",
+        "severity": 5,
+        "category": "unpaid_wages",
+        "reason": "Article reports Larsson Distributors AB has missed payroll for a second consecutive month at its Gothenburg depot, a severe sign of cash flow distress."
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY014",
+    "name": "Nordkrans Steel Traders AB",
+    "severity": 5,
+    "category": "wage_delay",
+    "reason": "Company has missed payroll for a second consecutive month at its Malmo yard with stalled union talks, indicating severe cash flow distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Nordkrans"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY014\", \"name\": \"Nordkrans Steel Traders AB\", \"sector\": \"Steel Trading\", \"city\": \"Malmo\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY014",
+        "severity": 5,
+        "category": "wage_delay",
+        "reason": "Company has missed payroll for a second consecutive month at its Malmo yard with stalled union talks, indicating severe cash flow distress."
+      }
+    }
+  ],
+  "turns": 2
+}

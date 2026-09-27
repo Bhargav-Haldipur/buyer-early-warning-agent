@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY016",
+    "name": "Larsson Distributors AB",
+    "severity": 5,
+    "category": "unpaid_wages",
+    "reason": "Larsson Distributors AB has missed payroll for a second consecutive month at its Gothenburg depot, with union talks stalled, indicating severe cash flow distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsson"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY016\", \"name\": \"Larsson Distributors AB\", \"sector\": \"Pharma Distribution\", \"city\": \"Gothenburg\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY016",
+        "severity": 5,
+        "category": "unpaid_wages",
+        "reason": "Larsson Distributors AB has missed payroll for a second consecutive month at its Gothenburg depot, with union talks stalled, indicating severe cash flow distress."
+      }
+    }
+  ],
+  "turns": 2
+}

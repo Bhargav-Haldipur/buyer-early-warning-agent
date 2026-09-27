@@ -1,0 +1,44 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "The article names \"Larsson Dental AB\", but the only registry match is \"Larsson Distributors AB\" (Pharma Distribution). \"Dental\" is a distinguishing word not present in the registered name, indicating a different line of business, so no confident match can be made."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsson"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY016\", \"name\": \"Larsson Distributors AB\", \"sector\": \"Pharma Distribution\", \"city\": \"Gothenburg\"}]"
+    },
+    {
+      "tool": "find_articles",
+      "input": {
+        "query": "Larsson"
+      },
+      "result": "[{\"note\": \"no other article mentions 'Larsson'\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY016"
+      },
+      "result": "{\"id\": \"BUY016\", \"kind\": \"buyer\", \"name\": \"Larsson Distributors AB\", \"short_name\": \"Larsson\", \"sector\": \"Pharma Distribution\", \"city\": \"Gothenburg\", \"size_band\": \"small\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "The article names \"Larsson Dental AB\", but the only registry match is \"Larsson Distributors AB\" (Pharma Distribution). \"Dental\" is a distinguishing word not present in the registered name, indicating a different line of business, so no confident match can be made."
+      }
+    }
+  ],
+  "turns": 3
+}

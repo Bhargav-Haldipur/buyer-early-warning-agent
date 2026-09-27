@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY018",
+    "name": "Novara Foods SpA",
+    "severity": 5,
+    "category": "wage_delay",
+    "reason": "Employees are protesting over late wage payments, a severe indicator of cash flow distress at Novara Foods SpA."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Novara"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY018\", \"name\": \"Novara Foods SpA\", \"sector\": \"Food Processing\", \"city\": \"Parma\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY018"
+      },
+      "result": "{\"id\": \"BUY018\", \"kind\": \"buyer\", \"name\": \"Novara Foods SpA\", \"short_name\": \"Novara\", \"sector\": \"Food Processing\", \"city\": \"Parma\", \"size_band\": \"small\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY018",
+        "severity": 5,
+        "category": "wage_delay",
+        "reason": "Employees are protesting over late wage payments, a severe indicator of cash flow distress at Novara Foods SpA."
+      }
+    }
+  ],
+  "turns": 3
+}

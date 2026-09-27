@@ -618,8 +618,13 @@ class LiveInput(unittest.TestCase):
         import dashboard.server as S
         self.S = S
         S.LIVE.update(articles=[], dpd={}, last=None)
-        S._LIVE_CACHE.clear()
+        S._CACHE.clear()
         self.addCleanup(lambda: S.LIVE.update(articles=[], dpd={}, last=None))
+
+    @staticmethod
+    def _insurer_of(buyer_id: str) -> str:
+        return next(l["client_id"] for l in Loader().credit_limits()
+                    if l["buyer_id"] == buyer_id)
 
     def _story(self, **kw):
         base = {"mention": "Oakhurst Components Ltd", "headline": "Wage protest",
@@ -634,6 +639,28 @@ class LiveInput(unittest.TestCase):
 
     def test_a_near_miss_name_moves_nothing(self):
         self.assertEqual(self._story(mention="Oakhurst Realty LLP")["moves"], [])
+
+    def test_a_story_with_no_company_named_is_accepted(self):
+        """The company field is a convenience, not an input the system depends on: the
+        agent reads the body. Offline the rule-based resolver needs it and refuses,
+        which is the honest answer rather than a hidden failure."""
+        last = self._story(mention="")
+        self.assertIsNone(last.get("error"), "a story without a named company must be taken")
+        self.assertEqual(len(self.S.LIVE["articles"]), 1)
+        self.assertEqual(self.S.LIVE["articles"][0]["mentioned_entity_as_written"], "")
+
+    def test_a_headline_and_body_are_still_required(self):
+        self.assertTrue(self._story(headline="")["error"])
+        self.assertTrue(self._story(body="")["error"])
+
+    def test_a_refusal_with_no_named_company_still_reads(self):
+        """The refusals table prints the mention; with none it must fall back to the
+        headline rather than render an empty cell."""
+        self._story(mention="")
+        refusals = self.S.snapshot()["refusals"]
+        live = [r for r in refusals if r["source"].startswith("LIVE")]
+        for r in live:
+            self.assertTrue(r["data"]["mention"].strip())
 
     def test_a_story_the_run_could_not_have_seen_is_refused(self):
         last = self._story(date="2026-12-01")
@@ -689,16 +716,26 @@ class LiveInput(unittest.TestCase):
         self._story(mention="<script>alert(1)</script>")
         self.assertNotIn("<script>alert(1)</script>", self.S.live_page().decode())
 
-    def test_a_buyer_opened_from_the_sandbox_shows_the_sandbox_score(self):
-        """Clicking through must not contradict, on the next screen, the number the
-        room just watched move."""
+    def test_every_page_follows_the_sandbox_not_just_the_buyer(self):
+        """Clicking through must not contradict, on the next screen, the number the room
+        just watched move. The buyer page alone was fixed first, which left the insurer
+        page behind it still showing the shipped score - worse than not fixing it."""
+        self.S._CACHE.clear()
         self._story()
-        live = self.S.buyer_page("BUY019", "score", live=True).decode()
-        scripted = self.S.buyer_page("BUY019", "score", live=False).decode()
-        self.assertIn("47.7", live)
-        self.assertIn("Live sandbox view", live)
-        self.assertNotIn("Live sandbox view", scripted)
-        self.assertIn("21.7", scripted)
+        for page in (self.S.buyer_page("BUY019", "score"), self.S.client_page("CL01"),
+                     self.S.home()):
+            self.assertIn("Live input in play", page.decode())
+        self.assertIn("47.7", self.S.buyer_page("BUY019", "score").decode())
+        self.assertIn("47.7", self.S.client_page(self._insurer_of("BUY019")).decode())
+
+    def test_resetting_puts_every_page_back(self):
+        self.S._CACHE.clear()
+        self._story()
+        self.S.LIVE.update(articles=[], dpd={}, last=None)
+        for page in (self.S.buyer_page("BUY019", "score"), self.S.client_page("CL01"),
+                     self.S.home()):
+            self.assertNotIn("Live input in play", page.decode())
+        self.assertIn("21.7", self.S.buyer_page("BUY019", "score").decode())
 
     def test_skipping_commentary_does_not_move_a_single_score(self):
         from ews.llm import FallbackLLM
