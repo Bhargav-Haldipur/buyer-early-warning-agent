@@ -42,17 +42,16 @@ The section clocks below assume a brisk read with normal pauses.
 "A credit insurer pays the supplier when its customer doesn't. So its exposure sits on
 companies it has no relationship with.
 
-How much cover each one gets is the **risk underwriter's** call — not the one who prices
-the policy, the one who sets a single buyer's limit.
+How much cover each one gets is the **risk underwriter's** call. Grading and limit
+decisions are already automated — that part works.
 
-That job is already automated: grading runs off company filings, limits get set on request
-or when something trips a review.
+What isn't automated is **the brief**. When a buyer comes up for review, someone pulls the
+financials, finds the old memos, compares exposure and payment behaviour, reads the
+external reports. Our own estimate for that is **thirty to sixty minutes per buyer**.
 
-What nobody does is look at **every buyer, every day**. Payment sits in the policy
-system, news sits elsewhere, and the case for a cut is assembled by hand.
-
-On this book the median limit was last looked at **six hundred and ninety-one days ago**,
-and all four buyers that fail began deteriorating *after* their last review.
+So nobody does it for every buyer, every day. On this book the median limit was last
+looked at **six hundred and ninety-one days ago**, and all four buyers that fail began
+deteriorating *after* their last review.
 
 Nobody was asleep. The cycle is just slower than the risk."
 
@@ -61,10 +60,29 @@ Nobody was asleep. The cycle is just slower than the risk."
 > serves the second one only, and in a Tinubu room the loose term invites a clarifying
 > question you have no clock for.
 >
-> **Do not say "they do this manually."** Grading is automated, most limit requests are
-> auto-decided, and carriers pool overdue reports across policyholders — someone in that
-> room does this for a living and will correct you in the first thirty seconds. *Periodic,
-> siloed, and assembled by hand* is all true and all defensible.
+> **Be precise about what is and isn't manual — the line is not where you'd guess.**
+>
+> - **Grading and limit decisioning: automated.** Carriers score tens of millions of
+>   companies continuously and auto-decide most limit requests. Claim this is manual and
+>   someone in the room who does it for a living corrects you in the first thirty seconds.
+> - **The underwriting brief: manual.** Tinubu's own *Buyer Intelligence Synthesizer*
+>   spec says underwriters "manually pull and read financial statements, search for past
+>   underwriting memos, compare exposures and payment behavior" and puts it at **30–60+
+>   minutes per buyer**, with an expected **60–80% reduction**. That number is internal,
+>   so say "our own estimate" — it lands harder than anything you could assert yourself.
+>
+> **You are proving the software, not the insurance.** Tinubu sells TCS to carriers and
+> MGAs; the risk underwriter is your customer's employee, not yours. Frame every benefit
+> as a TCS capability.
+>
+> **Both halves of this are already on the roadmap** — `Product / TCS Strategy & Vision /
+> Agentic AI`, product TCS-ATLAS: *AI Notifiable event — Early warning & portfolio
+> monitoring* (Gain: Medium) and *Automated Underwriting Brief — Buyer Intelligence
+> Synthesizer* (Gain: High). Naming them is a strength, not a weakness: this is not a
+> science project, it is two backlog items working. The Early Warning spec even lists
+> "match buyer names across databases for global buyers with subsidiaries" as an
+> **optional advanced** capability — that is your entity resolution and parent contagion,
+> and you built the stretch goal.
 >
 > | Checkable on screen, from `credit_limits.csv` + `ground_truth.csv` | |
 > |---|---|
@@ -79,7 +97,10 @@ Nobody was asleep. The cycle is just slower than the risk."
 
 > *Click into Adlerhof — the book, sorted by expected loss.*
 
-"Two signals. **How the buyer pays us** — our invoice ledger, sixty-five percent.
+"Two ideas already sit in the TCS-ATLAS backlog: **Early Warning**, and the **Automated
+Underwriting Brief**. We built both, fused into one.
+
+Two signals. **How the buyer pays us** — our invoice ledger, sixty-five percent.
 **What the world says** — news, thirty-five, and it decays with age.
 
 Four agents read; out comes one score, one band, and a limit action with a euro figure.
@@ -272,6 +293,7 @@ happen. **One sentence, then stop.** Whoever built it takes it.
 | **"What if the agent gets it wrong?"** | S | "Three layers: it can only submit an entity it actually looked up, the Adjudicator can challenge a score but not change it, and every figure in the write-up is checked against the data — fail twice and a template renders and says so on the page." |
 | **"What if Claude is down?"** | S | "Every agent has a deterministic fallback; any failure drops that one item to rules and the run finishes. All nine gates pass with no API key." |
 | **"691 days? We review annually."** | B | "It's a synthetic book, built so the gap is visible on one screen. The mechanism doesn't depend on the number — at any cadence, deterioration that starts between reviews is invisible until someone looks, and on this book all four failures began deteriorating after their last review." |
+| **"Isn't this already on our roadmap?"** | S | "Yes — *AI Notifiable event* and *Automated Underwriting Brief*, both TCS-ATLAS, both Priority 2. That's why we picked it. The point isn't the idea, it's that it works, and the entity matching the spec lists as an optional advanced capability is in there." |
 | **"Doesn't the insurer already monitor buyers?"** | B | "Yes — grading and overdue reporting both exist. What doesn't exist is the two fused into one daily queue ranked by money with the limit action already drafted. We're not replacing the monitoring; we're deciding what the underwriter opens first." |
 | **"Who uses this on Monday?"** | B | "The **risk underwriter** — the one who sets limits on individual buyers, not the policy underwriter who prices the seller's contract. Today they work a queue driven by limit requests and triggers; this is a daily one ranked by money, with the file already drafted." |
 | **"How do you know it isn't tuned on the answers?"** | B | "The labels are unreadable to the engine — the loader raises, and a test greps every file to prove none of them even names them." |
@@ -281,7 +303,8 @@ happen. **One sentence, then stop.** Whoever built it takes it.
 | **"What does it cost to run?"** | B | "Measured, not estimated — printed every run. A full pass over 26 buyers is 87 agent runs, a couple of dollars; roughly eight cents per buyer per day." |
 | **"You know we pool overdue data across all policyholders?"** | B | "Yes, and that's a stronger signal than anything here — we see one insurer's view of one buyer. Pooled, the payment side gets better and nothing about the design changes; the news side and the drafted case file are what we're adding." |
 | **"What breaks at 10,000 buyers?"** | S | "Entity resolution against a real company master, and news volume — 87 runs a day becomes 30,000. It fans out fine; cost is the constraint, not the design." |
-| **"What would you change for production?"** | B | "A real news feed instead of a CSV, entity resolution against LEI or Orbis, the risk underwriter's approve/amend/reject written back, and weights backtested on a real book rather than reasoned about." |
+| **"What would you change for production?"** | B | "Entity resolution stops being string matching — you resolve a buyer to a **company registry identifier**, a DUNS or a national registration number, which the platform already carries. Then a real news feed instead of a CSV, the underwriter's approve/amend/reject written back, and weights backtested on a real book rather than reasoned about." |
+| **"Would this work on a real book?"** | S | "Structurally yes — whole-turnover cover over mid-market European debtors is the shape of this data, and the platform already holds the limits, payment terms and exposure we would read. Two honest gaps: we match buyers by name where production matches on a registry identifier, and we model one insurer per buyer, so we do not get the pooled overdue signal a carrier has across policyholders. Both make our job harder, not easier." |
 | **"Did you both build it?"** | both | B: engine, scoring, dataset, leakage boundary, harness, spend controls. S: agent runtime, markdown agent definitions, guardrails, case file, dashboard. `git shortlog -sne` if they want it. |
 
 ---
