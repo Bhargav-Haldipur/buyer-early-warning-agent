@@ -1,0 +1,91 @@
+{
+  "result": {
+    "narrative": "Maasland Agro Processing BV scores 66.9 with a PD of 0.6396, placing it in the High Risk band. The driver is a single seriously overdue invoice: INV000340 at 55 days past due on 60-day terms, worth \u20ac140,000, sitting alongside \u20ac1.13M of other open invoices that are not yet due. Total open exposure with the one insurer on risk is \u20ac1,267,900 against a credit line of \u20ac1,380,000. Supporting this is one severity 4 news item from 334 days ago reporting a capacity cut at the Zwolle unit.\n\nThe band is built from 0.65 x 90.0 (payment, 55 DPD) + 0.35 x 23.9 (news) = 66.9. The adjudicator agreed with caveats and the caveats matter here. The payment raw of 90.0 is set by worst-line DPD alone and treats the whole \u20ac1,267,900 relationship as if it were 55 DPD, when only \u20ac140,000 is actually past due. There is no settled invoice history at all, so the payment agent recorded the trend as insufficient_history and no baseline exists to tell a structural problem from a one-off dispute. Most significantly, payment alone gives 58.5, below the 60.0 High Risk cutoff, so the 8.4 weighted points from a 334-day-old, largely single-sourced article are what carry this buyer from Watch into High Risk.\n\nThe recommendation is REDUCE on the one line: Solvenza Trade Credit (CL03) from \u20ac1,380,000 down to \u20ac1,267,900, which cuts expected loss from \u20ac637,713 to \u20ac585,911. This is a cut to current outstandings rather than a withdrawal, so it stops further drawdown without disturbing the existing book. Against that, the payment agent flags concentration risk not captured in the formula: only one insurer holds a line, and open exposure sits close to it.\n\nBefore treating the band as settled, the two things worth resolving are the status of INV000340 and whether the Zwolle capacity cut persisted. The score is 6.9 points above the Watch line at 60.0, and the news component decays on a 365-day half-life, so the band does not hold on news alone indefinitely.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Reduce the Solvenza Trade Credit line from \u20ac1,380,000 to \u20ac1,267,900, cutting exposure to current outstandings on a 55 DPD overdue and a PD of 0.6396. The adjudicator agreed only with caveats: payment alone scores 58.5, below the 60.0 cutoff, so the High Risk band rests entirely on one 334-day-old article.",
+      "payment_note": "One seriously overdue invoice, INV000340 at 55 DPD and \u20ac140,000, sits alongside \u20ac1.13M of open invoices not yet due against a \u20ac1,380,000 line, and with no settled invoice history the trend is recorded as insufficient_history, so there is no baseline to judge whether this is typical.",
+      "news_note": "One severity 4 item from 334 days ago (Continental Trade Wire, 2025-10-26) reports the Zwolle unit cut from three shifts to one on weak order inflow, sourced to two people with direct knowledge and a former employee, with the company confirming only a \"temporary realignment of production\" and no follow-up coverage since.",
+      "lifts_it": [
+        "INV000340 (\u20ac140,000, 55 DPD) cleared or shown to be a dispute \u2014 payment alone scores 58.5, under the 60.0 line",
+        "6.9 points takes the score below 60.0 into Watch",
+        "Further decay of NWS0009 on its 365-day half-life; news alone does not hold the band"
+      ],
+      "worsens_it": [
+        "No higher band exists \u2014 High Risk is the top band, so watch severity within it",
+        "Any of the \u20ac1.13M not-yet-due invoices going past due, which would broaden delinquency beyond the single \u20ac140,000 line",
+        "Open exposure of \u20ac1,267,900 rising against the \u20ac1,380,000 limit, with only one insurer on risk"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY004\", \"score\": 66.9, \"band\": \"High Risk\", \"pd\": 0.6396, \"payment\": {\"dpd\": 55, \"raw\": 90.0, \"weighted\": 58.5, \"worst_line\": \"CL03\"}, \"news\": {\"severity\": 4, \"category\": \"capacity_cut\", \"article_id\": \"NWS0009\", \"age_days\": 334, \"headline\": \"Maasland Agro Processing BV scales back operations at Zwolle unit\", \"via_parent\": false, \"parent_name\": null, \"raw\": 23.9, \"weighted\": 8.4}, \"t"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM0009\", \"buyer_id\": \"BUY004\", \"client_id\": \"CL03\", \"client_name\": \"Solvenza Trade Credit\", \"current_limit\": 1380000, \"owed\": 1267900, \"revised_limit\": 1267900, \"change\": -112100, \"action\": \"REDUCE\", \"reason\": \"cut to the limit where expected loss meets 25% appetite\", \"pd\": 0.6396, \"pd_target\": 0.25, \"max_liability_binds\": false, \"expected_loss_before\": 637713, \"expected_loss_after"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": null, \"next_band_at\": null, \"points_to_next_band\": null, \"dpd_for_next_band\": null, \"lower_band\": \"Watch\", \"lower_band_below\": 60.0, \"points_to_lower_band\": 6.9, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"INV000340\", \"kind\": \"payment\", \"date\": \"2026-08-01\", \"detail\": \"6 open invoice(s) with CL03; worst is 55 days past due\", \"data\": {\"client_id\": \"CL03\", \"dpd\": 55, \"owed\": 1267900.0, \"open_count\": 6}}, {\"id\": \"INV000340\", \"kind\": \"payment_review\", \"date\": \"2026-08-01\", \"detail\": \"Maasland Agro Processing BV has one seriously overdue invoice (INV000340, 55 DPD, \\u20ac140,000) alongside \\u20a"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "NWS0009"
+      },
+      "result": "{\"article_id\": \"NWS0009\", \"published_date\": \"2025-10-26\", \"publication\": \"Continental Trade Wire\", \"headline\": \"Maasland Agro Processing BV scales back operations at Zwolle unit\", \"body\": \"Maasland Agro Processing BV has reduced operations at its Zwolle unit, moving to a single shift from three, according to two people with direct knowledge of the decision.\\n\\nThe company has cited weak order infl"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Maasland Agro Processing BV scores 66.9 with a PD of 0.6396, placing it in the High Risk band. The driver is a single seriously overdue invoice: INV000340 at 55 days past due on 60-day terms, worth \u20ac140,000, sitting alongside \u20ac1.13M of other open invoices that are not yet due. Total open exposure with the one insurer on risk is \u20ac1,267,900 against a credit line of \u20ac1,380,000. Supporting this is one severity 4 news item from 334 days ago reporting a capacity cut at the Zwolle unit.\n\nThe band is built from 0.65 x 90.0 (payment, 55 DPD) + 0.35 x 23.9 (news) = 66.9. The adjudicator agreed with caveats and the caveats matter here. The payment raw of 90.0 is set by worst-line DPD alone and treats the whole \u20ac1,267,900 relationship as if it were 55 DPD, when only \u20ac140,000 is actually past due. There is no settled invoice history at all, so the payment agent recorded the trend as insufficient_history and no baseline exists to tell a structural problem from a one-off dispute. Most significantly, payment alone gives 58.5, below the 60.0 High Risk cutoff, so the 8.4 weighted points from a 334-day-old, largely single-sourced article are what carry this buyer from Watch into High Risk.\n\nThe recommendation is REDUCE on the one line: Solvenza Trade Credit (CL03) from \u20ac1,380,000 to \u20ac1,267,900, a change of \u20ac112,100, cutting expected loss from \u20ac637,713 to \u20ac585,911. This is a cut to current outstandings rather than a withdrawal, so it stops further drawdown without disturbing the existing book. Against that, the payment agent flags concentration risk not captured in the formula: only one insurer holds a line, and open exposure sits close to it.\n\nBefore treating the band as settled, the two things worth resolving are the status of INV000340 and whether the Zwolle capacity cut persisted. The score is 6.9 points above the Watch line at 60.0, and the news component decays on a 365-day half-life, so the band does not hold on news alone indefinitely.",
+        "bottom_line": "Reduce the Solvenza Trade Credit line from \u20ac1,380,000 to \u20ac1,267,900 (-\u20ac112,100), cutting exposure to current outstandings on a 55 DPD overdue and a PD of 0.6396. The adjudicator agreed only with caveats: payment alone scores 58.5, below the 60.0 cutoff, so the High Risk band rests entirely on one 334-day-old article.",
+        "payment_note": "One seriously overdue invoice, INV000340 at 55 DPD and \u20ac140,000, sits alongside \u20ac1.13M of open invoices not yet due against a \u20ac1,380,000 line, and with no settled invoice history the trend is recorded as insufficient_history, so there is no baseline to judge whether this is typical.",
+        "news_note": "One severity 4 item from 334 days ago (Continental Trade Wire, 2025-10-26) reports the Zwolle unit cut from three shifts to one on weak order inflow, sourced to two people with direct knowledge and a former employee, with the company confirming only a \"temporary realignment of production\" and no follow-up coverage since.",
+        "lifts_it": [
+          "INV000340 (\u20ac140,000, 55 DPD) cleared or shown to be a dispute \u2014 payment alone scores 58.5, under the 60.0 line",
+          "6.9 points takes the score below 60.0 into Watch",
+          "Further decay of NWS0009 on its 365-day half-life; news alone does not hold the band"
+        ],
+        "worsens_it": [
+          "No higher band exists \u2014 High Risk is the top band, so watch severity within it",
+          "Any of the \u20ac1.13M not-yet-due invoices going past due, which would broaden delinquency beyond the single \u20ac140,000 line",
+          "Open exposure of \u20ac1,267,900 rising against the \u20ac1,380,000 limit, with only one insurer on risk"
+        ]
+      },
+      "error": "these figures are not in the data: ['112,100,', '112,100']. Use only the numbers the tools returned, then resubmit"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Maasland Agro Processing BV scores 66.9 with a PD of 0.6396, placing it in the High Risk band. The driver is a single seriously overdue invoice: INV000340 at 55 days past due on 60-day terms, worth \u20ac140,000, sitting alongside \u20ac1.13M of other open invoices that are not yet due. Total open exposure with the one insurer on risk is \u20ac1,267,900 against a credit line of \u20ac1,380,000. Supporting this is one severity 4 news item from 334 days ago reporting a capacity cut at the Zwolle unit.\n\nThe band is built from 0.65 x 90.0 (payment, 55 DPD) + 0.35 x 23.9 (news) = 66.9. The adjudicator agreed with caveats and the caveats matter here. The payment raw of 90.0 is set by worst-line DPD alone and treats the whole \u20ac1,267,900 relationship as if it were 55 DPD, when only \u20ac140,000 is actually past due. There is no settled invoice history at all, so the payment agent recorded the trend as insufficient_history and no baseline exists to tell a structural problem from a one-off dispute. Most significantly, payment alone gives 58.5, below the 60.0 High Risk cutoff, so the 8.4 weighted points from a 334-day-old, largely single-sourced article are what carry this buyer from Watch into High Risk.\n\nThe recommendation is REDUCE on the one line: Solvenza Trade Credit (CL03) from \u20ac1,380,000 down to \u20ac1,267,900, which cuts expected loss from \u20ac637,713 to \u20ac585,911. This is a cut to current outstandings rather than a withdrawal, so it stops further drawdown without disturbing the existing book. Against that, the payment agent flags concentration risk not captured in the formula: only one insurer holds a line, and open exposure sits close to it.\n\nBefore treating the band as settled, the two things worth resolving are the status of INV000340 and whether the Zwolle capacity cut persisted. The score is 6.9 points above the Watch line at 60.0, and the news component decays on a 365-day half-life, so the band does not hold on news alone indefinitely.",
+        "bottom_line": "Reduce the Solvenza Trade Credit line from \u20ac1,380,000 to \u20ac1,267,900, cutting exposure to current outstandings on a 55 DPD overdue and a PD of 0.6396. The adjudicator agreed only with caveats: payment alone scores 58.5, below the 60.0 cutoff, so the High Risk band rests entirely on one 334-day-old article.",
+        "payment_note": "One seriously overdue invoice, INV000340 at 55 DPD and \u20ac140,000, sits alongside \u20ac1.13M of open invoices not yet due against a \u20ac1,380,000 line, and with no settled invoice history the trend is recorded as insufficient_history, so there is no baseline to judge whether this is typical.",
+        "news_note": "One severity 4 item from 334 days ago (Continental Trade Wire, 2025-10-26) reports the Zwolle unit cut from three shifts to one on weak order inflow, sourced to two people with direct knowledge and a former employee, with the company confirming only a \"temporary realignment of production\" and no follow-up coverage since.",
+        "lifts_it": [
+          "INV000340 (\u20ac140,000, 55 DPD) cleared or shown to be a dispute \u2014 payment alone scores 58.5, under the 60.0 line",
+          "6.9 points takes the score below 60.0 into Watch",
+          "Further decay of NWS0009 on its 365-day half-life; news alone does not hold the band"
+        ],
+        "worsens_it": [
+          "No higher band exists \u2014 High Risk is the top band, so watch severity within it",
+          "Any of the \u20ac1.13M not-yet-due invoices going past due, which would broaden delinquency beyond the single \u20ac140,000 line",
+          "Open exposure of \u20ac1,267,900 rising against the \u20ac1,380,000 limit, with only one insurer on risk"
+        ]
+      }
+    }
+  ],
+  "turns": 4
+}

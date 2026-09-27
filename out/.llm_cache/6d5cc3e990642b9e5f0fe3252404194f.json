@@ -1,0 +1,71 @@
+{
+  "result": {
+    "narrative": "Halberg Textiles GmbH is carrying one invoice 40 days past due (INV000220, \u20ac55,300) alongside five other open invoices with client CL01. Total open exposure is around \u20ac527,100 against a granted limit of \u20ac440,000, so the buyer is already over limit. There is no settled payment history at all \u2014 the trend flag reads \"insufficient_history\" \u2014 so the 40 DPD reading is a point-in-time snapshot with no behavioural track record behind it. The only news on file is a 2025-10-20 report that the Bielefeld unit moved from three shifts to one on weak order inflow; the company called it a \"temporary realignment of production\".\n\nThe score is 42.7, inside the Watch band of 35.0 to 60.0, with a PD of 0.3267. Payment does almost all the work: 0.65 x 60.0 (payment, 40 DPD) gives a weighted 39.0, while the news contributes a raw 10.5 decayed over 340 days for a weighted 3.7. The adjudicator agreed with the band but attached caveats: the formula scores only days past due and is blind both to the over-limit position across six open invoices and to the absence of any settlement history. They also noted the news rests on two anonymous sources and a former employee, and flagged an unexplained discrepancy in the age_days used for decay (small, and working against the buyer). Treat 42.7 as a caveated reading rather than a comfortable mid-Watch one.\n\nThe recommended action for Adlerhof Trade Credit (CL01, LIM0006) is FREEZE: the limit stays at \u20ac440,000 with no change, because the buyer already owes \u20ac527,100 \u2014 at or above the limit, so there is nothing left to cut. Expected loss is unchanged at \u20ac116,436 before and after, and PD of 0.3267 sits above the 0.25 target; the maximum liability constraint does not bind. The practical lever here is collection of the overdue \u20ac55,300 and refusing further shipment above the granted line, not a limit reduction. The credit limit was last reviewed in Nov 2024 and looks stale against current exposure \u2014 worth a fresh review alongside this decision.\n\nTo move Halberg out of Watch the score needs to fall 7.7 points below 35.0, which means clearing the 40 DPD arrears; news alone does not hold the band, and the capacity-cut item decays on a 365-day half-life so it will keep fading on its own. Bringing open exposure back under the \u20ac440,000 limit and building a run of settled invoices would give the trend flag something to work with and turn the current reading into an assessable pattern. Going the other way, 54 DPD on the worst line would carry the score to the 60.0 High Risk threshold, 17.3 points above where it sits now.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Hold the \u20ac440,000 limit for Adlerhof Trade Credit as a FREEZE \u2014 the buyer already owes \u20ac527,100, so there is nothing left to cut. The adjudicator agreed with the Watch band but caveated it: the 42.7 score reflects only the 40 DPD figure and ignores the over-limit position and the complete absence of settled payment history.",
+      "payment_note": "One invoice is 40 days past due (INV000220, \u20ac55,300) among six open invoices totalling roughly \u20ac527,100 against a \u20ac440,000 limit, and with no settled invoices on record the trend is flagged \"insufficient_history\" so no payment pattern can be assessed.",
+      "news_note": "A single severity 3 capacity-cut story from 2025-10-20 reports the Bielefeld unit dropping from three shifts to one on weak order inflow \u2014 sourced anonymously, described by the company as a \"temporary realignment of production\", and decayed over 340 days to a weighted 3.7.",
+      "lifts_it": [
+        "Clearing the 40 DPD arrears \u2014 the score needs to drop 7.7 points to reach Healthy below 35.0",
+        "Open exposure brought back under the \u20ac440,000 limit from the current \u20ac527,100",
+        "A run of settled invoices to replace the \"insufficient_history\" trend flag"
+      ],
+      "worsens_it": [
+        "Worst line slipping to 54 DPD, which reaches the 60.0 High Risk threshold (17.3 points above the current score)",
+        "Further shipment pushing exposure further beyond the \u20ac440,000 limit",
+        "Escalation of the Bielefeld capacity cut beyond the company's \"temporary realignment\" characterisation"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY003\", \"score\": 42.7, \"band\": \"Watch\", \"pd\": 0.3267, \"payment\": {\"dpd\": 40, \"raw\": 60.0, \"weighted\": 39.0, \"worst_line\": \"CL01\"}, \"news\": {\"severity\": 3, \"category\": \"capacity_cut\", \"article_id\": \"NWS0008\", \"age_days\": 340, \"headline\": \"Halberg Textiles GmbH scales back operations at Bielefeld unit\", \"via_parent\": false, \"parent_name\": null, \"raw\": 10.5, \"weighted\": 3.7}, \"trace\": "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM0006\", \"buyer_id\": \"BUY003\", \"client_id\": \"CL01\", \"client_name\": \"Adlerhof Trade Credit\", \"current_limit\": 440000, \"owed\": 527100, \"revised_limit\": 440000, \"change\": 0, \"action\": \"FREEZE\", \"reason\": \"already owed at or above the limit - nothing left to cut\", \"pd\": 0.3267, \"pd_target\": 0.25, \"max_liability_binds\": false, \"expected_loss_before\": 116436, \"expected_loss_after\": 11643"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 60.0, \"points_to_next_band\": 17.3, \"dpd_for_next_band\": 54, \"lower_band\": \"Healthy\", \"lower_band_below\": 35.0, \"points_to_lower_band\": 7.7, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"INV000220\", \"kind\": \"payment\", \"date\": \"2026-08-16\", \"detail\": \"6 open invoice(s) with CL01; worst is 40 days past due\", \"data\": {\"client_id\": \"CL01\", \"dpd\": 40, \"owed\": 527100.0, \"open_count\": 6}}, {\"id\": \"INV000220\", \"kind\": \"payment_review\", \"date\": \"2026-08-16\", \"detail\": \"Halberg Textiles has one invoice 40 days past due (INV000220, \\u20ac55,300) plus five other open invoices, with t"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "NWS0008"
+      },
+      "result": "{\"article_id\": \"NWS0008\", \"published_date\": \"2025-10-20\", \"publication\": \"Metro Business Daily\", \"headline\": \"Halberg Textiles GmbH scales back operations at Bielefeld unit\", \"body\": \"Halberg Textiles GmbH has reduced operations at its Bielefeld unit, moving to a single shift from three, according to two people with direct knowledge of the decision.\\n\\nThe company has cited weak order inflow in th"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Halberg Textiles GmbH is carrying one invoice 40 days past due (INV000220, \u20ac55,300) alongside five other open invoices with client CL01. Total open exposure is around \u20ac527,100 against a granted limit of \u20ac440,000, so the buyer is already over limit. There is no settled payment history at all \u2014 the trend flag reads \"insufficient_history\" \u2014 so the 40 DPD reading is a point-in-time snapshot with no behavioural track record behind it. The only news on file is a 2025-10-20 report that the Bielefeld unit moved from three shifts to one on weak order inflow; the company called it a \"temporary realignment of production\".\n\nThe score is 42.7, inside the Watch band of 35.0 to 60.0, with a PD of 0.3267. Payment does almost all the work: 0.65 x 60.0 (payment, 40 DPD) gives a weighted 39.0, while the news contributes a raw 10.5 decayed over 340 days for a weighted 3.7. The adjudicator agreed with the band but attached caveats: the formula scores only days past due and is blind both to the over-limit position across six open invoices and to the absence of any settlement history. They also noted the news rests on two anonymous sources and a former employee, and flagged an unexplained discrepancy in the age_days used for decay (small, and working against the buyer). Treat 42.7 as a caveated reading rather than a comfortable mid-Watch one.\n\nThe recommended action for Adlerhof Trade Credit (CL01, LIM0006) is FREEZE: the limit stays at \u20ac440,000 with no change, because the buyer already owes \u20ac527,100 \u2014 at or above the limit, so there is nothing left to cut. Expected loss is unchanged at \u20ac116,436 before and after, and PD of 0.3267 sits above the 0.25 target; the maximum liability constraint does not bind. The practical lever here is collection of the overdue \u20ac55,300 and refusing further shipment above the granted line, not a limit reduction. The credit limit was last reviewed in Nov 2024 and looks stale against current exposure \u2014 worth a fresh review alongside this decision.\n\nTo move Halberg out of Watch the score needs to fall 7.7 points below 35.0, which means clearing the 40 DPD arrears; news alone does not hold the band, and the capacity-cut item decays on a 365-day half-life so it will keep fading on its own. Bringing open exposure back under the \u20ac440,000 limit and building a run of settled invoices would give the trend flag something to work with and turn the current reading into an assessable pattern. Going the other way, 54 DPD on the worst line would carry the score to the 60.0 High Risk threshold, 17.3 points above where it sits now.",
+        "bottom_line": "Hold the \u20ac440,000 limit for Adlerhof Trade Credit as a FREEZE \u2014 the buyer already owes \u20ac527,100, so there is nothing left to cut. The adjudicator agreed with the Watch band but caveated it: the 42.7 score reflects only the 40 DPD figure and ignores the over-limit position and the complete absence of settled payment history.",
+        "payment_note": "One invoice is 40 days past due (INV000220, \u20ac55,300) among six open invoices totalling roughly \u20ac527,100 against a \u20ac440,000 limit, and with no settled invoices on record the trend is flagged \"insufficient_history\" so no payment pattern can be assessed.",
+        "news_note": "A single severity 3 capacity-cut story from 2025-10-20 reports the Bielefeld unit dropping from three shifts to one on weak order inflow \u2014 sourced anonymously, described by the company as a \"temporary realignment of production\", and decayed over 340 days to a weighted 3.7.",
+        "lifts_it": [
+          "Clearing the 40 DPD arrears \u2014 the score needs to drop 7.7 points to reach Healthy below 35.0",
+          "Open exposure brought back under the \u20ac440,000 limit from the current \u20ac527,100",
+          "A run of settled invoices to replace the \"insufficient_history\" trend flag"
+        ],
+        "worsens_it": [
+          "Worst line slipping to 54 DPD, which reaches the 60.0 High Risk threshold (17.3 points above the current score)",
+          "Further shipment pushing exposure further beyond the \u20ac440,000 limit",
+          "Escalation of the Bielefeld capacity cut beyond the company's \"temporary realignment\" characterisation"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -1,0 +1,78 @@
+{
+  "result": {
+    "narrative": "Emberline Electricals Ltd scores 37.2 and sits in the Watch band, with a PD of 0.2718 against a portfolio target of 0.25. The exposure is all with one client, Adlerhof Trade Credit (CL01): six open invoices totalling roughly \u20ac324.7k, of which INV000379 at \u20ac65,400 is 32 days past due and the remaining five, around \u20ac259k, are open but not yet due. There is no settled payment history at all, so the trend is recorded as insufficient_history and the 32 DPD reading has no baseline. Two adverse articles sit on file, both pointing the same way.\n\nThe band is driven by payment: 0.65 x 44.0 (payment, 32 DPD) + 0.35 x 24.5 (news) = 37.2, so 28.6 of the score comes from lateness and 8.6 from news. The adjudicator agreed with the band but attached caveats and asked that the file be treated as the weak end of Watch rather than a marginal pass. Four things the formula does not capture all push upward: open exposure of \u20ac324.7k exceeds the \u20ac300k CL01 limit, there is no settled history to benchmark the 32 DPD against, the payment snapshot of 2026-08-24 predates the as-of date implied by the news age_days, and the more recent NWS0011 is excluded because only the top-severity article scores. The adjudicator also noted the payment review contradicts itself, describing the exposure as \"close to\" the \u20ac300k limit in its summary while its own concerns list states it exceeds it.\n\nThe recommended action is FREEZE on LIM0010: the limit stays at \u20ac300,000, change 0, on the grounds that the buyer is already owed at or above the limit and there is nothing left to cut. Expected loss is 66047 before and after, so the freeze contains further drawdown rather than reducing existing risk. Before relying on the score, the adjudicator recommends pulling a current aged-debt position and re-underwriting the line, which was last reviewed in Nov 2024 and predates the current overdue balance. Confirming the identity behind NWS0011 is also worth doing, as it names \"Emberline Inds.\" and appears matched on the Coventry location and Electrical Equipment segment rather than legal name.\n\nTo move down to Healthy the score needs to fall below 35.0, which is 2.2 points away and well within reach if INV000379 settles and the remaining \u20ac259k is paid to terms, establishing the settlement history the file currently lacks. Bringing total exposure back under the \u20ac300k limit would remove the breach. On the downside, High Risk begins at 60.0, 22.8 points up, reachable at 50 DPD on the worst line; news alone does not hold the band, and the news component decays on a 365-day half-life.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Freeze LIM0010 at \u20ac300,000 (no change): open exposure of \u20ac324.7k already exceeds the limit, so there is nothing left to cut, and a 32 DPD line plus vendor payment-delay reporting hold the buyer in Watch at 37.2. The adjudicator agreed with the band but added caveats \u2014 treat this as the weak end of Watch and pull a current aged-debt position and re-underwrite the Nov 2024 line before relying on the score.",
+      "payment_note": "One invoice (INV000379, \u20ac65,400) is 32 days past due with five further invoices of about \u20ac259k open but not yet due across a total \u20ac324.7k exposure, and there is no settlement trend because no settled payment history exists.",
+      "news_note": "Two adverse items are on file: a severity 4 vendor_payment_delay article (age_days 320) reporting supplier delays of 60 to 100 days against 45-day terms plus part-payments, which scores a decayed 24.51, and a more recent severity 3 capacity_cut article (age_days 262, decayed 12.16) on a Coventry unit cut from three shifts to one, which contributes nothing to the score and names \"Emberline Inds.\" rather than the buyer's legal name.",
+      "lifts_it": [
+        "Score falling below 35.0 into Healthy \u2014 only 2.2 points away",
+        "INV000379 settling and the remaining \u20ac259k paying to terms, establishing the missing settlement history",
+        "Total exposure brought back under the \u20ac300k CL01 limit, clearing the breach"
+      ],
+      "worsens_it": [
+        "Worst line reaching 50 DPD, which would take the score to the High Risk threshold of 60.0 (22.8 points up)",
+        "A current aged-debt pull showing INV000379 beyond the 32 DPD used in the calculation",
+        "Any of the \u20ac259k not yet due falling overdue from a counterparty never observed settling"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"BUY005\", \"score\": 37.2, \"band\": \"Watch\", \"pd\": 0.2718, \"payment\": {\"dpd\": 32, \"raw\": 44.0, \"weighted\": 28.6, \"worst_line\": \"CL01\"}, \"news\": {\"severity\": 4, \"category\": \"vendor_payment_delay\", \"article_id\": \"NWS0010\", \"age_days\": 320, \"headline\": \"Vendors say Emberline has fallen behind on payments\", \"via_parent\": false, \"parent_name\": null, \"raw\": 24.5, \"weighted\": 8.6}, \"trace\": \"0."
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM0010\", \"buyer_id\": \"BUY005\", \"client_id\": \"CL01\", \"client_name\": \"Adlerhof Trade Credit\", \"current_limit\": 300000, \"owed\": 324700, \"revised_limit\": 300000, \"change\": 0, \"action\": \"FREEZE\", \"reason\": \"already owed at or above the limit - nothing left to cut\", \"pd\": 0.2718, \"pd_target\": 0.25, \"max_liability_binds\": false, \"expected_loss_before\": 66047, \"expected_loss_after\": 66047}"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 60.0, \"points_to_next_band\": 22.8, \"dpd_for_next_band\": 50, \"lower_band\": \"Healthy\", \"lower_band_below\": 35.0, \"points_to_lower_band\": 2.2, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"INV000379\", \"kind\": \"payment\", \"date\": \"2026-08-24\", \"detail\": \"6 open invoice(s) with CL01; worst is 32 days past due\", \"data\": {\"client_id\": \"CL01\", \"dpd\": 32, \"owed\": 324700.0, \"open_count\": 6}}, {\"id\": \"INV000379\", \"kind\": \"payment_review\", \"date\": \"2026-08-24\", \"detail\": \"Emberline Electricals has one invoice (INV000379, \\u20ac65,400) 32 days past due, with five further invoices tota"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "NWS0010"
+      },
+      "result": "{\"article_id\": \"NWS0010\", \"published_date\": \"2025-11-09\", \"publication\": \"Metro Business Daily\", \"headline\": \"Vendors say Emberline has fallen behind on payments\", \"body\": \"Several suppliers to Emberline, the Electrical Equipment firm based in Coventry, say invoice settlements have slipped well beyond agreed terms over the past two quarters.\\n\\nThree vendors, who asked not to be named because they"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "NWS0011"
+      },
+      "result": "{\"article_id\": \"NWS0011\", \"published_date\": \"2026-01-06\", \"publication\": \"The Commerce Wire\", \"headline\": \"Emberline Inds. scales back operations at Coventry unit\", \"body\": \"Emberline Inds. has reduced operations at its Coventry unit, moving to a single shift from three, according to two people with direct knowledge of the decision.\\n\\nThe company has cited weak order inflow in the Electrical Equi"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Emberline Electricals Ltd scores 37.2 and sits in the Watch band, with a PD of 0.2718 against a portfolio target of 0.25. The exposure is all with one client, Adlerhof Trade Credit (CL01): six open invoices totalling roughly \u20ac324.7k, of which INV000379 at \u20ac65,400 is 32 days past due and the remaining five, around \u20ac259k, are open but not yet due. There is no settled payment history at all, so the trend is recorded as insufficient_history and the 32 DPD reading has no baseline. Two adverse articles sit on file, both pointing the same way.\n\nThe band is driven by payment: 0.65 x 44.0 (payment, 32 DPD) + 0.35 x 24.5 (news) = 37.2, so 28.6 of the score comes from lateness and 8.6 from news. The adjudicator agreed with the band but attached caveats and asked that the file be treated as the weak end of Watch rather than a marginal pass. Four things the formula does not capture all push upward: open exposure of \u20ac324.7k exceeds the \u20ac300k CL01 limit, there is no settled history to benchmark the 32 DPD against, the payment snapshot of 2026-08-24 predates the as-of date implied by the news age_days, and the more recent NWS0011 is excluded because only the top-severity article scores. The adjudicator also noted the payment review contradicts itself, describing the exposure as \"close to\" the \u20ac300k limit in its summary while its own concerns list states it exceeds it.\n\nThe recommended action is FREEZE on LIM0010: the limit stays at \u20ac300,000, change 0, on the grounds that the buyer is already owed at or above the limit and there is nothing left to cut. Expected loss is 66047 before and after, so the freeze contains further drawdown rather than reducing existing risk. Before relying on the score, the adjudicator recommends pulling a current aged-debt position and re-underwriting the line, which was last reviewed in Nov 2024 and predates the current overdue balance. Confirming the identity behind NWS0011 is also worth doing, as it names \"Emberline Inds.\" and appears matched on the Coventry location and Electrical Equipment segment rather than legal name.\n\nTo move down to Healthy the score needs to fall below 35.0, which is 2.2 points away and well within reach if INV000379 settles and the remaining \u20ac259k is paid to terms, establishing the settlement history the file currently lacks. Bringing total exposure back under the \u20ac300k limit would remove the breach. On the downside, High Risk begins at 60.0, 22.8 points up, reachable at 50 DPD on the worst line; news alone does not hold the band, and the news component decays on a 365-day half-life.",
+        "bottom_line": "Freeze LIM0010 at \u20ac300,000 (no change): open exposure of \u20ac324.7k already exceeds the limit, so there is nothing left to cut, and a 32 DPD line plus vendor payment-delay reporting hold the buyer in Watch at 37.2. The adjudicator agreed with the band but added caveats \u2014 treat this as the weak end of Watch and pull a current aged-debt position and re-underwrite the Nov 2024 line before relying on the score.",
+        "payment_note": "One invoice (INV000379, \u20ac65,400) is 32 days past due with five further invoices of about \u20ac259k open but not yet due across a total \u20ac324.7k exposure, and there is no settlement trend because no settled payment history exists.",
+        "news_note": "Two adverse items are on file: a severity 4 vendor_payment_delay article (age_days 320) reporting supplier delays of 60 to 100 days against 45-day terms plus part-payments, which scores a decayed 24.51, and a more recent severity 3 capacity_cut article (age_days 262, decayed 12.16) on a Coventry unit cut from three shifts to one, which contributes nothing to the score and names \"Emberline Inds.\" rather than the buyer's legal name.",
+        "lifts_it": [
+          "Score falling below 35.0 into Healthy \u2014 only 2.2 points away",
+          "INV000379 settling and the remaining \u20ac259k paying to terms, establishing the missing settlement history",
+          "Total exposure brought back under the \u20ac300k CL01 limit, clearing the breach"
+        ],
+        "worsens_it": [
+          "Worst line reaching 50 DPD, which would take the score to the High Risk threshold of 60.0 (22.8 points up)",
+          "A current aged-debt pull showing INV000379 beyond the 32 DPD used in the calculation",
+          "Any of the \u20ac259k not yet due falling overdue from a counterparty never observed settling"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}
