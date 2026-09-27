@@ -6,7 +6,7 @@ and per-insurer findings are kept as first-class evidence so a buyer-level numbe
 can never hide a single bad line.
 
 The agent then investigates the buyer's open invoices, settled history and credit
-lines, and reports the trend and anything an underwriter should know. It must state
+lines, and reports the trend and anything a risk underwriter should know. It must state
 the same worst invoice the ledger found - a submission that disagrees is rejected
 and the agent is told to look again - so the score input is never the model's.
 """

@@ -2,7 +2,7 @@
 
 The Case File is the default tab and comes in two forms from one set of facts:
 
-  fields     - structured sections for the underwriter to scan: header, bottom line,
+  fields     - structured sections for the risk underwriter to scan: header, bottom line,
                limit actions, drivers, adjudicator review, what would lift or worsen
                it, evidence. Every figure in them is copied from the engine by code.
   narrative  - four short paragraphs, the same story in prose.

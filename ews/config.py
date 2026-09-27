@@ -9,7 +9,7 @@ W_PAYMENT, W_NEWS = 0.65, 0.35
 DPD_KNEE = 30                       # matches every insurer's overdue reporting window
 NEWS_HALF_LIFE_DAYS = 365           # measured: <270d drops Emberline (see plan D5)
 # Decay alone never reaches zero: a 4-year-old severity-5 story still carries 1.6
-# points, enough to tip a buyer sitting just under a band line. An underwriter would
+# points, enough to tip a buyer sitting just under a band line. A risk underwriter would
 # not weigh a story that old at all, so news past this age is not read.
 NEWS_MAX_AGE_DAYS = 730
 # ...and it fades out over its final stretch rather than dropping off a cliff, so a

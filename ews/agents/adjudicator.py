@@ -7,7 +7,7 @@ formula and the D8 bands, in code, so every score is reproducible and traced.
 score - payment findings, the payment agent's review, every matched article - and
 submits whether it agrees with the verdict, agrees with caveats, or challenges it,
 citing the evidence it is worried about. It cannot change the score; a challenge is
-surfaced to the underwriter next to it. Any figure it writes must exist in the data.
+surfaced to the risk underwriter next to it. Any figure it writes must exist in the data.
 """
 from __future__ import annotations
 

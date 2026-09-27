@@ -36,7 +36,7 @@ decide the outcome; the news *plus the books* did.
 
 **Step 8 is why lead time is worth money.** Kessler was already on the watchlist from a
 news signal before its payment behaviour moved. By the time the payment data confirms
-it, the underwriter has had the file open for a week.
+it, the risk underwriter has had the file open for a week.
 
 ## What to say if asked
 

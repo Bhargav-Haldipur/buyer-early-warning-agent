@@ -449,7 +449,7 @@ def review_block(rv: dict | None) -> str:
             f'<p class="body2">{e(rv["rationale"])}</p>'
             + (f'<ul class="body2">{concerns}</ul>' if concerns else "")
             + '<p class="overline">The review cannot change the score; a challenge goes to '
-              'the underwriter alongside it.</p>')
+              'the risk underwriter alongside it.</p>')
 
 
 def case_tab(r: dict) -> str:
@@ -461,7 +461,7 @@ def case_tab(r: dict) -> str:
               if h["assessment"] else "")
     head = (f'<p class="overline">{band_pill(h["band"])} score <b>{h["score"]}</b> &middot; '
             f'PD {h["pd"]*100:.1f}%{assess} &middot; as of {e(h["as_of"])} &middot; '
-            f'<b>draft for underwriter review and approval</b></p>')
+            f'<b>draft for risk-underwriter review and approval</b></p>')
 
     rows = "".join(
         f'<tr><td>{e(l["client_name"])}</td><td class="num">{money(l["current_limit"])}</td>'
@@ -599,7 +599,7 @@ def buyer_page(bid: str, tab: str, live: bool = False) -> bytes:
             inner = (f'<table><thead><tr><th>Insurer</th><th class="num">Current limit</th>'
                      f'<th class="num">Owed</th><th class="num">Revised</th><th>Action</th>'
                      f'<th class="num">Expected loss</th></tr></thead><tbody>{rows}</tbody></table>'
-                     f'<p class="overline">Every recommendation awaits an underwriter. '
+                     f'<p class="overline">Every recommendation awaits a risk underwriter. '
                      f'Limits are never raised and never cut below what is already owed.</p>')
 
     elif tab == "payments":
