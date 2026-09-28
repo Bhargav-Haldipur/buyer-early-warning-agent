@@ -204,77 +204,106 @@ seen."
 
 One tab: **`/live`**. A second tab on `/demo` as the fallback. Do not switch tabs otherwise.
 
-**Only 81 seconds of this is talking.** The rest is typing, three ~8-second agent runs,
-and the judge deciding. Realistically:
+**Every beat is on one buyer — Nordkrans Steel Traders AB** (Steel Trading, Malmö,
+insured by Nordhaven). One narrative, and a €1.46M limit, so the cuts are legible from
+the back of the room.
 
-| | Speech | Action | Total |
-|---|---|---|---|
-| Ask the judge | 8s | ~12s for them to answer | 20s |
-| Story 1: click the name chip, type headline + one line of body, submit | 8s | ~22s typing + 8s run | 30s |
-| Read the result | 5s | ~15s pointing | 20s |
-| Story 2: change **only** the company field, submit | 24s | ~8s typing + 6s run | 38s |
-| Ledger: pick the buyer, type 45, submit | 22s | ~8s + 11s run | 41s |
-| Close | 2s | — | 5s |
-| | | | **~2:34** |
+**Only ~85 seconds of this is talking.** The rest is typing, three ~7-second agent runs,
+and the judge deciding. Click the name chip rather than typing it, keep the headline to
+six words, keep the body to one sentence.
 
-That is over budget before anything goes wrong, so: **click the name chip rather than
-typing it, keep the headline to six words, and keep the body to one short sentence** —
-"Staff protested over delayed wages" is enough for the agent to grade. Leave the headline
-and body untouched for story 2; only the company changes.
-
-**If you are running long, cut the ledger beat** and say the line instead: *"and when the
-payment data catches up, this buyer goes to High Risk at forty-five days instead of
-fifty-seven."* You lose the demo but keep the argument. Never cut the refusal — it is
-what the rubric asks for by name.
+**Measured: ~2:42 with the optional beat, ~2:27 without it.** Plan to cut it — it is
+marked, and it is the only thing in here that is not load-bearing. If you are still long
+after that, say the ledger line without demoing it. **Never cut the refusal** — it is what
+the rubric asks for by name.
 
 ### 0:00 – 0:20 · Hand over the keyboard — **S**
 
-> *`/live`, already open, reset to the shipped dataset.*
+> *`/live`, reset, already open.*
 
 "Nothing from here is prepared. There's the book — **pick any company on it**, and give me
 a headline. Anything you like."
 
-> *Click their company in the row of name chips under the field — it fills exactly as
-> registered — then type their headline and one line of body. Submit.*
+> *If they pick their own, use it. If they defer, use Nordkrans and the story below.*
+> *Click the name chip. Type the headline. One sentence of body. Submit.*
 
-### 0:20 – 0:50 · Narrate the wait — **S**
+| | |
+|---|---|
+| Company | click the **Nordkrans** chip |
+| Headline | `Steel trader misses payroll for a second month` |
+| Body | `Nordkrans Steel Traders AB has missed payroll for a second consecutive month at its Malmo yard, three workers said. Union talks have stalled.` |
 
-> *~8 seconds. Do not go quiet.*
+### 0:20 – 0:50 · Narrate the wait, then the result — **S**
 
-"It's searching our registry now, pulling that company's record, checking its line of
-business and its city against what the story says, and grading how bad it is for their
-ability to pay. This story did not exist thirty seconds ago — there's nothing cached."
+> *~7 seconds. Do not go quiet.*
 
-### 0:50 – 1:10 · The result — **S**
+"It's searching our registry, pulling that company's record, checking its line of business
+and its city against the story, and grading how bad it is for their ability to pay. This
+story didn't exist thirty seconds ago — there is nothing cached."
 
-> *Point at the band crossing, then the tool list.*
+> *Result lands: 21.7 → 47.7, Healthy → Watch. Point at the tool list.*
 
 "Healthy to Watch. And there are the tool calls it made to get there."
 
-### 1:10 – 1:50 · What it does when it isn't sure — **B**
+### 0:50 – 1:25 · What it does when it isn't sure — **B**
 
-> *Same headline. Change only the company to a near-miss — keep the first word, change
-> the business. The hint under the field gives you one.*
+> *Change **only** the company field. Leave the headline and body untouched.*
 
-"Same story, same day. One word different in the name — and it's **refused.** Nothing
-scored, and it says why.
+`Nordkrans Yachting Ltd`
 
-That's the defence that matters most. A wrong match freezes a healthy customer's credit
-line, so when the agent can't place a name it says so instead of guessing. Five of the
-articles in this dataset exist purely to try to trip that."
+> *Say this before submitting: "Same story. Same day. One word different in the name."*
 
-### 1:50 – 2:20 · The two signals together — **B**
+"**Refused.** Nothing scored — and it says why: a Southampton leisure-boat firm is not a
+Malmö steel trader.
 
-> *Age that same buyer's worst invoice to **45** days. Submit.*
+A wrong match freezes a healthy customer's credit line, so when it can't place a name it
+says so instead of guessing. And it **cannot see which of these are decoys** — those
+columns are stripped before an article reaches it."
 
-"Now the payment side. Forty-five days late — **High Risk**, and the recommendation flips
-to a cut.
+### 1:25 – 1:40 · *(optional — cut this first)* It doesn't need the name — **B**
 
-Here's the number worth keeping: on payment alone this buyer doesn't reach High Risk until
-**fifty-seven** days. With the news signal it gets there at **forty-five**. That's **twelve
-days of lead time** — twelve days where there's still limit left to cut."
+> *Clear the company field entirely. Leave the headline and body.*
 
-### 2:20 – 2:30 · Close — **B**
+"It doesn't even need that field. The company name is only in the body now — nothing tells
+it who this is about."
+
+> *Still finds Nordkrans, still grades it 5.*
+
+### 1:40 – 2:15 · What the underwriter actually does — **B**
+
+> *Age an invoice: **Nordkrans**, **45** days. Submit — then open the **Limit** tab.*
+
+"Forty-five days late. Seventy-one point five, **High Risk**.
+
+And here's what the risk underwriter does with that. The recommendation was **maintain a
+one-point-four-six million limit**. It's now **reduce to five hundred and eleven
+thousand**. Expected loss on that line was a hundred and thirty thousand — it's now
+**seven hundred and ninety-seven**. That's exposure we were carrying without knowing.
+
+On payment alone, with no news at all, those same forty-five days only reach Watch and the
+cut stops at a million. **The news signal is worth half a million euros of cover we would
+otherwise still be writing.**"
+
+> **The numbers, verified — read them off the screen, not off this page.**
+>
+> | | Score | Band | Action | Limit → revised | Expected loss |
+> |---|---|---|---|---|---|
+> | baseline | 21.7 | Healthy | MAINTAIN | €1,460,000 | €130,342 |
+> | + the story | 47.7 | Watch | REDUCE | → €968,941 | €420,736 |
+> | + 45 days | 71.5 | High Risk | REDUCE | → €511,204 | €797,467 |
+> | 45 days, no story | 45.5 | Watch | REDUCE | → €1,028,169 | €396,500 |
+>
+> €1,028,169 − €511,204 = **€516,965** — what the news signal is worth in cover.
+>
+> **If someone spots that expected-loss-after is €279,225 every time:** that is the
+> formula working, not a bug. It cuts to wherever expected loss meets our risk appetite,
+> so the after figure is the same by construction — what changes is how far it has to cut
+> to get there.
+>
+> The Limit tab is code-generated, so it renders fully even though the sandbox skips
+> commentary. Only the Case File tab falls back to the template while live input is in play.
+
+### 2:15 – 2:25 · Close — **B**
 
 "That's the product. Thank you."
 
