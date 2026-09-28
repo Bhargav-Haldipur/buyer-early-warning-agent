@@ -77,7 +77,88 @@ A baseline pass is **87 agent runs**: 26 payment + 31 news + 26 adjudicator + 4 
 
 ---
 
-## 3. Every file
+## 3. The formula, in full
+
+```
+Risk Score = 0.65 × PaymentScore + 0.35 × NewsScore
+```
+
+**PaymentScore** — from DPD, the worst **Open** invoice on the buyer's ledger:
+
+```
+DPD ≤ 30 :  (DPD / 30) × 40            gentle — 1.33 points a day
+DPD > 30 :  40 + min(60, (DPD−30) × 2) steep  — 2 points a day, caps at 100 (60 DPD)
+```
+
+The knee sits at 30 because that is every insurer's `overdue_reporting_window_days`.
+Inside the window lateness is friction; past it the policyholder is contractually obliged
+to report it, so the score treats it as a different kind of event. Only Open invoices
+count — settled ones go to the agent as history for the trend, never into the score. It
+is the **worst single invoice**, not an average, and the amount does not enter: size
+belongs in the exposure calculation, not the risk score.
+
+**NewsScore** — the **maximum** over the buyer's articles, never a sum:
+
+```
+base(severity) × 0.5 ^ (age_days / 365)
+
+base:  sev 0 → 0     sev 3 → 20     sev 4 → 45     sev 5 → 75
+```
+
+…multiplied by a linear fade `(730 − age) / 180` once age > 550, and **0** when age ≥ 730
+(past the relevance horizon) or age < 0 (dated after the run). Ten mild stories never add
+up to one severe one.
+
+**Bands:**
+
+```
+0 – 34.9  Healthy        35 – 59.9  Watch        60+  High Risk
+```
+
+**Worked example — Arcline Fabrications NV**
+
+```
+worst Open invoice  INV000075, 45 days past due
+payment             40 + (45−30) × 2 = 70.0    × 0.65 = 45.5
+news                sev 5, 204d old: 75 × 0.5^(204/365) = 50.9    × 0.35 = 17.8
+                                                           45.5 + 17.8 = 63.3  High Risk
+```
+
+That last line is what the Score tab prints verbatim as `verdict.trace`.
+
+**Ceiling worth knowing:** the largest news contribution possible is `75 × 0.35 = 26.25`,
+and Watch starts at 35 — so **news alone can never move a buyer out of Healthy**. Only
+payment behaviour crosses a band line. That is what keeps Vandermeer, a buyer carrying a
+severity-5 unpaid-wages story who never defaults, sitting in Healthy.
+
+### Who decides what, in the news half
+
+| | Decided by |
+|---|---|
+| Which company the article is about, or none | **the agent** |
+| How severe it is — 0 / 3 / 4 / 5 | **the agent** |
+| That the id exists, matches the declared kind, and was looked up this run | code |
+| That the severity is on the ladder | code |
+| base lookup, decay, the fade, the horizon | code |
+| parent step-down and fan-out to subsidiaries | code |
+| taking the max across the buyer's articles | code |
+
+Resolution and grading are **one submission, one agent run** — `submit_assessment(kind,
+entity_id, severity, category, reason)`. Offline, the same two decisions come from
+`strict_resolve()` and `keyword_grade()` as separate deterministic passes.
+
+**Downstream of the score**, all of it deterministic:
+
+```
+PD            = interpolate over (0,1%) (20,10%) (55,45%) (80,85%) (100,95%)
+Exposure      = min(max_liability, limit × indemnity × (1 − deductible))
+ExpectedLoss  = PD × Exposure
+RevisedLimit  = min(limit, max(owed, limit × PD_target / PD))      PD_target = 25%
+```
+
+---
+
+## 4. Every file
 
 ### `data/` — the synthetic dataset (26 buyers, 3 insurers, snapshot 2026-09-25)
 
@@ -142,7 +223,7 @@ budgets, usage accounting).
 
 ---
 
-## 4. Click-path traces — where each number on screen comes from
+## 5. Click-path traces — where each number on screen comes from
 
 Everything rendered comes from **one dict**, built once per demo state by
 `snapshot()` (`dashboard/server.py:38`) and memoised in `_CACHE`. You can see the whole
@@ -218,7 +299,7 @@ Each step re-runs everything from scratch. Nothing is special-cased for the demo
 
 ---
 
-## 5. What the code refuses to let the agents do
+## 6. What the code refuses to let the agents do
 
 This is the part worth being able to recite. Each of these is enforced in code, has a
 test, and is visible on the Agents tab when it fires.
@@ -237,7 +318,7 @@ letting a loop run up a bill.
 
 ---
 
-## 6. Rules, Claude, or cache?
+## 7. Rules, Claude, or cache?
 
 Three ways any given agent run can resolve, shown honestly on every buyer's Agents tab:
 
@@ -251,7 +332,7 @@ Three ways any given agent run can resolve, shown honestly on every buyer's Agen
 
 ---
 
-## 7. The three questions to expect
+## 8. The three questions to expect
 
 **"Can the news alone put a healthy company on a watchlist?"**
 No. Maximum news contribution is `0.35 × 75 = 26.25`, and Watch starts at 35. Only
