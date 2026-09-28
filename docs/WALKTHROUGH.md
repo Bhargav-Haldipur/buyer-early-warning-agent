@@ -147,14 +147,81 @@ Resolution and grading are **one submission, one agent run** — `submit_assessm
 entity_id, severity, category, reason)`. Offline, the same two decisions come from
 `strict_resolve()` and `keyword_grade()` as separate deterministic passes.
 
-**Downstream of the score**, all of it deterministic:
+### Expected loss, and the limit recommendation
+
+Everything below the score is deterministic — no LLM touches any of it (`ews/limits.py`).
+
+**Step 1 — turn the score into a probability of default.** Linear interpolation across
+five anchors. Not fitted to anything; it is a stated risk appetite, not a model.
 
 ```
-PD            = interpolate over (0,1%) (20,10%) (55,45%) (80,85%) (100,95%)
-Exposure      = min(max_liability, limit × indemnity × (1 − deductible))
-ExpectedLoss  = PD × Exposure
-RevisedLimit  = min(limit, max(owed, limit × PD_target / PD))      PD_target = 25%
+(0, 1%)   (20, 10%)   (55, 45%)   (80, 85%)   (100, 95%)
 ```
+
+**Step 2 — work out what the insurer actually carries.** A credit insurer never covers
+the whole limit: it pays a percentage (indemnity), the policyholder eats a slice first
+(deductible), and the policy caps total liability.
+
+```
+InsuredExposure = min(max_liability, limit × indemnity × (1 − deductible))
+```
+
+**Step 3 — expected loss is the two multiplied.**
+
+```
+ExpectedLoss = PD × InsuredExposure
+```
+
+**Step 4 — recommend an action.** `PD_target` is the PD at the Watch line, score 35,
+which works out at **25%**. One setting, and it is the only risk-appetite number in the
+system.
+
+| Action | When | Effect |
+|---|---|---|
+| **MAINTAIN** | PD ≤ 25% | no change |
+| **FREEZE** | PD > 25% **and** owed ≥ limit, or the liability cap already binds | stop insuring new invoices; there is nothing useful left to cut |
+| **REDUCE** | PD > 25% **and** owed < limit | cut to the revised limit |
+
+```
+FormulaLimit = limit × PD_target / PD          the limit at which EL meets appetite
+RevisedLimit = min(limit, max(owed, FormulaLimit))
+```
+
+Limits are **never raised** and **never cut below what is already owed** — you cannot
+un-insure invoices that have already been issued.
+
+**Worked example — Arcline Fabrications NV, insured by Nordhaven**
+
+```
+score 63.3  →  PD 58.3%                        interpolated between (55,45%) and (80,85%)
+
+policy:  indemnity 85%   deductible 10%   max liability €6,000,000
+limit:   €820,000        owed: €559,900
+
+InsuredExposure = min(6,000,000, 820,000 × 0.85 × 0.90) = €627,300
+ExpectedLoss    = 0.583 × 627,300                       = €365,779
+
+PD 58.3% > 25%, the cap does not bind, owed < limit     → REDUCE
+FormulaLimit  = 820,000 × 0.25 / 0.583                  = €351,570
+RevisedLimit  = min(820,000, max(559,900, 351,570))     = €559,900   ← the owed floor binds
+ExpectedLoss after = 0.583 × (559,900 × 0.85 × 0.90)    = €249,755
+```
+
+The formula wanted to cut to €352k; it stops at €559,900 because that much is already
+owed. **That gap is the cost of being late to the signal** — and it is the argument for
+watching daily rather than at review.
+
+**The other two shapes, from the same data**
+
+```
+Halberg   PD 32.7% > 25%, but owed €527,100 ≥ limit €440,000   → FREEZE, nothing to cut
+Oakhurst  PD 11.7% ≤ 25%                                       → MAINTAIN
+```
+
+**If someone asks why expected-loss-after is often the same figure across scenarios:** it
+is the formula working. The cut targets whatever limit brings expected loss to appetite,
+so the after value converges by construction. What changes is how far it has to cut to
+get there.
 
 ---
 

@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY016",
+    "name": "Larsson Distributors AB",
+    "severity": 5,
+    "category": "unpaid_wages",
+    "reason": "Larsson Distributors AB (Pharma Distribution, Gothenburg) matches the article's \"Larsson Pharma AB\" by brand name, sector, and city; missing payroll for a second consecutive month indicates severe financial distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsson Pharma"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY016\", \"name\": \"Larsson Distributors AB\", \"sector\": \"Pharma Distribution\", \"city\": \"Gothenburg\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY016"
+      },
+      "result": "{\"id\": \"BUY016\", \"kind\": \"buyer\", \"name\": \"Larsson Distributors AB\", \"short_name\": \"Larsson\", \"sector\": \"Pharma Distribution\", \"city\": \"Gothenburg\", \"size_band\": \"small\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY016",
+        "severity": 5,
+        "category": "unpaid_wages",
+        "reason": "Larsson Distributors AB (Pharma Distribution, Gothenburg) matches the article's \"Larsson Pharma AB\" by brand name, sector, and city; missing payroll for a second consecutive month indicates severe financial distress."
+      }
+    }
+  ],
+  "turns": 3
+}
