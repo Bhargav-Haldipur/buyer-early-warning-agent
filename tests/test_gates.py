@@ -758,3 +758,21 @@ class TestsStayOffline(unittest.TestCase):
     def test_no_test_resolves_its_own_model_from_the_environment(self):
         import os
         self.assertEqual(os.environ.get("EWS_LLM"), "fallback")
+
+
+class NextSteps(unittest.TestCase):
+    def test_the_slide_is_served_and_uses_the_shared_theme(self):
+        import dashboard.server as S
+        html = (ROOT / "dashboard" / "next.html").read_text()
+        self.assertIn('href="/theme.css"', html)
+        self.assertIn("HACKATHON PROTOTYPE", html)
+        self.assertIn('<a href="/next"', S.home().decode())
+
+    def test_the_slide_lists_every_tool_each_agent_actually_has(self):
+        """A diagram that omits a tool is worse than none - search_entities is in every
+        trace the live demo shows."""
+        from ews.agents import definition
+        html = (ROOT / "dashboard" / "next.html").read_text()
+        for name in ("payment", "news", "adjudicator", "casefile"):
+            for tool in definition.load(name).tools:
+                self.assertIn(tool, html, f"{name}: {tool} missing from the diagram")

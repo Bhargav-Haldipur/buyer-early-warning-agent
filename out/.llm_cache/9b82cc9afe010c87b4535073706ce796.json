@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "No covered entity named 'Lovara' or similar exists in the registry, so no match can be made."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Lovara"
+      },
+      "result": "[{\"note\": \"no covered entity shares a word with 'Lovara'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "No covered entity named 'Lovara' or similar exists in the registry, so no match can be made."
+      }
+    }
+  ],
+  "turns": 2
+}

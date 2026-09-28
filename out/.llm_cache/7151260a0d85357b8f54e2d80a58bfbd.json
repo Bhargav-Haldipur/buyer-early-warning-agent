@@ -1,0 +1,51 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY009",
+    "name": "Prevost Prime Components SA",
+    "severity": 4,
+    "category": "labor_unrest",
+    "reason": "Workers are protesting at Prevost Prime Components SA, indicating labor unrest that could disrupt operations and signal financial strain, though no explicit wage non-payment or insolvency is confirmed."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Prevost"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY009\", \"name\": \"Prevost Prime Components SA\", \"sector\": \"Auto Components\", \"city\": \"Lyon\"}]"
+    },
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Prime Components"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY009\", \"name\": \"Prevost Prime Components SA\", \"sector\": \"Auto Components\", \"city\": \"Lyon\"}, {\"kind\": \"buyer\", \"id\": \"BUY019\", \"name\": \"Oakhurst Components Ltd\", \"sector\": \"Auto Components\", \"city\": \"Birmingham\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY009"
+      },
+      "result": "{\"id\": \"BUY009\", \"kind\": \"buyer\", \"name\": \"Prevost Prime Components SA\", \"short_name\": \"Prevost Prime\", \"sector\": \"Auto Components\", \"city\": \"Lyon\", \"size_band\": \"mid\", \"parent\": {\"id\": \"PAR01\", \"name\": \"Brandt Holdings GmbH\"}}"
+    },
+    {
+      "tool": "find_articles",
+      "input": {
+        "query": "Prevost Prime Components"
+      },
+      "result": "[{\"note\": \"no other article mentions 'Prevost Prime Components'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY009",
+        "severity": 4,
+        "category": "labor_unrest",
+        "reason": "Workers are protesting at Prevost Prime Components SA, indicating labor unrest that could disrupt operations and signal financial strain, though no explicit wage non-payment or insolvency is confirmed."
+      }
+    }
+  ],
+  "turns": 3
+}

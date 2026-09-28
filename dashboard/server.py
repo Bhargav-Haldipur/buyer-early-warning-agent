@@ -212,7 +212,7 @@ def page(title: str, body: str, theme: str = "", nav: str = "home") -> bytes:
 <header class="head"><div class="banner">{BANNER}</div>
 <nav class="topbar"><div class="topbar-in">
 <a class="brand" href="/"><span class="brand-mark">{BRAND_MARK}</span>Buyer Early Warning and Limit Review</a>
-<div class="topnav"><a href="/"{on("home")}>Insurers</a><a href="/demo"{on("demo")}>Scripted demo</a><a href="/live"{on("live")}>Live input</a></div>
+<div class="topnav"><a href="/"{on("home")}>Insurers</a><a href="/demo"{on("demo")}>Scripted demo</a><a href="/live"{on("live")}>Live input</a><a href="/next">Architecture</a></div>
 </div></nav></header>
 <div class="wrap">{body}
 <footer>
@@ -949,6 +949,9 @@ class Handler(BaseHTTPRequestHandler):
 
         if url.path == "/theme.css":
             return self._send((HERE / "theme.css").read_bytes(), "text/css; charset=utf-8")
+        if url.path == "/next":
+            # static: it is a slide, not a view of the data
+            return self._send((HERE / "next.html").read_bytes())
         if url.path == "/":
             return self._send(home())
         if url.path == "/demo":

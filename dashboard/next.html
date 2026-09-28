@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>[PROTOTYPE] Architecture &middot; Synthetic Data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/theme.css">
+</head><body>
+<header class="head"><div class="banner">HACKATHON PROTOTYPE &middot; SYNTHETIC DATA</div>
+<nav class="topbar"><div class="topbar-in">
+<a class="brand" href="/"><span class="brand-mark"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 9h3l2-5 3 8 2-4h3"/></svg></span>Buyer Early Warning and Limit Review</a>
+<div class="topnav"><a href="/">Insurers</a><a href="/live">Live input</a><a href="/next" class="on">Architecture</a></div>
+</div></nav></header>
+<div class="wrap">
+
+<div class="hero">
+<p class="masthead">Architecture</p>
+<h1>Agents produce judgement. Code produces every number.</h1>
+</div>
+
+<div class="flow">
+  <div class="tier">
+    <span class="tierlabel">1 &middot; Evidence</span>
+    <div class="lane">
+      <span class="node ghost">data/*.csv</span><span class="arr">&rarr;</span>
+      <span class="node">Loader</span><span class="arr">&rarr;</span>
+      <span class="stack">
+        <span class="node agent">Payment agent</span>
+        <span class="node agent">News agent</span>
+      </span>
+      <span class="arr">&rarr;</span>
+      <span class="node store">Evidence Store</span>
+    </div>
+    <p class="note">The Loader is the leakage boundary &mdash; it refuses the label tables
+    and strips the answer columns out of news. Producers never score.</p>
+  </div>
+
+  <div class="tier">
+    <span class="tierlabel">2 &middot; Judgement</span>
+    <div class="lane">
+      <span class="node store">Evidence Store</span><span class="arr">&rarr;</span>
+      <span class="node code">adjudicate() &mdash; the formula</span><span class="arr">&rarr;</span>
+      <span class="node">score &middot; band &middot; PD</span>
+      <span class="arr">&rarr;</span>
+      <span class="node agent">Adjudicator review</span>
+    </div>
+    <p class="note">The only place a number is produced. The review agent agrees, caveats
+    or <b>challenges</b> &mdash; and cannot change the score.</p>
+  </div>
+
+  <div class="tier">
+    <span class="tierlabel">3 &middot; Action</span>
+    <div class="lane">
+      <span class="node code">Limit recommendations</span><span class="arr">&rarr;</span>
+      <span class="node agent">Case File agent</span><span class="arr">&rarr;</span>
+      <span class="node">draft for the risk underwriter</span><span class="arr">&rarr;</span>
+      <span class="node ghost">dashboard</span>
+    </div>
+    <p class="note">Every figure the agent writes is checked against the data before it
+    renders. Fail twice and a template renders instead, and says so.</p>
+  </div>
+</div>
+
+<h2>The four agents and their tools</h2>
+<div class="toolgrid">
+  <div class="panel toolcard">
+    <h4>Payment Behaviour</h4><p class="overline">claude-sonnet-5</p>
+    <ul><li>get_open_invoices</li><li>get_payment_history</li><li>get_credit_lines</li>
+        <li class="sub">submit_payment_review</li></ul>
+    <p class="overline">Must report the ledger&rsquo;s own worst invoice.</p>
+  </div>
+  <div class="panel toolcard">
+    <h4>News Intelligence</h4><p class="overline">claude-sonnet-5</p>
+    <ul><li>search_entities</li><li>get_entity</li><li>find_articles</li>
+        <li class="sub">submit_assessment</li></ul>
+    <p class="overline">Cannot submit an id it never looked up.</p>
+  </div>
+  <div class="panel toolcard">
+    <h4>Risk Adjudicator</h4><p class="overline">claude-opus-5</p>
+    <ul><li>get_score_breakdown</li><li>get_evidence</li><li>get_article</li>
+        <li class="sub">submit_review</li></ul>
+    <p class="overline">Every concern must cite a real evidence id.</p>
+  </div>
+  <div class="panel toolcard">
+    <h4>Case File</h4><p class="overline">claude-opus-5</p>
+    <ul><li>get_verdict</li><li>get_limits</li><li>get_outlook</li><li>get_evidence</li>
+        <li>get_article</li><li class="sub">submit_case_file</li></ul>
+    <p class="overline">Every number checked against the data.</p>
+  </div>
+</div>
+
+<h2>What we&rsquo;d build next</h2>
+<p class="sub">None of it needs a new data source.</p>
+<ul class="nextlist">
+  <li>
+    <b>Cross-insurer payment data.</b>
+    <span>One buyer going late to five suppliers at once, not one &mdash; the signal only
+    a carrier has.</span>
+  </li>
+  <li>
+    <b>Parent company contagion, past the first hop.</b>
+    <span>Today it runs one level down. Next: up from a subsidiary, across siblings, and
+    aggregated at the group cap.</span>
+  </li>
+  <li>
+    <b>Further signal analysis for the case file.</b>
+    <span>Buyer rating, country cap, multi-year financials, assessment history &mdash;
+    already collected, not yet read.</span>
+  </li>
+</ul>
+
+<footer>
+  <b>HACKATHON PROTOTYPE &middot; SYNTHETIC DATA</b><br>
+  Every buyer, insurer, invoice and news article here is fabricated. No real counterparty appears.
+  Not reviewed by Risk or Compliance, and not a product.
+</footer>
+</div></body></html>

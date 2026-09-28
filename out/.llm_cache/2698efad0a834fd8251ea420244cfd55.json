@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY011",
+    "name": "Marchetti Mills SpA",
+    "severity": 5,
+    "category": "wage_delay",
+    "reason": "Workers at Marchetti Mills SpA staged a 7-day protest over delayed wages, indicating severe cash flow / payment distress at the company."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Marchetti"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY011\", \"name\": \"Marchetti Mills SpA\", \"sector\": \"Textiles\", \"city\": \"Biella\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY011",
+        "severity": 5,
+        "category": "wage_delay",
+        "reason": "Workers at Marchetti Mills SpA staged a 7-day protest over delayed wages, indicating severe cash flow / payment distress at the company."
+      }
+    }
+  ],
+  "turns": 2
+}
