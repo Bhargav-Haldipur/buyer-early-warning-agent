@@ -1,0 +1,10 @@
+# Keep LF line endings on every platform, Windows included.
+# The CSVs carry multi-line article bodies inside quoted fields, and the csv module
+# keeps line endings there verbatim - a CRLF checkout changes every article's text,
+# which changes the agent cache keys and silently stops the shipped Claude cache
+# from replaying.
+* text=auto eol=lf
+
+*.pptx binary
+*.png  binary
+*.jpg  binary

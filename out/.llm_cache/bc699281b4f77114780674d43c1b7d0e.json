@@ -1,0 +1,44 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY029",
+    "name": "Carreau Mills SA",
+    "severity": 3,
+    "category": "stock_decline",
+    "reason": "Article only reports a stock price crash for Carreau with no operational or payment detail; matches Carreau Mills SA as the sole registered entity with this name, but the content is too thin to indicate more than mild investor-confidence concern."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Carreau"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY029\", \"name\": \"Carreau Mills SA\", \"sector\": \"Textiles\", \"city\": \"Roubaix\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY029"
+      },
+      "result": "{\"id\": \"BUY029\", \"kind\": \"buyer\", \"name\": \"Carreau Mills SA\", \"short_name\": \"Carreau\", \"sector\": \"Textiles\", \"city\": \"Roubaix\", \"size_band\": \"mid\", \"parent\": {\"id\": \"PAR04\", \"name\": \"Vasterberg Industrier AB\"}}"
+    },
+    {
+      "tool": "find_articles",
+      "input": {
+        "query": "Carreau"
+      },
+      "result": "[{\"note\": \"no other article mentions 'Carreau'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY029",
+        "severity": 3,
+        "category": "stock_decline",
+        "reason": "Article only reports a stock price crash for Carreau with no operational or payment detail; matches Carreau Mills SA as the sole registered entity with this name, but the content is too thin to indicate more than mild investor-confidence concern."
+      }
+    }
+  ],
+  "turns": 3
+}

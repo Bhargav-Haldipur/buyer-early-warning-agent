@@ -1,0 +1,44 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY002",
+    "name": "Arcline Fabrications NV",
+    "severity": 5,
+    "category": "labor_unrest",
+    "reason": "Workers staging protests and leaving en masse at the Arcline plant aligns with prior reporting of wage delays, vendor non-payment, legal notices, and lender concern at Arcline Fabrications NV, indicating a severe deterioration in operations and ability to pay."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Arcline"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY002\", \"name\": \"Arcline Fabrications NV\", \"sector\": \"Steel Fabrication\", \"city\": \"Antwerp\"}]"
+    },
+    {
+      "tool": "find_articles",
+      "input": {
+        "query": "Arcline"
+      },
+      "result": "[{\"article_id\": \"NWS0004\", \"date\": \"2025-11-10\", \"publication\": \"Regional Commerce Review\", \"headline\": \"Vendors say ARCLINE FABRICATIONS NV has fallen behind on payments\", \"mentioned_as\": \"ARCLINE FABRICATIONS NV\"}, {\"article_id\": \"NWS0005\", \"date\": \"2025-11-15\", \"publication\": \"Continental Trade Wire\", \"headline\": \"Legal notice served on Arcline Inds. over unpaid dues\", \"mentioned_as\": \"Arcline "
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY002"
+      },
+      "result": "{\"id\": \"BUY002\", \"kind\": \"buyer\", \"name\": \"Arcline Fabrications NV\", \"short_name\": \"Arcline\", \"sector\": \"Steel Fabrication\", \"city\": \"Antwerp\", \"size_band\": \"mid\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY002",
+        "severity": 5,
+        "category": "labor_unrest",
+        "reason": "Workers staging protests and leaving en masse at the Arcline plant aligns with prior reporting of wage delays, vendor non-payment, legal notices, and lender concern at Arcline Fabrications NV, indicating a severe deterioration in operations and ability to pay."
+      }
+    }
+  ],
+  "turns": 3
+}

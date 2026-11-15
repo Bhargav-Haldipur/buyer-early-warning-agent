@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY034",
+    "name": "Tornquist Packaging AS",
+    "severity": 4,
+    "category": "layoffs",
+    "reason": "Tornquist Packaging AS is reported to have laid off 1000 employees, indicating significant financial distress and potential strain on operations and payment capacity."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Tornquist"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY034\", \"name\": \"Tornquist Packaging AS\", \"sector\": \"Packaging\", \"city\": \"Aarhus\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY034",
+        "severity": 4,
+        "category": "layoffs",
+        "reason": "Tornquist Packaging AS is reported to have laid off 1000 employees, indicating significant financial distress and potential strain on operations and payment capacity."
+      }
+    }
+  ],
+  "turns": 2
+}

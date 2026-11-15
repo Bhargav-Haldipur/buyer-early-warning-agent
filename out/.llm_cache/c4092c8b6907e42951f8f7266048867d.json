@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY003",
+    "name": "Halberg Textiles GmbH",
+    "severity": 3,
+    "category": "stock_decline",
+    "reason": "Article reports Halberg Textiles GmbH's stock hitting a 10-year low, signaling market concern about the company's financial health, though no direct payment default or operational disruption is mentioned."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Halberg"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY003\", \"name\": \"Halberg Textiles GmbH\", \"sector\": \"Textiles\", \"city\": \"Bielefeld\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY003",
+        "severity": 3,
+        "category": "stock_decline",
+        "reason": "Article reports Halberg Textiles GmbH's stock hitting a 10-year low, signaling market concern about the company's financial health, though no direct payment default or operational disruption is mentioned."
+      }
+    }
+  ],
+  "turns": 2
+}

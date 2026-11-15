@@ -1,0 +1,44 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY002",
+    "name": "Arcline Fabrications NV",
+    "severity": 5,
+    "category": "unpaid_wages",
+    "reason": "Worker protests at an \"Arcline\" plant align with the only registered Arcline entity (Arcline Fabrications NV, Steel Fabrication, Antwerp) and match a documented pattern of unpaid vendor bills, legal notices, and lender concern at this company, including a prior article on wage delays triggering worker protests."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "arcline"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY002\", \"name\": \"Arcline Fabrications NV\", \"sector\": \"Steel Fabrication\", \"city\": \"Antwerp\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY002"
+      },
+      "result": "{\"id\": \"BUY002\", \"kind\": \"buyer\", \"name\": \"Arcline Fabrications NV\", \"short_name\": \"Arcline\", \"sector\": \"Steel Fabrication\", \"city\": \"Antwerp\", \"size_band\": \"mid\", \"parent\": null}"
+    },
+    {
+      "tool": "find_articles",
+      "input": {
+        "query": "Arcline"
+      },
+      "result": "[{\"article_id\": \"NWS0004\", \"date\": \"2025-11-10\", \"publication\": \"Regional Commerce Review\", \"headline\": \"Vendors say ARCLINE FABRICATIONS NV has fallen behind on payments\", \"mentioned_as\": \"ARCLINE FABRICATIONS NV\"}, {\"article_id\": \"NWS0005\", \"date\": \"2025-11-15\", \"publication\": \"Continental Trade Wire\", \"headline\": \"Legal notice served on Arcline Inds. over unpaid dues\", \"mentioned_as\": \"Arcline "
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY002",
+        "severity": 5,
+        "category": "unpaid_wages",
+        "reason": "Worker protests at an \"Arcline\" plant align with the only registered Arcline entity (Arcline Fabrications NV, Steel Fabrication, Antwerp) and match a documented pattern of unpaid vendor bills, legal notices, and lender concern at this company, including a prior article on wage delays triggering worker protests."
+      }
+    }
+  ],
+  "turns": 4
+}

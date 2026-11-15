@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY023",
+    "name": "Kessler Traders GmbH",
+    "severity": 4,
+    "category": "unpaid_vendors",
+    "reason": "Two steel mill suppliers report Kessler Traders GmbH has fallen behind on payments since August, with one supplier already moving to cash-on-delivery terms, indicating liquidity stress and vendor payment risk."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Kessler"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY023\", \"name\": \"Kessler Traders GmbH\", \"sector\": \"Steel Trading\", \"city\": \"Essen\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY023",
+        "severity": 4,
+        "category": "unpaid_vendors",
+        "reason": "Two steel mill suppliers report Kessler Traders GmbH has fallen behind on payments since August, with one supplier already moving to cash-on-delivery terms, indicating liquidity stress and vendor payment risk."
+      }
+    }
+  ],
+  "turns": 2
+}

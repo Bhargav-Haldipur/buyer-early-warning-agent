@@ -1,0 +1,44 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY018",
+    "name": "Novara Foods SpA",
+    "severity": 5,
+    "category": "unpaid_wages",
+    "reason": "Novara Foods SpA (sector: Food Processing) matches the \"Novara\" food processing distributor named in the article; missing payroll for a second consecutive month at a depot is a severe liquidity red flag."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Novara"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY018\", \"name\": \"Novara Foods SpA\", \"sector\": \"Food Processing\", \"city\": \"Parma\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY018"
+      },
+      "result": "{\"id\": \"BUY018\", \"kind\": \"buyer\", \"name\": \"Novara Foods SpA\", \"short_name\": \"Novara\", \"sector\": \"Food Processing\", \"city\": \"Parma\", \"size_band\": \"small\", \"parent\": null}"
+    },
+    {
+      "tool": "find_articles",
+      "input": {
+        "query": "Novara"
+      },
+      "result": "[{\"note\": \"no other article mentions 'Novara'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY018",
+        "severity": 5,
+        "category": "unpaid_wages",
+        "reason": "Novara Foods SpA (sector: Food Processing) matches the \"Novara\" food processing distributor named in the article; missing payroll for a second consecutive month at a depot is a severe liquidity red flag."
+      }
+    }
+  ],
+  "turns": 4
+}

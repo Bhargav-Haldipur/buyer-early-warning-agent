@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "No covered entity matches \"Nordkans\"; the registry search returned no results, and the article content (CEO turnover) is also not a financial risk indicator even if a match existed."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Nordkans"
+      },
+      "result": "[{\"note\": \"no covered entity shares a word with 'Nordkans'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "No covered entity matches \"Nordkans\"; the registry search returned no results, and the article content (CEO turnover) is also not a financial risk indicator even if a match existed."
+      }
+    }
+  ],
+  "turns": 2
+}

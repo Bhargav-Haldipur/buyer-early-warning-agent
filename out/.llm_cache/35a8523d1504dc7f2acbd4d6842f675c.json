@@ -1,0 +1,44 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY023",
+    "name": "Kessler Traders GmbH",
+    "severity": 5,
+    "category": "wage_delay",
+    "reason": "Workers at Kessler (matched to Kessler Traders GmbH, short name 'Kessler') staged a protest over unpaid wages, indicating severe cash flow distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Kessler"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY023\", \"name\": \"Kessler Traders GmbH\", \"sector\": \"Steel Trading\", \"city\": \"Essen\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY023"
+      },
+      "result": "{\"id\": \"BUY023\", \"kind\": \"buyer\", \"name\": \"Kessler Traders GmbH\", \"short_name\": \"Kessler\", \"sector\": \"Steel Trading\", \"city\": \"Essen\", \"size_band\": \"small\", \"parent\": null}"
+    },
+    {
+      "tool": "find_articles",
+      "input": {
+        "query": "Kessler"
+      },
+      "result": "[{\"note\": \"no other article mentions 'Kessler'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY023",
+        "severity": 5,
+        "category": "wage_delay",
+        "reason": "Workers at Kessler (matched to Kessler Traders GmbH, short name 'Kessler') staged a protest over unpaid wages, indicating severe cash flow distress."
+      }
+    }
+  ],
+  "turns": 3
+}

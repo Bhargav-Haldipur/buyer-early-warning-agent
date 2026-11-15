@@ -1,0 +1,44 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY009",
+    "name": "Prevost Prime Components SA",
+    "severity": 3,
+    "category": "stock_decline",
+    "reason": "Article reports Prevost Prime Components SA's stock hitting a new low, a market signal of investor concern though no concrete operational or payment issue is disclosed."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Prevost"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY009\", \"name\": \"Prevost Prime Components SA\", \"sector\": \"Auto Components\", \"city\": \"Lyon\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY009"
+      },
+      "result": "{\"id\": \"BUY009\", \"kind\": \"buyer\", \"name\": \"Prevost Prime Components SA\", \"short_name\": \"Prevost Prime\", \"sector\": \"Auto Components\", \"city\": \"Lyon\", \"size_band\": \"mid\", \"parent\": {\"id\": \"PAR01\", \"name\": \"Brandt Holdings GmbH\"}}"
+    },
+    {
+      "tool": "find_articles",
+      "input": {
+        "query": "Prevost Prime"
+      },
+      "result": "[{\"note\": \"no other article mentions 'Prevost Prime'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY009",
+        "severity": 3,
+        "category": "stock_decline",
+        "reason": "Article reports Prevost Prime Components SA's stock hitting a new low, a market signal of investor concern though no concrete operational or payment issue is disclosed."
+      }
+    }
+  ],
+  "turns": 3
+}

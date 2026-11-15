@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "No covered entity in the registry matches \"Reheinfels\"; cannot attribute this wage-delay report to any insured company."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Reheinfels"
+      },
+      "result": "[{\"note\": \"no covered entity shares a word with 'Reheinfels'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "No covered entity in the registry matches \"Reheinfels\"; cannot attribute this wage-delay report to any insured company."
+      }
+    }
+  ],
+  "turns": 2
+}
