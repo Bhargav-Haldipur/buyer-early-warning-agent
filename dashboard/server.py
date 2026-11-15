@@ -1,4 +1,4 @@
-"""Local multi-page dashboard. Home > Client > Buyer, plus the live demo panel.
+"""Local multi-page dashboard. Home > Client > Buyer, plus the live input sandbox.
 
     python -m dashboard.server        then open http://localhost:8000
 """
@@ -22,19 +22,7 @@ HERE = Path(__file__).resolve().parent
 BANNER = "HACKATHON PROTOTYPE &middot; SYNTHETIC DATA"
 TABS = ("case", "score", "limit", "payments", "news", "agents")
 
-DEMO_STEPS = [
-    "Marchetti Mills appoints new plant head (severity 0)",
-    "Nordkrans scales back operations (severity 3)",
-    "Vendors say Larsson has fallen behind on payments (severity 4)",
-    "Workers at Oakhurst protest over delayed wages (severity 5)",
-    "Kessler LOGISTICS wage protest - a decoy, must be refused",
-    "Workers at Kessler TRADERS protest over delayed wages (severity 5)",
-    "Northpoint parent in restructuring talks - fans out to two subsidiaries",
-]
-SWAP_STEP = "Payment data updates: Kessler moves from 25 to 40 days past due"
-
-STATE = {"step": 0, "swap": False}
-_CACHE: dict[tuple[int, bool], dict] = {}
+_CACHE: dict[tuple[str, str], dict] = {}
 _LOCK = threading.Lock()
 
 # ---------------------------------------------------------------- live sandbox
@@ -69,10 +57,10 @@ def moves_between(before: dict, after: dict) -> list[dict]:
 def snapshot() -> dict:
     """The one run every page renders from.
 
-    Sandbox input composes with the scripted demo rather than living beside it: an
-    earlier version kept two snapshots, so a buyer opened from /live showed the sandbox
-    score while the insurer page behind it still showed the shipped one. Two views of
-    the same buyer disagreeing mid-demo is worse than any feature they bought.
+    Sandbox input changes this run rather than living beside it: an earlier version
+    kept two snapshots, so a buyer opened from /live showed the sandbox score while the
+    insurer page behind it still showed the shipped one. Two views of the same buyer
+    disagreeing mid-demo is worse than any feature they bought.
 
     While sandbox input is in play the run skips commentary - the News agent still runs
     live on the typed story, but the two Opus agents that only write prose are not worth
@@ -80,12 +68,10 @@ def snapshot() -> dict:
     formula, not from an agent.
     """
     live = live_active()
-    key = (STATE["step"], STATE["swap"],
-           json.dumps(LIVE["articles"], sort_keys=True), json.dumps(LIVE["dpd"], sort_keys=True))
+    key = (json.dumps(LIVE["articles"], sort_keys=True), json.dumps(LIVE["dpd"], sort_keys=True))
     with _LOCK:  # one engine run at a time now that requests are threaded
         if key not in _CACHE:
             _CACHE[key] = engine.run(
-                demo_steps=STATE["step"], swap_invoices=STATE["swap"],
                 extra_articles=LIVE["articles"] or None, dpd_overrides=LIVE["dpd"] or None,
                 commentary=not live)
         return _CACHE[key]
@@ -212,7 +198,7 @@ def page(title: str, body: str, theme: str = "", nav: str = "home") -> bytes:
 <header class="head"><div class="banner">{BANNER}</div>
 <nav class="topbar"><div class="topbar-in">
 <a class="brand" href="/"><span class="brand-mark">{BRAND_MARK}</span>Buyer Early Warning and Limit Review</a>
-<div class="topnav"><a href="/"{on("home")}>Insurers</a><a href="/demo"{on("demo")}>Scripted demo</a><a href="/live"{on("live")}>Live input</a><a href="/next">Architecture</a></div>
+<div class="topnav"><a href="/"{on("home")}>Insurers</a><a href="/live"{on("live")}>Live input</a><a href="/next">Architecture</a></div>
 </div></nav></header>
 <div class="wrap">{body}
 <footer>
@@ -229,29 +215,6 @@ def crumbs(*parts) -> str:
         # the href is built from ids that come from CSV: escape it like any other input
         out.append(f'<a href="{e(href)}">{e(label)}</a>' if href else e(label))
     return f'<div class="crumb">{" &rsaquo; ".join(out)}</div>'
-
-
-def demo_panel() -> str:
-    rows = []
-    for i, text in enumerate(DEMO_STEPS, 1):
-        cls = "done" if i <= STATE["step"] else ("next" if i == STATE["step"] + 1 else "")
-        mark = "&#10003;" if i <= STATE["step"] else f"{i}."
-        rows.append(f'<div class="step {cls}">{mark} {e(text)}</div>')
-    swap_cls = "done" if STATE["swap"] else ("next" if STATE["step"] == len(DEMO_STEPS) else "")
-    rows.append(f'<div class="step {swap_cls}">'
-                f'{"&#10003;" if STATE["swap"] else "8."} {e(SWAP_STEP)}</div>')
-
-    if STATE["step"] < len(DEMO_STEPS):
-        nxt = f'<a class="btn" href="/demo/next">Publish article {STATE["step"]+1}</a>'
-    elif not STATE["swap"]:
-        nxt = '<a class="btn" href="/demo/next">Update payment data</a>'
-    else:
-        nxt = '<span class="overline">demo complete</span>'
-    return (f'<div class="demo"><h4>Live demo &mdash; step {STATE["step"] + (1 if STATE["swap"] else 0)} of 8</h4>'
-            f'<p class="body2" style="color:var(--theme-neutral-500);margin:.25rem 0 .75rem">'
-            f'Each step appends one article or updates payment data, then re-runs the engine.</p>'
-            f'{"".join(rows)}<div style="margin-top:.9rem;display:flex;gap:.5rem">'
-            f'{nxt}<a class="btn ghost" href="/demo/reset">Reset</a></div></div>')
 
 
 def live_banner() -> str:
@@ -311,41 +274,10 @@ def home() -> bytes:
 Watch buyers, each with a recommended limit action &mdash; freeze or reduce &mdash;
 while there is still limit to cut.</p>
 <div class="statrow">{"".join(tiles)}</div>
-<p class="meta">{len(data['clients'])} insurers &middot; <a href="/demo">Live demo &rsaquo;</a></p>
+<p class="meta">{len(data['clients'])} insurers</p>
 </div>
 <h2>Insurers</h2>
 <div class="cards">{"".join(cards)}</div>""")
-
-
-def demo_page() -> bytes:
-    data = snapshot()
-    flagged = [r for r in data["buyers"] if r["verdict"]["band"] != "Healthy"]
-    rows = "".join(
-        f'<tr><td><a href="/buyer/{e(r["buyer_id"])}">{e(r["short_name"])}</a></td>'
-        f'<td class="num">{r["verdict"]["score"]}</td><td>{band_pill(r["verdict"]["band"])}</td>'
-        f'<td class="num">{r["verdict"]["payment"]["dpd"]}</td>'
-        f'<td>{e(r["verdict"]["news"]["headline"] or "-")}</td></tr>'
-        for r in flagged)
-    brief = (f'<h2>Today&rsquo;s brief</h2><table><thead><tr><th>Buyer</th>'
-             f'<th class="num">Score</th><th>Band</th><th class="num">DPD</th>'
-             f'<th>Strongest news</th></tr></thead><tbody>{rows}</tbody></table>'
-             if flagged else '<h2>Today&rsquo;s brief</h2><div class="panel">Nothing flagged.</div>')
-
-    refused = "".join(
-        f'<tr><td>{e(x["data"]["mention"])}</td><td>{e(x["data"]["headline"])}</td>'
-        f'<td><span class="pill refused">refused</span></td></tr>'
-        for x in data["refusals"])
-    ref_block = (f'<h2>Articles refused by entity resolution</h2><table><thead><tr>'
-                 f'<th>Named in the article</th><th>Headline</th><th></th></tr></thead>'
-                 f'<tbody>{refused}</tbody></table>') if refused else ""
-
-    return page("Live demo", nav="demo", body=f"""
-{crumbs(("Home", "/"), ("Live demo", None))}
-<h1>Live demo</h1>
-<p class="sub">As of {e(data['as_of'])} &middot; scoring engine: {e(data['llm'])}</p>
-{demo_panel()}
-{brief}
-{ref_block}""")
 
 
 def client_page(cid: str) -> bytes:
@@ -954,8 +886,6 @@ class Handler(BaseHTTPRequestHandler):
             return self._send((HERE / "next.html").read_bytes())
         if url.path == "/":
             return self._send(home())
-        if url.path == "/demo":
-            return self._send(demo_page())
         if url.path == "/live":
             return self._send(live_page())
         if url.path == "/live/reset":
@@ -969,15 +899,6 @@ class Handler(BaseHTTPRequestHandler):
             body = buyer_page(parts[1], tab if tab in TABS else "case",
                               )
             return self._send(body, code=404 if b"Unknown buyer" in body else 200)
-        if url.path == "/demo/next":
-            if STATE["step"] < len(DEMO_STEPS):
-                STATE["step"] += 1
-            elif not STATE["swap"]:
-                STATE["swap"] = True
-            return self._redirect("/demo")
-        if url.path == "/demo/reset":
-            STATE.update(step=0, swap=False)
-            return self._redirect("/demo")
         if url.path == "/api/run":
             return self._send(json.dumps(snapshot(), indent=2).encode(), "application/json")
         self._send(page("Not found", "<h1>Not found</h1>"), code=404)

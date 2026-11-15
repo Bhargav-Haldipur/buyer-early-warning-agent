@@ -18,9 +18,6 @@ The rubric rewards two different things, and one format cannot carry both.
 | **Video 2:10** | Business Value (20%), Technical Execution (15%), *"show it calling tools"* | Narration and cached screens. Nothing can go wrong, pacing is exact, and it buys back the 45 seconds you'd lose fumbling live. |
 | **Live 2:30** | **Working Demo (30%)**, *"show guardrails / what it does when unsure"* (part of 25%) | A judge types the input. That is the one thing a video cannot earn, and the rubric asks for it by name. |
 
-**Do not demo the scripted 8-step `/demo` page.** The live sandbox supersedes it. Keep it
-loaded in a tab purely as the wifi-failure fallback.
-
 ---
 
 # PART 1 — Video (aim 2:10)
@@ -125,7 +122,7 @@ claim cited back to an invoice or an article."
 
 ### 1:44 – 2:09 · Why you should believe it — **B** *(61 words)*
 
-> *Terminal: `python3 -m harness.evaluate`, 9/9 green.*
+> *Terminal: `python3 -m harness.evaluate`, 8/8 green.*
 
 "We know which four of these buyers actually failed. That answer key is a file the engine
 is **physically forbidden to open** — it raises if you try.
@@ -148,7 +145,7 @@ Four of four caught, and **not one false alarm in twenty-two**. Both at once is 
 > alone is trivially gameable — passing both at once is the whole claim. Say that, or the
 > two figures land as trivia.
 >
-> **What each of the nine gates defends against, for Q&A:**
+> **What each of the eight gates defends against, for Q&A:**
 >
 > | If a judge says | Point at |
 > |---|---|
@@ -158,7 +155,6 @@ Four of four caught, and **not one false alarm in twenty-two**. Both at once is 
 > | "Your entity matching is keyword soup" | 33/33 genuine mentions resolved **and** 5/5 decoys refused — precision and recall together |
 > | "It would flag anyone with a scary headline" | The trap gate: three buyers carry a severity-5 story and never default — Vandermeer, Oakhurst, Kessler — and all three stay Healthy |
 > | "An LLM makes this unreproducible" | Determinism gate, and the whole suite passes with **no API key at all** |
-> | "You cherry-picked the demo" | Demo replay reproduces the exact scores |
 >
 > The trap gate is the one worth knowing if anyone digs: those three buyers are **not named
 > in the code**. They are derived at runtime as "any buyer carrying a severity-5 article who
@@ -202,7 +198,7 @@ seen."
 
 # PART 2 — Live (2:30)
 
-One tab: **`/live`**. A second tab on `/demo` as the fallback. Do not switch tabs otherwise.
+One tab: **`/live`**. Do not switch tabs.
 
 **Every beat is on one buyer — Nordkrans Steel Traders AB** (Steel Trading, Malmö,
 insured by Nordhaven). One narrative, and a €1.46M limit, so the cuts are legible from
@@ -320,7 +316,7 @@ happen. **One sentence, then stop.** Whoever built it takes it.
 |---|---|---|
 | **"Is any of that hardcoded?"** | B | "You chose the company and the headline. Same code path as everything else — the loader doesn't know where a story came from." |
 | **"What if the agent gets it wrong?"** | S | "Three layers: it can only submit an entity it actually looked up, the Adjudicator can challenge a score but not change it, and every figure in the write-up is checked against the data — fail twice and a template renders and says so on the page." |
-| **"What if Claude is down?"** | S | "Every agent has a deterministic fallback; any failure drops that one item to rules and the run finishes. All nine gates pass with no API key." |
+| **"What if Claude is down?"** | S | "Every agent has a deterministic fallback; any failure drops that one item to rules and the run finishes. All eight gates pass with no API key." |
 | **"691 days? We review annually."** | B | "It's a synthetic book, built so the gap is visible on one screen. The mechanism doesn't depend on the number — at any cadence, deterioration that starts between reviews is invisible until someone looks, and on this book all four failures began deteriorating after their last review." |
 | **"Isn't this already on our roadmap?"** | S | "Yes — *AI Notifiable event* and *Automated Underwriting Brief*, both TCS-ATLAS, both Priority 2. That's why we picked it. The point isn't the idea, it's that it works, and the entity matching the spec lists as an optional advanced capability is in there." |
 | **"Doesn't the insurer already monitor buyers?"** | B | "Yes — grading and overdue reporting both exist. What doesn't exist is the two fused into one daily queue ranked by money with the limit action already drafted. We're not replacing the monitoring; we're deciding what the underwriter opens first." |
@@ -343,8 +339,8 @@ happen. **One sentence, then stop.** Whoever built it takes it.
 ```bash
 cd ~/Projects/buyer-early-warning-agent
 export ANTHROPIC_API_KEY=$(cat ~/.anthropic-key)
-python3 -m unittest discover -s tests -q      # 111 OK, ~2s, no network
-python3 -m harness.evaluate                   # 9/9
+python3 -m unittest discover -s tests -q      # 110 OK, ~2s, no network
+python3 -m harness.evaluate                   # 8/8
 .venv/bin/python -m dashboard.server
 ```
 
@@ -358,8 +354,8 @@ python3 -m harness.evaluate                   # 9/9
 
 ## If it goes wrong live
 
-- **A story hangs past 20s** — keep talking, then *"we'll take the prepared path"* and
-  switch to `/demo`, fully cached, no network needed.
+- **A story hangs past 20s** — keep talking, then *"we'll show you a recorded run"* and
+  play the backup clip.
 - **Wifi dies** — restart without `ANTHROPIC_API_KEY`. Everything still runs on rules.
   Say so out loud: it's the fallback working, not a save.
 - **A judge names a company you don't cover** — perfect. That's the refusal beat early.

@@ -239,8 +239,7 @@ get there.
 | `parent_companies.csv` | 4 | The holding companies news can arrive through. |
 | `ground_truth.csv` | 26 | **Answers. Harness only.** Who actually defaulted. `loader.py` raises if engine code opens it. |
 | `payment_behaviour_monthly.csv` | 451 | **Harness only.** Monthly aggregates — would hand the engine the trend it is meant to infer. |
-| `demo/demo_articles_to_add.csv` | 7 | Appended one at a time during the live demo. |
-| `demo/invoices_after_payment_demo.csv` | 156 | Drop-in replacement for `invoices.csv`, identical but for **one invoice**: Kessler's `INV001567` moves 25 → 40 DPD. |
+| `harness_articles.csv` | 7 | **Harness only.** Labelled stories the shipped news lacks — the only parent-company story and two decoys. The harness hands them to the engine label-stripped, as extra articles. |
 
 ### `ews/` — the engine
 
@@ -270,9 +269,9 @@ cache key, so the next run re-runs that agent rather than replaying a stale answ
 
 ### `harness/evaluate.py`
 
-The **only** module allowed to read the labels. Nine gates: detection, false positives,
+The **only** module allowed to read the labels. Eight gates: detection, false positives,
 named traps, entity-resolution recall, decoy refusal, severity agreement, parent
-fan-out, demo replay, case-file figure tracing. The traps are **derived from the labels**
+fan-out, case-file figure tracing. The traps are **derived from the labels**
 (any severity-5 story on a buyer that never defaults), not named in code — naming them
 would let a rename silently delete the check.
 
@@ -292,7 +291,7 @@ budgets, usage accounting).
 
 ## 5. Click-path traces — where each number on screen comes from
 
-Everything rendered comes from **one dict**, built once per demo state by
+Everything rendered comes from **one dict**, built once per live-input state by
 `snapshot()` (`dashboard/server.py:38`) and memoised in `_CACHE`. You can see the whole
 thing at **`http://localhost:8000/api/run`** — that is the single source for every page.
 
@@ -352,17 +351,6 @@ saying whether it ran as an agent / from rules / fell back / replayed from cache
 **every tool call it made, in order, with the arguments and a preview of what came
 back** — including calls the guardrails rejected. This is the tab that proves the
 agents are real.
-
-### `/demo` — the live demo
-
-`STATE = {"step": N, "swap": bool}` at module level. **Publish article N** →
-`/demo/next` increments it → 303 redirect → `snapshot()` finds no cached entry for the
-new state → `engine.run(demo_steps=N)` re-runs the whole pipeline → the page re-renders.
-`demo_steps=N` makes `Loader.news()` append the first N rows of
-`demo/demo_articles_to_add.csv`. Step 8 sets `swap=True`, which makes `Loader.invoices()`
-read the demo invoice file instead.
-
-Each step re-runs everything from scratch. Nothing is special-cased for the demo.
 
 ---
 

@@ -28,16 +28,17 @@ python3 -m dashboard.server
 | Command | What it does |
 |---|---|
 | `ews.run` | scores every buyer, writes `out/runs/<date>.json` |
-| `harness.evaluate` | grades that run against the labels — 9 gates |
+| `harness.evaluate` | grades that run against the labels — 8 gates |
 | `unittest discover -s tests` | leakage, determinism, formulae, resolver, guard, theme, agent loop, agent definitions, settings — 40 tests |
 | `dashboard.server` | serves the dashboard on http://localhost:8000 (Ctrl-C to stop) |
 
 **No install, no API key, no network.** Everything above runs on the Python 3 standard
 library. Run them from the repository root.
 
-The dashboard blocks the terminal, so give it its own window. The live demo is at
-http://localhost:8000/demo (linked from the home page): press **Publish article** eight times to walk the whole story.
-[`docs/DEMO_GUIDE.md`](docs/DEMO_GUIDE.md) says what each step is meant to prove.
+The dashboard blocks the terminal, so give it its own window. The live input sandbox
+is at http://localhost:8000/live: type a story nobody prepared or age an invoice by hand,
+and the engine re-runs on it. [`docs/PRESENTATION.md`](docs/PRESENTATION.md) walks
+through it.
 
 ### Switching the agents on
 
@@ -230,7 +231,6 @@ Measured on both paths — the rule-based fallback, and the four agents on Claud
 | Entity resolution — **decoys refused** | **5/5** | **5/5** |
 | Severity agreement with labels | 32/32 | 29/32 — see below |
 | Parent fan-out | pass | pass |
-| Demo replay, steps 1–8 | pass | pass |
 | Case file figures traced to the engine | 26 templated | **4 model-written, 0 discarded** |
 | Tests | **79/79** | — |
 
@@ -270,8 +270,7 @@ it first.
 | `harness/evaluate.py` | the only module permitted to read the labels |
 | `dashboard/` | local multi-page app and the TCS design tokens |
 | `tests/test_gates.py` | leakage, determinism, formulae, resolver, guard, theme |
-| `data/` | the synthetic dataset; `data/demo/` drives the live demo |
+| `data/` | the synthetic dataset; `harness_articles.csv` holds labelled stories only the harness reads |
 | `docs/PLAN.md` | the specification this was built from, with every decision and its evidence |
-| `docs/DEMO_GUIDE.md` | the live demo script |
 | `docs/WALKTHROUGH.md` | what every file does, and where each number on screen comes from |
 | `docs/PRESENTATION.md` | the five minutes: the video script, the live demo, and the Q&A |

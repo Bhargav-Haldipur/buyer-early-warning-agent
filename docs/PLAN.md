@@ -9,7 +9,7 @@ contagion and entity-resolution decoys added to the data, and the harness, case-
 guard and LLM integration specified (D9–D11). Every number in it was measured
 against the shipped CSVs before a line of engine code existed.
 
-Built and verified: **9/9 harness gates, 79/79 tests**, on both the rule-based
+Built and verified: **8/8 harness gates, 79/79 tests**, on both the rule-based
 path and the four agents running on Claude. See *As built* at the end.
 
 **Superseded in one place, deliberately.** The agents described in D1/D4/D11 were
@@ -44,7 +44,7 @@ window.
 |---|---|---|
 | Defaults (`gradual`) | 4 | Arcline, Halberg, Maasland, Emberline |
 | `wobble_recovered` | 4 | Prevost Prime, Bluestone, Rheinfels, Westbridge |
-| `healthy` | 12 | includes the 5 demo boundary buyers and Vandermeer |
+| `healthy` | 12 | includes the 5 boundary buyers and Vandermeer |
 
 Buyers per insurer: Adlerhof 11, Solvenza 6, Nordhaven 3.
 
@@ -52,8 +52,7 @@ Buyers per insurer: Adlerhof 11, Solvenza 6, Nordhaven 3.
 |---|---|
 | `clients`, `buyers`, `credit_limits`, `invoices`, `news_articles`, `parent_companies` | engine inputs |
 | `ground_truth`, `payment_behaviour_monthly` | **harness-only** |
-| `demo/demo_articles_to_add.csv` | articles appended one at a time during the demo |
-| `demo/invoices_after_payment_demo.csv` | drop-in replacement for `invoices.csv` (Kessler at 40 DPD) |
+| `harness_articles` | **harness-only** — labelled stories the shipped news lacks (the parent story, two decoys), handed to the engine label-stripped |
 
 **Baseline result (measured, with the D5 decay applied):** Arcline 63.3 and Maasland
 62.2 in High Risk; Halberg 42.7 and Emberline 37.2 in Watch; all 22 survivors Healthy.
@@ -120,8 +119,8 @@ Money at risk: `EL = PD × min(max_liability, limit × indemnity × (1 − deduc
 per line. PD is a credit-risk prior on the Risk Score, **linearly interpolated**
 between (0, 1%), (20, 10%), (55, 45%), (80, 85%), (100, 95%). Not fitted.
 
-Dashboard: see **Frontend**, plus a **live-demo panel** (append a demo article, swap
-the invoice file, re-run). Every alert states why it fired and what would lift it.
+Dashboard: see **Frontend**, plus a **live input sandbox** (type a story, age an
+invoice, re-run). Every alert states why it fired and what would lift it.
 
 ### D4 — News reliability
 
@@ -264,7 +263,6 @@ Runs against the labels; the sole reader of `ground_truth.csv`. Reports:
 | Leakage | engine import of a harness-only table raises; no `gt_*` column reaches the LLM |
 | Formula | D5, D6 and the PD curve unit-tested at their knees (DPD 0/30/60, score 0/20/35/55/80/100) |
 | Case File | every figure in the LLM's output matches the numbers it was given (D10) |
-| Demo replay | the scripted sequence reproduces the scores in **Demo** below |
 
 ### D10 — Case File guard
 
@@ -290,7 +288,7 @@ The Case File is the default tab, so it cannot be allowed to invent a number.
 **Every response is cached to disk by content hash.** The demo runs from cache, so a
 network failure in the room cannot break it; a cache miss falls back to the
 deterministic grader rather than blocking. ~27 baseline articles ≈ 54 calls, then one
-call per demo article.
+call per new article.
 
 ### D12 — Autonomous agent runtime  *(added after the first build)*
 
@@ -338,7 +336,7 @@ plus one field edit; the baseline is re-measured as unchanged at 4/4 and 22/22.
 
 - `buyers.csv`: **Marchetti Mills (BUY011)** repointed to `PAR03` (Northpoint
   Industrial Holdings), joining Westbridge.
-- `demo/`: `NWSDEMO07` — *Northpoint Industrial Holdings in restructuring talks with
+- `harness_articles.csv`: `NWSDEMO07` — *Northpoint Industrial Holdings in restructuring talks with
   lenders*, severity 5, `gt_is_parent_story=Y`, dated 2026-09-20.
 - Measured effect — one story, two buyers, **different outcomes**: Westbridge
   13.0 → 28.6 (Healthy, it is paying on time) and Marchetti 21.7 → 37.3 (**Watch**, it
@@ -346,7 +344,7 @@ plus one field edit; the baseline is re-measured as unchanged at 4/4 and 22/22.
 
 **2. Entity resolution — the dataset had zero decoys. ✅ done**
 
-Four decoys added to `news_articles.csv` (now 31 articles) and one to the demo set.
+Four decoys added to `news_articles.csv` (now 31 articles) and one to the harness articles.
 Each is a real company in an unrelated line of business sharing a brand token with a
 covered buyer. **None carries a "not affiliated" disclaimer** — the earlier dataset's
 decoys announced themselves, which made resolution a keyword match rather than a
@@ -367,35 +365,8 @@ Watch in front of the room.** Silent failure is not available.
 All decoys carry `gt_category=decoy`, `gt_severity=0`, empty `gt_buyer_id`, so the D9
 precision gate is simply: every `decoy` row must resolve to nothing.
 
-**3. `gt_severity` on demo articles — not needed.** They already carry `gt_severity`,
+**3. `gt_severity` on the harness articles — not needed.** They already carry `gt_severity`,
 `gt_category` and `gt_is_parent_story`; my earlier gap report was wrong.
-
----
-
-## Demo
-
-Five boundary buyers all sit at **DPD 25 → score 21.7, Healthy**. Articles are
-appended one at a time and the engine re-run.
-
-All scores below are **measured against the shipped data**, not estimated.
-
-| Step | Article | Sev | Buyer | Score | Band |
-|---|---|---|---|---|---|
-| 1 | Marchetti Mills appoints new plant head | 0 | Marchetti | 21.7 → 21.7 | Healthy — *news that means nothing* |
-| 2 | Nordkrans scales back operations | 3 | Nordkrans | 21.7 → 28.6 | Healthy |
-| 3 | Vendors say Larsson has fallen behind on payments | 4 | Larsson | 21.7 → 37.3 | **Watch** |
-| 4 | Workers at Oakhurst protest delayed wages | 5 | Oakhurst | 21.7 → 47.7 | **Watch** |
-| 5 | Kessler **Logistics** wage protest — decoy | — | *(none)* | no change | **refused** — wrong company |
-| 6 | Workers at Kessler **Traders** protest delayed wages | 5 | Kessler | 21.7 → 47.7 | **Watch** |
-| 7 | Northpoint parent in restructuring talks | 5→4 | Marchetti | 21.7 → 37.3 | **Watch** |
-| 7 | *…same article, second subsidiary* | 5→4 | Westbridge | 13.0 → 28.6 | Healthy |
-| 8 | swap `invoices.csv` → Kessler DPD 25 → 40 | — | Kessler | 47.7 → **65.0** | **High Risk** |
-
-Steps 5 and 6 are the pair that sells entity resolution: the same wage-protest story,
-one refused and one accepted, on names differing by a single token.
-
-Step 5 is the refusal, step 7 is contagion with two different outcomes, step 8 is the
-two signals compounding.
 
 ---
 
@@ -404,11 +375,10 @@ two signals compounding.
 ```
 ~/Projects/buyer-early-warning-agent/
 ├── README.md                 # opens with HACKATHON PROTOTYPE · SYNTHETIC DATA
-├── data/                     # dataset CSVs (labels + monthly table harness-only)
-│   └── demo/                 # demo_articles_to_add.csv, invoices_after_payment_demo.csv
+├── data/                     # dataset CSVs (labels, monthly table, harness_articles: harness-only)
 ├── agents/                   # D12: one .md per agent - tools + system prompt
 │   └── payment.md  news.md  adjudicator.md  casefile.md
-├── docs/  PLAN.md (this file)  DEMO_GUIDE.md
+├── docs/  PLAN.md (this file)  WALKTHROUGH.md  PRESENTATION.md
 ├── ews/
 │   ├── config.py             # every constant the plan fixes, in one place
 │   ├── settings.py           # D12: per-agent model, effort, limits, guardrails
@@ -430,7 +400,7 @@ two signals compounding.
 
 Python 3 + stdlib, plus the Claude client behind `llm.py`. The dashboard is a
 multi-page app served locally by `dashboard/server.py`; it reads `out/runs/` and
-re-runs the engine for the live demo.
+re-runs the engine on live input.
 
 The loader **allow-lists** engine tables, so no engine file ever names the labels.
 
@@ -506,7 +476,7 @@ Three smaller deviations, recorded here rather than left for someone to discover
 | Planned | Built | Why |
 |---|---|---|
 | `dashboard/pages/` directory | page functions inside `server.py` | three pages did not justify a package |
-| `docs/DECISIONS.md`, `docs/PITCH.md` | not written | this file already carries the decisions; the pitch is `DEMO_GUIDE.md` |
+| `docs/DECISIONS.md`, `docs/PITCH.md` | not written | this file already carries the decisions; the pitch is `PRESENTATION.md` |
 | — | `ews/config.py` added | every fixed constant in one file, so a threshold cannot drift between agent and harness |
 | three agents, fixed prompts | four autonomous agents over tools | D12 — the invariants it had to preserve are tabled there |
 
@@ -521,7 +491,6 @@ Three smaller deviations, recorded here rather than left for someone to discover
 | Entity resolution — every decoy refused | **5/5** |
 | Severity agreement with labels | **32/32** rules · **29/32** Claude |
 | Parent fan-out — exact subsidiaries, stepped-down severity | pass |
-| Demo replay — steps 1–8 reproduce the planned scores | pass |
 | Case file — every figure traced to the engine | none discarded (4 model-written on Claude) |
 
 Baseline scores: Arcline **63.3** and Maasland **62.2** High Risk; Halberg **42.7**

@@ -1,8 +1,6 @@
 """Orchestrator. Code, not an LLM (D0): it runs the four agents in a fixed order.
 
     python -m ews.run                      # the baseline snapshot
-    python -m ews.run --demo-steps 4       # first four demo articles appended
-    python -m ews.run --demo-steps 7 --swap-invoices   # the full demo
 """
 from __future__ import annotations
 
@@ -22,7 +20,7 @@ from .loader import Loader
 OUT_DIR = Path(__file__).resolve().parent.parent / "out" / "runs"
 
 
-def run(demo_steps: int = 0, swap_invoices: bool = False, llm=None, cache: bool = True,
+def run(llm=None, cache: bool = True,
         extra_articles: list[dict] | None = None,
         dpd_overrides: dict[str, int] | None = None, commentary: bool = True) -> dict:
     """commentary=False skips the two agents that only write prose about a verdict.
@@ -33,8 +31,7 @@ def run(demo_steps: int = 0, swap_invoices: bool = False, llm=None, cache: bool 
     has just moved bands misses the cache on both - ninety seconds of silence in front
     of a room, to render commentary nobody is reading at that moment.
     """
-    loader = Loader(demo_steps=demo_steps, swap_invoices=swap_invoices,
-                    extra_articles=extra_articles, dpd_overrides=dpd_overrides)
+    loader = Loader(extra_articles=extra_articles, dpd_overrides=dpd_overrides)
     loader.validate()          # fail on an inconsistent dataset, not halfway through scoring
     llm = llm or get_llm(cache=cache)
     store = EvidenceStore()
@@ -97,8 +94,6 @@ def run(demo_steps: int = 0, swap_invoices: bool = False, llm=None, cache: bool 
         "llm": getattr(llm, "name", "unknown"),
         "agent_runs": _agent_stats(records, store),
         "spend": llm.spend() if hasattr(llm, "spend") else None,
-        "demo_steps": demo_steps,
-        "swap_invoices": swap_invoices,
         "commentary": commentary,
         # what the live sandbox added on top of the shipped dataset, so a run is
         # reproducible from its own output
@@ -142,10 +137,6 @@ def _agent_stats(records: list[dict], store: EvidenceStore) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="Buyer Early Warning Agent")
-    ap.add_argument("--demo-steps", type=int, default=0,
-                    help="append the first N demo articles (0-7)")
-    ap.add_argument("--swap-invoices", action="store_true",
-                    help="demo step 8: Kessler moves from 25 to 40 DPD")
     ap.add_argument("--no-cache", action="store_true", help="bypass the LLM disk cache")
     ap.add_argument("--agents", default=None,
                     help="comma-separated agents to run on Claude this run "
@@ -164,14 +155,11 @@ def main() -> None:
         print(f"running on Claude: {', '.join(settings.enabled_agents()) or 'none'} "
               f"(others use rules) · budget {settings.MAX_MODEL_CALLS} calls")
 
-    result = run(args.demo_steps, args.swap_invoices, cache=not args.no_cache)
+    result = run(cache=not args.no_cache)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     # The filename records what produced the run, so a narrowed test run cannot
     # quietly overwrite a full one - they are different results, not versions.
-    parts = [result["as_of"], f"demo{args.demo_steps}"]
-    if args.swap_invoices:
-        parts.append("swap")
-    parts.append(result["llm"])
+    parts = [result["as_of"], result["llm"]]
     on_claude = settings.enabled_agents()
     if result["llm"] == "claude" and set(on_claude) != set(settings.AGENTS):
         parts.append("agents-" + ("+".join(on_claude) if on_claude else "none"))

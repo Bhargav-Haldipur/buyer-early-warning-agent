@@ -14,7 +14,7 @@ from ews import run as engine
 from ews.agents.news import NewsDesk
 from ews.config import PARENT_STEP_DOWN
 from ews.llm import get_llm
-from ews.loader import Loader
+from ews.loader import NEWS_LABEL_COLUMNS, Loader
 
 PASS, FAIL, WARN = "PASS", "FAIL", "WARN"
 
@@ -22,11 +22,16 @@ PASS, FAIL, WARN = "PASS", "FAIL", "WARN"
 def evaluate(llm=None) -> dict:
     llm = llm or get_llm()
     labels = {r["buyer_id"]: r for r in Loader(harness=True).table("ground_truth")}
-    all_demo = len(Loader(harness=True).demo_articles())
-    labelled_news = Loader(harness=True, demo_steps=all_demo).news()
     hl = Loader(harness=True)
+    # Labelled stories the shipped news does not carry (the parent-company story, two
+    # decoys). They reach the engine as extra articles with the labels stripped, the
+    # same seam the live sandbox uses, so nothing in the engine knows they exist.
+    fixture = hl.table("harness_articles")
+    unlabelled_fixture = [{k: v for k, v in a.items() if k not in NEWS_LABEL_COLUMNS}
+                          for a in fixture]
+    labelled_news = hl.news() + list(fixture)
     # the agent investigates through an engine loader, so its tools never see a label
-    desk = NewsDesk(Loader(demo_steps=all_demo))
+    desk = NewsDesk(Loader(extra_articles=unlabelled_fixture))
     subs = hl.subsidiaries()
     parents_by_name = {p["name"]: p["parent_id"] for p in hl.parent_companies()}
 
@@ -111,14 +116,14 @@ def evaluate(llm=None) -> dict:
                             + (f"; disagreements (label->got) {dict(confusion)}" if confusion else "")})
 
     # --- 6: parent fan-out ------------------------------------------------
-    demo = engine.run(demo_steps=all_demo, llm=llm)
+    with_fixture = engine.run(extra_articles=unlabelled_fixture, llm=llm)
     fan_issues = []
     for art in labelled_news:
         if art["gt_is_parent_story"] != "Y":
             continue
         pid = parents_by_name.get(art["mentioned_entity_as_written"])
         expected_subs, want_sev = set(subs.get(pid, [])), PARENT_STEP_DOWN[int(art["gt_severity"])]
-        got = {r["buyer_id"]: e for r in demo["buyers"] for e in r["evidence"]
+        got = {r["buyer_id"]: e for r in with_fixture["buyers"] for e in r["evidence"]
                if e["kind"] == "parent" and e["source"] == art["article_id"]}
         if set(got) != expected_subs:
             fan_issues.append(f"{art['article_id']}: reached {sorted(got)} not {sorted(expected_subs)}")
@@ -129,24 +134,6 @@ def evaluate(llm=None) -> dict:
     gates.append({"gate": "Parent fan-out - exact subsidiaries, stepped-down severity",
                   "status": PASS if not fan_issues else FAIL,
                   "detail": f"{n_parent} parent story/stories" + ("; " + "; ".join(fan_issues) if fan_issues else "")})
-
-    # --- 11: demo replay --------------------------------------------------
-    expected = {1: ("BUY011", 21.7), 2: ("BUY014", 28.6), 3: ("BUY016", 37.3),
-                4: ("BUY019", 47.7), 6: ("BUY023", 47.7), 7: ("BUY011", 37.3)}
-    replay_bad = []
-    for step, (bid, want) in expected.items():
-        got = next(r["verdict"]["score"] for r in engine.run(demo_steps=step, llm=llm)["buyers"]
-                   if r["buyer_id"] == bid)
-        if abs(got - want) > 0.15:
-            replay_bad.append(f"step {step} {bid}: {got} != {want}")
-    swap = next(r["verdict"] for r in engine.run(demo_steps=all_demo, swap_invoices=True,
-                                                 llm=llm)["buyers"]
-                if r["buyer_id"] == "BUY023")
-    if abs(swap["score"] - 65.0) > 0.15 or swap["band"] != "High Risk":
-        replay_bad.append(f"step 8 BUY023: {swap['score']} {swap['band']} != 65.0 High Risk")
-    gates.append({"gate": "Demo replay reproduces the planned scores",
-                  "status": PASS if not replay_bad else FAIL,
-                  "detail": "steps 1-8" + ("; " + "; ".join(replay_bad) if replay_bad else "")})
 
     # --- case file guard --------------------------------------------------
     bad_cf = [r["short_name"] for r in result["buyers"] if r["case_file"]["rejected_numbers"]]

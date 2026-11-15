@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 class Leakage(unittest.TestCase):
     def test_label_tables_refused_for_engine(self):
-        for table in ("ground_truth", "payment_behaviour_monthly"):
+        for table in ("ground_truth", "payment_behaviour_monthly", "harness_articles"):
             with self.assertRaises(LeakageError):
                 Loader().table(table)
 
@@ -33,7 +33,9 @@ class Leakage(unittest.TestCase):
         self.assertTrue(Loader(harness=True).table("ground_truth"))
 
     def test_gt_columns_stripped_from_news(self):
-        for article in Loader(demo_steps=7).news():
+        # the harness fixture reaches the engine as extra articles; labels must not
+        fixture = Loader(harness=True).table("harness_articles")
+        for article in Loader(extra_articles=fixture).news():
             for col in NEWS_LABEL_COLUMNS:
                 self.assertNotIn(col, article)
 
@@ -43,7 +45,7 @@ class Leakage(unittest.TestCase):
     def test_no_engine_file_names_the_labels(self):
         hits = subprocess.run(
             ["grep", "-rnI", "--include=*.py", "--include=*.html", "--include=*.css",
-             "-e", "ground_truth", "-e", "payment_behaviour_monthly",
+             "-e", "ground_truth", "-e", "payment_behaviour_monthly", "-e", "harness_articles",
              str(ROOT / "ews"), str(ROOT / "dashboard")],
             capture_output=True, text=True).stdout.strip()
         # loader.py names them only to refuse them
@@ -70,11 +72,6 @@ class Guards(unittest.TestCase):
         got = _insured(1_000_000, {"indemnity_pct": "87.5", "deductible_pct": "10",
                                    "max_liability_eur": "1e12"})
         self.assertAlmostEqual(got, 1_000_000 * 0.875 * 0.9)
-
-    def test_demo_steps_out_of_range_is_refused(self):
-        for bad in (-1, -7, 999):
-            with self.assertRaises(ValueError, msg=str(bad)):
-                Loader(demo_steps=bad)
 
     def test_a_settled_invoice_with_no_payment_date_names_itself(self):
         from ews.agents.payment import _days_late
@@ -140,34 +137,6 @@ class Integrity(unittest.TestCase):
             self._write(d / "invoices.csv", r)
         with self.assertRaises(DataError):
             Loader(self._corrupt(m)).validate()
-
-    def test_the_demo_swap_file_changes_only_the_one_invoice(self):
-        """demo/invoices_after_payment_demo.csv is a drop-in replacement for
-        invoices.csv, so it must hold every row of it and differ in exactly one.
-
-        It drifted once: six buyers added to invoices.csv were never added here, so
-        demo step 8 silently dropped their invoices and sent four scores to 0.0. Every
-        one of them was Healthy either way, so no other gate noticed.
-        """
-        base = {r["invoice_id"]: r for r in self._rows(ROOT / "data" / "invoices.csv")}
-        swap = {r["invoice_id"]: r
-                for r in self._rows(ROOT / "data" / "demo" / "invoices_after_payment_demo.csv")}
-        self.assertEqual(set(base), set(swap), "the swap file is not the same invoice set")
-        differ = sorted(k for k in swap if base[k] != swap[k])
-        self.assertEqual(differ, ["INV001567"], "step 8 must move one invoice and no other")
-        self.assertEqual((base["INV001567"]["days_past_due"],
-                          swap["INV001567"]["days_past_due"]), ("25", "40"))
-
-    def test_step_8_moves_one_buyer_and_no_other(self):
-        """The same guarantee at the level the room actually sees: a score on screen."""
-        before = {r["buyer_id"]: r["verdict"]["score"]
-                  for r in engine.run(demo_steps=7, llm=FallbackLLM(cache=False))["buyers"]}
-        after = {r["buyer_id"]: r["verdict"]["score"]
-                 for r in engine.run(demo_steps=7, swap_invoices=True,
-                                     llm=FallbackLLM(cache=False))["buyers"]}
-        moved = sorted(b for b in before if before[b] != after[b])
-        self.assertEqual(moved, ["BUY023"], "only Kessler may move when payment data updates")
-
 
 class Determinism(unittest.TestCase):
     def test_same_inputs_give_identical_output(self):
@@ -375,25 +344,6 @@ class Routing(unittest.TestCase):
         finally:
             httpd.shutdown()
 
-    def test_the_demo_length_is_not_hardcoded(self):
-        from dashboard.server import DEMO_STEPS
-        self.assertEqual(len(DEMO_STEPS), len(Loader().demo_articles()),
-                         "server.py's demo script and the demo CSV have drifted apart")
-
-    def test_the_demo_cannot_be_advanced_past_its_last_step(self):
-        httpd, base = self._serve()
-        from dashboard.server import DEMO_STEPS, STATE
-        try:
-            self._get(base, "/demo/reset")
-            for _ in range(len(DEMO_STEPS) + 5):
-                self._get(base, "/demo/next")
-            self.assertEqual(STATE["step"], len(DEMO_STEPS))
-            self.assertTrue(STATE["swap"])
-        finally:
-            self._get(base, "/demo/reset")
-            httpd.shutdown()
-
-
 class Overrides(unittest.TestCase):
     """`--agents news` once applied to ews.run and silently not to the harness, which
     then ran every agent - including the Opus ones - on the default settings."""
@@ -489,7 +439,7 @@ class RunOutputNames(unittest.TestCase):
 
     def test_the_filename_records_what_produced_the_run(self):
         import subprocess as sp
-        out = sp.run(["grep", "-n", "parts.append(result\\[\"llm\"\\])", "ews/run.py"],
+        out = sp.run(["grep", "-nE", "parts = .*result\\[\"llm\"\\]", "ews/run.py"],
                      cwd=ROOT, capture_output=True, text=True)
         self.assertTrue(out.stdout, "the engine name must be part of the output filename")
 
@@ -588,26 +538,6 @@ class ShippedCacheIsUntrusted(unittest.TestCase):
                 self.assertFalse(out["cached"], content)
         finally:
             entry.unlink(missing_ok=True)
-
-
-class LoaderWithoutDemoFiles(unittest.TestCase):
-    """Range-checking demo_steps must not make demo/ a hard dependency of loading."""
-
-    def _without_demo(self):
-        import shutil, tempfile
-        from pathlib import Path as P
-        d = P(tempfile.mkdtemp()) / "data"
-        shutil.copytree(ROOT / "data", d)
-        shutil.rmtree(d / "demo")
-        return d
-
-    def test_a_dataset_with_no_demo_folder_still_loads(self):
-        self.assertTrue(Loader(self._without_demo()).buyers())
-
-    def test_asking_for_demo_steps_without_the_file_says_so(self):
-        with self.assertRaises(ValueError) as ctx:
-            Loader(self._without_demo(), demo_steps=3)
-        self.assertIn("demo_articles_to_add.csv", str(ctx.exception))
 
 
 class LiveInput(unittest.TestCase):

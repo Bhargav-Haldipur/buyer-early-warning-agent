@@ -129,19 +129,6 @@ td a { color: var(--theme-accent); text-decoration: none; font-weight: 500; }
 .kv dt { color: var(--theme-neutral-500); }
 .kv dd { margin: 0; font-weight: 500; }
 
-/* --- demo panel -------------------------------------------------------- */
-.demo { background: var(--theme-neutral-0); border: 1px solid var(--theme-neutral-300);
-        border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; }
-.demo button, .demo a.btn {
-  font: inherit; font-size: .875rem; font-weight: 600; cursor: pointer;
-  background: var(--theme-accent); color: var(--theme-neutral-0);
-  border: none; border-radius: 6px; padding: .45rem 1rem; text-decoration: none;
-  display: inline-block; }
-.demo a.btn.ghost { background: var(--theme-neutral-100); color: var(--theme-neutral-700); }
-.step { font-size: .875rem; padding: .35rem 0; border-top: 1px solid var(--theme-neutral-100); }
-.step.done { color: var(--theme-neutral-500); }
-.step.next { font-weight: 600; }
-
 footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--theme-neutral-200);
          font-size: .75rem; color: var(--theme-neutral-500); line-height: 1.6; }
 
@@ -330,11 +317,7 @@ td a:hover { text-decoration: underline; }
 .chip { transition: all .15s; box-shadow: var(--shadow-sm); }
 .chip:hover { border-color: var(--theme-accent); color: var(--theme-neutral-900); }
 .chip.on { box-shadow: 0 4px 12px -2px rgba(5,187,210,.45); }
-.panel, .demo, .statrow { border-radius: var(--radius); box-shadow: var(--shadow-sm); }
-.demo a.btn, .demo button { background: linear-gradient(135deg, var(--theme-accent), var(--theme-blue-500));
-  box-shadow: 0 4px 12px -2px rgba(5,187,210,.45); transition: transform .12s, box-shadow .12s; }
-.demo a.btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -2px rgba(5,187,210,.55); }
-.demo a.btn.ghost { background: var(--theme-neutral-100); box-shadow: none; }
+.panel, .statrow { border-radius: var(--radius); box-shadow: var(--shadow-sm); }
 .tabs a { transition: color .15s, border-color .15s; }
 .tabs a:hover { color: var(--theme-neutral-900); }
 .g-fill { transition: stroke-dasharray .6s ease; }

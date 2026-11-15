@@ -138,7 +138,7 @@ class NewsDesk:
         run = attempt(llm, lambda: self.rules_decision(art), spec=spec,
                       task=f"Assess this article:\n{_json(article)}", tools=tools,
                       # the other articles are context, not input: a cached decision is
-                      # reused when later demo articles are added
+                      # reused when later articles are added
                       cache_payload={"article": article, "registry": self.candidates})
         return {**run["result"], "agent": _summary(run)}
 

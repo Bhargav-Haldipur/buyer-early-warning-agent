@@ -15,7 +15,10 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 ENGINE_TABLES = frozenset(
     {"clients", "buyers", "credit_limits", "invoices", "news_articles", "parent_companies"}
 )
-HARNESS_ONLY = frozenset({"ground_truth", "payment_behaviour_monthly"})
+# harness_articles holds labelled stories the harness needs and the shipped news does
+# not carry - the only parent-company story, and two of the decoys. The harness passes
+# them to the engine label-stripped, as extra articles; the engine never reads the file.
+HARNESS_ONLY = frozenset({"ground_truth", "payment_behaviour_monthly", "harness_articles"})
 # What a story typed into the live sandbox must carry to go through the same pipeline
 # as a shipped one. `mentioned_entity_as_written` is deliberately NOT here: the agent
 # reads the body and finds the company itself, so the field is a convenience the
@@ -46,29 +49,14 @@ def _read(path: Path) -> list[dict]:
 
 class Loader:
     def __init__(self, data_dir: Path | str = DATA_DIR, *, harness: bool = False,
-                 demo_steps: int = 0, swap_invoices: bool = False,
                  extra_articles: list[dict] | None = None,
                  dpd_overrides: dict[str, int] | None = None):
-        # a negative slice silently *keeps* demo articles ([:-1] of 7 keeps 6), so the
-        # range is checked rather than trusted - but only when the demo is in play, so a
-        # dataset without a demo/ folder still loads
-        if demo_steps:
-            demo_file = Path(data_dir) / "demo" / "demo_articles_to_add.csv"
-            if not demo_file.exists():
-                raise ValueError(f"demo_steps={demo_steps} but there is no {demo_file}")
-            available = len(_read(demo_file))
-            if not 0 <= demo_steps <= available:
-                raise ValueError(f"demo_steps must be between 0 and {available}, "
-                                 f"got {demo_steps}")
-        elif demo_steps < 0:
-            raise ValueError(f"demo_steps must not be negative, got {demo_steps}")
         self.dir = Path(data_dir)
         self.harness = harness
-        self.demo_steps = demo_steps          # how many demo articles are in play
-        self.swap_invoices = swap_invoices    # step 8: Kessler moves to 40 DPD
         # Live input from the dashboard sandbox: a story nobody prepared, and an
         # invoice aged by hand. Both go through the same pipeline as shipped data -
-        # there is no second code path for them, which is the point of the demo.
+        # there is no second code path for them. The harness uses the same seam for
+        # its labelled fixture articles.
         self.extra_articles = [dict(a) for a in (extra_articles or [])]
         self.dpd_overrides = {str(b): int(d) for b, d in (dpd_overrides or {}).items()}
         for aid, art in enumerate(self.extra_articles):
@@ -154,8 +142,7 @@ class Loader:
         return self.table("credit_limits")
 
     def invoices(self) -> list[dict]:
-        rows = (_read(self.dir / "demo" / "invoices_after_payment_demo.csv")
-                if self.swap_invoices else self.table("invoices"))
+        rows = self.table("invoices")
         if not self.dpd_overrides:
             return rows
         # copy first: table() hands back the cached list, and an override must not
@@ -170,21 +157,16 @@ class Loader:
         return rows
 
     def news(self) -> list[dict]:
-        """Baseline articles plus however many demo articles the demo has reached.
+        """Shipped articles plus any extra ones (live sandbox input, harness fixtures).
 
         gt_* columns are stripped unless this is the harness — the LLM must never
         see the answer it is being asked for.
         """
         rows = list(self.table("news_articles"))
-        if self.demo_steps:
-            rows += _read(self.dir / "demo" / "demo_articles_to_add.csv")[: self.demo_steps]
         rows += self.extra_articles
         if self.harness:
             return rows
         return [{k: v for k, v in r.items() if k not in NEWS_LABEL_COLUMNS} for r in rows]
-
-    def demo_articles(self) -> list[dict]:
-        return _read(self.dir / "demo" / "demo_articles_to_add.csv")
 
     # -- convenience indexes -------------------------------------------------
     def buyers_by_id(self) -> dict[str, dict]:
