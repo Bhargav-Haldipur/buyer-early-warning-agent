@@ -30,6 +30,24 @@ _LOCK = threading.Lock()
 # through exactly the same engine.run() as the shipped dataset - there is no second
 # code path for it, which is the only reason showing it proves anything.
 LIVE: dict = {"articles": [], "dpd": {}, "last": None}
+
+
+def engine_date(shown: date) -> date:
+    """Live stories are typed on today's calendar and scored on the snapshot's.
+
+    The engine is pinned to AS_OF: every news age, every score and every cached agent
+    run depends on it, so moving it would re-score the whole book. Instead a story
+    dated today reaches the engine as published on AS_OF, and one dated a week ago as
+    a week before it - the age, and so the score, is what it would be had the
+    snapshot been taken today. Only the date shown on screen is the typed one.
+    """
+    return shown - (date.today() - AS_OF)
+
+
+def shown_date(source: str, engine: str) -> str:
+    """The date to display for an article: the typed one for a live story."""
+    art = next((a for a in LIVE["articles"] if a["article_id"] == source), None)
+    return art.get("shown_date", engine) if art else engine
 _LIVE_CACHE: dict[str, dict] = {}
 
 
@@ -437,7 +455,7 @@ def case_tab(r: dict) -> str:
 
     evidence = "".join(
         f'<tr><td>{e(x["id"])}</td><td>{e(x["kind"].replace("_", " "))}</td>'
-        f'<td>{e(x["date"])}</td><td>{e(x["detail"])}</td></tr>' for x in f["evidence"])
+        f'<td>{e(shown_date(x["id"], x["date"]))}</td><td>{e(x["detail"])}</td></tr>' for x in f["evidence"])
     evidence = (f'<table><thead><tr><th>Id</th><th>Kind</th><th>Date</th><th>Detail</th>'
                 f'</tr></thead><tbody>{evidence}</tbody></table>' if evidence else
                 '<p class="body2">No evidence recorded.</p>')
@@ -576,7 +594,7 @@ def buyer_page(bid: str, tab: str) -> bytes:
         ev = [x for x in r["evidence"] if x["kind"] in ("news", "parent")]
         ev.sort(key=lambda x: x["date"], reverse=True)
         rows = "".join(
-            f'<tr><td>{e(x["date"])}</td><td>{e(x["data"]["headline"])}<br>'
+            f'<tr><td>{e(shown_date(x["source"], x["date"]))}</td><td>{e(x["data"]["headline"])}<br>'
             f'<span class="overline">{e(x["data"]["publication"])} &middot; matched to '
             f'{e(x["data"]["entity"])}{" (parent)" if x["data"]["via_parent"] else ""}</span></td>'
             f'<td class="num">{x["data"]["severity"]}</td>'
@@ -584,7 +602,7 @@ def buyer_page(bid: str, tab: str) -> bytes:
             f'<td class="num">{x["data"]["base"]:.0f} &rarr; {x["data"]["decayed"]:.1f}</td></tr>'
             for x in ev)
         refused = "".join(
-            f'<tr><td>{e(x["date"])}</td><td>{e(x["data"]["headline"])}<br>'
+            f'<tr><td>{e(shown_date(x["source"], x["date"]))}</td><td>{e(x["data"]["headline"])}<br>'
             f'<span class="overline">named {e(x["data"]["mention"])}</span></td>'
             f'<td colspan="3"><span class="pill refused">refused</span></td></tr>'
             for x in data["refusals"]
@@ -660,7 +678,7 @@ def live_inputs_block() -> str:
         return ('<p class="overline">Nothing added yet &mdash; the engine is running on the '
                 'shipped dataset exactly as it ships.</p>')
     arts = "".join(
-        f'<tr><td>{e(a["article_id"])}</td><td>{e(a["published_date"])}</td>'
+        f'<tr><td>{e(a["article_id"])}</td><td>{e(a.get("shown_date", a["published_date"]))}</td>'
         f'<td>{e(a["mentioned_entity_as_written"])}</td><td>{e(a["headline"])}</td></tr>'
         for a in LIVE["articles"])
     arts = (f'<table><thead><tr><th>Id</th><th>Date</th><th>Company named</th>'
@@ -700,7 +718,8 @@ def live_page() -> bytes:
 <h1>Live input</h1>
 <p class="sub">Type a story that has never been seen, or age an invoice by hand. Both go
 through the same engine as the shipped data &mdash; there is no separate path for them.
-Snapshot is {e(AS_OF.isoformat())}. The News agent runs live on what you type; the two
+The dataset is a snapshot of {e(AS_OF.isoformat())}; a story dated today is scored as if it
+broke that day. The News agent runs live on what you type; the two
 Opus agents that only write prose are skipped here so this answers in seconds.</p>
 
 {result_panel()}
@@ -722,8 +741,8 @@ Opus agents that only write prose are skipped here so this answers in seconds.</
   <label>Body <span class="overline">what the agent actually reads</span>
     <textarea name="body" rows="3" required
       placeholder="Staff staged a protest over three months of delayed wages, unions said."></textarea></label>
-  <label>Published <input type="date" name="date" value="{e(AS_OF.isoformat())}"
-           max="{e(AS_OF.isoformat())}"></label>
+  <label>Published <input type="date" name="date" value="{e(date.today().isoformat())}"
+           max="{e(date.today().isoformat())}"></label>
   <button class="btn" type="submit">Publish &amp; re-run</button>
   <p class="overline">The News agent searches the registry, checks sector and city, and
   decides. A name it cannot place is refused.</p>
@@ -787,7 +806,7 @@ def add_story(form: dict) -> None:
     mention = (form.get("mention", [""])[0] or "").strip()
     headline = (form.get("headline", [""])[0] or "").strip()
     body = (form.get("body", [""])[0] or "").strip()
-    when = (form.get("date", [""])[0] or AS_OF.isoformat()).strip()
+    when = (form.get("date", [""])[0] or date.today().isoformat()).strip()
 
     def mutate() -> str:
         # the company is optional: the agent finds it in the body. Offline the
@@ -798,14 +817,14 @@ def add_story(form: dict) -> None:
             published = date.fromisoformat(when)
         except ValueError as exc:
             raise ValueError(f"cannot read {when!r} as a date") from exc
-        if published > AS_OF:
+        if published > date.today():
             raise ValueError(
-                f"this run is a snapshot of {AS_OF.isoformat()}, so a story dated "
-                f"{published.isoformat()} would score zero - the engine refuses news it "
-                f"could not have seen. Pick a date on or before {AS_OF.isoformat()}.")
+                f"a story dated {published.isoformat()} is in the future - the engine "
+                f"refuses news it could not have seen. Pick today or an earlier date.")
         aid = f"LIVE{len(LIVE['articles']) + 1:02d}"
         LIVE["articles"].append({
-            "article_id": aid, "published_date": published.isoformat(),
+            "article_id": aid, "published_date": engine_date(published).isoformat(),
+            "shown_date": published.isoformat(),
             "publication": "Live input", "headline": headline, "body": body,
             "mentioned_entity_as_written": mention})
         return aid

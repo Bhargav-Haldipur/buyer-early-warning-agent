@@ -13,6 +13,7 @@ import json
 import re
 import subprocess
 import unittest
+from datetime import date, timedelta
 from pathlib import Path
 
 from ews import config, run as engine
@@ -558,7 +559,8 @@ class LiveInput(unittest.TestCase):
 
     def _story(self, **kw):
         base = {"mention": "Oakhurst Components Ltd", "headline": "Wage protest",
-                "body": "Staff protested over delayed wages.", "date": "2026-09-20"}
+                "body": "Staff protested over delayed wages.",
+                "date": (date.today() - timedelta(days=5)).isoformat()}
         self.S.add_story({k: [v] for k, v in {**base, **kw}.items()})
         return self.S.LIVE["last"]
 
@@ -593,9 +595,21 @@ class LiveInput(unittest.TestCase):
             self.assertTrue(r["data"]["mention"].strip())
 
     def test_a_story_the_run_could_not_have_seen_is_refused(self):
-        last = self._story(date="2026-12-01")
-        self.assertIn("snapshot", last["error"])
+        last = self._story(date=(date.today() + timedelta(days=1)).isoformat())
+        self.assertIn("future", last["error"])
         self.assertEqual(self.S.LIVE["articles"], [], "a refused story must not be kept")
+
+    def test_a_story_dated_today_is_scored_on_the_snapshot_day(self):
+        """The form shows today's calendar; the engine stays pinned to AS_OF, so a story
+        dated today must reach it as published on AS_OF - same age, same score, same
+        cache entry as before the form moved to today's date."""
+        from ews.config import AS_OF
+        self._story(date=date.today().isoformat())
+        art = self.S.LIVE["articles"][0]
+        self.assertEqual(art["published_date"], AS_OF.isoformat())
+        self.assertEqual(art["shown_date"], date.today().isoformat())
+        self.assertEqual(self.S.shown_date(art["article_id"], art["published_date"]),
+                         date.today().isoformat())
 
     def test_a_rejected_input_leaves_the_previous_state_intact(self):
         self._story()
