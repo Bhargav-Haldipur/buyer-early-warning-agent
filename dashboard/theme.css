@@ -219,7 +219,42 @@ th.sortable.desc::after { content: " \25BC"; font-size: .6rem; }
 
 /* case file */
 .case .bottom-line { font-size: 1.0625rem; font-weight: 600; line-height: 1.6rem; margin: .25rem 0 1rem; }
-.cf-split { display: grid; gap: 0 1.5rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.cf-card { --c: var(--theme-orange-700); --soft: #fff7ed; --line: var(--theme-orange-200);
+           display: grid; grid-template-columns: auto auto 1fr; align-items: end; gap: 1rem 2.5rem;
+           padding: 1.1rem 1.5rem; margin-bottom: 1.25rem; border-radius: var(--radius, 12px);
+           background: linear-gradient(90deg, var(--soft), var(--theme-neutral-0) 85%);
+           border: 1px solid var(--line); border-left: 6px solid var(--c); box-shadow: var(--shadow-sm); }
+.cf-card.high    { --c: var(--theme-red-500);  --soft: var(--theme-red-50); --line: #fecaca; }
+.cf-card.healthy { --c: #15803d;               --soft: #f0fdf4;             --line: var(--theme-green-200); }
+.cf-stat { display: flex; flex-direction: column; justify-content: space-between; gap: .35rem; align-self: stretch; }
+.cf-label { font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+            color: var(--theme-neutral-500); }
+.cf-band { display: inline-flex; align-items: center; gap: .5rem; font-size: 1.6rem; font-weight: 700;
+           color: var(--c); line-height: 1.1; }
+.cf-band i { width: .7rem; height: .7rem; border-radius: 50%; background: var(--c);
+             box-shadow: 0 0 0 4px var(--line); }
+.cf-score { font-size: 2.6rem; font-weight: 800; line-height: 1; color: var(--theme-neutral-900); }
+.cf-score small { font-size: 1rem; font-weight: 500; color: var(--theme-neutral-500); margin-left: .2rem; }
+.cf-scale { min-width: 220px; align-self: center; padding-top: 1.2rem; }
+.cf-track { position: relative; display: flex; height: 10px; border-radius: 999px; overflow: visible; }
+.cf-track .seg { height: 100%; opacity: .28; }
+.cf-track .seg:first-child { border-radius: 999px 0 0 999px; }
+.cf-track .seg:nth-child(3) { border-radius: 0 999px 999px 0; }
+.cf-track .seg.on { opacity: 1; }
+.seg.healthy { background: #15803d; } .seg.watch { background: var(--theme-orange-700); }
+.seg.high { background: var(--theme-red-500); }
+.cf-marker { position: absolute; top: 50%; width: 18px; height: 18px; border-radius: 50%;
+             transform: translate(-50%, -50%); background: var(--theme-neutral-0);
+             border: 4px solid var(--c); box-shadow: var(--shadow-md); }
+.cf-ticks { position: relative; height: 1.1rem; margin-top: .4rem; font-size: .75rem;
+            color: var(--theme-neutral-500); }
+.cf-ticks span { position: absolute; transform: translateX(-50%); }
+.cf-ticks span:first-child { transform: none; } .cf-ticks span:last-child { transform: translateX(-100%); }
+@media (max-width: 640px) { .cf-card { grid-template-columns: 1fr 1fr; } .cf-scale { grid-column: 1 / -1; } }
+.case ul.bottom-line { margin: 0 0 1.25rem; padding-left: 1.2rem; }
+.case ul.bottom-line li { margin-bottom: .35rem; }
+.case .cf-verdict { margin: 1rem 0 .25rem; }
+.cf-more summary { cursor: pointer; color: var(--theme-accent); font-weight: 500; margin-bottom: .75rem; }
 
 /* ======================================================================
    Polish layer. Adds depth, motion and a top bar on top of the tokens

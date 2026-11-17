@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import html
 import json
+import re
 import threading
 import traceback
 import urllib.parse
@@ -80,10 +81,10 @@ def snapshot() -> dict:
     insurer page behind it still showed the shipped one. Two views of the same buyer
     disagreeing mid-demo is worse than any feature they bought.
 
-    While sandbox input is in play the run skips commentary - the News agent still runs
-    live on the typed story, but the two Opus agents that only write prose are not worth
-    ninety seconds of silence. Scores are identical either way; they come from the
-    formula, not from an agent.
+    While sandbox input is in play the adjudicator and the Case File agent run fresh
+    only for the buyers that input touched; every other buyer replays its cached
+    commentary. Scores are identical either way; they come from the formula, not from
+    an agent.
     """
     live = live_active()
     key = (json.dumps(LIVE["articles"], sort_keys=True), json.dumps(LIVE["dpd"], sort_keys=True))
@@ -91,7 +92,7 @@ def snapshot() -> dict:
         if key not in _CACHE:
             _CACHE[key] = engine.run(
                 extra_articles=LIVE["articles"] or None, dpd_overrides=LIVE["dpd"] or None,
-                commentary=not live)
+                commentary="changed" if live else True)
         return _CACHE[key]
 
 
@@ -249,9 +250,8 @@ def live_banner() -> str:
                     f'{"edit" if len(LIVE["dpd"]) == 1 else "edits"}')
     return ('<div class="panel result"><b>Live input in play</b> &mdash; '
             f'{" and ".join(bits)} on top of the shipped dataset. Every page reflects it. '
-            'The adjudicator review and the agent-written case file are skipped while the '
-            'sandbox is active so it answers in seconds; the score is the formula and is '
-            'unaffected. <a href="/live">Live input &rsaquo;</a></div>')
+            'The adjudicator and the Case File agent re-review the buyers it touched; '
+            'every other buyer keeps its cached review. <a href="/live">Live input &rsaquo;</a></div>')
 
 
 # ---------------------------------------------------------------- pages
@@ -391,8 +391,7 @@ def mode_pill(run: dict | None) -> str:
            "disabled": "maintain"}[run["mode"]]
     extra = ""
     if run["mode"] == "agent":
-        extra = f' &middot; {run["turns"]} turn{"s" if run["turns"] != 1 else ""}' + (
-            " &middot; replayed from cache" if run["cached"] else "")
+        extra = f' &middot; {run["turns"]} turn{"s" if run["turns"] != 1 else ""}'
     return (f'<span class="pill {cls}">{MODE_LABEL[run["mode"]]}</span>'
             f'<span class="overline">{extra}</span>')
 
@@ -428,16 +427,55 @@ def review_block(rv: dict | None) -> str:
               'the risk underwriter alongside it.</p>')
 
 
+def score_card(score: float, band: str) -> str:
+    """Band and score side by side over a 0-100 scale split at the band lines."""
+    from ews.config import BAND_HIGH, BAND_WATCH
+    cls = {"High Risk": "high", "Watch": "watch", "Healthy": "healthy"}[band]
+    pos = max(0.0, min(100.0, float(score)))
+    segs = "".join(
+        f'<span class="seg {c}{" on" if c == cls else ""}" style="width:{hi-lo:g}%"></span>'
+        for c, lo, hi in [("healthy", 0, BAND_WATCH), ("watch", BAND_WATCH, BAND_HIGH),
+                          ("high", BAND_HIGH, 100)])
+    ticks = "".join(f'<span style="left:{t:g}%">{t:g}</span>' for t in (0, BAND_WATCH, BAND_HIGH, 100))
+    return (f'<div class="cf-card {cls}">'
+            f'<div class="cf-stat"><span class="cf-label">Risk band</span>'
+            f'<span class="cf-band"><i></i>{e(band)}</span></div>'
+            f'<div class="cf-stat"><span class="cf-label">Risk score</span>'
+            f'<span class="cf-score">{score}<small>/100</small></span></div>'
+            f'<div class="cf-scale"><div class="cf-track">{segs}'
+            f'<span class="cf-marker" style="left:{pos:g}%"></span></div>'
+            f'<div class="cf-ticks">{ticks}</div></div></div>')
+
+
+def bottom_line(text: str) -> str:
+    points = re.split(r'(?<=[.!?])\s+(?=[A-Z"])', text.strip())
+    return '<ul class="bottom-line">' + "".join(f"<li>{e(x)}</li>" for x in points if x) + "</ul>"
+
+
+def first_sentence(text: str) -> str:
+    return re.split(r'(?<=[.!?])\s+(?=[A-Z"])', text.strip(), maxsplit=1)[0]
+
+
+def adjudicator_view(r: dict) -> str:
+    """The Risk Adjudicator's verdict on the band, one point per concern."""
+    rv = r["verdict"].get("review")
+    if not rv:
+        return ""
+    cls = {"agree": "healthy", "agree_with_caveats": "watch", "challenge": "high"}[rv["assessment"]]
+    points = "".join(f'<li>{e(first_sentence(c["issue"]))} <span class="overline">'
+                     f'{e(c["source_id"])}</span></li>' for c in rv["concerns"])
+    return (f'<h3>Adjudicator&rsquo;s view</h3>'
+            f'<p class="cf-verdict"><span class="pill {cls}">{ASSESS_LABEL[rv["assessment"]]}</span></p>'
+            + (f'<ul class="body2">{points}</ul>' if points else
+               f'<p class="body2">{e(first_sentence(rv["rationale"]))}</p>'))
+
+
 def case_tab(r: dict) -> str:
-    """Structured case file first, for scanning; the narrative underneath."""
+    """Band and score up top, then the action, the evidence, the review, a short narrative."""
     cf = r["case_file"]
     f = cf["fields"]
     h = f["header"]
-    assess = (f' &middot; adjudicator: <b>{e(ASSESS_LABEL[h["assessment"]])}</b>'
-              if h["assessment"] else "")
-    head = (f'<p class="overline">{band_pill(h["band"])} score <b>{h["score"]}</b> &middot; '
-            f'PD {h["pd"]*100:.1f}%{assess} &middot; as of {e(h["as_of"])} &middot; '
-            f'<b>draft for risk-underwriter review and approval</b></p>')
+    head = score_card(h["score"], h["band"])
 
     rows = "".join(
         f'<tr><td>{e(l["client_name"])}</td><td class="num">{money(l["current_limit"])}</td>'
@@ -450,9 +488,6 @@ def case_tab(r: dict) -> str:
               f'<th>Action</th></tr></thead><tbody>{rows}</tbody></table>'
               if rows else '<p class="body2">No credit limit lines.</p>')
 
-    def items(xs: list[str]) -> str:
-        return '<ul class="body2">' + "".join(f"<li>{e(x)}</li>" for x in xs) + "</ul>"
-
     evidence = "".join(
         f'<tr><td>{e(x["id"])}</td><td>{e(x["kind"].replace("_", " "))}</td>'
         f'<td>{e(shown_date(x["id"], x["date"]))}</td><td>{e(x["detail"])}</td></tr>' for x in f["evidence"])
@@ -460,18 +495,23 @@ def case_tab(r: dict) -> str:
                 f'</tr></thead><tbody>{evidence}</tbody></table>' if evidence else
                 '<p class="body2">No evidence recorded.</p>')
 
-    paras = "".join(f"<p>{e(p)}</p>" for p in cf["narrative"].split("\n\n") if p.strip())
+    # Short by default: the opening paragraph; the rest one click away, so the
+    # cached agent text is shown unchanged rather than regenerated.
+    paras = [p for p in cf["narrative"].split("\n\n") if p.strip()]
+    narrative = "".join(f"<p>{e(p)}</p>" for p in paras[:1])
+    if len(paras) > 1:
+        narrative += ('<details class="cf-more"><summary>Full narrative</summary>'
+                      + "".join(f"<p>{e(p)}</p>" for p in paras[1:]) + "</details>")
     note = (f'<p class="overline">Judgement and narrative written by '
             f'{"the Case File agent" if cf["source"]=="llm" else "template"}; header, '
             f'limits and evidence filled from the engine'
             + (f'; model output discarded &mdash; unverifiable figures {cf["rejected_numbers"]}'
                if cf["rejected_numbers"] else "") + "</p>")
-    return (f'<div class="panel case">{head}<p class="bottom-line">{e(f["bottom_line"])}</p>'
+    return (f'<div class="panel case">{head}{bottom_line(f["bottom_line"])}'
             f'<h3>Recommended limit action</h3>{limits}'
-            f'<div class="cf-split"><div><h3>What would lift it</h3>{items(f["lifts_it"])}</div>'
-            f'<div><h3>What would worsen it</h3>{items(f["worsens_it"])}</div></div>'
-            f'<h3>Narrative</h3>{paras}'
-            f'<h3>Evidence</h3>{evidence}{note}</div>')
+            f'<h3>Evidence</h3>{evidence}'
+            f'{adjudicator_view(r)}'
+            f'<h3>Narrative</h3>{narrative}{note}</div>')
 
 
 def agents_tab(r: dict, data: dict) -> str:
@@ -719,8 +759,9 @@ def live_page() -> bytes:
 <p class="sub">Type a story that has never been seen, or age an invoice by hand. Both go
 through the same engine as the shipped data &mdash; there is no separate path for them.
 The dataset is a snapshot of {e(AS_OF.isoformat())}; a story dated today is scored as if it
-broke that day. The News agent runs live on what you type; the two
-Opus agents that only write prose are skipped here so this answers in seconds.</p>
+broke that day. The News agent runs live on what you type, then the adjudicator and the
+Case File agent re-review every buyer your input touched, so a publish or a ledger edit
+takes about a minute with Claude connected.</p>
 
 {result_panel()}
 
@@ -777,7 +818,7 @@ document.querySelectorAll('.namechip').forEach(c => c.addEventListener('click', 
 document.querySelectorAll('form.live-form').forEach(f => f.addEventListener('submit', () => {{
   const b = f.querySelector('button');
   b.disabled = true;
-  b.textContent = 'The agent is investigating\u2026';
+  b.textContent = 'The agents are re-reviewing\u2026 about a minute';
 }}));
 </script>""")
 

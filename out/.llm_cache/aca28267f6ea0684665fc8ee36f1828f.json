@@ -1,0 +1,44 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "BUY002",
+    "name": "Arcline Fabrications NV",
+    "severity": 5,
+    "category": "labor_unrest",
+    "reason": "Workers at Arcline Fabrications NV have staged a three-week protest, consistent with prior reports of the company falling behind on vendor payments and lenders reviewing exposure, indicating severe financial distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Arcline"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"BUY002\", \"name\": \"Arcline Fabrications NV\", \"sector\": \"Steel Fabrication\", \"city\": \"Antwerp\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "BUY002"
+      },
+      "result": "{\"id\": \"BUY002\", \"kind\": \"buyer\", \"name\": \"Arcline Fabrications NV\", \"short_name\": \"Arcline\", \"sector\": \"Steel Fabrication\", \"city\": \"Antwerp\", \"size_band\": \"mid\", \"parent\": null}"
+    },
+    {
+      "tool": "find_articles",
+      "input": {
+        "query": "Arcline Fabrications"
+      },
+      "result": "[{\"article_id\": \"NWS0004\", \"date\": \"2025-11-10\", \"publication\": \"Regional Commerce Review\", \"headline\": \"Vendors say ARCLINE FABRICATIONS NV has fallen behind on payments\", \"mentioned_as\": \"ARCLINE FABRICATIONS NV\"}, {\"article_id\": \"NWS0006\", \"date\": \"2025-11-28\", \"publication\": \"Continental Trade Wire\", \"headline\": \"Lenders said to be reviewing exposure to Arcline Fabrications NV\", \"mentioned_as\""
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "BUY002",
+        "severity": 5,
+        "category": "labor_unrest",
+        "reason": "Workers at Arcline Fabrications NV have staged a three-week protest, consistent with prior reports of the company falling behind on vendor payments and lenders reviewing exposure, indicating severe financial distress."
+      }
+    }
+  ],
+  "turns": 4
+}

@@ -296,8 +296,9 @@ otherwise still be writing.**"
 > so the after figure is the same by construction — what changes is how far it has to cut
 > to get there.
 >
-> The Limit tab is code-generated, so it renders fully even though the sandbox skips
-> commentary. Only the Case File tab falls back to the template while live input is in play.
+> The Limit tab is code-generated, so it updates the moment the score does. The Case File
+> and the adjudicator's view are rewritten by Claude for the buyer you changed (about a
+> minute with a working key); every other buyer keeps its cached review.
 
 ### 2:15 – 2:25 · Close — **B**
 

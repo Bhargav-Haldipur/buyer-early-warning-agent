@@ -22,14 +22,18 @@ OUT_DIR = Path(__file__).resolve().parent.parent / "out" / "runs"
 
 def run(llm=None, cache: bool = True,
         extra_articles: list[dict] | None = None,
-        dpd_overrides: dict[str, int] | None = None, commentary: bool = True) -> dict:
-    """commentary=False skips the two agents that only write prose about a verdict.
+        dpd_overrides: dict[str, int] | None = None,
+        commentary: bool | str = True) -> dict:
+    """commentary controls the two agents that only write prose about a verdict.
 
-    The score is the D5 formula in code, so it is byte-identical either way; what is
-    lost is the adjudicator's review and an agent-written case file, which fall to the
-    template. The live sandbox uses it because those two run on Opus and a buyer that
-    has just moved bands misses the cache on both - ninety seconds of silence in front
-    of a room, to render commentary nobody is reading at that moment.
+    True runs the adjudicator review and the agent-written case file for every buyer;
+    False skips both, leaving no review and the template case file. "changed" is the
+    live sandbox's mode: the two run fresh only for the buyers the sandbox input
+    touched (a ledger edit, or evidence from a typed story, parent fan-out included);
+    every other buyer replays its cached commentary and never calls the model, so a
+    publish costs two Opus runs per touched buyer, not one per buyer in the book.
+
+    The score is the D5 formula in code, so it is byte-identical in every mode.
     """
     loader = Loader(extra_articles=extra_articles, dpd_overrides=dpd_overrides)
     loader.validate()          # fail on an inconsistent dataset, not halfway through scoring
@@ -39,14 +43,26 @@ def run(llm=None, cache: bool = True,
     payments = payment_agent.assess(loader, store, llm)
     newsvals = news_agent.assess(loader, llm, store)
 
+    live_ids = {a["article_id"] for a in (extra_articles or [])}
+    changed = set(loader.dpd_overrides) | {
+        e.buyer_id for e in store.all() if e.buyer_id and e.source in live_ids}
+    replay = _CacheOnly(llm)
+
+    def prose_llm(bid: str):
+        """Which model writes this buyer's commentary; None skips it."""
+        if commentary == "changed":
+            return llm if bid in changed else replay
+        return llm if commentary else None
+
     buyers = loader.buyers_by_id()
     articles = {a["article_id"]: a for a in loader.news()}
     verdicts = {}
     for bid in payments:
         v = adjudicator.adjudicate(bid, payments[bid], newsvals[bid])
+        pl = prose_llm(bid)
         v["review"] = adjudicator.review(buyers[bid], v,
                                          [e.to_dict() for e in store.for_buyer(bid)],
-                                         articles, llm) if commentary else None
+                                         articles, pl) if pl else None
         verdicts[bid] = v
     limit_lines = recommend(loader, verdicts)
     by_buyer: dict[str, list[dict]] = defaultdict(list)
@@ -59,7 +75,8 @@ def run(llm=None, cache: bool = True,
         lines = by_buyer.get(bid, [])
         items = [e.to_dict() for e in store.for_buyer(bid)]
         # bands outside settings.py run_for_bands (Healthy, by default) get the template
-        cf = casefile.write(llm if commentary and verdict["band"] in write_for else _RULES,
+        pl = prose_llm(bid)
+        cf = casefile.write(pl if pl and verdict["band"] in write_for else _RULES,
                             buyers[bid],
                             verdict, lines, items, articles)
         records.append({
@@ -95,6 +112,7 @@ def run(llm=None, cache: bool = True,
         "agent_runs": _agent_stats(records, store),
         "spend": llm.spend() if hasattr(llm, "spend") else None,
         "commentary": commentary,
+        "commentary_fresh_for": sorted(changed) if commentary == "changed" else None,
         # what the live sandbox added on top of the shipped dataset, so a run is
         # reproducible from its own output
         "live_articles": [a["article_id"] for a in (extra_articles or [])],
@@ -106,6 +124,26 @@ def run(llm=None, cache: bool = True,
 
 
 _RULES = FallbackLLM(cache=False)
+
+
+class _CacheOnly:
+    """The run's model, limited to answers already in the cache.
+
+    Used for the buyers live input did not touch: their verdict and evidence are
+    unchanged, so their commentary is a cache hit. A miss falls back to the template
+    instead of quietly calling Opus for a buyer nobody changed.
+    """
+
+    def __init__(self, inner):
+        self._inner = inner
+        self.degraded = 0
+
+    def __getattr__(self, name):
+        return getattr(self._inner, name)
+
+    def create(self, **_):
+        from .agents.runtime import AgentError
+        raise AgentError("not in the cache, and this buyer's inputs did not change")
 
 
 def _agent_stats(records: list[dict], store: EvidenceStore) -> dict:

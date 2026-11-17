@@ -690,6 +690,36 @@ class LiveInput(unittest.TestCase):
         self.assertEqual(full, quick)
 
 
+    def test_live_commentary_is_fresh_only_for_the_touched_buyer(self):
+        """A ledger edit re-runs the adjudicator and Case File agent for that buyer only;
+        every other buyer replays its shipped review and never reaches the model."""
+        from ews.agents.runtime import AgentError
+        from ews.llm import _Cache
+
+        class ModelOffline:
+            """Agentic, reads the shipped cache, and fails any call that reaches the model."""
+            name, agentic, disabled, degraded = "claude", True, False, 0
+            api_errors = ()
+
+            def __init__(self):
+                self.cache = _Cache(True)
+
+            def create(self, **_):
+                raise AgentError("model called")
+
+        out = engine.run(llm=ModelOffline(), dpd_overrides={"BUY003": 70},
+                         commentary="changed")
+        self.assertEqual(out["commentary_fresh_for"], ["BUY003"])
+        for r in out["buyers"]:
+            rv, cf = r["verdict"]["review"], r["case_file"]["agent"]
+            if r["buyer_id"] == "BUY003":
+                self.assertEqual(rv["agent"]["error"], "model called")
+                self.assertEqual(cf["error"], "model called")
+            else:
+                self.assertEqual((rv["agent"]["mode"], rv["agent"]["cached"]), ("agent", True),
+                                 r["buyer_id"])
+                self.assertIn(cf["mode"], ("agent", "rules"), r["buyer_id"])
+
 class TestsStayOffline(unittest.TestCase):
     """The documented way to run this project exports ANTHROPIC_API_KEY, and several
     tests drive the full engine. Without the guard in tests/__init__.py the suite bills
