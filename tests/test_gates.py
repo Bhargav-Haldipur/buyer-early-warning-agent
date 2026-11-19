@@ -766,13 +766,13 @@ class NextSteps(unittest.TestCase):
         self.assertIn("{{BANNER}}", html)
         self.assertIn('<a href="/next"', S.home().decode())
 
-    def test_no_page_calls_itself_a_hackathon_prototype(self):
+    def test_every_page_carries_the_tinubu_banner(self):
         import dashboard.server as S
         for body in (S.home(), S.live_page(), S.buyer_page("BUY019", "score"),
-                     (ROOT / "dashboard" / "next.html").read_bytes()):
+                     S.next_page()):
             text = body.decode().upper()
             self.assertNotIn("HACKATHON", text)
-            self.assertNotIn("PROTOTYPE", text)
+            self.assertIn("TINUBU PRODUCT PROTOTYPE", text)
 
     def test_the_slide_lists_every_tool_each_agent_actually_has(self):
         """A diagram that omits a tool is worse than none - search_entities is in every

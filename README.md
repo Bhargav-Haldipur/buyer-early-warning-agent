@@ -1,6 +1,6 @@
 # Buyer Early Warning Agent
 
-> **SAMPLE DATA**
+> **TINUBU PRODUCT PROTOTYPE**
 > The main dataset under `data/` is sample data: no real counterparty, client or
 > portfolio appears in it. The SBI book under `data/sbi/` names real US companies with
 > real public news, and an **illustrative** payment ledger - see below.

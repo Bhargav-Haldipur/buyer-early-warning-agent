@@ -23,18 +23,18 @@ from ews.loader import DATA_DIR, DataError, Loader
 HERE = Path(__file__).resolve().parent
 LIVE_BOOK = DATASET != "synthetic"          # real companies, news fetched from outside
 if LIVE_BOOK:
-    # The companies are real and the ledger is not: that line stays on every page, so no
-    # screenshot of a real company's payments can be taken for its actual record.
-    BANNER = "REAL COMPANIES &amp; LIVE NEWS &middot; ILLUSTRATIVE PAYMENT DATA"
-    TITLE_TAG = "Illustrative Data"
+    # The companies are real and the ledger is not: the footer says so on every page, so
+    # no screenshot of a real company's payments can be taken for its actual record.
+    BANNER = "Tinubu Product Prototype"
+    TITLE_TAG = "Tinubu Product Prototype"
     DISCLAIMER = ("The companies are real and the news is fetched from public sources (SEC EDGAR, "
                   "trusted publishers via Google News), linked on each buyer&rsquo;s News tab. The "
                   "insurer&rsquo;s book on them &mdash; credit limits, invoices and payments &mdash; "
                   "is illustrative: no real trade-credit ledger sits behind it, and no payment "
                   "figure here describes how any of these companies actually pays.")
 else:
-    BANNER = "SAMPLE DATA"
-    TITLE_TAG = "Sample Data"
+    BANNER = "Tinubu Product Prototype"
+    TITLE_TAG = "Tinubu Product Prototype"
     DISCLAIMER = ("Every buyer, insurer, invoice and news article in this view is sample data. "
                   "No real counterparty appears.")
 SYMBOL = {"EUR": "&euro;", "USD": "$"}[CURRENCY]
@@ -960,6 +960,13 @@ def refresh_news() -> None:
                      + ". Scores below are re-run on them.")
 
 
+def next_page() -> bytes:
+    """Static: it is a slide, not a view of the data - only the banner follows the book."""
+    html_ = (HERE / "next.html").read_text()
+    return (html_.replace("{{BANNER}}", BANNER).replace("{{DISCLAIMER}}", DISCLAIMER)
+            .replace("{{TITLE_TAG}}", TITLE_TAG)).encode()
+
+
 # ---------------------------------------------------------------- routing
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *a):        # quiet
@@ -1014,11 +1021,7 @@ class Handler(BaseHTTPRequestHandler):
         if url.path == "/theme.css":
             return self._send((HERE / "theme.css").read_bytes(), "text/css; charset=utf-8")
         if url.path == "/next":
-            # static: it is a slide, not a view of the data - only the banner follows the book
-            html_ = (HERE / "next.html").read_text()
-            html_ = (html_.replace("{{BANNER}}", BANNER).replace("{{DISCLAIMER}}", DISCLAIMER)
-                     .replace("{{TITLE_TAG}}", TITLE_TAG))
-            return self._send(html_.encode())
+            return self._send(next_page())
         if url.path == "/":
             return self._send(home())
         if url.path == "/live":
