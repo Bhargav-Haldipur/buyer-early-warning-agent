@@ -151,9 +151,17 @@ button does the same and re-scores.
 **Auto refresh** is an on/off switch next to that button. Off by default. While on, the
 dashboard fetches and re-scores every 15 minutes in the background, shows when the next
 fetch is due, and the open home page reloads itself each minute. Switching it on fetches
-straight away. Set the interval with `EWS_AUTO_REFRESH_MINUTES=30`, or start with it on
-using `EWS_AUTO_REFRESH=on`. Fetching is free (no API key); a failed fetch keeps the
-previous news, and two fetches never run at once. On this book a story typed on the Live input page is
+straight away. The switch lives in **`settings.json`** at the project root:
+
+```json
+{ "news": { "auto_refresh": false, "refresh_minutes": 15,
+            "lookback_days": 180, "stories_per_company": 12 } }
+```
+
+Edit it and the dashboard follows within seconds, no restart; the button writes the same
+file. A typo is reported on the page and the previous settings stay in force. Fetching is
+free (no API key); a failed fetch keeps the previous news, and two fetches never run at
+once. On this book a story typed on the Live input page is
 labelled **HYPOTHETICAL** everywhere it appears. The harness grades the synthetic
 dataset only - there are no labels for real companies.
 

@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-11-19T10:47:17+00:00",
+  "fetched_at": "2026-11-19T10:52:50+00:00",
   "as_of": "2026-11-19",
   "days": 180,
   "feeds": [
@@ -36,12 +36,12 @@
     "Apple": {
       "sec_edgar": 4,
       "google_news": 12,
-      "untrusted_dropped": 55
+      "untrusted_dropped": 52
     },
     "Walmart": {
       "sec_edgar": 4,
       "google_news": 12,
-      "untrusted_dropped": 83
+      "untrusted_dropped": 59
     },
     "Caterpillar": {
       "sec_edgar": 5,
@@ -51,7 +51,7 @@
     "Intel": {
       "sec_edgar": 3,
       "google_news": 12,
-      "untrusted_dropped": 60
+      "untrusted_dropped": 58
     },
     "Boeing": {
       "sec_edgar": 4,
@@ -61,7 +61,7 @@
     "Ford": {
       "sec_edgar": 5,
       "google_news": 12,
-      "untrusted_dropped": 49
+      "untrusted_dropped": 45
     },
     "Nike": {
       "sec_edgar": 9,

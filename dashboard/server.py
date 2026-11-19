@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import html
 import json
-import os
 import re
 import threading
 import time
@@ -18,7 +17,7 @@ from pathlib import Path
 
 from ews import run as engine
 from ews.agents import definition
-from ews import fetch_news
+from ews import fetch_news, user_settings
 from ews.config import AS_OF, CURRENCY, DATASET, W_NEWS
 from ews.loader import DATA_DIR, DataError, Loader
 
@@ -48,14 +47,32 @@ _LOCK = threading.Lock()
 _FETCH_LOCK = threading.Lock()      # one fetch at a time: the button and the timer share it
 
 # ---------------------------------------------------------------- auto refresh
-# An on/off switch on the SBI home page. While on, a background thread fetches the
-# news and re-scores every AUTO_MINUTES. Off by default: nothing reaches the network
-# unless someone turns it on (or starts the server with EWS_AUTO_REFRESH=on).
-AUTO_MINUTES = int(os.environ.get("EWS_AUTO_REFRESH_MINUTES", "15"))
-if not 1 <= AUTO_MINUTES <= 1440:
-    raise ValueError(f"EWS_AUTO_REFRESH_MINUTES must be 1-1440, got {AUTO_MINUTES}")
-AUTO: dict = {"on": os.environ.get("EWS_AUTO_REFRESH", "off").strip().lower() == "on",
-              "next": None, "running": False}
+# The switch lives in settings.json (ews/user_settings.py), re-read every few seconds:
+# edit the file and the dashboard follows without a restart; the button on the home
+# page writes the same file. While on, a background thread fetches the news and
+# re-scores every refresh_minutes. Off by default.
+AUTO: dict = {"on": False, "minutes": 15, "days": 180, "per_company": 12,
+              "next": None, "running": False, "error": None}
+
+
+def sync_settings() -> None:
+    """Pull settings.json into AUTO. A broken file keeps the last good values."""
+    try:
+        news = user_settings.load()["news"]
+    except (user_settings.SettingsFileError, OSError) as exc:
+        AUTO["error"] = str(exc)
+        return
+    AUTO["error"] = None
+    was_on = AUTO["on"]
+    AUTO.update(on=news["auto_refresh"], minutes=news["refresh_minutes"],
+                days=news["lookback_days"], per_company=news["stories_per_company"])
+    if AUTO["on"] and not was_on:
+        AUTO["next"] = time.time()            # switching on fetches straight away
+    elif not AUTO["on"]:
+        AUTO["next"] = None
+    elif AUTO["next"]:
+        # a shorter interval takes effect now, not after the old one runs out
+        AUTO["next"] = min(AUTO["next"], time.time() + AUTO["minutes"] * 60)
 
 # ---------------------------------------------------------------- live sandbox
 # Input nobody prepared: a story typed in the room, an invoice aged by hand. It goes
@@ -365,7 +382,11 @@ def auto_switch() -> str:
         mins = max(0, round((AUTO["next"] - time.time()) / 60))
         status = f"next fetch in about {mins} min" if mins else "next fetch due now"
     else:
-        status = f"off &mdash; when on, fetches every {AUTO_MINUTES} min"
+        status = f"off &mdash; when on, fetches every {AUTO['minutes']} min"
+    status += " &middot; set in <code>settings.json</code>"
+    if AUTO["error"]:
+        status += (f'<br><b>settings.json not applied:</b> {e(AUTO["error"])} '
+                   f'&mdash; the previous settings stay in force')
     label = "Auto refresh: ON" if on else "Auto refresh: OFF"
     cls = "btn" if on else "btn ghost"
     return (f'<form method="post" action="/news/auto"><input type="hidden" name="on" '
@@ -989,7 +1010,8 @@ def refresh_news(source: str = "Manual") -> None:
     AUTO["running"] = True
     try:
         try:
-            rep = fetch_news.fetch(quiet=True)
+            rep = fetch_news.fetch(days=AUTO["days"], per_buyer=AUTO["per_company"],
+                                   quiet=True)
         except (SystemExit, OSError, ValueError) as exc:
             FETCH["last"] = f"{source} fetch failed - the previous news is still in use: {exc}"
             return
@@ -1006,18 +1028,23 @@ def refresh_news(source: str = "Manual") -> None:
 
 
 def set_auto(on: bool) -> None:
-    AUTO["on"] = on
-    # turning it on fetches straight away; the timer runs from there
-    AUTO["next"] = time.time() if on else None
+    """The home-page button: writes settings.json, then applies it."""
+    try:
+        user_settings.set_auto_refresh(on)
+    except (user_settings.SettingsFileError, OSError) as exc:
+        AUTO["error"] = f"could not save the switch: {exc}"
+        return
+    sync_settings()
 
 
 def _auto_loop() -> None:
     """Background timer. Wakes every few seconds; fetches when on and due."""
     while True:
         time.sleep(5)
+        sync_settings()
         if not (AUTO["on"] and AUTO["next"]) or time.time() < AUTO["next"]:
             continue
-        AUTO["next"] = time.time() + AUTO_MINUTES * 60
+        AUTO["next"] = time.time() + AUTO["minutes"] * 60
         try:
             refresh_news("Auto")
         except Exception:                                          # noqa: BLE001
@@ -1114,11 +1141,12 @@ def main(port: int = 8000) -> None:
     print("warming the engine...")
     snapshot()
     if LIVE_BOOK:
-        if AUTO["on"]:
-            set_auto(True)
+        sync_settings()
         threading.Thread(target=_auto_loop, name="auto-refresh", daemon=True).start()
-        print(f"auto refresh {'ON' if AUTO['on'] else 'OFF'} (every {AUTO_MINUTES} min "
-              f"when on; switch it on the home page)")
+        print(f"auto refresh {'ON' if AUTO['on'] else 'OFF'} (every {AUTO['minutes']} min "
+              f"when on) - switch it in {user_settings.PATH.name} or on the home page")
+        if AUTO["error"]:
+            print(f"  ! settings.json not applied: {AUTO['error']}")
     print(f"dashboard on http://localhost:{port}  (Ctrl-C to stop)")
     ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()
 

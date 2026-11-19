@@ -95,27 +95,66 @@ class AutoRefresh(unittest.TestCase):
     """The on/off switch. The fetch itself is stubbed: no test reaches the network."""
 
     def setUp(self):
+        import tempfile
+        from pathlib import Path
         import dashboard.server as S
-        self.S = S
-        self._saved = (dict(S.AUTO), dict(S.FETCH), S.fetch_news.fetch, S.snapshot)
+        from ews import user_settings
+        self.S, self.us = S, user_settings
+        self._saved = (dict(S.AUTO), dict(S.FETCH), S.fetch_news.fetch, S.snapshot,
+                       user_settings.PATH)
+        self.tmp = tempfile.TemporaryDirectory()
+        user_settings.PATH = Path(self.tmp.name) / "settings.json"   # never the real file
         S.snapshot = lambda: {}
-        self.calls = 0
+        self.calls = []
 
-        def fake_fetch(quiet=True):
-            self.calls += 1
+        def fake_fetch(**kw):
+            self.calls.append(kw)
             return {"articles": 7, "errors": []}
         S.fetch_news.fetch = fake_fetch
 
     def tearDown(self):
-        auto, fetch, real_fetch, snap = self._saved
+        auto, fetch, real_fetch, snap, path = self._saved
         self.S.AUTO.clear(); self.S.AUTO.update(auto)
         self.S.FETCH.clear(); self.S.FETCH.update(fetch)
         self.S.fetch_news.fetch, self.S.snapshot = real_fetch, snap
+        self.us.PATH = path
+        self.tmp.cleanup()
 
-    def test_it_starts_off(self):
-        import os
-        if os.environ.get("EWS_AUTO_REFRESH", "off").lower() != "on":
-            self.assertFalse(self.S.AUTO["on"])
+    def test_the_shipped_settings_file_starts_off(self):
+        self.assertFalse(self.us.load(self._saved[4])["news"]["auto_refresh"])
+
+    def test_the_button_writes_the_settings_file(self):
+        self.S.set_auto(True)
+        self.assertTrue(self.us.load()["news"]["auto_refresh"])
+        self.S.set_auto(False)
+        self.assertFalse(self.us.load()["news"]["auto_refresh"])
+
+    def test_editing_the_file_flips_the_switch_without_a_restart(self):
+        import json
+        self.S.sync_settings()
+        self.assertFalse(self.S.AUTO["on"])
+        self.us.PATH.write_text(json.dumps({"news": {"auto_refresh": True, "refresh_minutes": 5}}))
+        self.S.sync_settings()
+        self.assertTrue(self.S.AUTO["on"])
+        self.assertEqual(self.S.AUTO["minutes"], 5)
+        self.assertIsNotNone(self.S.AUTO["next"])
+
+    def test_a_broken_file_keeps_the_last_good_settings(self):
+        self.S.set_auto(True)
+        self.us.PATH.write_text('{"news": {"auto_refresh": tru')
+        self.S.sync_settings()
+        self.assertTrue(self.S.AUTO["on"], "a typo must not switch it off")
+        self.assertIn("not valid JSON", self.S.AUTO["error"])
+        self.assertIn("not applied", self.S.auto_switch())
+
+    def test_the_fetch_uses_the_file_s_lookback(self):
+        import json
+        self.us.PATH.write_text(json.dumps({"news": {"lookback_days": 30,
+                                                     "stories_per_company": 5}}))
+        self.S.sync_settings()
+        self.S.refresh_news("Auto")
+        self.assertEqual(self.calls[-1]["days"], 30)
+        self.assertEqual(self.calls[-1]["per_buyer"], 5)
 
     def test_switching_on_schedules_a_fetch_now_and_off_cancels_it(self):
         import time
@@ -130,7 +169,7 @@ class AutoRefresh(unittest.TestCase):
 
     def test_a_fetch_records_what_it_did(self):
         self.S.refresh_news("Auto")
-        self.assertEqual(self.calls, 1)
+        self.assertEqual(len(self.calls), 1)
         self.assertIn("Auto fetch at", self.S.FETCH["last"])
         self.assertFalse(self.S.AUTO["running"])
 
@@ -140,16 +179,34 @@ class AutoRefresh(unittest.TestCase):
             self.S.refresh_news("Auto")
         finally:
             self.S._FETCH_LOCK.release()
-        self.assertEqual(self.calls, 0)
+        self.assertEqual(self.calls, [])
         self.assertIn("already running", self.S.FETCH["last"])
 
     def test_a_failed_fetch_keeps_the_old_news(self):
-        def broken(quiet=True):
+        def broken(**kw):
             raise OSError("network down")
         self.S.fetch_news.fetch = broken
         self.S.refresh_news("Auto")
         self.assertIn("previous news is still in use", self.S.FETCH["last"])
         self.assertFalse(self.S.AUTO["running"])
+
+
+class SettingsFile(unittest.TestCase):
+    def check(self, news):
+        from ews.user_settings import SettingsFileError, _validate
+        with self.assertRaises(SettingsFileError, msg=news):
+            _validate({"news": news})
+
+    def test_bad_values_are_refused(self):
+        self.check({"auto_refresh": "yes"})
+        self.check({"refresh_minutes": 0})
+        self.check({"refresh_minutes": True})
+        self.check({"lookback_days": 1000})
+        self.check({"auto_refrsh": True})           # a typo is an error, not ignored
+
+    def test_missing_keys_take_the_defaults(self):
+        from ews.user_settings import DEFAULTS, _validate
+        self.assertEqual(_validate({}), DEFAULTS)
 
 
 if __name__ == "__main__":
