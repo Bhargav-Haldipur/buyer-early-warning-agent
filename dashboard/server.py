@@ -6,11 +6,13 @@ from __future__ import annotations
 
 import html
 import json
+import os
 import re
 import threading
+import time
 import traceback
 import urllib.parse
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -43,6 +45,17 @@ TABS = ("case", "score", "limit", "payments", "news", "agents")
 _CACHE: dict[tuple[str, str], dict] = {}
 FETCH: dict = {"last": None}
 _LOCK = threading.Lock()
+_FETCH_LOCK = threading.Lock()      # one fetch at a time: the button and the timer share it
+
+# ---------------------------------------------------------------- auto refresh
+# An on/off switch on the SBI home page. While on, a background thread fetches the
+# news and re-scores every AUTO_MINUTES. Off by default: nothing reaches the network
+# unless someone turns it on (or starts the server with EWS_AUTO_REFRESH=on).
+AUTO_MINUTES = int(os.environ.get("EWS_AUTO_REFRESH_MINUTES", "15"))
+if not 1 <= AUTO_MINUTES <= 1440:
+    raise ValueError(f"EWS_AUTO_REFRESH_MINUTES must be 1-1440, got {AUTO_MINUTES}")
+AUTO: dict = {"on": os.environ.get("EWS_AUTO_REFRESH", "off").strip().lower() == "on",
+              "next": None, "running": False}
 
 # ---------------------------------------------------------------- live sandbox
 # Input nobody prepared: a story typed in the room, an invoice aged by hand. It goes
@@ -337,8 +350,30 @@ def sources_panel() -> str:
 <h3>News sources</h3>
 <p class="body2">{feed_txt}. Press stories are kept only from: {e(", ".join(publishers))}.</p>
 <p class="overline">{when}{errs}</p>{flash}
-<form method="post" action="/news/fetch" style="margin-top:.6rem" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Fetching\u2026'">
-<button class="btn" type="submit">Fetch latest news &amp; re-score</button></form></div>"""
+<div style="margin-top:.6rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+<form method="post" action="/news/fetch" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Fetching\u2026'">
+<button class="btn" type="submit">Fetch latest news &amp; re-score</button></form>
+{auto_switch()}</div></div>"""
+
+
+def auto_switch() -> str:
+    """The on/off switch, and while on, when the next fetch is due."""
+    on = AUTO["on"]
+    if AUTO["running"]:
+        status = "fetching now&hellip;"
+    elif on and AUTO["next"]:
+        mins = max(0, round((AUTO["next"] - time.time()) / 60))
+        status = f"next fetch in about {mins} min" if mins else "next fetch due now"
+    else:
+        status = f"off &mdash; when on, fetches every {AUTO_MINUTES} min"
+    label = "Auto refresh: ON" if on else "Auto refresh: OFF"
+    cls = "btn" if on else "btn ghost"
+    return (f'<form method="post" action="/news/auto"><input type="hidden" name="on" '
+            f'value="{"off" if on else "on"}"><button class="{cls}" type="submit" '
+            f'aria-pressed="{str(on).lower()}">{label}</button></form>'
+            f'<span class="overline">{status}</span>'
+            # while on, the open home page follows the timer without anyone touching it
+            + ('<script>setTimeout(() => location.reload(), 60000)</script>' if on else ""))
 
 
 def client_page(cid: str) -> bytes:
@@ -946,18 +981,48 @@ def set_dpd(form: dict) -> None:
     _apply(f"Ledger updated: {name} now {raw} days past due", mutate)
 
 
-def refresh_news() -> None:
+def refresh_news(source: str = "Manual") -> None:
     """Fetch from the trusted sources, then re-score. A failed fetch keeps the old file."""
-    try:
-        rep = fetch_news.fetch(quiet=True)
-    except (SystemExit, OSError, ValueError) as exc:
-        FETCH["last"] = f"Fetch failed - the previous news is still in use: {exc}"
+    if not _FETCH_LOCK.acquire(blocking=False):
+        FETCH["last"] = "A fetch is already running - its result will show here."
         return
-    with _LOCK:
-        _CACHE.clear()
-    FETCH["last"] = (f"Fetched {rep['articles']} articles"
-                     + (f"; {len(rep['errors'])} source error(s)" if rep["errors"] else "")
-                     + ". Scores below are re-run on them.")
+    AUTO["running"] = True
+    try:
+        try:
+            rep = fetch_news.fetch(quiet=True)
+        except (SystemExit, OSError, ValueError) as exc:
+            FETCH["last"] = f"{source} fetch failed - the previous news is still in use: {exc}"
+            return
+        with _LOCK:
+            _CACHE.clear()
+        stamp = datetime.now(timezone.utc).strftime("%H:%M UTC")
+        FETCH["last"] = (f"{source} fetch at {stamp}: {rep['articles']} articles"
+                         + (f"; {len(rep['errors'])} source error(s)" if rep["errors"] else "")
+                         + ". Scores are re-run on them.")
+        snapshot()                  # re-score now, so the next page view does not wait
+    finally:
+        AUTO["running"] = False
+        _FETCH_LOCK.release()
+
+
+def set_auto(on: bool) -> None:
+    AUTO["on"] = on
+    # turning it on fetches straight away; the timer runs from there
+    AUTO["next"] = time.time() if on else None
+
+
+def _auto_loop() -> None:
+    """Background timer. Wakes every few seconds; fetches when on and due."""
+    while True:
+        time.sleep(5)
+        if not (AUTO["on"] and AUTO["next"]) or time.time() < AUTO["next"]:
+            continue
+        AUTO["next"] = time.time() + AUTO_MINUTES * 60
+        try:
+            refresh_news("Auto")
+        except Exception:                                          # noqa: BLE001
+            # the timer must outlive any one bad fetch
+            traceback.print_exc()
 
 
 def next_page() -> bytes:
@@ -995,6 +1060,9 @@ class Handler(BaseHTTPRequestHandler):
                 set_dpd(form)
             elif path == "/news/fetch" and LIVE_BOOK:
                 refresh_news()
+                return self._redirect("/")
+            elif path == "/news/auto" and LIVE_BOOK:
+                set_auto((form.get("on", ["off"])[0] or "off") == "on")
                 return self._redirect("/")
             else:
                 return self._send(page("Not found", "<h1>Not found</h1>"), code=404)
@@ -1045,6 +1113,12 @@ class Handler(BaseHTTPRequestHandler):
 def main(port: int = 8000) -> None:
     print("warming the engine...")
     snapshot()
+    if LIVE_BOOK:
+        if AUTO["on"]:
+            set_auto(True)
+        threading.Thread(target=_auto_loop, name="auto-refresh", daemon=True).start()
+        print(f"auto refresh {'ON' if AUTO['on'] else 'OFF'} (every {AUTO_MINUTES} min "
+              f"when on; switch it on the home page)")
     print(f"dashboard on http://localhost:{port}  (Ctrl-C to stop)")
     ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()
 

@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-11-19T09:10:22+00:00",
+  "fetched_at": "2026-11-19T10:47:17+00:00",
   "as_of": "2026-11-19",
   "days": 180,
   "feeds": [
@@ -26,32 +26,32 @@
     "Nvidia": {
       "sec_edgar": 8,
       "google_news": 12,
-      "untrusted_dropped": 35
+      "untrusted_dropped": 33
     },
     "Microsoft": {
       "sec_edgar": 7,
-      "google_news": 12,
-      "untrusted_dropped": 88
+      "google_news": 10,
+      "untrusted_dropped": 90
     },
     "Apple": {
       "sec_edgar": 4,
       "google_news": 12,
-      "untrusted_dropped": 57
+      "untrusted_dropped": 55
     },
     "Walmart": {
       "sec_edgar": 4,
       "google_news": 12,
-      "untrusted_dropped": 81
+      "untrusted_dropped": 83
     },
     "Caterpillar": {
       "sec_edgar": 5,
       "google_news": 12,
-      "untrusted_dropped": 84
+      "untrusted_dropped": 83
     },
     "Intel": {
       "sec_edgar": 3,
       "google_news": 12,
-      "untrusted_dropped": 59
+      "untrusted_dropped": 60
     },
     "Boeing": {
       "sec_edgar": 4,
@@ -61,7 +61,7 @@
     "Ford": {
       "sec_edgar": 5,
       "google_news": 12,
-      "untrusted_dropped": 38
+      "untrusted_dropped": 49
     },
     "Nike": {
       "sec_edgar": 9,
@@ -75,5 +75,5 @@
     }
   },
   "errors": [],
-  "articles": 171
+  "articles": 169
 }

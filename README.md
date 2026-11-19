@@ -146,7 +146,14 @@ News comes from the sources in `data/sbi/trusted_sources.csv` - edit it to chang
 
 Fetching writes `data/sbi/news_articles.csv`; the engine reads that file, so runs stay
 reproducible and the agent cache still works. The dashboard's **Fetch latest news**
-button does the same and re-scores. On this book a story typed on the Live input page is
+button does the same and re-scores.
+
+**Auto refresh** is an on/off switch next to that button. Off by default. While on, the
+dashboard fetches and re-scores every 15 minutes in the background, shows when the next
+fetch is due, and the open home page reloads itself each minute. Switching it on fetches
+straight away. Set the interval with `EWS_AUTO_REFRESH_MINUTES=30`, or start with it on
+using `EWS_AUTO_REFRESH=on`. Fetching is free (no API key); a failed fetch keeps the
+previous news, and two fetches never run at once. On this book a story typed on the Live input page is
 labelled **HYPOTHETICAL** everywhere it appears. The harness grades the synthetic
 dataset only - there are no labels for real companies.
 

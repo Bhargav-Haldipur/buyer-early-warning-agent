@@ -91,5 +91,66 @@ class Grading(unittest.TestCase):
                 for b in Loader(SBI).buyers()]
 
 
+class AutoRefresh(unittest.TestCase):
+    """The on/off switch. The fetch itself is stubbed: no test reaches the network."""
+
+    def setUp(self):
+        import dashboard.server as S
+        self.S = S
+        self._saved = (dict(S.AUTO), dict(S.FETCH), S.fetch_news.fetch, S.snapshot)
+        S.snapshot = lambda: {}
+        self.calls = 0
+
+        def fake_fetch(quiet=True):
+            self.calls += 1
+            return {"articles": 7, "errors": []}
+        S.fetch_news.fetch = fake_fetch
+
+    def tearDown(self):
+        auto, fetch, real_fetch, snap = self._saved
+        self.S.AUTO.clear(); self.S.AUTO.update(auto)
+        self.S.FETCH.clear(); self.S.FETCH.update(fetch)
+        self.S.fetch_news.fetch, self.S.snapshot = real_fetch, snap
+
+    def test_it_starts_off(self):
+        import os
+        if os.environ.get("EWS_AUTO_REFRESH", "off").lower() != "on":
+            self.assertFalse(self.S.AUTO["on"])
+
+    def test_switching_on_schedules_a_fetch_now_and_off_cancels_it(self):
+        import time
+        self.S.set_auto(True)
+        self.assertTrue(self.S.AUTO["on"])
+        self.assertLessEqual(self.S.AUTO["next"], time.time())
+        self.assertIn("Auto refresh: ON", self.S.auto_switch())
+        self.S.set_auto(False)
+        self.assertFalse(self.S.AUTO["on"])
+        self.assertIsNone(self.S.AUTO["next"])
+        self.assertIn("Auto refresh: OFF", self.S.auto_switch())
+
+    def test_a_fetch_records_what_it_did(self):
+        self.S.refresh_news("Auto")
+        self.assertEqual(self.calls, 1)
+        self.assertIn("Auto fetch at", self.S.FETCH["last"])
+        self.assertFalse(self.S.AUTO["running"])
+
+    def test_two_fetches_never_overlap(self):
+        self.S._FETCH_LOCK.acquire()
+        try:
+            self.S.refresh_news("Auto")
+        finally:
+            self.S._FETCH_LOCK.release()
+        self.assertEqual(self.calls, 0)
+        self.assertIn("already running", self.S.FETCH["last"])
+
+    def test_a_failed_fetch_keeps_the_old_news(self):
+        def broken(quiet=True):
+            raise OSError("network down")
+        self.S.fetch_news.fetch = broken
+        self.S.refresh_news("Auto")
+        self.assertIn("previous news is still in use", self.S.FETCH["last"])
+        self.assertFalse(self.S.AUTO["running"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
