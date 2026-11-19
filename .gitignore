@@ -2,6 +2,8 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+# secrets: API keys live in .env, never in the repository (.env.example is the template)
+.env
 # git will not descend into an ignored directory, so ignore the contents of out/
 # rather than out/ itself - otherwise the negation below can never take effect.
 out/*

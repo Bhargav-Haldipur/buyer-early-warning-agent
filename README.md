@@ -49,11 +49,16 @@ tool whose input code checks. Without Claude, each falls back to its rule-based 
 so the demo, harness and tests always work offline. To use Claude:
 
 ```bash
+cp .env.example .env            # then paste your key after ANTHROPIC_API_KEY= in .env
 python3 -m venv .venv
 .venv/bin/pip install anthropic
-export ANTHROPIC_API_KEY=sk-ant-...
 .venv/bin/python -m ews.run
 ```
+
+**The API key goes in `.env`** at the project root. It is git-ignored, so the key never
+reaches the repository, and it is loaded automatically by every entry point - the
+dashboard, `ews.run`, `ews.fetch_news`. `.env.example` lists every variable it accepts.
+A variable already exported in your shell takes precedence over the file.
 
 A venv is needed because Homebrew's Python is externally managed (PEP 668). Only the
 Claude path needs it &mdash; everything above runs on the system `python3`.
