@@ -173,7 +173,7 @@ the case-file writer can explain a verdict but never change one.
 ### The score
 
 ```
-Risk Score = 0.65 × Payment Score + 0.35 × News Score      Healthy 0–34 · Watch 35–59 · High Risk 60–100
+Risk Score = 0.65 × Payment Score + 0.35 × News Score      Healthy 0–19 · Watch 20–49 · High Risk 50–100
 ```
 
 **Payment** is the worst open invoice: linear to 40 points at 30 days past due — which
@@ -193,15 +193,18 @@ two-year-old story carry full weight.
 | 2 | notable negative - guidance cut, profit warning, layoffs, store closures | 40 | 0.35 | 14 |
 | 3 | mild credit negative - capacity cut, legal notice, contract loss, major lawsuit or probe, sudden CEO/CFO exit, scandal | 60 | 0.35 | 21 |
 | 4 | moderate - unpaid vendors, lenders reviewing exposure, credit downgrade, restatement, CEO/CFO exit, mass layoffs | 80 | 0.35 | 28 |
-| 5 | severe - unpaid wages, debt restructuring or default, insolvency | 100 | 0.35 | 35, the Watch line |
+| 5 | severe - unpaid wages, debt restructuring or default, insolvency | 100 | 0.35 | 35 |
 
-Every severity is weighted at 35%, so news alone adds at most **35** - a severity 5
-story published today, which sits exactly on the Watch line and drops below it the
-next day. Moving a band takes the ledger as well: a buyer 25 days behind (21.7 points
-of payment) reaches Watch with a fresh severity 3 story and 56 with a severity 5 one.
-To let severe news move a buyer that pays on time on its own, put `{4, 5}` back in
-`FULL_WEIGHT_SEVERITIES` in `ews/config.py` - they then count at `W_NEWS_SEVERE` (1.0),
-with the score capped at 100.
+Every severity is weighted at 35%, so news alone adds at most **35** (a severity 5
+story published today). With the Watch line at 20, a fresh severity 3, 4 or 5 story
+moves a buyer that pays on time to **Watch** on its own - a CEO exit (severity 4)
+scores 28 - and it returns to Healthy as the story decays. News alone never reaches
+High Risk at 50; that takes the ledger too. Risk appetite (`PD_TARGET_SCORE`) stays at
+score 35, so a Watch buyer below 35 is watched but its limit is maintained.
+
+**The cost of the lower Watch line:** payment alone reaches it at 23 days past due. On
+the sample data that puts five buyers that never default (one invoice 25 days late, no
+news) on Watch, and the harness reports it - 17/22 survivors clean.
 
 Vandermeer, the severity-5 trap in the baseline, stays Healthy: its story is 710 days
 old and has decayed to about 3 points.

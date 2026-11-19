@@ -50,13 +50,17 @@ NEWS_BASE = {0: 0.0, 1: 20.0, 2: 40.0, 3: 60.0, 4: 80.0, 5: 100.0}
 PARENT_STEP_DOWN = {5: 4, 4: 3, 3: 2, 2: 1, 1: 0, 0: 0}
 
 # --- D8: bands --------------------------------------------------------------
-BAND_WATCH, BAND_HIGH = 35.0, 60.0
+# Healthy 0-19.9 · Watch 20-49.9 · High Risk 50-100
+BAND_WATCH, BAND_HIGH = 20.0, 50.0
 
 # --- D3: PD prior, linearly interpolated. Not fitted. ------------------------
 PD_ANCHORS = [(0, 0.01), (20, 0.10), (55, 0.45), (80, 0.85), (100, 0.95)]
 
 # --- D6: risk appetite ------------------------------------------------------
-PD_TARGET_SCORE = 35.0              # PD at the Watch line == 25%
+# Deliberately not tied to BAND_WATCH: the bands decide who is watched, appetite
+# decides when a limit is cut. PD at score 35 == 25%; at the Watch line (20) it
+# would be 10%, and nearly every Watch buyer would get a REDUCE.
+PD_TARGET_SCORE = 35.0
 
 # --- D11: models are set per agent, in agents/*.md ---------------------------
 

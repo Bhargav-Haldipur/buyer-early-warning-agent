@@ -846,9 +846,9 @@ takes about a minute with Claude connected.</p>
   <label>Worst open invoice is now
     <input type="number" name="dpd" min="0" max="365" value="45" required> days past due</label>
   <button class="btn" type="submit">Update ledger &amp; re-run</button>
-  <p class="overline">Payment carries 65% of the score, news 35%. A severity 5 story
-  published today adds 35 points - exactly the Watch line - so news alone only just
-  reaches Watch; anything milder or older needs the ledger behind it.</p>
+  <p class="overline">Payment carries 65% of the score, news 35%. Bands: Healthy below
+  20, Watch 20-50, High Risk 50+. A fresh severity 3-5 story alone reaches Watch; news
+  alone never reaches High Risk - that takes the ledger too.</p>
 </form>
 </div>
 

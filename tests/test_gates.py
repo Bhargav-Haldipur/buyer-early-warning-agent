@@ -154,10 +154,10 @@ class Formula(unittest.TestCase):
         self.assertAlmostEqual(config.payment_score(90), 100.0, msg="must cap at 100")
 
     def test_band_boundaries(self):
-        self.assertEqual(config.band(34.9), "Healthy")
-        self.assertEqual(config.band(35.0), "Watch")
-        self.assertEqual(config.band(59.9), "Watch")
-        self.assertEqual(config.band(60.0), "High Risk")
+        self.assertEqual(config.band(19.9), "Healthy")
+        self.assertEqual(config.band(20.0), "Watch")
+        self.assertEqual(config.band(49.9), "Watch")
+        self.assertEqual(config.band(50.0), "High Risk")
 
     def test_pd_anchors_and_target(self):
         for score, pd in config.PD_ANCHORS:
@@ -165,21 +165,21 @@ class Formula(unittest.TestCase):
         self.assertAlmostEqual(config.PD_TARGET, 0.25, places=6,
                                msg="D6 risk appetite must be PD at score 35")
 
-    def test_news_alone_cannot_leave_healthy_below_severity_5(self):
-        """At 35% only a same-day severity-5 story reaches the Watch line on its own."""
-        for sev in set(config.NEWS_BASE) - {5}:
-            stepped = config.PARENT_STEP_DOWN[sev]
-            parent = config.news_weight(stepped, via_parent=True) * config.NEWS_BASE[stepped]
-            self.assertLess(parent, config.BAND_WATCH, f"parent sev {sev}")
-            if sev not in config.FULL_WEIGHT_SEVERITIES:
-                direct = config.news_weight(sev, via_parent=False) * config.NEWS_BASE[sev]
-                self.assertLess(direct, config.BAND_WATCH, f"direct sev {sev}")
+    def test_what_news_alone_can_do(self):
+        """With Watch at 20: a fresh severity 3-5 story moves a buyer that pays on time
+        to Watch; severity 1-2 cannot; news alone never reaches High Risk."""
+        def alone(sev):
+            return config.risk_score(0, config.NEWS_BASE[sev], config.news_weight(sev, False))
+        for sev in (1, 2):
+            self.assertEqual(config.band(alone(sev)), "Healthy", sev)
+        for sev in (3, 4, 5):
+            self.assertEqual(config.band(alone(sev)), "Watch", sev)
 
     def test_every_severity_is_weighted_at_35_percent(self):
         for sev in config.NEWS_BASE:
             self.assertEqual(config.news_weight(sev, via_parent=False), config.W_NEWS, sev)
         sev5 = config.risk_score(0, config.NEWS_BASE[5], config.news_weight(5, False))
-        self.assertEqual(sev5, 35.0, "a same-day sev-5 story on a perfect payer sits on the Watch line")
+        self.assertEqual(sev5, 35.0, "a same-day sev-5 story on a perfect payer scores 35")
 
     def test_severe_news_fades_back_to_healthy_without_a_cliff(self):
         w = config.news_weight(5, False) * config.NEWS_BASE[5]
@@ -504,7 +504,7 @@ class ScoringConstants(unittest.TestCase):
             ("NEWS_MAX_AGE_DAYS", -10, "scores all news zero"),
             ("DPD_KNEE", 0, "divides by zero"),
             ("W_NEWS", 0.5, "weights no longer sum to 1"),
-            ("BAND_HIGH", 20.0, "High Risk below Watch"),
+            ("BAND_HIGH", 10.0, "High Risk below Watch"),
             ("PD_ANCHORS", [(50, 0.5), (10, 0.1)], "anchors out of order"),
             ("PARENT_STEP_DOWN", {5: 7}, "steps onto a severity with no base score"),
         ]:

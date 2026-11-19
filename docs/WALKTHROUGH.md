@@ -55,7 +55,7 @@ EvidenceStore  (ews/evidence.py) — typed, dated, id-cited items:
     ▼
 adjudicate()  ← THE ONLY PLACE A SCORE IS PRODUCED  (ews/agents/adjudicator.py:23)
     score = 0.65 × payment_score(DPD) + 0.35 × news_score
-    band  = Healthy <35 · Watch 35–59 · High Risk 60+
+    band  = Healthy <20 · Watch 20–49 · High Risk 50+
     pd    = interpolated from the score
     │
     ├───────────────────── Agent 3 · Adjudicator  (once per buyer, 26 runs)
@@ -112,7 +112,7 @@ up to one severe one.
 **Bands:**
 
 ```
-0 – 34.9  Healthy        35 – 59.9  Watch        60+  High Risk
+0 – 19.9  Healthy        20 – 49.9  Watch        50+  High Risk
 ```
 
 **Worked example — Arcline Fabrications NV**
@@ -126,10 +126,11 @@ news                sev 5, 204d old: 75 × 0.5^(204/365) = 50.9    × 0.35 = 17.
 
 That last line is what the Score tab prints verbatim as `verdict.trace`.
 
-**Ceiling worth knowing:** the largest news contribution possible is `75 × 0.35 = 26.25`,
-and Watch starts at 35 — so **news alone can never move a buyer out of Healthy**. Only
-payment behaviour crosses a band line. That is what keeps Vandermeer, a buyer carrying a
-severity-5 unpaid-wages story who never defaults, sitting in Healthy.
+**Ceiling worth knowing:** the largest news contribution possible is `100 × 0.35 = 35`.
+Watch starts at 20, so a fresh severity 3–5 story moves a buyer that pays on time to
+**Watch** on its own; High Risk starts at 50, so news alone never gets there. Vandermeer,
+carrying a severity-5 unpaid-wages story but never defaulting, stays Healthy because the
+story is 710 days old and has decayed to about 3 points.
 
 ### Who decides what, in the news half
 
@@ -390,10 +391,9 @@ Three ways any given agent run can resolve, shown honestly on every buyer's Agen
 ## 8. The three questions to expect
 
 **"Can the news alone put a healthy company on a watchlist?"**
-No. Maximum news contribution is `0.35 × 75 = 26.25`, and Watch starts at 35. Only
-payment behaviour can carry a buyer over a band line. That is by design, and it is what
-keeps Vandermeer — a severity-5 unpaid-wages story on a company that never defaults —
-in Healthy.
+Onto Watch, yes; onto High Risk, no. Maximum news contribution is `0.35 × 100 = 35`:
+above the Watch line at 20, below High Risk at 50. A CEO exit (severity 4) on a company
+that pays on time scores 28 - Watch - and fades back to Healthy as the story ages.
 
 **"Is the model inventing numbers?"**
 It cannot. Every numeric token in what it writes is extracted and matched against the

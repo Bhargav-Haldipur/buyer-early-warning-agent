@@ -1,6 +1,6 @@
 {
-  "fetched_at": "2026-11-18T11:27:40+00:00",
-  "as_of": "2026-11-18",
+  "fetched_at": "2026-11-19T09:10:22+00:00",
+  "as_of": "2026-11-19",
   "days": 180,
   "feeds": [
     "google_news",
@@ -26,52 +26,52 @@
     "Nvidia": {
       "sec_edgar": 8,
       "google_news": 12,
-      "untrusted_dropped": 36
+      "untrusted_dropped": 35
     },
     "Microsoft": {
       "sec_edgar": 7,
-      "google_news": 10,
-      "untrusted_dropped": 90
+      "google_news": 12,
+      "untrusted_dropped": 88
     },
     "Apple": {
       "sec_edgar": 4,
       "google_news": 12,
-      "untrusted_dropped": 55
+      "untrusted_dropped": 57
     },
     "Walmart": {
       "sec_edgar": 4,
       "google_news": 12,
-      "untrusted_dropped": 87
+      "untrusted_dropped": 81
     },
     "Caterpillar": {
       "sec_edgar": 5,
       "google_news": 12,
-      "untrusted_dropped": 83
+      "untrusted_dropped": 84
     },
     "Intel": {
       "sec_edgar": 3,
       "google_news": 12,
-      "untrusted_dropped": 58
+      "untrusted_dropped": 59
     },
     "Boeing": {
       "sec_edgar": 4,
       "google_news": 12,
-      "untrusted_dropped": 87
+      "untrusted_dropped": 83
     },
     "Ford": {
       "sec_edgar": 5,
       "google_news": 12,
-      "untrusted_dropped": 43
+      "untrusted_dropped": 38
     },
     "Nike": {
       "sec_edgar": 9,
-      "google_news": 12,
-      "untrusted_dropped": 81
+      "google_news": 11,
+      "untrusted_dropped": 89
     },
     "Starbucks": {
       "sec_edgar": 4,
-      "google_news": 12,
-      "untrusted_dropped": 86
+      "google_news": 11,
+      "untrusted_dropped": 89
     }
   },
   "errors": [],
