@@ -1,11 +1,39 @@
 """Single place for every constant the plan fixes. Nothing here is fitted to labels."""
 import math
+import os
 from datetime import date
 
-AS_OF = date(2026, 9, 25)          # dataset snapshot
+# --- which book is being watched ----------------------------------------------
+# synthetic: the sample dataset under data/, graded by the harness.
+# sbi:       one insurer (SBI Trade Credit) covering real US companies, with news
+#            fetched from trusted external sources (python -m ews.fetch_news) and an
+#            illustrative payment ledger under data/sbi/. There are no labels for it.
+DATASETS = ("synthetic", "sbi")
+DATASET = os.environ.get("EWS_DATASET", "synthetic").strip().lower() or "synthetic"
+if DATASET not in DATASETS:
+    raise ValueError(f"EWS_DATASET must be one of {DATASETS}, got {DATASET!r}")
+
+# The synthetic dataset is a fixed snapshot. The SBI book reads live news, so it is
+# scored as of today - a fixed date would score tomorrow's articles as unseen.
+# EWS_AS_OF pins either one, for a reproducible run.
+if os.environ.get("EWS_AS_OF"):
+    AS_OF = date.fromisoformat(os.environ["EWS_AS_OF"])
+elif DATASET == "sbi":
+    AS_OF = date.today()
+else:
+    AS_OF = date(2026, 9, 25)      # dataset snapshot
+
+CURRENCY = {"synthetic": "EUR", "sbi": "USD"}[DATASET]
 
 # --- D5: Risk Score ---------------------------------------------------------
 W_PAYMENT, W_NEWS = 0.65, 0.35
+# Severities listed here, about the buyer itself, count at W_NEWS_SEVERE instead of
+# W_NEWS. Empty: every severity is weighted at 35%, so news alone adds at most
+# 0.35 x 100 = 35 (sev 5, published today) and payment drives the bands. Put {4, 5}
+# back to let severe news move a buyer that pays on time on its own.
+FULL_WEIGHT_SEVERITIES: frozenset[int] = frozenset()
+W_NEWS_SEVERE = 1.0
+SCORE_CAP = 100.0
 DPD_KNEE = 30                       # matches every insurer's overdue reporting window
 NEWS_HALF_LIFE_DAYS = 365           # measured: <270d drops Emberline (see plan D5)
 # Decay alone never reaches zero: a 4-year-old severity-5 story still carries 1.6
@@ -15,10 +43,11 @@ NEWS_MAX_AGE_DAYS = 730
 # ...and it fades out over its final stretch rather than dropping off a cliff, so a
 # buyer never improves overnight just because an article crossed the horizon.
 NEWS_FADE_DAYS = 180
-NEWS_BASE = {0: 0.0, 3: 20.0, 4: 45.0, 5: 75.0}
+# News points by severity, before weighting and decay.
+NEWS_BASE = {0: 0.0, 1: 20.0, 2: 40.0, 3: 60.0, 4: 80.0, 5: 100.0}
 
-# --- D4: a parent story is a moderate concern for a subsidiary, not a severe one
-PARENT_STEP_DOWN = {5: 4, 4: 3, 3: 0, 0: 0}
+# --- D4: a parent story counts one rung down for each subsidiary
+PARENT_STEP_DOWN = {5: 4, 4: 3, 3: 2, 2: 1, 1: 0, 0: 0}
 
 # --- D8: bands --------------------------------------------------------------
 BAND_WATCH, BAND_HIGH = 35.0, 60.0
@@ -50,6 +79,18 @@ def payment_score(dpd: int) -> float:
     if dpd <= DPD_KNEE:
         return (dpd / DPD_KNEE) * 40.0
     return 40.0 + min(60.0, (dpd - DPD_KNEE) * 2.0)
+
+
+def news_weight(severity: int, via_parent: bool) -> float:
+    """The weight one story's news points carry into the score."""
+    if not via_parent and severity in FULL_WEIGHT_SEVERITIES:
+        return W_NEWS_SEVERE
+    return W_NEWS
+
+
+def risk_score(payment_points: float, news_points: float, news_w: float = W_NEWS) -> float:
+    """D5, capped: full-weight news on top of a bad ledger can pass 100."""
+    return min(SCORE_CAP, W_PAYMENT * payment_points + news_w * news_points)
 
 
 def decay(age_days: int) -> float:
@@ -103,6 +144,12 @@ def _validate() -> None:
         problems.append("DPD_KNEE must be positive")
     if abs(W_PAYMENT + W_NEWS - 1.0) > 1e-9:
         problems.append(f"W_PAYMENT + W_NEWS must be 1.0, got {W_PAYMENT + W_NEWS}")
+    if not 0 < W_NEWS_SEVERE <= 1.0 or W_NEWS_SEVERE < W_NEWS:
+        problems.append("W_NEWS_SEVERE must be in [W_NEWS, 1.0] - severe news must never "
+                        "weigh less than mild news")
+    if not FULL_WEIGHT_SEVERITIES <= set(NEWS_BASE):
+        problems.append(f"FULL_WEIGHT_SEVERITIES names severities absent from NEWS_BASE: "
+                        f"{sorted(FULL_WEIGHT_SEVERITIES - set(NEWS_BASE))}")
     if not 0 < BAND_WATCH < BAND_HIGH <= 100:
         problems.append("bands must satisfy 0 < BAND_WATCH < BAND_HIGH <= 100")
     xs = [x for x, _ in PD_ANCHORS]

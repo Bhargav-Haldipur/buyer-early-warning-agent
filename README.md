@@ -1,9 +1,9 @@
 # Buyer Early Warning Agent
 
-> **HACKATHON PROTOTYPE · SYNTHETIC DATA**
-> Every buyer, insurer, invoice and news article in this repository is fabricated.
-> No real counterparty, client or portfolio appears anywhere in it. Not reviewed by
-> Risk or Compliance, and not a product.
+> **SAMPLE DATA**
+> The main dataset under `data/` is sample data: no real counterparty, client or
+> portfolio appears in it. The SBI book under `data/sbi/` names real US companies with
+> real public news, and an **illustrative** payment ledger - see below.
 
 A credit insurer finds out a buyer is in trouble when the claim arrives. This watches
 every covered buyer across every insurer and flags the early signs first — from two
@@ -29,7 +29,7 @@ python3 -m dashboard.server
 |---|---|
 | `ews.run` | scores every buyer, writes `out/runs/<date>.json` |
 | `harness.evaluate` | grades that run against the labels — 8 gates |
-| `unittest discover -s tests` | leakage, determinism, formulae, resolver, guard, theme, agent loop, agent definitions, settings — 40 tests |
+| `unittest discover -s tests` | leakage, determinism, formulae, resolver, guard, theme, agent loop, agent definitions, settings, SBI book — 128 tests |
 | `dashboard.server` | serves the dashboard on http://localhost:8000 (Ctrl-C to stop) |
 
 **No install, no API key, no network.** Everything above runs on the Python 3 standard
@@ -121,6 +121,35 @@ The guardrails, with their defaults in `ews/settings.py`:
 | Risk Adjudicator | agree / caveats / challenge, with cited evidence | must call `get_evidence` first; `require_real_citations`; `verify_figures`; `max_concerns` | cannot change the score |
 | Case File | a draft for the risk underwriter to review and approve: structured fields (bottom line, driver notes, lift/worsen triggers) + a four-paragraph narrative; header, limits, trace and evidence are filled by code | must call `get_verdict` and `get_limits` first; `verify_figures` over every field; `figure_tolerance`; `max_list_items`; `run_for_bands` | template when the agent cannot produce a clean draft |
 
+### The SBI Trade Credit book (real companies, live news)
+
+A second dataset under `data/sbi/`: one insurer, **SBI Trade Credit**, covering ten real
+US companies (Nvidia, Microsoft, Apple, Walmart, Caterpillar, Intel, Boeing, Ford, Nike,
+Starbucks). The companies, SEC CIKs and headquarters are real; **the credit limits,
+invoices and payments are illustrative** - everyone pays on or near time, so what moves
+a score is real news, never an invented payment problem at a real company. Every page
+says so.
+
+```bash
+EWS_DATASET=sbi python3 -m ews.fetch_news            # fetch the last 180 days of news
+EWS_DATASET=sbi python3 -m ews.run                   # score it
+EWS_DATASET=sbi python3 -m dashboard.server 8001     # http://localhost:8001
+python3 -m ews.sbi_seed                              # re-date the ledger to today
+```
+
+News comes from the sources in `data/sbi/trusted_sources.csv` - edit it to change them:
+
+| Source | What | Notes |
+|---|---|---|
+| SEC EDGAR Form 8-K | what the company itself reported (bankruptcy, debt acceleration, restatement, restructuring, officer changes...) | free, official, no key; set `SEC_USER_AGENT` to your organisation and email |
+| Google News RSS | press coverage, **kept only from the listed publishers** (Reuters, AP, Bloomberg, WSJ, FT, CNBC...) | headline only - the feed carries no article body |
+
+Fetching writes `data/sbi/news_articles.csv`; the engine reads that file, so runs stay
+reproducible and the agent cache still works. The dashboard's **Fetch latest news**
+button does the same and re-scores. On this book a story typed on the Live input page is
+labelled **HYPOTHETICAL** everywhere it appears. The harness grades the synthetic
+dataset only - there are no labels for real companies.
+
 ---
 
 ## What was built
@@ -151,14 +180,31 @@ Risk Score = 0.65 × Payment Score + 0.35 × News Score      Healthy 0–34 · W
 is every insurer's overdue reporting window — then two points a day, capped at 100 at
 60 days.
 
-**News** takes the buyer's strongest article, scores it 0 / 20 / 45 / 75 by severity,
+**News** takes the buyer's strongest article, scores it by severity -
+0 / **20 / 40 / 60 / 80 / 100** for severity 0 / 1 / 2 / 3 / 4 / 5 -
 and decays it on a **365-day half-life**. That number is measured, not chosen: a
 180-day half-life drops Emberline below the Watch line, and no decay at all lets a
 two-year-old story carry full weight.
 
-News alone tops out at 0.35 × 75 = **26.25**, below the Watch line at 35. **Only
-payment behaviour can flag a buyer.** That single constraint is what keeps the
-severity-5 trap in Healthy.
+| Severity | Meaning | Points | Weight | Adds on day 0 |
+|---|---|---|---|---|
+| 0 | neutral or positive - appointments, results, expansion | 0 | - | 0 |
+| 1 | minor negative - analyst stock downgrade, short outage, minor lawsuit | 20 | 0.35 | 7 |
+| 2 | notable negative - guidance cut, profit warning, layoffs, store closures | 40 | 0.35 | 14 |
+| 3 | mild credit negative - capacity cut, legal notice, contract loss, major lawsuit or probe, sudden CEO/CFO exit, scandal | 60 | 0.35 | 21 |
+| 4 | moderate - unpaid vendors, lenders reviewing exposure, credit downgrade, restatement, CEO/CFO exit, mass layoffs | 80 | 0.35 | 28 |
+| 5 | severe - unpaid wages, debt restructuring or default, insolvency | 100 | 0.35 | 35, the Watch line |
+
+Every severity is weighted at 35%, so news alone adds at most **35** - a severity 5
+story published today, which sits exactly on the Watch line and drops below it the
+next day. Moving a band takes the ledger as well: a buyer 25 days behind (21.7 points
+of payment) reaches Watch with a fresh severity 3 story and 56 with a severity 5 one.
+To let severe news move a buyer that pays on time on its own, put `{4, 5}` back in
+`FULL_WEIGHT_SEVERITIES` in `ews/config.py` - they then count at `W_NEWS_SEVERE` (1.0),
+with the score capped at 100.
+
+Vandermeer, the severity-5 trap in the baseline, stays Healthy: its story is 710 days
+old and has decayed to about 3 points.
 
 ### What it guards against
 
@@ -213,7 +259,7 @@ back to a row in a CSV.
 
 The Case File is a draft for a risk underwriter, not a decision. They review it
 and approves, amends or rejects the recommended limit action; nothing changes on an
-insurer's book until they do. The prototype shows the file but does not yet record the
+insurer's book until they do. The dashboard shows the file but does not yet record the
 risk underwriter's decision.
 
 ---
@@ -232,7 +278,7 @@ Measured on both paths — the rule-based fallback, and the four agents on Claud
 | Severity agreement with labels | 32/32 | 29/32 — see below |
 | Parent fan-out | pass | pass |
 | Case file figures traced to the engine | 26 templated | **4 model-written, 0 discarded** |
-| Tests | **79/79** | — |
+| Tests | **132/132** | — |
 
 **The decoys held against a real model.** Given search tools and free rein to
 investigate, Claude still refused all five — including `Halberg Jewellers GmbH`

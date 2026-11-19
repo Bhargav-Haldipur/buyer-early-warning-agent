@@ -165,9 +165,31 @@ class Formula(unittest.TestCase):
         self.assertAlmostEqual(config.PD_TARGET, 0.25, places=6,
                                msg="D6 risk appetite must be PD at score 35")
 
-    def test_news_alone_cannot_leave_healthy(self):
-        worst = config.W_NEWS * config.NEWS_BASE[5]
-        self.assertLess(worst, config.BAND_WATCH)
+    def test_news_alone_cannot_leave_healthy_below_severity_5(self):
+        """At 35% only a same-day severity-5 story reaches the Watch line on its own."""
+        for sev in set(config.NEWS_BASE) - {5}:
+            stepped = config.PARENT_STEP_DOWN[sev]
+            parent = config.news_weight(stepped, via_parent=True) * config.NEWS_BASE[stepped]
+            self.assertLess(parent, config.BAND_WATCH, f"parent sev {sev}")
+            if sev not in config.FULL_WEIGHT_SEVERITIES:
+                direct = config.news_weight(sev, via_parent=False) * config.NEWS_BASE[sev]
+                self.assertLess(direct, config.BAND_WATCH, f"direct sev {sev}")
+
+    def test_every_severity_is_weighted_at_35_percent(self):
+        for sev in config.NEWS_BASE:
+            self.assertEqual(config.news_weight(sev, via_parent=False), config.W_NEWS, sev)
+        sev5 = config.risk_score(0, config.NEWS_BASE[5], config.news_weight(5, False))
+        self.assertEqual(sev5, 35.0, "a same-day sev-5 story on a perfect payer sits on the Watch line")
+
+    def test_severe_news_fades_back_to_healthy_without_a_cliff(self):
+        w = config.news_weight(5, False) * config.NEWS_BASE[5]
+        bands = [config.band(w * config.decay(d)) for d in range(config.NEWS_MAX_AGE_DAYS + 1)]
+        self.assertEqual(bands[-1], "Healthy")
+        order = {"High Risk": 2, "Watch": 1, "Healthy": 0}
+        self.assertEqual([order[b] for b in bands], sorted((order[b] for b in bands), reverse=True))
+
+    def test_score_is_capped_at_100(self):
+        self.assertEqual(config.risk_score(100, config.NEWS_BASE[5], 1.0), 100.0)
 
     def test_decay_half_life(self):
         self.assertAlmostEqual(config.decay(config.NEWS_HALF_LIFE_DAYS), 0.5)
@@ -182,10 +204,12 @@ class Formula(unittest.TestCase):
 
     def test_the_horizon_is_a_fade_not_a_cliff(self):
         """No buyer may improve overnight because an article aged out."""
-        step = config.W_NEWS * config.NEWS_BASE[5]
+        step = config.W_NEWS_SEVERE * config.NEWS_BASE[5]
         worst = max(abs(step * config.decay(d) - step * config.decay(d + 1))
                     for d in range(0, config.NEWS_MAX_AGE_DAYS))
-        self.assertLess(worst, 0.25, "a single day must not move the score materially")
+        # 0.3: a severity-5 story is now worth 100 points, and its steepest day in the
+        # fade-out moves the score 0.26 - still far below anything that reads as news
+        self.assertLess(worst, 0.3, "a single day must not move the score materially")
 
     def test_decay_never_increases_with_age(self):
         vals = [config.decay(d) for d in range(0, config.NEWS_MAX_AGE_DAYS + 10)]
@@ -482,7 +506,7 @@ class ScoringConstants(unittest.TestCase):
             ("W_NEWS", 0.5, "weights no longer sum to 1"),
             ("BAND_HIGH", 20.0, "High Risk below Watch"),
             ("PD_ANCHORS", [(50, 0.5), (10, 0.1)], "anchors out of order"),
-            ("PARENT_STEP_DOWN", {5: 2}, "steps onto a severity with no base score"),
+            ("PARENT_STEP_DOWN", {5: 7}, "steps onto a severity with no base score"),
         ]:
             setattr(config, attr, bad)
             with self.assertRaises(ValueError, msg=f"{attr}={bad!r} ({why})"):
@@ -669,8 +693,8 @@ class LiveInput(unittest.TestCase):
         for page in (self.S.buyer_page("BUY019", "score"), self.S.client_page("CL01"),
                      self.S.home()):
             self.assertIn("Live input in play", page.decode())
-        self.assertIn("47.7", self.S.buyer_page("BUY019", "score").decode())
-        self.assertIn("47.7", self.S.client_page(self._insurer_of("BUY019")).decode())
+        self.assertIn("56.3", self.S.buyer_page("BUY019", "score").decode())
+        self.assertIn("56.3", self.S.client_page(self._insurer_of("BUY019")).decode())
 
     def test_resetting_puts_every_page_back(self):
         self.S._CACHE.clear()
@@ -739,8 +763,16 @@ class NextSteps(unittest.TestCase):
         import dashboard.server as S
         html = (ROOT / "dashboard" / "next.html").read_text()
         self.assertIn('href="/theme.css"', html)
-        self.assertIn("HACKATHON PROTOTYPE", html)
+        self.assertIn("{{BANNER}}", html)
         self.assertIn('<a href="/next"', S.home().decode())
+
+    def test_no_page_calls_itself_a_hackathon_prototype(self):
+        import dashboard.server as S
+        for body in (S.home(), S.live_page(), S.buyer_page("BUY019", "score"),
+                     (ROOT / "dashboard" / "next.html").read_bytes()):
+            text = body.decode().upper()
+            self.assertNotIn("HACKATHON", text)
+            self.assertNotIn("PROTOTYPE", text)
 
     def test_the_slide_lists_every_tool_each_agent_actually_has(self):
         """A diagram that omits a tool is worse than none - search_entities is in every

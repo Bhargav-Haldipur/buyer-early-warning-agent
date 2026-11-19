@@ -13,7 +13,8 @@ from __future__ import annotations
 
 from ..casefile import verify
 from ..evidence import evidence_view
-from ..config import W_NEWS, W_PAYMENT, band, payment_score, pd_for
+from ..config import (SCORE_CAP, W_NEWS, W_PAYMENT, band, news_weight, payment_score, pd_for,
+                      risk_score)
 from . import definition
 from .runtime import Tool, attempt
 
@@ -24,7 +25,14 @@ def adjudicate(buyer_id: str, payment: dict, news: dict) -> dict:
     dpd = payment["dpd"]
     p = payment_score(dpd)
     n = news["value"]
-    score = W_PAYMENT * p + W_NEWS * n
+    wn = news_weight(news["severity"], news["via_parent"])
+    score = risk_score(p, n, wn)
+    uncapped = W_PAYMENT * p + wn * n
+    severe = f", sev {news['severity']} full weight" if wn != W_NEWS and n else ""
+    trace = (f"{W_PAYMENT} x {p:.1f} (payment, {dpd} DPD) + "
+             f"{wn:g} x {n:.1f} (news{severe}) = {uncapped:.1f}")
+    if uncapped > SCORE_CAP:
+        trace += f", capped at {SCORE_CAP:g}"
     return {
         "buyer_id": buyer_id,
         "score": round(score, 1),
@@ -45,10 +53,9 @@ def adjudicate(buyer_id: str, payment: dict, news: dict) -> dict:
             "via_parent": news["via_parent"],
             "parent_name": news["parent_name"],
             "raw": round(n, 1),
-            "weighted": round(W_NEWS * n, 1),
+            "weighted": round(wn * n, 1),
         },
-        "trace": (f"{W_PAYMENT} x {p:.1f} (payment, {dpd} DPD) + "
-                  f"{W_NEWS} x {n:.1f} (news) = {score:.1f}"),
+        "trace": trace,
     }
 
 

@@ -246,7 +246,7 @@ class Settings(unittest.TestCase):
 
     def test_bad_values_stop_the_run(self):
         bad = [("payment", {"effort": "extreme"}), ("news", {"model": "gpt-4"}),
-               ("news", {"allowed_severities": [0, 2]}), ("payment", {"max_turns": 0}),
+               ("news", {"allowed_severities": [0, 7]}), ("payment", {"max_turns": 0}),
                ("casefile", {"run_for_bands": ["Red"]}), ("payment", {"enabled": "yes"}),
                ("payment", {"required_before_submit": ["not_a_tool"]})]
         for name, change in bad:
@@ -305,7 +305,7 @@ class Guards(unittest.TestCase):
 
     def test_news_agent_severity_must_be_on_the_ladder(self):
         with self.assertRaises(ValueError):
-            self.desk.submit("buyer", "BUY002", 2, "other", "off the ladder")
+            self.desk.submit("buyer", "BUY002", 7, "other", "off the ladder")
 
     def test_payment_agent_must_match_the_ledger(self):
         from ews.agents.payment import Ledger
@@ -386,17 +386,17 @@ class EndToEnd(unittest.TestCase):
 class Outlook(unittest.TestCase):
     def test_dpd_trigger_reaches_the_next_band(self):
         from ews.casefile import outlook
-        from ews.config import W_NEWS, W_PAYMENT, band, payment_score
+        from ews.config import W_PAYMENT, band, payment_score
         for r in engine.run(llm=FallbackLLM(cache=False))["buyers"]:
             v = r["verdict"]
             o = outlook(v)
             if o["dpd_for_next_band"] is None:
                 continue
-            news = v["news"]["raw"]
+            news = v["news"]["weighted"]
             at = o["dpd_for_next_band"]
-            self.assertEqual(band(W_PAYMENT * payment_score(at) + W_NEWS * news), o["next_band"])
+            self.assertEqual(band(W_PAYMENT * payment_score(at) + news), o["next_band"])
             if at > 0:
-                self.assertNotEqual(band(W_PAYMENT * payment_score(at - 1) + W_NEWS * news),
+                self.assertNotEqual(band(W_PAYMENT * payment_score(at - 1) + news),
                                     o["next_band"])
 
 

@@ -29,6 +29,8 @@ CACHE_DIR = Path(__file__).resolve().parent.parent / "out" / ".llm_cache"
 GENERIC_TOKENS = frozenset({
     # Anglo
     "LTD", "LIMITED", "PLC", "LLP", "INC", "CO", "COMPANY", "CORP",
+    # US registered names: "The Boeing Company", "NVIDIA Corporation"
+    "CORPORATION", "INCORPORATED", "THE",
     # continental European legal forms, written without dots in this dataset
     "GMBH", "AG", "KG", "NV", "BV", "SA", "SAS", "SARL", "SPA", "SRL",
     "AB", "AS", "APS", "OY", "OYJ",
@@ -77,6 +79,32 @@ _GRADE_RULES: list[tuple[str, str, int]] = [
     (r"reviewing exposure|lenders review|review .*exposure", "lender_review", 4),
     (r"scales back|scaling back|halts production|capacity cut", "capacity_cut", 3),
     (r"legal notice|winding.up petition|insolvency petition", "legal_notice", 3),
+    # Real-world events (SBI book: press headlines and SEC 8-K item titles). After the
+    # synthetic rules so those grade exactly as before; before the neutral ones so a
+    # "new plant... and 2,000 job cuts" story is not read as expansion.
+    (r"bankruptcy or receivership|chapter 11|files? for bankruptcy|insolvency proceedings",
+     "bankruptcy", 5),
+    (r"triggering events that accelerate|default(ed|s)? on (its )?(debt|bonds?|loans?|notes)"
+     r"|missed (an? )?(interest|debt|bond|coupon) payment", "debt_default", 5),
+    (r"non-reliance on previously issued|going.concern|notice of delisting"
+     r"|restat(e|es|ed|ement) (of )?(its )?(prior )?financial", "accounting_or_listing", 4),
+    (r"(credit|debt) rating.{0,30}(cut|downgrad)|(cut|downgrad)\w*.{0,30}(credit|debt) rating"
+     r"|downgrad\w*.{0,30}junk|(cut|lowered) to junk",
+     "credit_downgrade", 4),
+    (r"(ceo|cfo|chief executive|chief financial officer).{0,40}(resign|steps? down|ousted|fired|departs|exit|won.t return)"
+     r"|won.t return as (ceo|chief executive)|(without|bring back|return of) (jensen )?huang"
+     r"|huang (gone|exit|departure)", "leadership_exit", 4),
+    (r"mass layoffs?|layoffs?|job cuts|cut\w* .{0,40}(jobs|workers|staff|employees)",
+     "mass_layoffs", 4),
+    (r"termination of a material definitive agreement|material impairments?|impairment charge"
+     r"|regulatory probe|antitrust|fraud|scandal|class action|shareholders? sue"
+     r"|on strike|strike action|material cybersecurity incident",
+     "governance_or_legal", 3),
+    (r"exit or disposal activities|buyouts to .{0,20}employees"
+     r"|shutter\w* .{0,30}stores|store closures|profit warning"
+     r"|(cut|lower)\w* .{0,25}(guidance|forecast|outlook)", "restructuring", 2),
+    (r"lawsuit|\bsue[sd]?\b|investigation|probe|outage"
+     r"|downgrade[sd]? .{0,30}(stock|shares|to (hold|sell|neutral|underweight))", "minor_negative", 1),
     (r"appoints|appointment of", "appointment", 0),
     (r"commissions new line|new facility|expansion", "expansion", 0),
     (r"tie.up|distribution arrangement|partnership", "tie_up", 0),

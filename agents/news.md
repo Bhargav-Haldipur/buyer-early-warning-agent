@@ -28,10 +28,14 @@ answer kind "none". A story about a parent holding company is kind "parent".
 
 ## Severity for the matched entity
 
-- 0 - neutral or positive (appointments, expansion, tie-ups, higher volumes)
-- 3 - mild negative (capacity cut, legal notice, contract loss)
-- 4 - moderate negative (unpaid vendors, lenders reviewing exposure)
-- 5 - severe negative (unpaid wages, debt restructuring, insolvency)
+- 0 - neutral or positive (appointments, expansion, tie-ups, higher volumes, results)
+- 1 - minor negative (analyst downgrade of the stock, short outage, minor lawsuit)
+- 2 - notable negative (guidance cut, profit warning, voluntary buyouts, store closures)
+- 3 - mild negative for credit (capacity cut, legal notice, contract loss, major lawsuit
+  or regulatory probe, scandal)
+- 4 - moderate negative (unpaid vendors, lenders reviewing exposure, credit rating
+  downgrade, restated accounts, CEO or CFO exit, mass layoffs)
+- 5 - severe negative (unpaid wages, debt restructuring, debt default, insolvency)
 
 Grade what the article says about this company only. When kind is "none", submit
 severity 0 and category "none".

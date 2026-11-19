@@ -14,6 +14,8 @@ agent set the risk score - that is always the formula in ews/config.py.
 # tool calls and less thinking - cheaper and faster, less thorough.
 import os
 
+from .config import NEWS_BASE
+
 EFFORTS = ("low", "medium", "high", "xhigh", "max")
 
 AGENTS = {
@@ -42,8 +44,8 @@ AGENTS = {
             # a matched entity id must have come back from search_entities or get_entity
             # in this run - the agent cannot guess an id it has not looked up
             "entity_must_be_looked_up": True,
-            # severities the agent may submit; must be a subset of 0, 3, 4, 5
-            "allowed_severities": [0, 3, 4, 5],
+            # severities the agent may submit; must be a subset of 0-5
+            "allowed_severities": [0, 1, 2, 3, 4, 5],
         },
     },
     "adjudicator": {
@@ -208,8 +210,9 @@ def agent(name: str) -> dict:
         raise SettingsError(f"AGENTS[{name!r}]: max_turns must be >= 1, max_tokens >= 256")
     g = s["guardrails"]
     if "allowed_severities" in g and (not g["allowed_severities"]
-                                      or not set(g["allowed_severities"]) <= {0, 3, 4, 5}):
-        raise SettingsError("news allowed_severities must be a non-empty subset of 0, 3, 4, 5")
+                                      or not set(g["allowed_severities"]) <= set(NEWS_BASE)):
+        raise SettingsError(f"news allowed_severities must be a non-empty subset of "
+                            f"{sorted(NEWS_BASE)}")
     if "run_for_bands" in g and not set(g["run_for_bands"]) <= {"Healthy", "Watch", "High Risk"}:
         raise SettingsError("casefile run_for_bands may only name Healthy, Watch, High Risk")
     if g.get("max_list_items", 1) < 1:

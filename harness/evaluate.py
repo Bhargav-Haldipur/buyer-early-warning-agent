@@ -12,7 +12,7 @@ from pathlib import Path
 
 from ews import run as engine
 from ews.agents.news import NewsDesk
-from ews.config import PARENT_STEP_DOWN
+from ews.config import DATASET, PARENT_STEP_DOWN
 from ews.llm import get_llm
 from ews.loader import NEWS_LABEL_COLUMNS, Loader
 
@@ -20,6 +20,10 @@ PASS, FAIL, WARN = "PASS", "FAIL", "WARN"
 
 
 def evaluate(llm=None) -> dict:
+    if DATASET != "synthetic":
+        # real companies carry no labels: there is nothing to grade them against
+        raise SystemExit(f"the harness grades the synthetic dataset only; unset "
+                         f"EWS_DATASET (it is {DATASET!r}) and run it again")
     llm = llm or get_llm()
     labels = {r["buyer_id"]: r for r in Loader(harness=True).table("ground_truth")}
     hl = Loader(harness=True)

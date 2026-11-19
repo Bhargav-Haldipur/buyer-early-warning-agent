@@ -1,6 +1,6 @@
 # Walkthrough — what every file does, and where every number on screen comes from
 
-> **HACKATHON PROTOTYPE · SYNTHETIC DATA**
+> **SAMPLE DATA**
 
 `README.md` says how to run it. `docs/PLAN.md` says why each decision was made.
 **This file is the map**: read it once and you can open any page in the dashboard,
