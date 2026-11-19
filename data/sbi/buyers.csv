@@ -1,0 +1,11 @@
+buyer_id,buyer_name,short_name,sector,city,size_band,parent_id,annual_turnover_eur,relationship_start
+US001,NVIDIA Corporation,Nvidia,Semiconductors,"Santa Clara, CA",large,,,2023-01-15
+US002,Microsoft Corporation,Microsoft,Software,"Redmond, WA",large,,,2023-01-15
+US003,Apple Inc.,Apple,Consumer Electronics,"Cupertino, CA",large,,,2023-01-15
+US004,Walmart Inc.,Walmart,Retail,"Bentonville, AR",large,,,2023-01-15
+US005,Caterpillar Inc.,Caterpillar,Construction Machinery,"Irving, TX",large,,,2023-01-15
+US006,Intel Corporation,Intel,Semiconductors,"Santa Clara, CA",large,,,2023-01-15
+US007,The Boeing Company,Boeing,Aerospace,"Arlington, VA",large,,,2023-01-15
+US008,Ford Motor Company,Ford,Automotive,"Dearborn, MI",large,,,2023-01-15
+US009,"NIKE, Inc.",Nike,Apparel & Footwear,"Beaverton, OR",large,,,2023-01-15
+US010,Starbucks Corporation,Starbucks,Restaurants,"Seattle, WA",large,,,2023-01-15

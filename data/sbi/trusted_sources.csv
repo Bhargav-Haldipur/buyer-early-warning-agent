@@ -1,0 +1,17 @@
+type,name,enabled,notes
+feed,sec_edgar,Y,Form 8-K current reports from the SEC's own API - what the company itself reported
+feed,google_news,Y,Press coverage via Google News RSS - kept only from the publishers below
+publisher,Reuters,Y,
+publisher,Associated Press,Y,
+publisher,AP News,Y,
+publisher,Bloomberg,Y,
+publisher,Bloomberg.com,Y,
+publisher,The Wall Street Journal,Y,
+publisher,WSJ,Y,
+publisher,Financial Times,Y,
+publisher,CNBC,Y,
+publisher,Barron's,Y,
+publisher,MarketWatch,Y,
+publisher,The New York Times,Y,
+publisher,Fortune,Y,
+publisher,Yahoo Finance,Y,

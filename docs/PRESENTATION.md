@@ -328,7 +328,7 @@ happen. **One sentence, then stop.** Whoever built it takes it.
 | **"How do you know it isn't tuned on the answers?"** | B | "The labels are unreadable to the engine — the loader raises, and a test greps every file to prove none of them even names them." |
 | **"Biggest trade-off?"** | B | "The model never produces a number. Costs some fluency in the write-up; buys an auditable score, which a regulated insurer can't do without." |
 | **"Why not just watch payment data?"** | S | "You already do, and it's late. Fifty-seven days versus forty-five is the whole argument." |
-| **"Could news alone flag someone?"** | S | "No, by design — news tops out at 26 points and Watch starts at 35. Only money crosses a line." |
+| **"Could news alone flag someone?"** | S | "Barely — news is weighted 35%, so a same-day severity 5 story adds 35 points, exactly the Watch line. Moving a band takes the ledger too." |
 | **"What does it cost to run?"** | B | "Measured, not estimated — printed every run. A full pass over 26 buyers is 87 agent runs, a couple of dollars; roughly eight cents per buyer per day." |
 | **"You know we pool overdue data across all policyholders?"** | B | "Yes, and that's a stronger signal than anything here — we see one insurer's view of one buyer. Pooled, the payment side gets better and nothing about the design changes; the news side and the drafted case file are what we're adding." |
 | **"What breaks at 10,000 buyers?"** | S | "Entity resolution against a real company master, and news volume — 87 runs a day becomes 30,000. It fans out fine; cost is the constraint, not the design." |

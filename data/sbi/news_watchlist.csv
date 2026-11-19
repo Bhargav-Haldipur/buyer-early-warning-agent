@@ -1,0 +1,11 @@
+buyer_id,cik,ticker,news_query,aliases
+US001,1045810,NVDA,"""Nvidia""",Nvidia
+US002,789019,MSFT,"""Microsoft""",Microsoft
+US003,320193,AAPL,"""Apple Inc"" OR ""Apple shares"" OR ""Apple stock""",Apple
+US004,104169,WMT,"""Walmart""",Walmart
+US005,18230,CAT,"""Caterpillar""",Caterpillar
+US006,50863,INTC,"""Intel""",Intel
+US007,12927,BA,"""Boeing""",Boeing
+US008,37996,F,"""Ford Motor"" OR ""Ford shares"" OR ""Ford stock""",Ford Motor|Ford
+US009,320187,NKE,"""Nike""",Nike
+US010,829224,SBUX,"""Starbucks""",Starbucks

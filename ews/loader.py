@@ -10,7 +10,11 @@ import csv
 from datetime import date
 from pathlib import Path
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+from .config import DATASET
+
+ROOT_DATA = Path(__file__).resolve().parent.parent / "data"
+# the synthetic book lives at the top of data/; any other book in its own folder
+DATA_DIR = ROOT_DATA if DATASET == "synthetic" else ROOT_DATA / DATASET
 
 ENGINE_TABLES = frozenset(
     {"clients", "buyers", "credit_limits", "invoices", "news_articles", "parent_companies"}

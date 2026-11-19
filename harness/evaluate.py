@@ -12,7 +12,7 @@ from pathlib import Path
 
 from ews import run as engine
 from ews.agents.news import NewsDesk
-from ews.config import PARENT_STEP_DOWN
+from ews.config import DATASET, PARENT_STEP_DOWN
 from ews.llm import get_llm
 from ews.loader import Loader
 
@@ -20,6 +20,10 @@ PASS, FAIL, WARN = "PASS", "FAIL", "WARN"
 
 
 def evaluate(llm=None) -> dict:
+    if DATASET != "synthetic":
+        # real companies carry no labels: there is nothing to grade them against
+        raise SystemExit(f"the harness grades the synthetic dataset only; unset "
+                         f"EWS_DATASET (it is {DATASET!r}) and run it again")
     llm = llm or get_llm()
     labels = {r["buyer_id"]: r for r in Loader(harness=True).table("ground_truth")}
     all_demo = len(Loader(harness=True).demo_articles())
@@ -131,8 +135,9 @@ def evaluate(llm=None) -> dict:
                   "detail": f"{n_parent} parent story/stories" + ("; " + "; ".join(fan_issues) if fan_issues else "")})
 
     # --- 11: demo replay --------------------------------------------------
-    expected = {1: ("BUY011", 21.7), 2: ("BUY014", 28.6), 3: ("BUY016", 37.3),
-                4: ("BUY019", 47.7), 6: ("BUY023", 47.7), 7: ("BUY011", 37.3)}
+    # news points 0/20/40/60/80/100 by severity, every severity weighted at 35%
+    expected = {1: ("BUY011", 21.7), 2: ("BUY014", 42.5), 3: ("BUY016", 49.4),
+                4: ("BUY019", 56.3), 6: ("BUY023", 56.3), 7: ("BUY011", 49.4)}
     replay_bad = []
     for step, (bid, want) in expected.items():
         got = next(r["verdict"]["score"] for r in engine.run(demo_steps=step, llm=llm)["buyers"]
@@ -142,8 +147,8 @@ def evaluate(llm=None) -> dict:
     swap = next(r["verdict"] for r in engine.run(demo_steps=all_demo, swap_invoices=True,
                                                  llm=llm)["buyers"]
                 if r["buyer_id"] == "BUY023")
-    if abs(swap["score"] - 65.0) > 0.15 or swap["band"] != "High Risk":
-        replay_bad.append(f"step 8 BUY023: {swap['score']} {swap['band']} != 65.0 High Risk")
+    if abs(swap["score"] - 73.7) > 0.15 or swap["band"] != "High Risk":
+        replay_bad.append(f"step 8 BUY023: {swap['score']} {swap['band']} != 73.7 High Risk")
     gates.append({"gate": "Demo replay reproduces the planned scores",
                   "status": PASS if not replay_bad else FAIL,
                   "detail": "steps 1-8" + ("; " + "; ".join(replay_bad) if replay_bad else "")})

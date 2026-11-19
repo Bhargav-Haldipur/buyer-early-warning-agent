@@ -15,11 +15,29 @@ from pathlib import Path
 
 from ews import run as engine
 from ews.agents import definition
-from ews.config import AS_OF
-from ews.loader import DataError, Loader
+from ews import fetch_news
+from ews.config import AS_OF, CURRENCY, DATASET, W_NEWS
+from ews.loader import DATA_DIR, DataError, Loader
 
 HERE = Path(__file__).resolve().parent
-BANNER = "HACKATHON PROTOTYPE &middot; SYNTHETIC DATA"
+LIVE_BOOK = DATASET != "synthetic"          # real companies, news fetched from outside
+HAS_DEMO = (DATA_DIR / "demo" / "demo_articles_to_add.csv").exists()
+if LIVE_BOOK:
+    # The companies are real and the ledger is not: that line stays on every page, so no
+    # screenshot of a real company's payments can be taken for its actual record.
+    BANNER = "REAL COMPANIES &amp; LIVE NEWS &middot; ILLUSTRATIVE PAYMENT DATA"
+    TITLE_TAG = "Illustrative Data"
+    DISCLAIMER = ("The companies are real and the news is fetched from public sources (SEC EDGAR, "
+                  "trusted publishers via Google News), linked on each buyer&rsquo;s News tab. The "
+                  "insurer&rsquo;s book on them &mdash; credit limits, invoices and payments &mdash; "
+                  "is illustrative: no real trade-credit ledger sits behind it, and no payment "
+                  "figure here describes how any of these companies actually pays.")
+else:
+    BANNER = "SAMPLE DATA"
+    TITLE_TAG = "Sample Data"
+    DISCLAIMER = ("Every buyer, insurer, invoice and news article in this view is sample data. "
+                  "No real counterparty appears.")
+SYMBOL = {"EUR": "&euro;", "USD": "$"}[CURRENCY]
 TABS = ("case", "score", "limit", "payments", "news", "agents")
 
 DEMO_STEPS = [
@@ -34,6 +52,7 @@ DEMO_STEPS = [
 SWAP_STEP = "Payment data updates: Kessler moves from 25 to 40 days past due"
 
 STATE = {"step": 0, "swap": False}
+FETCH: dict = {"last": None}
 _CACHE: dict[tuple[int, bool], dict] = {}
 _LOCK = threading.Lock()
 
@@ -99,10 +118,10 @@ def e(x) -> str:
 def money(v: float) -> str:
     v = float(v)
     if abs(v) >= 1e6:
-        return f"&euro;{v/1e6:,.2f}M"
+        return f"{SYMBOL}{v/1e6:,.2f}M"
     if abs(v) >= 1e3:
-        return f"&euro;{v/1e3:,.0f}k"
-    return f"&euro;{v:,.0f}"
+        return f"{SYMBOL}{v/1e3:,.0f}k"
+    return f"{SYMBOL}{v:,.0f}"
 
 
 def band_pill(band: str) -> str:
@@ -201,10 +220,11 @@ def page(title: str, body: str, theme: str = "", nav: str = "home") -> bytes:
 
     def on(key: str) -> str:
         return ' class="on"' if key == nav else ""
+    demo_link = f'<a href="/demo"{on("demo")}>Scripted demo</a>' if HAS_DEMO else ""
     return f"""<!doctype html>
 <html lang="en"{attr}><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>[PROTOTYPE] {e(title)} &middot; Synthetic Data</title>
+<title>{e(title)} &middot; {TITLE_TAG}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/theme.css">
@@ -212,13 +232,12 @@ def page(title: str, body: str, theme: str = "", nav: str = "home") -> bytes:
 <header class="head"><div class="banner">{BANNER}</div>
 <nav class="topbar"><div class="topbar-in">
 <a class="brand" href="/"><span class="brand-mark">{BRAND_MARK}</span>Buyer Early Warning and Limit Review</a>
-<div class="topnav"><a href="/"{on("home")}>Insurers</a><a href="/demo"{on("demo")}>Scripted demo</a><a href="/live"{on("live")}>Live input</a><a href="/next">Architecture</a></div>
+<div class="topnav"><a href="/"{on("home")}>Insurers</a>{demo_link}<a href="/live"{on("live")}>Live input</a><a href="/next">Architecture</a></div>
 </div></nav></header>
 <div class="wrap">{body}
 <footer>
   <b>{BANNER}</b><br>
-  Every buyer, insurer, invoice and news article here is fabricated. No real counterparty appears.
-  Not reviewed by Risk or Compliance, and not a product.
+  {DISCLAIMER}
 </footer>
 </div></body></html>""".encode()
 
@@ -266,7 +285,9 @@ def live_banner() -> str:
     if LIVE["dpd"]:
         bits.append(f'{len(LIVE["dpd"])} ledger '
                     f'{"edit" if len(LIVE["dpd"]) == 1 else "edits"}')
-    return ('<div class="panel result"><b>Live input in play</b> &mdash; '
+    what = ("<b>Hypothetical scenario in play</b> &mdash; the typed stories are not real news. "
+            if LIVE_BOOK else "<b>Live input in play</b> &mdash; ")
+    return (f'<div class="panel result">{what}'
             f'{" and ".join(bits)} on top of the shipped dataset. Every page reflects it. '
             'The adjudicator review and the agent-written case file are skipped while the '
             'sandbox is active so it answers in seconds; the score is the formula and is '
@@ -301,20 +322,46 @@ def home() -> bytes:
              stat(bands["High Risk"], "High risk", dot="high"),
              stat(bands["Watch"], "Watch", dot="watch")]
 
+    n = len(data["clients"])
+    demo = (' &middot; <a href="/demo">Scripted demo &rsaquo;</a>' if HAS_DEMO
+            else ' &middot; <a href="/live">Live input &rsaquo;</a>')
     return page("Buyer Early Warning and Limit Review", f"""
 {live_banner()}
 <div class="hero">
 <p class="masthead">Buyer Early Warning and Limit Review</p>
-<h1>Today&rsquo;s risk across every insurer</h1>
+<h1>Today&rsquo;s risk across {"every insurer" if n > 1 else "the book"}</h1>
 <p class="lede">Each covered buyer gets a daily risk score from how late it pays
-(65%) and what the news says about it (35%). Open an insurer to see its High Risk and
-Watch buyers, each with a recommended limit action &mdash; freeze or reduce &mdash;
-while there is still limit to cut.</p>
+(65%) and what the news says about it (35%). News is graded severity 1&ndash;5
+(20 to 100 points) and fades with age. Open an insurer to see its
+High Risk and Watch buyers, each with a recommended limit action &mdash; freeze or
+reduce &mdash; while there is still limit to cut.</p>
 <div class="statrow">{"".join(tiles)}</div>
-<p class="meta">{len(data['clients'])} insurers &middot; <a href="/demo">Live demo &rsaquo;</a></p>
+<p class="meta">{n} insurer{"s" if n != 1 else ""}{demo}</p>
 </div>
+{sources_panel()}
 <h2>Insurers</h2>
 <div class="cards">{"".join(cards)}</div>""")
+
+
+def sources_panel() -> str:
+    """Where the news comes from, when it was last fetched, and a button to refresh it."""
+    if not LIVE_BOOK:
+        return ""
+    log = fetch_news.last_fetch()
+    feeds, publishers = fetch_news.load_sources(DATA_DIR)
+    names = {"sec_edgar": "SEC EDGAR Form 8-K filings", "google_news": "Google News"}
+    feed_txt = " &middot; ".join(names.get(f, f) for f in sorted(feeds))
+    when = (f'Last fetched {e(log["fetched_at"].replace("T", " ").replace("+00:00", " UTC"))} '
+            f'&middot; {log["articles"]} articles from the last {log["days"]} days'
+            if log else "Not fetched yet")
+    errs = "".join(f'<br><span class="overline">{e(x)}</span>' for x in (log or {}).get("errors", []))
+    flash = (f'<p class="body2"><b>{e(FETCH["last"])}</b></p>' if FETCH.get("last") else "")
+    return f"""<div class="panel">
+<h3>News sources</h3>
+<p class="body2">{feed_txt}. Press stories are kept only from: {e(", ".join(publishers))}.</p>
+<p class="overline">{when}{errs}</p>{flash}
+<form method="post" action="/news/fetch" style="margin-top:.6rem" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Fetching\u2026'">
+<button class="btn" type="submit">Fetch latest news &amp; re-score</button></form></div>"""
 
 
 def demo_page() -> bytes:
@@ -601,7 +648,7 @@ def buyer_page(bid: str, tab: str) -> bytes:
 <dt>Worst open invoice</dt><dd>{v['payment']['dpd']} days past due</dd>
 <dt>Payment score</dt><dd>{v['payment']['raw']}</dd>
 <dt>Contribution</dt><dd>{v['payment']['weighted']}</dd></dl>
-<h3>News &mdash; weight 0.35</h3><dl class="kv">
+<h3>News &mdash; weight {n.get('weight', W_NEWS):g}{" (severe news about the buyer itself counts in full)" if n.get('weight', W_NEWS) != W_NEWS else ""}</h3><dl class="kv">
 <dt>Strongest article</dt><dd>{src}</dd>
 <dt>News score after decay</dt><dd>{n['raw']}</dd>
 <dt>Contribution</dt><dd>{n['weighted']}</dd></dl>
@@ -641,10 +688,11 @@ def buyer_page(bid: str, tab: str) -> bytes:
         inner = agents_tab(r, data)
 
     else:  # news
+        urls = {a["article_id"]: a.get("url") for a in Loader().news()}
         ev = [x for x in r["evidence"] if x["kind"] in ("news", "parent")]
         ev.sort(key=lambda x: x["date"], reverse=True)
         rows = "".join(
-            f'<tr><td>{e(x["date"])}</td><td>{e(x["data"]["headline"])}<br>'
+            f'<tr><td>{e(x["date"])}</td><td>{_headline(x["data"]["headline"], urls.get(x["source"]))}<br>'
             f'<span class="overline">{e(x["data"]["publication"])} &middot; matched to '
             f'{e(x["data"]["entity"])}{" (parent)" if x["data"]["via_parent"] else ""}</span></td>'
             f'<td class="num">{x["data"]["severity"]}</td>'
@@ -669,6 +717,13 @@ def buyer_page(bid: str, tab: str) -> bytes:
 <h1>{e(r["buyer_name"])}</h1>
 <p class="sub">{e(r["sector"])} &middot; {e(r["city"])} &middot; score {v['score']} {band_pill(v['band'])}</p>
 <div class="tabs">{tabs}</div>{inner}""", theme=cid)
+
+
+def _headline(text: str, url: str | None) -> str:
+    """A fetched story links to its source; a shipped or typed one has nowhere to go."""
+    if url and url.startswith("https://"):
+        return f'<a href="{e(url)}" target="_blank" rel="noopener noreferrer">{e(text)}</a>'
+    return e(text)
 
 
 # ---------------------------------------------------------------- live page
@@ -803,8 +858,9 @@ Opus agents that only write prose are skipped here so this answers in seconds.</
   <label>Worst open invoice is now
     <input type="number" name="dpd" min="0" max="365" value="45" required> days past due</label>
   <button class="btn" type="submit">Update ledger &amp; re-run</button>
-  <p class="overline">Payment carries 65% of the score and is the only signal that can
-  cross a band line on its own. News alone tops out at 26 points; Watch starts at 35.</p>
+  <p class="overline">Payment carries 65% of the score, news 35%. A severity 5 story
+  published today adds 35 points - exactly the Watch line - so news alone only just
+  reaches Watch; anything milder or older needs the ledger behind it.</p>
 </form>
 </div>
 
@@ -874,7 +930,10 @@ def add_story(form: dict) -> None:
         aid = f"LIVE{len(LIVE['articles']) + 1:02d}"
         LIVE["articles"].append({
             "article_id": aid, "published_date": published.isoformat(),
-            "publication": "Live input", "headline": headline, "body": body,
+            # on a book of real companies a typed story is a what-if, and every page
+            # it reaches must say so - a screenshot must not read as real news
+            "publication": "HYPOTHETICAL - typed in the room" if LIVE_BOOK else "Live input",
+            "headline": (f"[HYPOTHETICAL] {headline}" if LIVE_BOOK else headline), "body": body,
             "mentioned_entity_as_written": mention})
         return aid
 
@@ -897,6 +956,20 @@ def set_dpd(form: dict) -> None:
 
     name = Loader().buyers_by_id().get(bid, {}).get("short_name", bid)
     _apply(f"Ledger updated: {name} now {raw} days past due", mutate)
+
+
+def refresh_news() -> None:
+    """Fetch from the trusted sources, then re-score. A failed fetch keeps the old file."""
+    try:
+        rep = fetch_news.fetch(quiet=True)
+    except (SystemExit, OSError, ValueError) as exc:
+        FETCH["last"] = f"Fetch failed - the previous news is still in use: {exc}"
+        return
+    with _LOCK:
+        _CACHE.clear()
+    FETCH["last"] = (f"Fetched {rep['articles']} articles"
+                     + (f"; {len(rep['errors'])} source error(s)" if rep["errors"] else "")
+                     + ". Scores below are re-run on them.")
 
 
 # ---------------------------------------------------------------- routing
@@ -925,6 +998,9 @@ class Handler(BaseHTTPRequestHandler):
                 add_story(form)
             elif path == "/live/ledger":
                 set_dpd(form)
+            elif path == "/news/fetch" and LIVE_BOOK:
+                refresh_news()
+                return self._redirect("/")
             else:
                 return self._send(page("Not found", "<h1>Not found</h1>"), code=404)
             self._redirect("/live")                  # POST-redirect-GET: no re-submit
@@ -950,11 +1026,16 @@ class Handler(BaseHTTPRequestHandler):
         if url.path == "/theme.css":
             return self._send((HERE / "theme.css").read_bytes(), "text/css; charset=utf-8")
         if url.path == "/next":
-            # static: it is a slide, not a view of the data
-            return self._send((HERE / "next.html").read_bytes())
+            # static: it is a slide, not a view of the data - only the banner follows the book
+            html_ = (HERE / "next.html").read_text()
+            html_ = (html_.replace("{{BANNER}}", BANNER).replace("{{DISCLAIMER}}", DISCLAIMER)
+                     .replace("{{TITLE_TAG}}", TITLE_TAG))
+            return self._send(html_.encode())
         if url.path == "/":
             return self._send(home())
         if url.path == "/demo":
+            if not HAS_DEMO:
+                return self._redirect("/")
             return self._send(demo_page())
         if url.path == "/live":
             return self._send(live_page())

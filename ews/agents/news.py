@@ -13,7 +13,7 @@ from the two rule-based passes (strict_resolve, then keyword_grade).
 """
 from __future__ import annotations
 
-from ..config import NEWS_BASE, PARENT_STEP_DOWN, AS_OF, decay
+from ..config import NEWS_BASE, PARENT_STEP_DOWN, AS_OF, decay, news_weight
 from ..evidence import Evidence
 from ..llm import FallbackLLM, tokens
 from ..loader import Loader, parse_date
@@ -78,7 +78,7 @@ class NewsDesk:
 
     def submit(self, kind: str, entity_id: str, severity: int, category: str,
                reason: str, *, guard: dict | None = None, seen: set | None = None) -> dict:
-        guard = guard or {"entity_must_be_looked_up": False, "allowed_severities": [0, 3, 4, 5]}
+        guard = guard or {"entity_must_be_looked_up": False, "allowed_severities": sorted(NEWS_BASE)}
         if kind == "none":
             return {"kind": "none", "id": "", "name": "", "severity": 0,
                     "category": None, "reason": reason}
@@ -158,8 +158,11 @@ def assess(loader: Loader, llm, store) -> dict[str, dict]:
     best: dict[str, dict] = {}
 
     def offer(buyer_id: str, value: float, rec: dict) -> None:
-        if value > best.get(buyer_id, {}).get("value", -1.0):
-            best[buyer_id] = {"value": value, **rec}
+        # strongest by what it adds to the score, not by raw points: a direct sev-4
+        # story at full weight outweighs a parent sev-4 story that counts at 35%
+        pts = value * news_weight(rec["severity"], rec["via_parent"])
+        if pts > best.get(buyer_id, {}).get("points", -1.0):
+            best[buyer_id] = {"value": value, "points": pts, **rec}
 
     for art in desk.articles:
         d = desk.decide(art, llm)
