@@ -15,10 +15,12 @@ template built from the same facts renders instead.
 """
 from __future__ import annotations
 
+import json
 import math
 import re
 
-from .config import AS_OF, BAND_HIGH, BAND_WATCH, DPD_KNEE, NEWS_HALF_LIFE_DAYS, W_NEWS, W_PAYMENT
+from .config import (AS_OF, BAND_HIGH, BAND_WATCH, DPD_KNEE, KNEE_POINTS, NEWS_HALF_LIFE_DAYS,
+                     PAYMENT_SLOPE, W_NEWS, W_PAYMENT)
 
 _NUM = re.compile(r"(?<![\w.])(\d[\d,]*(?:\.\d+)?)\s*(M|m|%)?")
 
@@ -46,8 +48,13 @@ def allowed_numbers(facts: dict) -> set[float]:
     """Every number the writer may use, plus the scaled/rounded forms of each."""
     base: set[float] = set()
     _collect(facts, base)
+    # Rupee amounts are written in crore and lakh. Only for a book that has them: on a
+    # euro book "42.8" for 4,280,000 would let a wrong figure through.
+    rupees = '"INR"' in json.dumps(facts, default=str)
     out: set[float] = set()
     for v in base:
+        if rupees and abs(v) >= 1e5:
+            out.update({round(v / 1e7, 1), round(v / 1e7, 2), round(v / 1e5, 1), round(v / 1e5)})
         out.add(v)
         out.add(round(v, 1))
         out.add(round(v))
@@ -87,9 +94,9 @@ def _dpd_for(payment_points: float) -> int | None:
         return 0
     if payment_points > 100:
         return None
-    if payment_points <= 40:
-        return math.ceil(payment_points / 40.0 * DPD_KNEE)
-    return math.ceil(DPD_KNEE + (payment_points - 40.0) / 2.0)
+    if payment_points <= KNEE_POINTS:
+        return math.ceil(payment_points / KNEE_POINTS * DPD_KNEE)
+    return math.ceil(DPD_KNEE + (payment_points - KNEE_POINTS) / PAYMENT_SLOPE)
 
 
 def outlook(verdict: dict) -> dict:
@@ -151,11 +158,11 @@ def template_judgement(facts: dict) -> dict:
               "MAINTAIN": "Maintain cover", "NO LIMITS": "No limit lines to act on"}[action]
     bottom += f": {name} scores {v['score']} and sits in {v['band']}"
     if pay["dpd"]:
-        bottom += f", with its worst open invoice {pay['dpd']} days past due"
+        bottom += f", with its oldest open overdue {pay['dpd']} days past due"
     bottom += "."
 
     if pay["dpd"]:
-        pnote = (f"Worst open invoice is {pay['dpd']} days past due, contributing "
+        pnote = (f"Oldest open overdue is {pay['dpd']} days past due, contributing "
                  f"{pay['weighted']} points.")
     else:
         pnote = "Nothing is overdue."
@@ -190,7 +197,7 @@ def template_judgement(facts: dict) -> dict:
         worsens = [f"A rise of {o['points_to_next_band']} points moves it to "
                    f"{o['next_band']} (score {o['next_band_at']})."]
         if o["dpd_for_next_band"] is not None:
-            worsens.append(f"On payment alone, that happens when the worst invoice reaches "
+            worsens.append(f"On payment alone, that happens when the oldest overdue reaches "
                            f"{o['dpd_for_next_band']} days past due.")
         else:
             worsens.append("Payment alone cannot move it there; it would take new "
@@ -214,7 +221,7 @@ def template(facts: dict) -> str:
     acts = "; ".join(f"{a['client_name']}: {a['action']}" for a in lim) or "no limit lines"
     return (
         f"{facts['buyer']['buyer_name']} scores {v['score']} and sits in {v['band']}. "
-        f"Its worst open invoice is {v['payment']['dpd']} days past due, contributing "
+        f"Its oldest open overdue is {v['payment']['dpd']} days past due, contributing "
         f"{v['payment']['weighted']} points. {news_line}\n\n"
         f"Score trace: {v['trace']}.\n\n"
         f"Recommended limit action - {acts}.\n\n"
@@ -228,7 +235,7 @@ def _fields(facts: dict, judgement: dict, items: list[dict]) -> dict:
     b, v = facts["buyer"], facts["verdict"]
     pay, news = v["payment"], v["news"]
     pay_ev = next((e["source"] for e in items if e["kind"] == "payment"
-                   and e["data"].get("client_id") == pay["worst_line"]), None)
+                   and e["data"].get("policy_id") == pay["worst_line"]), None)
     rv = v.get("review")
     return {
         "header": {
@@ -241,8 +248,9 @@ def _fields(facts: dict, judgement: dict, items: list[dict]) -> dict:
         },
         "bottom_line": judgement["bottom_line"],
         "limit_actions": [
-            {k: l[k] for k in ("client_name", "current_limit", "owed", "revised_limit",
-                               "change", "action", "reason")}
+            {k: l.get(k, "") for k in ("client_name", "insured_name", "policy_id", "currency",
+                                      "current_limit", "owed", "revised_limit", "change",
+                                      "action", "reason")}
             for l in facts["limits"]],
         "drivers": [
             {"driver": "payment", "weight": W_PAYMENT, "points": pay["weighted"],

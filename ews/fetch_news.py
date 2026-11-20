@@ -1,4 +1,4 @@
-"""Fetch news for the SBI book from trusted external sources.
+"""Fetch news for the live-news book from trusted external sources.
 
     EWS_DATASET=sbi python3 -m ews.fetch_news            # last 180 days
     EWS_DATASET=sbi python3 -m ews.fetch_news --days 90
@@ -11,7 +11,18 @@ dashboard never waits on a feed in front of a room.
 Sources are listed in data/sbi/trusted_sources.csv:
   feed       sec_edgar    - Form 8-K current reports, from the SEC's own API
   feed       google_news  - press coverage, kept only from the publishers below
-  publisher  <name>       - a publisher whose stories are kept from google_news
+  publisher  <name>       - a publisher whose stories are kept from google_news;
+                            its `country` column limits it to buyers of that country
+                            (blank: every buyer). Other spellings Google News uses
+                            for the same publisher follow its name, split by "|"
+                            ("Bloomberg|Bloomberg.com"); the first is the one shown.
+
+Each company on news_watchlist.csv is routed by its country:
+  IND  Google News, India edition (en-IN), Indian and global publishers
+  USA  SEC EDGAR 8-K filings when the company has a CIK, and Google News, US edition
+  else Google News in the country's edition where one is listed, else the US one
+Only real companies are on the watchlist: an invented one could never come back
+from a real feed, and its stories live in illustrative_articles.csv.
 
 Fetching decides nothing about risk. Which company a story is about, and how severe
 it is, is still the News agent's call when the engine runs.
@@ -42,10 +53,21 @@ LOG = "news_fetch_log.json"
 
 # The SEC asks every automated client to identify itself; set this to your own
 # organisation and contact address before using it for anything beyond a demo.
-SEC_USER_AGENT = os.environ.get("SEC_USER_AGENT", "SBI-TCI-EWS research@example.com")
+SEC_USER_AGENT = os.environ.get("SEC_USER_AGENT", "TCI-EWS research@example.com")
 SEC_URL = "https://data.sec.gov/submissions/CIK{cik:010d}.json"
 SEC_DOC = "https://www.sec.gov/Archives/edgar/data/{cik}/{acc}/{doc}"
-GOOGLE_URL = "https://news.google.com/rss/search?q={q}&hl=en-US&gl=US&ceid=US:en"
+GOOGLE_URL = "https://news.google.com/rss/search?q={q}&hl={hl}&gl={gl}&ceid={ceid}"
+# Google News editions by CORE_LGE_COUNTRY: (hl, gl, ceid)
+EDITIONS = {
+    "IND": ("en-IN", "IN", "IN:en"),
+    "USA": ("en-US", "US", "US:en"),
+    "GBR": ("en-GB", "GB", "GB:en"),
+}
+DEFAULT_EDITION = "USA"
+
+
+def edition(country: str) -> tuple[str, str, str]:
+    return EDITIONS.get(country, EDITIONS[DEFAULT_EDITION])
 
 # Form 8-K items, as the SEC titles them. The body of an 8-K "article" is these
 # titles, so the News agent - and the rule-based fallback - grade the event the
@@ -93,16 +115,39 @@ def _read(path: Path) -> list[dict]:
         return list(csv.DictReader(fh))
 
 
-def load_sources(data_dir: Path) -> tuple[set[str], list[str]]:
+def _sources(data_dir: Path) -> list[dict]:
     rows = [r for r in _read(data_dir / "trusted_sources.csv")
             if r["enabled"].strip().upper() == "Y"]
-    feeds = {r["name"].strip() for r in rows if r["type"] == "feed"}
-    unknown = feeds - {"sec_edgar", "google_news"}
+    unknown = {r["name"].strip() for r in rows if r["type"] == "feed"} - {"sec_edgar", "google_news"}
     if unknown:
         raise ValueError(f"trusted_sources.csv names feeds this fetcher does not know: "
                          f"{sorted(unknown)}")
-    publishers = [r["name"].strip() for r in rows if r["type"] == "publisher"]
-    return feeds, publishers
+    return rows
+
+
+def _spellings(row: dict) -> list[str]:
+    """Every name a publisher row matches: its own, then its other spellings."""
+    return [n.strip() for n in row["name"].split("|") if n.strip()]
+
+
+def load_sources(data_dir: Path) -> tuple[set[str], list[str]]:
+    """Enabled feeds, and every trusted publisher spelling whatever its country."""
+    rows = _sources(data_dir)
+    return ({r["name"].strip() for r in rows if r["type"] == "feed"},
+            [n for r in rows if r["type"] == "publisher" for n in _spellings(r)])
+
+
+def publisher_names(data_dir: Path) -> list[str]:
+    """One name per trusted publisher, for showing to a person."""
+    return [_spellings(r)[0] for r in _sources(data_dir)
+            if r["type"] == "publisher" and _spellings(r)]
+
+
+def publishers_for(data_dir: Path, country: str) -> list[str]:
+    """The publisher spellings trusted for a company in `country`: its own, and the global ones."""
+    return [n for r in _sources(data_dir)
+            if r["type"] == "publisher" and r.get("country", "").strip() in ("", country)
+            for n in _spellings(r)]
 
 
 def mention_in(text: str, aliases: list[str]) -> str:
@@ -161,7 +206,8 @@ def google_news(buyer: dict, watch: dict, since: date, publishers: list[str],
     """Stories from the trusted publishers only. Returns (kept, dropped as untrusted)."""
     days = max(1, (AS_OF - since).days)
     q = urllib.parse.quote(f"{watch['news_query']} when:{days}d")
-    root = ET.fromstring(_get(GOOGLE_URL.format(q=q)))
+    hl, gl, ceid = edition(watch.get("country", ""))
+    root = ET.fromstring(_get(GOOGLE_URL.format(q=q, hl=hl, gl=gl, ceid=ceid)))
     trusted = {p.lower(): p for p in publishers}
     aliases = [a.strip() for a in watch["aliases"].split("|") if a.strip()]
     kept, dropped = [], 0
@@ -203,8 +249,9 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
     if DATASET == "synthetic":
         raise SystemExit("the synthetic dataset is fixed; set EWS_DATASET=sbi to fetch news")
     say = (lambda *a: None) if quiet else (lambda *a: print(*a))
+    from .loader import Loader
     feeds, publishers = load_sources(data_dir)
-    buyers = {b["buyer_id"]: b for b in _read(data_dir / "buyers.csv")}
+    buyers = Loader(data_dir).buyers_by_id()
     watchlist = _read(data_dir / "news_watchlist.csv")
     since = AS_OF - timedelta(days=days)
 
@@ -216,8 +263,11 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
         b = buyers.get(w["buyer_id"])
         if b is None:
             raise ValueError(f"news_watchlist.csv names absent buyer {w['buyer_id']}")
-        got = {"sec_edgar": 0, "google_news": 0, "untrusted_dropped": 0}
-        if "sec_edgar" in feeds:
+        country = w.get("country", "") or b.get("country", "")
+        w = {**w, "country": country}
+        got = {"country": country, "edition": edition(country)[0], "sec_edgar": 0,
+               "google_news": 0, "untrusted_dropped": 0}
+        if "sec_edgar" in feeds and str(w.get("cik", "")).strip().isdigit():
             try:
                 for a in sec_filings(b, w, since):
                     articles[a["article_id"]] = a
@@ -227,7 +277,8 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
             time.sleep(0.15)          # the SEC asks for no more than ten requests a second
         if "google_news" in feeds:
             try:
-                kept, dropped = google_news(b, w, since, publishers, per_buyer)
+                kept, dropped = google_news(b, w, since, publishers_for(data_dir, country),
+                                            per_buyer)
                 for a in kept:
                     # one story can come back for two companies' searches: keep the copy
                     # that names a company, so the fallback still has something to resolve
@@ -238,9 +289,11 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
                 got.update(google_news=len(kept), untrusted_dropped=dropped)
             except Exception as exc:                                   # noqa: BLE001
                 report["errors"].append(f"{b['short_name']} google_news: {exc}")
+        got["coverage"] = got["sec_edgar"] + got["google_news"]
         report["buyers"][b["short_name"]] = got
-        say(f"  {b['short_name']:12} 8-K {got['sec_edgar']:3}   press {got['google_news']:3}"
-            f"   (untrusted dropped {got['untrusted_dropped']})")
+        say(f"  {b['short_name']:14} {got['edition']:5}  8-K {got['sec_edgar']:3}   press "
+            f"{got['google_news']:3}   (untrusted dropped {got['untrusted_dropped']})"
+            + ("   - no coverage found" if not got["coverage"] else ""))
 
     if not articles and report["errors"]:
         # never replace a good file with an empty one because the network is down
@@ -272,7 +325,7 @@ def last_fetch(data_dir: Path = DATA_DIR) -> dict | None:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Fetch news for the SBI book from trusted sources")
+    ap = argparse.ArgumentParser(description="Fetch news for the live-news book from trusted sources")
     ap.add_argument("--days", type=int, default=180, help="how far back to look (default 180)")
     ap.add_argument("--per-buyer", type=int, default=12,
                     help="most press stories kept per company (default 12)")

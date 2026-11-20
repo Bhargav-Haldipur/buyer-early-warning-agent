@@ -1,2 +1,0 @@
-client_id,client_name,sector,city,policy_id,overdue_reporting_window_days,indemnity_pct,deductible_pct,max_liability_eur
-SBI01,SBI Trade Credit,Trade Credit Insurance,Mumbai,TCI-SBI01-2026,30,90,10,100000000

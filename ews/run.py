@@ -22,20 +22,21 @@ OUT_DIR = Path(__file__).resolve().parent.parent / "out" / "runs"
 
 def run(llm=None, cache: bool = True,
         extra_articles: list[dict] | None = None,
-        dpd_overrides: dict[str, int] | None = None,
+        extra_events: list[dict] | None = None,
         commentary: bool | str = True) -> dict:
     """commentary controls the two agents that only write prose about a verdict.
 
     True runs the adjudicator review and the agent-written case file for every buyer;
     False skips both, leaving no review and the template case file. "changed" is the
     live sandbox's mode: the two run fresh only for the buyers the sandbox input
-    touched (a ledger edit, or evidence from a typed story, parent fan-out included);
+    touched (a notification filed by hand, or evidence from a typed story, parent
+    fan-out included);
     every other buyer replays its cached commentary and never calls the model, so a
     publish costs two Opus runs per touched buyer, not one per buyer in the book.
 
     The score is the D5 formula in code, so it is byte-identical in every mode.
     """
-    loader = Loader(extra_articles=extra_articles, dpd_overrides=dpd_overrides)
+    loader = Loader(extra_articles=extra_articles, extra_events=extra_events)
     loader.validate()          # fail on an inconsistent dataset, not halfway through scoring
     llm = llm or get_llm(cache=cache)
     store = EvidenceStore()
@@ -44,7 +45,7 @@ def run(llm=None, cache: bool = True,
     newsvals = news_agent.assess(loader, llm, store)
 
     live_ids = {a["article_id"] for a in (extra_articles or [])}
-    changed = set(loader.dpd_overrides) | {
+    changed = {ev["CORE_LIMIT_REQUEST_DEBTOR"] for ev in loader.extra_events} | {
         e.buyer_id for e in store.all() if e.buyer_id and e.source in live_ids}
     replay = _CacheOnly(llm)
 
@@ -55,6 +56,7 @@ def run(llm=None, cache: bool = True,
         return llm if commentary else None
 
     buyers = loader.buyers_by_id()
+    notes = loader.notifications()
     articles = {a["article_id"]: a for a in loader.news()}
     verdicts = {}
     for bid in payments:
@@ -81,11 +83,15 @@ def run(llm=None, cache: bool = True,
                             verdict, lines, items, articles)
         records.append({
             **{k: buyers[bid][k] for k in
-               ("buyer_id", "buyer_name", "short_name", "sector", "city", "parent_id")},
+               ("buyer_id", "buyer_name", "short_name", "sector", "city", "parent_id",
+                "country", "size_band", "is_real")},
             "verdict": verdict,
             "limits": lines,
             "case_file": cf,
             "evidence": [e.to_dict() for e in store.for_buyer(bid)],
+            "notifications": sorted((n for n in notes if n["buyer_id"] == bid),
+                                    key=lambda n: (n["notification_date"], n["event_id"]),
+                                    reverse=True),
         })
     records.sort(key=lambda r: -r["verdict"]["score"])
 
@@ -99,8 +105,8 @@ def run(llm=None, cache: bool = True,
             **{k: c[k] for k in ("client_id", "client_name", "city")},
             "buyers": len(mine),
             "bands": dict(counts),
-            "expected_loss": sum(l["expected_loss_before"] for r in mine for l in r["limits"]
-                                 if l["client_id"] == c["client_id"]),
+            "expected_loss": sum(l["expected_loss_before_reporting"] for r in mine
+                                 for l in r["limits"] if l["client_id"] == c["client_id"]),
             "actions_pending": sum(1 for r in mine for l in r["limits"]
                                    if l["client_id"] == c["client_id"]
                                    and l["action"] in ("FREEZE", "REDUCE")),
@@ -116,7 +122,7 @@ def run(llm=None, cache: bool = True,
         # what the live sandbox added on top of the shipped dataset, so a run is
         # reproducible from its own output
         "live_articles": [a["article_id"] for a in (extra_articles or [])],
-        "dpd_overrides": dict(dpd_overrides or {}),
+        "live_notifications": [ev["event_id"] for ev in (extra_events or [])],
         "clients": clients,
         "buyers": records,
         "refusals": [e.to_dict() for e in store.of_kind("resolution")],

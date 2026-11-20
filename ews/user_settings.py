@@ -2,7 +2,7 @@
 
     {
       "news": {
-        "auto_refresh": false,        # fetch and re-score on a timer (SBI book)
+        "auto_refresh": false,        # fetch and re-score on a timer (live-news book)
         "refresh_minutes": 15,        # how often, while auto_refresh is on
         "lookback_days": 180,         # how far back each fetch looks
         "stories_per_company": 12     # most press stories kept per company

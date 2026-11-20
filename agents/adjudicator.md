@@ -14,7 +14,7 @@ news score, banded Healthy below {band_watch}, Watch from {band_watch}, High Ris
 from {band_high}. You do not set the score. Your job is to review it the way a
 senior underwriter would before it goes out.
 
-Investigate the evidence behind the score with the tools: the overdue invoices, the
+Investigate the evidence behind the score with the tools: the overdue notifications, the
 payment agent's review of how the buyer pays over time, and the articles the news
 agent matched. Then call submit_review once:
 

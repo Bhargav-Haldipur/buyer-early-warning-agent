@@ -1,11 +1,7 @@
-buyer_id,cik,ticker,news_query,aliases
-US001,1045810,NVDA,"""Nvidia""",Nvidia
-US002,789019,MSFT,"""Microsoft""",Microsoft
-US003,320193,AAPL,"""Apple Inc"" OR ""Apple shares"" OR ""Apple stock""",Apple
-US004,104169,WMT,"""Walmart""",Walmart
-US005,18230,CAT,"""Caterpillar""",Caterpillar
-US006,50863,INTC,"""Intel""",Intel
-US007,12927,BA,"""Boeing""",Boeing
-US008,37996,F,"""Ford Motor"" OR ""Ford shares"" OR ""Ford stock""",Ford Motor|Ford
-US009,320187,NKE,"""Nike""",Nike
-US010,829224,SBUX,"""Starbucks""",Starbucks
+buyer_id,country,exchange,ticker,cik,news_query,aliases
+IN01,IND,NSE,,,"""Tata Motors""",Tata Motors
+IN02,IND,NSE,,,"""Larsen & Toubro"" OR ""Larsen and Toubro""",Larsen & Toubro|Larsen and Toubro|L&T
+IN03,IND,NSE,,,"""Vodafone Idea"" OR ""Voda Idea""",Vodafone Idea|Voda Idea
+OS01,USA,NASDAQ,INTC,50863,"""Intel""",Intel
+OS02,USA,NYSE,BA,12927,"""Boeing""",Boeing
+OS03,USA,NYSE,F,37996,"""Ford Motor"" OR ""Ford shares"" OR ""Ford stock""",Ford Motor|Ford

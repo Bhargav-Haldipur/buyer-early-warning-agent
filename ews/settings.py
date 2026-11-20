@@ -27,8 +27,8 @@ AGENTS = {
         "max_tokens": 16000,          # per model call
         "guardrails": {
             # tools the agent must have called before submit_* is accepted
-            "required_before_submit": ["get_open_invoices"],
-            # the worst open invoice it reports must be the ledger's own
+            "required_before_submit": ["get_open_notifications"],
+            # the oldest open overdue it reports must be the ledger's own
             "must_match_ledger": True,
             "max_concerns": 5,
         },

@@ -435,7 +435,7 @@ Healthy.
 
 ## Design system and labelling
 
-**TCS-Frontend tokens only. Nothing is invented.** Source of truth:
+**Tinubu frontend tokens only. Nothing is invented.** Source of truth:
 `packages/ui-components/src/ThemeVariations/cssVariables.ts` and
 `ThemeProvider/{commonTheme,defaultLightTheme}.ts`.
 
@@ -453,7 +453,7 @@ Healthy.
 - **No third-party branding of any kind.** The three insurers in this dataset are
   invented, so dressing one of them in a real insurer's brand colour would put a real
   company's identity on fabricated risk data. An earlier draft re-skinned each insurer
-  from its TCS variation; that was dropped, along with the real insurer names, for
+  from its platform theme variation; that was dropped, along with the real insurer names, for
   exactly this reason.
 - Cost of the decision: the per-insurer re-skin is gone. Confidentiality is unaffected
   — each insurer still sees only its own buyers and no rival is named anywhere,

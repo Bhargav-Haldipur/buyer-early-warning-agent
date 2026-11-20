@@ -1,6 +1,6 @@
 {
-  "fetched_at": "2026-11-19T10:52:50+00:00",
-  "as_of": "2026-11-19",
+  "fetched_at": "2026-11-20T12:35:39+00:00",
+  "as_of": "2026-11-20",
   "days": 180,
   "feeds": [
     "google_news",
@@ -20,60 +20,76 @@
     "MarketWatch",
     "The New York Times",
     "Fortune",
-    "Yahoo Finance"
+    "Yahoo Finance",
+    "Business Standard",
+    "The Economic Times",
+    "ET Auto",
+    "ET Telecom",
+    "ET Infra",
+    "Livemint",
+    "Mint",
+    "Moneycontrol.com",
+    "Moneycontrol",
+    "BusinessLine",
+    "The Hindu BusinessLine",
+    "The Hindu",
+    "NDTV Profit",
+    "CNBC TV18",
+    "The Financial Express",
+    "Financial Express",
+    "Fortune India",
+    "The Times of India"
   ],
   "buyers": {
-    "Nvidia": {
-      "sec_edgar": 8,
+    "Tata Motors": {
+      "country": "IND",
+      "edition": "en-IN",
+      "sec_edgar": 0,
       "google_news": 12,
-      "untrusted_dropped": 33
+      "untrusted_dropped": 73,
+      "coverage": 12
     },
-    "Microsoft": {
-      "sec_edgar": 7,
-      "google_news": 10,
-      "untrusted_dropped": 90
-    },
-    "Apple": {
-      "sec_edgar": 4,
+    "L&T": {
+      "country": "IND",
+      "edition": "en-IN",
+      "sec_edgar": 0,
       "google_news": 12,
-      "untrusted_dropped": 52
+      "untrusted_dropped": 20,
+      "coverage": 12
     },
-    "Walmart": {
-      "sec_edgar": 4,
+    "Vodafone Idea": {
+      "country": "IND",
+      "edition": "en-IN",
+      "sec_edgar": 0,
       "google_news": 12,
-      "untrusted_dropped": 59
-    },
-    "Caterpillar": {
-      "sec_edgar": 5,
-      "google_news": 12,
-      "untrusted_dropped": 83
+      "untrusted_dropped": 61,
+      "coverage": 12
     },
     "Intel": {
+      "country": "USA",
+      "edition": "en-US",
       "sec_edgar": 3,
       "google_news": 12,
-      "untrusted_dropped": 58
+      "untrusted_dropped": 57,
+      "coverage": 15
     },
     "Boeing": {
+      "country": "USA",
+      "edition": "en-US",
       "sec_edgar": 4,
       "google_news": 12,
-      "untrusted_dropped": 83
+      "untrusted_dropped": 83,
+      "coverage": 16
     },
     "Ford": {
+      "country": "USA",
+      "edition": "en-US",
       "sec_edgar": 5,
       "google_news": 12,
-      "untrusted_dropped": 45
-    },
-    "Nike": {
-      "sec_edgar": 9,
-      "google_news": 11,
-      "untrusted_dropped": 89
-    },
-    "Starbucks": {
-      "sec_edgar": 4,
-      "google_news": 11,
-      "untrusted_dropped": 89
+      "untrusted_dropped": 47,
+      "coverage": 17
     }
   },
   "errors": [],
-  "articles": 169
+  "articles": 84
 }

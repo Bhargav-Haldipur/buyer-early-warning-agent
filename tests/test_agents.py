@@ -83,11 +83,11 @@ def policy(system, messages):
                                                  "category": g["category"], "reason": "match"}))
     if system.startswith("You are the Payment"):
         if rounds == 0:
-            return _resp(_call("get_open_invoices", {}))
-        open_ = [i for i in _results(messages)[0] if "invoice_id" in i]
-        worst = open_[0] if open_ else {"days_past_due": 0, "invoice_id": ""}
+            return _resp(_call("get_open_notifications", {}))
+        open_ = [i for i in _results(messages)[0] if "event_id" in i]
+        worst = open_[0] if open_ else {"days_past_due": 0, "event_id": ""}
         return _resp(_call("submit_payment_review", {
-            "worst_dpd": worst["days_past_due"], "worst_invoice_id": worst["invoice_id"],
+            "worst_dpd": worst["days_past_due"], "worst_event_id": worst["event_id"],
             "trend": "stable", "summary": "Reviewed.", "concerns": []}))
     if system.startswith("You are the Risk Adjudicator"):
         if rounds == 0:
@@ -259,7 +259,8 @@ class Settings(unittest.TestCase):
 
     def test_disabled_agent_uses_rules_without_a_call(self):
         # counts come from the data, so adding a buyer or an article cannot break this
-        n_buyers = len(Loader().buyers())
+        # a buyer with no overdue notification at all has nothing for the agent to review
+        n_buyers = len({n["buyer_id"] for n in Loader().notifications()})
         n_articles = len(Loader().news())
         llm = ScriptedLLM(policy)
         with self._with("payment", enabled=False):
@@ -310,10 +311,12 @@ class Guards(unittest.TestCase):
     def test_payment_agent_must_match_the_ledger(self):
         from ews.agents.payment import Ledger
         ld = Loader()
-        ledger = Ledger("BUY002", ld.invoices(), ld.credit_limits())
+        ledger = Ledger("BUY002", ld.notifications(), ld.credit_limits())
         with self.assertRaises(ValueError):
-            ledger.submit(ledger.worst_dpd + 5, ledger.open[0]["invoice_id"], "stable", "", [])
-        ok = ledger.submit(ledger.worst_dpd, ledger.open[0]["invoice_id"], "stable", "x", [])
+            ledger.submit(ledger.worst_dpd + 5, ledger.open[0]["event_id"], "stable", "", [])
+        with self.assertRaises(ValueError, msg="the right days, but not a notification at them"):
+            ledger.submit(ledger.worst_dpd, "NE-NOT-A-NOTIFICATION", "stable", "", [])
+        ok = ledger.submit(ledger.worst_dpd, ledger.open[0]["event_id"], "stable", "x", [])
         self.assertEqual(ok["trend"], "stable")
 
 

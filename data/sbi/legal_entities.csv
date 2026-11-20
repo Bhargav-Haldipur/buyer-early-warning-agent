@@ -1,0 +1,24 @@
+legal_entity_id,role,CORE_LGE_LEGAL_NAME,CORE_LGE_USUAL_NAME,CORE_LGE_COUNTRY,CORE_LGE_LEGAL_ADDRESS_TOWN,national_ids,LGE_DUNS_ID,LGE_ACTIVITY_TYPE,LGE_ACTIVITY_CODE,LGE_TRADE_SECTOR,LGE_LEGAL_FORM_DESC,legal_entity_parent_id,legal_entity_ultimate_parent_id,ews_size_band,ews_is_real,ews_is_listed
+TCI,INSURER,Trade Credit Insurer,Trade Credit Insurer,IND,Mumbai,,,,,Trade Credit Insurance,,,,,Y,
+INS01,INSURED,Velaris Polymers Private Limited,Velaris Polymers,IND,Pune,,,,,,,,,,N,
+INS02,INSURED,Orvana Steel Components Private Limited,Orvana Steel,IND,Ahmedabad,,,,,,,,,,N,
+INS03,INSURED,Tamrin Global Exports Limited,Tamrin Exports,IND,Chennai,,,,,,,,,,N,
+INS04,INSURED,Meridia Commercial Bank Limited,Meridia Bank,IND,Mumbai,,,,,,,,,,N,
+IN01,BUYER,Tata Motors Limited,Tata Motors,IND,Mumbai,,,,,Automotive,,,,large,Y,Y
+IN02,BUYER,Larsen & Toubro Limited,L&T,IND,Mumbai,,,,,Engineering & Construction,,,,large,Y,Y
+IN03,BUYER,Vodafone Idea Limited,Vodafone Idea,IND,Mumbai,,,,,Telecommunications,,,,large,Y,Y
+IN04,BUYER,Shrivana Textile Mills Private Limited,Shrivana Textiles,IND,Tiruppur,,,,,Textiles,,,,medium,N,N
+IN05,BUYER,Vardhit Auto Components Limited,Vardhit Auto,IND,Chennai,,,,,Auto Components,,,,medium,N,N
+IN06,BUYER,Aranya Pharma Packaging Private Limited,Aranya Packaging,IND,Hyderabad,,,,,Pharma Packaging,,,,medium,N,N
+IN07,BUYER,Mehtab Agro Foods,Mehtab Agro,IND,Indore,,,,,Food Processing,,,,small,N,N
+IN08,BUYER,Ravisha Engineering Works,Ravisha Engineering,IND,Ludhiana,,,,,Engineering,,,,small,N,N
+IN09,BUYER,Jyotsna Electricals,Jyotsna Electricals,IND,Coimbatore,,,,,Electrical Equipment,,,,small,N,N
+OS01,BUYER,Intel Corporation,Intel,USA,"Santa Clara, CA",,,,,Semiconductors,,,,large,Y,Y
+OS02,BUYER,The Boeing Company,Boeing,USA,"Arlington, VA",,,,,Aerospace,,,,large,Y,Y
+OS03,BUYER,Ford Motor Company,Ford,USA,"Dearborn, MI",,,,,Automotive,,,,large,Y,Y
+OS04,BUYER,Brightwell Home Retail Inc.,Brightwell Retail,USA,"Columbus, OH",,,,,Home Retail,,,,medium,N,N
+OS05,BUYER,Qasr Meridian Trading LLC,Qasr Meridian,ARE,Dubai,,,,,General Trading,,,,medium,N,N
+OS06,BUYER,Hessler Maschinenbau GmbH,Hessler,DEU,Stuttgart,,,,,Industrial Machinery,,,,medium,N,N
+OS07,BUYER,Pinecrest Outdoor Supply LLC,Pinecrest Outdoor,USA,"Boise, ID",,,,,Outdoor Retail,,,,small,N,N
+OS08,BUYER,Kestrel Marine Parts Ltd,Kestrel Marine,GBR,Southampton,,,,,Marine Equipment,,,,small,N,N
+OS09,BUYER,Ostara Organics BV,Ostara Organics,NLD,Utrecht,,,,,Organic Foods,,,,small,N,N

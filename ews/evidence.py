@@ -9,7 +9,7 @@ class Evidence:
     kind: str          # 'payment' | 'news' | 'parent' | 'resolution'
     buyer_id: str      # '' when the item is about a parent or an unresolved article
     detail: str        # one human-readable sentence
-    source: str        # invoice_id or article_id — always citable
+    source: str        # notification event_id or article_id — always citable
     date: str          # ISO date of the underlying fact
     data: dict = field(default_factory=dict)
 

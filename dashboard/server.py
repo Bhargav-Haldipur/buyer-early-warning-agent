@@ -18,8 +18,8 @@ from pathlib import Path
 from ews import run as engine
 from ews.agents import definition
 from ews import fetch_news, user_settings
-from ews.config import AS_OF, CURRENCY, DATASET, W_NEWS
-from ews.loader import DATA_DIR, DataError, Loader
+from ews.config import (AS_OF, CURRENCY, DATASET, FX_AS_OF, FX_SOURCE, FX_TO_REPORTING, W_NEWS)
+from ews.loader import DATA_DIR, MAX_LIVE_DPD, DataError, Loader
 
 HERE = Path(__file__).resolve().parent
 LIVE_BOOK = DATASET != "synthetic"          # real companies, news fetched from outside
@@ -28,17 +28,19 @@ if LIVE_BOOK:
     # no screenshot of a real company's payments can be taken for its actual record.
     BANNER = "Tinubu Product Prototype"
     TITLE_TAG = "Tinubu Product Prototype"
-    DISCLAIMER = ("The companies are real and the news is fetched from public sources (SEC EDGAR, "
-                  "trusted publishers via Google News), linked on each buyer&rsquo;s News tab. The "
-                  "insurer&rsquo;s book on them &mdash; credit limits, invoices and payments &mdash; "
-                  "is illustrative: no real trade-credit ledger sits behind it, and no payment "
-                  "figure here describes how any of these companies actually pays.")
+    DISCLAIMER = ("The six large companies are real, and their news is fetched from public "
+                  "sources (SEC EDGAR, trusted publishers via Google News), linked on each "
+                  "buyer&rsquo;s News tab. The medium and small companies, their stories and the "
+                  "policyholders are invented. Every credit limit and overdue notification is "
+                  "illustrative: no real trade-credit book sits behind it, and no payment figure "
+                  "here describes how any real company actually pays.")
 else:
     BANNER = "Tinubu Product Prototype"
     TITLE_TAG = "Tinubu Product Prototype"
-    DISCLAIMER = ("Every buyer, insurer, invoice and news article in this view is sample data. "
+    DISCLAIMER = ("Every buyer, insurer, overdue notification and news article in this view is "
+                  "sample data. "
                   "No real counterparty appears.")
-SYMBOL = {"EUR": "&euro;", "USD": "$"}[CURRENCY]
+SYMBOLS = {"EUR": "&euro;", "USD": "$", "INR": "&#8377;"}
 TABS = ("case", "score", "limit", "payments", "news", "agents")
 
 _CACHE: dict[tuple[str, str], dict] = {}
@@ -75,10 +77,11 @@ def sync_settings() -> None:
         AUTO["next"] = min(AUTO["next"], time.time() + AUTO["minutes"] * 60)
 
 # ---------------------------------------------------------------- live sandbox
-# Input nobody prepared: a story typed in the room, an invoice aged by hand. It goes
+# Input nobody prepared: a story typed in the room, an overdue notification filed by
+# hand as a policyholder files one on the platform. It goes
 # through exactly the same engine.run() as the shipped dataset - there is no second
 # code path for it, which is the only reason showing it proves anything.
-LIVE: dict = {"articles": [], "dpd": {}, "last": None}
+LIVE: dict = {"articles": [], "events": [], "last": None}
 
 
 def engine_date(shown: date) -> date:
@@ -94,14 +97,22 @@ def engine_date(shown: date) -> date:
 
 
 def shown_date(source: str, engine: str) -> str:
-    """The date to display for an article: the typed one for a live story."""
-    art = next((a for a in LIVE["articles"] if a["article_id"] == source), None)
-    return art.get("shown_date", engine) if art else engine
+    """The date to display: the typed one for a live story or a filed notification."""
+    for row in LIVE["articles"] + LIVE["events"]:
+        if source in (row.get("article_id"), row.get("event_id")):
+            shown = row.get("shown_dates", {}).get(engine) or row.get("shown_date")
+            return shown or engine
+    return engine
 _LIVE_CACHE: dict[str, dict] = {}
 
 
+def _engine_event(ev: dict) -> dict:
+    """A filed notification as the engine reads it: platform columns only."""
+    return {k: v for k, v in ev.items() if k != "shown_dates"}
+
+
 def live_active() -> bool:
-    return bool(LIVE["articles"] or LIVE["dpd"])
+    return bool(LIVE["articles"] or LIVE["events"])
 
 
 def moves_between(before: dict, after: dict) -> list[dict]:
@@ -135,11 +146,12 @@ def snapshot() -> dict:
     an agent.
     """
     live = live_active()
-    key = (json.dumps(LIVE["articles"], sort_keys=True), json.dumps(LIVE["dpd"], sort_keys=True))
+    key = (json.dumps(LIVE["articles"], sort_keys=True), json.dumps(LIVE["events"], sort_keys=True))
     with _LOCK:  # one engine run at a time now that requests are threaded
         if key not in _CACHE:
             _CACHE[key] = engine.run(
-                extra_articles=LIVE["articles"] or None, dpd_overrides=LIVE["dpd"] or None,
+                extra_articles=LIVE["articles"] or None,
+                extra_events=[_engine_event(ev) for ev in LIVE["events"]] or None,
                 commentary="changed" if live else True)
         return _CACHE[key]
 
@@ -149,13 +161,33 @@ def e(x) -> str:
     return html.escape(str(x))
 
 
-def money(v: float) -> str:
-    v = float(v)
+def money(v: float, currency: str = CURRENCY) -> str:
+    """Rupees in crore and lakh, as an Indian underwriter reads them; others in M and k."""
+    v, sym = float(v), SYMBOLS.get(currency, currency + " ")
+    if v < 0:
+        return "&minus;" + money(-v, currency)
+    if currency == "INR":
+        if abs(v) >= 1e7:
+            return f"{sym}{v/1e7:,.2f} Cr"
+        if abs(v) >= 1e5:
+            return f"{sym}{v/1e5:,.2f} L"
+        return f"{sym}{v:,.0f}"
     if abs(v) >= 1e6:
-        return f"{SYMBOL}{v/1e6:,.2f}M"
+        return f"{sym}{v/1e6:,.2f}M"
     if abs(v) >= 1e3:
-        return f"{SYMBOL}{v/1e3:,.0f}k"
-    return f"{SYMBOL}{v:,.0f}"
+        return f"{sym}{v/1e3:,.0f}k"
+    return f"{sym}{v:,.0f}"
+
+
+def fx_note() -> str:
+    """Where a total mixes currencies, say at what rate - once, next to the total."""
+    others = sorted(c for c in FX_TO_REPORTING if c != CURRENCY)
+    if not others:
+        return ""
+    rates = ", ".join(f"1 {c} = {money(FX_TO_REPORTING[c])}" if FX_TO_REPORTING[c] >= 1e5 else
+                      f"1 {c} = {SYMBOLS.get(CURRENCY, '')}{FX_TO_REPORTING[c]:,.4f}" for c in others)
+    return (f'<span class="overline">Totals in {CURRENCY} at {rates}, {e(FX_SOURCE)}, '
+            f'{FX_AS_OF.strftime("%-d %b %Y")}.</span>')
 
 
 def band_pill(band: str) -> str:
@@ -292,9 +324,9 @@ def live_banner() -> str:
     if LIVE["articles"]:
         bits.append(f'{len(LIVE["articles"])} published '
                     f'{"story" if len(LIVE["articles"]) == 1 else "stories"}')
-    if LIVE["dpd"]:
-        bits.append(f'{len(LIVE["dpd"])} ledger '
-                    f'{"edit" if len(LIVE["dpd"]) == 1 else "edits"}')
+    if LIVE["events"]:
+        bits.append(f'{len(LIVE["events"])} filed overdue '
+                    f'{"notification" if len(LIVE["events"]) == 1 else "notifications"}')
     what = ("<b>Hypothetical scenario in play</b> &mdash; the typed stories are not real news. "
             if LIVE_BOOK else "<b>Live input in play</b> &mdash; ")
     return (f'<div class="panel result">{what}'
@@ -345,19 +377,19 @@ reduce &mdash; while there is still limit to cut.</p>
 <div class="statrow">{"".join(tiles)}</div>
 <p class="meta">{n} insurer{"s" if n != 1 else ""}</p>
 </div>
-{sources_panel()}
 <h2>Insurers</h2>
 <div class="cards">{"".join(cards)}</div>""")
 
 
-def sources_panel() -> str:
+def sources_panel(back: str = "/live") -> str:
     """Where the news comes from, when it was last fetched, and a button to refresh it."""
     if not LIVE_BOOK:
         return ""
     log = fetch_news.last_fetch()
-    feeds, publishers = fetch_news.load_sources(DATA_DIR)
-    names = {"sec_edgar": "SEC EDGAR Form 8-K filings", "google_news": "Google News"}
-    feed_txt = " &middot; ".join(names.get(f, f) for f in sorted(feeds))
+    feeds, _ = fetch_news.load_sources(DATA_DIR)
+    publishers = fetch_news.publisher_names(DATA_DIR)
+    names = {"sec_edgar": "SEC EDGAR 8-K filings", "google_news": "Google News"}
+    feed_txt = " and ".join(names.get(f, f) for f in sorted(feeds))
     when = (f'Last fetched {e(log["fetched_at"].replace("T", " ").replace("+00:00", " UTC"))} '
             f'&middot; {log["articles"]} articles from the last {log["days"]} days'
             if log else "Not fetched yet")
@@ -365,10 +397,12 @@ def sources_panel() -> str:
     flash = (f'<p class="body2"><b>{e(FETCH["last"])}</b></p>' if FETCH.get("last") else "")
     return f"""<div class="panel">
 <h3>News sources</h3>
-<p class="body2">{feed_txt}. Press stories are kept only from: {e(", ".join(publishers))}.</p>
+<p class="body2">Fetched from <b>{feed_txt}</b>. Google News gathers stories from thousands of
+outlets; a story is kept only when it was published by one of these:
+{e(", ".join(publishers))}.</p>
 <p class="overline">{when}{errs}</p>{flash}
 <div style="margin-top:.6rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
-<form method="post" action="/news/fetch" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Fetching\u2026'">
+<form method="post" action="/news/fetch?back={e(back)}" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Fetching\u2026'">
 <button class="btn" type="submit">Fetch latest news &amp; re-score</button></form>
 {auto_switch()}</div></div>"""
 
@@ -393,7 +427,7 @@ def auto_switch() -> str:
             f'value="{"off" if on else "on"}"><button class="{cls}" type="submit" '
             f'aria-pressed="{str(on).lower()}">{label}</button></form>'
             f'<span class="overline">{status}</span>'
-            # while on, the open home page follows the timer without anyone touching it
+            # while on, the open live page follows the timer without anyone touching it
             + ('<script>setTimeout(() => location.reload(), 60000)</script>' if on else ""))
 
 
@@ -403,11 +437,14 @@ def client_page(cid: str) -> bytes:
     if client is None:
         return page("Not found", "<h1>Unknown insurer</h1>")
     mine = [r for r in data["buyers"] if any(l["client_id"] == cid for l in r["limits"])]
-    mine.sort(key=lambda r: -sum(l["expected_loss_before"] for l in r["limits"]
-                                 if l["client_id"] == cid))
+    def el(r: dict) -> float:
+        return sum(l["expected_loss_before_reporting"] for l in r["limits"] if l["client_id"] == cid)
+    mine.sort(key=lambda r: -el(r))
     rows = []
     for r in mine:
-        line = next(l for l in r["limits"] if l["client_id"] == cid)
+        lines = [l for l in r["limits"] if l["client_id"] == cid]
+        # several policies can cover one buyer: show the sharpest action of them
+        line = min(lines, key=lambda l: {"FREEZE": 0, "REDUCE": 1}.get(l["action"], 2))
         v = r["verdict"]
         news = v["news"]
         label = news_cell(news)
@@ -423,7 +460,7 @@ def client_page(cid: str) -> bytes:
             f'<td data-v="{rank}">{band_pill(v["band"])}</td>'
             f'<td class="num" data-v="{v["payment"]["dpd"]}">{v["payment"]["dpd"]}</td>'
             f'<td data-v="{news["severity"] or 0}">{label}</td>'
-            f'<td class="num" data-v="{line["expected_loss_before"]}">{money(line["expected_loss_before"])}</td>'
+            f'<td class="num" data-v="{el(r)}">{money(el(r))}</td>'
             f'<td data-v="{act_rank}">{action_pill(line["action"])}</td></tr>')
 
     b = client["bands"]
@@ -448,7 +485,7 @@ def client_page(cid: str) -> bytes:
 {live_banner()}
 <h1>{e(client["client_name"])}</h1>
 <p class="sub">{client['buyers']} buyers &middot; {money(client['expected_loss'])} expected loss
-{actions_note}. This insurer sees only its own buyers.</p>
+{actions_note}. This insurer sees only its own buyers.<br>{fx_note()}</p>
 <div class="chips">{chips}</div>
 <table id="buyers"><thead><tr>{heads}</tr></thead>
 <tbody>{"".join(rows)}</tbody></table>
@@ -569,6 +606,29 @@ def adjudicator_view(r: dict) -> str:
                f'<p class="body2">{e(first_sentence(rv["rationale"]))}</p>'))
 
 
+def coverage_note(r: dict) -> str:
+    """Say plainly when there is no news to read - silence is not good news.
+
+    Only on a book of real companies: a real one the last fetch found nothing on, and an
+    invented one, which no real feed could ever cover."""
+    if not LIVE_BOOK or any(x["kind"] in ("news", "parent") for x in r["evidence"]):
+        return ""
+    if not r.get("is_real"):
+        return ('<p class="overline">No news: an invented company is not on the news '
+                'watchlist, so only its illustrative stories could appear here.</p>')
+    log = fetch_news.last_fetch() or {}
+    got = (log.get("buyers") or {}).get(r["short_name"])
+    if not got:
+        return '<p class="overline">No news yet: this company has not been fetched.</p>'
+    found = got.get("sec_edgar", 0) + got.get("google_news", 0)
+    return (f'<p class="overline">No news coverage found in the last {log.get("days", "?")} '
+            f'days (Google News {e(got.get("edition", ""))}'
+            f'{", SEC EDGAR" if got.get("country") == "USA" else ""}, trusted publishers only). '
+            f'Read that as no information, not as good news.</p>' if not found else
+            f'<p class="overline">{found} stories fetched in the last {log.get("days", "?")} days; '
+            f'none graded as a credit signal for this company.</p>')
+
+
 def case_tab(r: dict) -> str:
     """Band and score up top, then the action, the evidence, the review, a short narrative."""
     cf = r["case_file"]
@@ -577,13 +637,16 @@ def case_tab(r: dict) -> str:
     head = score_card(h["score"], h["band"])
 
     rows = "".join(
-        f'<tr><td>{e(l["client_name"])}</td><td class="num">{money(l["current_limit"])}</td>'
-        f'<td class="num">{money(l["owed"])}</td><td class="num">{money(l["revised_limit"])}</td>'
-        f'<td class="num">{money(l["change"])}</td>'
+        f'<tr><td>{e(l.get("insured_name") or l["client_name"])}<br><span class="overline">'
+        f'{e(l.get("policy_id", ""))}</span></td>'
+        f'<td class="num">{money(l["current_limit"], l.get("currency", CURRENCY))}</td>'
+        f'<td class="num">{money(l["owed"], l.get("currency", CURRENCY))}</td>'
+        f'<td class="num">{money(l["revised_limit"], l.get("currency", CURRENCY))}</td>'
+        f'<td class="num">{money(l["change"], l.get("currency", CURRENCY))}</td>'
         f'<td>{action_pill(l["action"])}<br><span class="overline">{e(l["reason"])}</span></td></tr>'
         for l in f["limit_actions"])
-    limits = (f'<table><thead><tr><th>Insurer</th><th class="num">Current limit</th>'
-              f'<th class="num">Owed</th><th class="num">Revised</th><th class="num">Change</th>'
+    limits = (f'<table><thead><tr><th>Policy</th><th class="num">Current limit</th>'
+              f'<th class="num">Outstanding exposure</th><th class="num">Revised</th><th class="num">Change</th>'
               f'<th>Action</th></tr></thead><tbody>{rows}</tbody></table>'
               if rows else '<p class="body2">No credit limit lines.</p>')
 
@@ -608,7 +671,7 @@ def case_tab(r: dict) -> str:
                if cf["rejected_numbers"] else "") + "</p>")
     return (f'<div class="panel case">{head}{bottom_line(f["bottom_line"])}'
             f'<h3>Recommended limit action</h3>{limits}'
-            f'<h3>Evidence</h3>{evidence}'
+            f'<h3>Evidence</h3>{evidence}{coverage_note(r)}'
             f'{adjudicator_view(r)}'
             f'<h3>Narrative</h3>{narrative}{note}</div>')
 
@@ -635,7 +698,7 @@ def agents_tab(r: dict, data: dict) -> str:
     out = [card(1, "payment", pay["data"]["agent"] if pay else None,
                 (f'Trend: <b>{e(pay["data"]["trend"].replace("_", " "))}</b>. {e(pay["data"]["summary"])}'
                  + "".join(f"<br>&bull; {e(c)}" for c in pay["data"]["concerns"])) if pay
-                else "No invoices for this buyer.")]
+                else "No overdue notifications on this buyer.")]
     if news or refused:
         for x in news + refused:
             d = x["data"]
@@ -672,7 +735,7 @@ def buyer_page(bid: str, tab: str) -> bytes:
     tabs = "".join(
         f'<a class="{"on" if tab==t else ""}" href="/buyer/{e(bid)}?tab={t}">{label}</a>'
         for t, label in [("case", "Case File"), ("score", "Score"), ("limit", "Limit"),
-                         ("payments", "Payments"), ("news", "News"), ("agents", "Agents")])
+                         ("payments", "Overdue notifications"), ("news", "News"), ("agents", "Agents")])
 
     if tab == "case":
         inner = case_tab(r)
@@ -687,7 +750,7 @@ def buyer_page(bid: str, tab: str) -> bytes:
 {gauge(v['score'], v['band'])}
 <div class="trace">{e(v['trace'])}</div>
 <h3>Payment &mdash; weight 0.65</h3><dl class="kv">
-<dt>Worst open invoice</dt><dd>{v['payment']['dpd']} days past due</dd>
+<dt>Oldest open overdue</dt><dd>{v['payment']['dpd']} days past due</dd>
 <dt>Payment score</dt><dd>{v['payment']['raw']}</dd>
 <dt>Contribution</dt><dd>{v['payment']['weighted']}</dd></dl>
 <h3>News &mdash; weight {W_NEWS:g}</h3><dl class="kv">
@@ -703,28 +766,63 @@ def buyer_page(bid: str, tab: str) -> bytes:
             inner = '<div class="panel">No credit limit lines.</div>'
         else:
             rows = "".join(
-                f'<tr><td>{e(l["client_name"])}</td><td class="num">{money(l["current_limit"])}</td>'
-                f'<td class="num">{money(l["owed"])}</td><td class="num">{money(l["revised_limit"])}</td>'
+                f'<tr><td>{e(l["insured_name"] or l["client_name"])}<br><span class="overline">'
+                f'{e(l["policy_id"])} &middot; {e(l["product_type"].replace("_", " ").lower())}'
+                f'</span></td>'
+                f'<td class="num">{money(l["current_limit"], l["currency"])}</td>'
+                f'<td class="num">{money(l["owed"], l["currency"])}</td>'
+                f'<td class="num">{money(l["revised_limit"], l["currency"])}</td>'
                 f'<td>{action_pill(l["action"])}<br><span class="overline">{e(l["reason"])}</span></td>'
-                f'<td class="num">{money(l["expected_loss_before"])} &rarr; {money(l["expected_loss_after"])}</td>'
+                f'<td class="num">{money(l["expected_loss_before"], l["currency"])} &rarr; '
+                f'{money(l["expected_loss_after"], l["currency"])}</td>'
                 f'</tr>' for l in r["limits"])
-            inner = (f'<table><thead><tr><th>Insurer</th><th class="num">Current limit</th>'
-                     f'<th class="num">Owed</th><th class="num">Revised</th><th>Action</th>'
+            inner = (f'<table><thead><tr><th>Policy</th><th class="num">Current limit</th>'
+                     f'<th class="num">Outstanding exposure</th><th class="num">Revised</th><th>Action</th>'
                      f'<th class="num">Expected loss</th></tr></thead><tbody>{rows}</tbody></table>'
                      f'<p class="overline">Every recommendation awaits a risk underwriter. '
-                     f'Limits are never raised and never cut below what is already owed.</p>')
+                     f'Limits are never raised and never cut below the outstanding exposure.</p>')
 
     elif tab == "payments":
         ev = [x for x in r["evidence"] if x["kind"] == "payment"]
-        rows = "".join(
-            f'<tr><td>{e(x["data"]["client_id"])}</td><td class="num">{x["data"]["open_count"]}</td>'
-            f'<td class="num">{money(x["data"]["owed"])}</td>'
+        summary = "".join(
+            f'<tr><td>{e(x["data"]["client_id"])}<br><span class="overline">'
+            f'{e(x["data"].get("policy_id", ""))}</span></td><td class="num">{x["data"]["open_count"]}</td>'
+            f'<td class="num">{money(x["data"]["owed"], x["data"].get("currency", CURRENCY))}</td>'
             f'<td class="num">{x["data"]["dpd"]}</td><td>{e(x["source"])}<br>'
             f'<span class="overline">due {e(x["date"])}</span></td></tr>' for x in ev)
-        inner = (f'<table><thead><tr><th>Insurer</th><th class="num">Open invoices</th>'
-                 f'<th class="num">Owed</th><th class="num">Worst DPD</th><th>Worst invoice</th>'
-                 f'</tr></thead><tbody>{rows}</tbody></table>'
-                 if rows else '<div class="panel">No open invoices.</div>')
+        summary = (f'<h3>Open overdues by policy</h3><table><thead><tr><th>Insurer &middot; policy</th>'
+                   f'<th class="num">Open overdues</th><th class="num">Outstanding exposure</th>'
+                   f'<th class="num">Oldest, days past due</th><th>Oldest notification</th>'
+                   f'</tr></thead><tbody>{summary}</tbody></table>' if summary else "")
+
+        def ageing(n: dict) -> str:
+            return "<br>".join(f'{e(a["bucket"].replace("_", " ").lower())}: {money(a["amount"], n["currency"])}'
+                               for a in n["ageing"]) or "&mdash;"
+
+        def state(n: dict) -> str:
+            if n["status"] == "OPEN":
+                return (f'<span class="pill watch">open</span><br><span class="overline">'
+                        f'{n["dpd"]} days past due</span>' if n["dpd"] is not None else
+                        '<span class="pill watch">open</span>')
+            return (f'<span class="pill maintain">{e(n["status"].lower())}</span><br>'
+                    f'<span class="overline">{e(n["resolved_date"])}</span>')
+
+        rows = "".join(
+            f'<tr><td>{e(n["event_id"])}<br><span class="overline">{e(n["client_id"])}</span></td>'
+            f'<td>{e(n["reason"].replace("_", " ").lower())}</td>'
+            f'<td>{e(shown_date(n["event_id"], n["notification_date"]))}</td>'
+            f'<td>{e(shown_date(n["event_id"], n["original_due_date"]) if n["original_due_date"] else "—")}</td>'
+            f'<td>{state(n)}</td><td class="num">{money(n["amount_at_risk"], n["currency"])}</td>'
+            f'<td class="num">{ageing(n)}</td></tr>' for n in r.get("notifications", []))
+        inner = (summary + (
+            f'<h3>Notifications from policyholders</h3><table><thead><tr><th>Notification</th>'
+            f'<th>Reason</th><th>Notified</th><th>Original due</th><th>Status</th>'
+            f'<th class="num">Amount at risk</th><th class="num">Outstanding by ageing</th>'
+            f'</tr></thead><tbody>{rows}</tbody></table>'
+            f'<p class="overline">As the platform records them (notifiable events). There is no '
+            f'invoice ledger; resolution status is this prototype&rsquo;s own until the '
+            f'notification lifecycle adds one.</p>'
+            if rows else '<div class="panel">No overdue notifications on this buyer.</div>'))
 
     elif tab == "agents":
         inner = agents_tab(r, data)
@@ -751,6 +849,7 @@ def buyer_page(bid: str, tab: str) -> bytes:
                  f'<th class="num">Age</th><th class="num">Base &rarr; decayed</th></tr></thead>'
                  f'<tbody>{rows}{refused}</tbody></table>'
                  if rows or refused else '<div class="panel">No news matched to this buyer.</div>')
+        inner += coverage_note(r)
 
     banner = live_banner()
     return page(r["buyer_name"], f"""
@@ -821,7 +920,7 @@ def result_panel() -> str:
 
 
 def live_inputs_block() -> str:
-    if not LIVE["articles"] and not LIVE["dpd"]:
+    if not LIVE["articles"] and not LIVE["events"]:
         return ('<p class="overline">Nothing added yet &mdash; the engine is running on the '
                 'shipped dataset exactly as it ships.</p>')
     arts = "".join(
@@ -831,20 +930,35 @@ def live_inputs_block() -> str:
     arts = (f'<table><thead><tr><th>Id</th><th>Date</th><th>Company named</th>'
             f'<th>Headline</th></tr></thead><tbody>{arts}</tbody></table>' if arts else "")
     names = Loader().buyers_by_id()
-    dpd = "".join(
-        f'<tr><td>{e(names[b]["short_name"]) if b in names else e(b)}</td>'
-        f'<td class="num">{d} days past due</td></tr>' for b, d in sorted(LIVE["dpd"].items()))
-    dpd = (f'<table><thead><tr><th>Buyer</th><th class="num">Worst open invoice</th>'
-           f'</tr></thead><tbody>{dpd}</tbody></table>' if dpd else "")
-    return arts + dpd
+    evs = "".join(
+        f'<tr><td>{e(ev["event_id"])}</td>'
+        f'<td>{e(names.get(ev["CORE_LIMIT_REQUEST_DEBTOR"], {}).get("short_name", ev["CORE_LIMIT_REQUEST_DEBTOR"]))}'
+        f'<br><span class="overline">{e(ev["policy_id"])}</span></td>'
+        f'<td>{e(ev["NEV_REASON"].replace("_", " ").lower())}</td>'
+        f'<td>{e(ev["shown_dates"].get(ev["NEV_ORIGINAL_DUE_DATE"], "") or "&mdash;")}</td>'
+        f'<td class="num">{money(float(ev["NEV_AMOUNT_AT_RISK"]), ev["NEV_CURRENCY"])}</td></tr>'
+        for ev in LIVE["events"])
+    evs = (f'<table><thead><tr><th>Notification</th><th>Buyer &middot; policy</th>'
+           f'<th>Reason</th><th>Original due</th><th class="num">Amount at risk</th>'
+           f'</tr></thead><tbody>{evs}</tbody></table>' if evs else "")
+    return arts + evs
 
 
 def live_page() -> bytes:
     data = snapshot()
-    buyers = sorted(Loader().buyers(), key=lambda b: b["short_name"])
-    options = "".join(
-        f'<option value="{e(b["buyer_id"])}">{e(b["short_name"])} &mdash; {e(b["sector"])}, '
-        f'{e(b["city"])}</option>' for b in buyers)
+    loader = Loader()
+    buyers = sorted(loader.buyers(), key=lambda b: b["short_name"])
+    short = {b["buyer_id"]: b["short_name"] for b in buyers}
+    pols = loader.policies_by_id()
+    ent = {x["legal_entity_id"]: x["CORE_LGE_USUAL_NAME"] for x in loader.table("legal_entities")}
+    # one option per credit line: a policyholder notifies on a buyer its policy covers
+    line_options = "".join(
+        f'<option value="{e(l["buyer_id"])}|{e(l["policy_id"])}">{e(short[l["buyer_id"]])} '
+        f'&mdash; {e(ent.get(pols[l["policy_id"]].get("CORE_MAIN_INSURED", ""), "") or l["policy_id"])}'
+        f' ({e(l["currency"])})</option>'
+        for l in sorted(loader.credit_limits(), key=lambda l: (short[l["buyer_id"]], l["policy_id"])))
+    default_due = (date.today() - timedelta(days=45)).isoformat()
+    oldest_due = (date.today() - timedelta(days=MAX_LIVE_DPD)).isoformat()
 
     # Registered names, click-to-fill. Typing "Nordkrans Steel Traders AB" correctly in
     # front of a room is a risk with no upside; the field stays free text, so a name that
@@ -863,14 +977,13 @@ def live_page() -> bytes:
     return page("Live input", nav="live", body=f"""
 {crumbs(("Home", "/"), ("Live input", None))}
 <h1>Live input</h1>
-<p class="sub">Type a story that has never been seen, or age an invoice by hand. Both go
-through the same engine as the shipped data &mdash; there is no separate path for them.
-The dataset is a snapshot of {e(AS_OF.isoformat())}; a story dated today is scored as if it
-broke that day. The News agent runs live on what you type, then the adjudicator and the
-Case File agent re-review every buyer your input touched, so a publish or a ledger edit
+<p class="sub">File an overdue invoice the way a policyholder notifies one on the platform,
+{"fetch the latest real news, " if LIVE_BOOK else ""}or type a story nobody has seen.
+The agents re-review every buyer your input touched, so each step
 takes about a minute with Claude connected.</p>
 
 {result_panel()}
+{sources_panel("/live") if LIVE_BOOK else ""}
 
 <div class="live-grid">
 <form class="panel live-form" method="post" action="/live/story">
@@ -879,10 +992,6 @@ takes about a minute with Claude connected.</p>
     <input name="mention" id="mention" placeholder="leave blank and the agent reads it out of the body"
            autocomplete="off"></label>
   <div class="namechips">{chips}</div>
-  <p class="overline">Click to fill, or type anything, or <b>leave it empty</b> &mdash; the
-  agent reads the body and finds the company itself. To see a refusal, keep the first word
-  and change the business: &ldquo;Larsson <b>Dental Group</b> AB&rdquo; is not
-  &ldquo;Larsson <b>Distributors</b> AB&rdquo;.</p>
   <label>Headline
     <input name="headline" required placeholder="Workers protest over delayed wages"
            autocomplete="off"></label>
@@ -896,15 +1005,15 @@ takes about a minute with Claude connected.</p>
   decides. A name it cannot place is refused.</p>
 </form>
 
-<form class="panel live-form" method="post" action="/live/ledger">
-  <h3>Age an invoice</h3>
-  <label>Buyer<select name="buyer_id">{options}</select></label>
-  <label>Worst open invoice is now
-    <input type="number" name="dpd" min="0" max="365" value="45" required> days past due</label>
-  <button class="btn" type="submit">Update ledger &amp; re-run</button>
-  <p class="overline">Payment carries 65% of the score, news 35%. Bands: Healthy below
-  20, Watch 20-50, High Risk 50+. A fresh severity 3-5 story alone reaches Watch; news
-  alone never reaches High Risk - that takes the ledger too.</p>
+<form class="panel live-form" method="post" action="/live/notification">
+  <h3>File an overdue invoice</h3>
+  <label>Buyer &middot; policyholder<select name="line" required>{line_options}</select></label>
+  <label>Original due date
+    <input type="date" name="due" value="{e(default_due)}" min="{e(oldest_due)}"
+           max="{e(date.today().isoformat())}" required></label>
+  <label>Amount at risk <span class="overline">in the policy&rsquo;s currency</span>
+    <input type="number" name="amount" min="1" step="any" required placeholder="e.g. 4500000"></label>
+  <button class="btn" type="submit">File overdue invoice &amp; re-run</button>
 </form>
 </div>
 
@@ -939,12 +1048,12 @@ def _apply(title: str, mutate) -> None:
     a bad input must never be able to take the demo down mid-sentence.
     """
     before = snapshot()
-    keep = (list(LIVE["articles"]), dict(LIVE["dpd"]))
+    keep = (list(LIVE["articles"]), list(LIVE["events"]))
     try:
         new_id = mutate()
         after = snapshot()
     except (DataError, ValueError, KeyError) as exc:
-        LIVE["articles"], LIVE["dpd"] = keep
+        LIVE["articles"], LIVE["events"] = keep
         LIVE["last"] = {"title": title, "error": str(exc), "moves": []}
         return
     LIVE["last"] = {"title": title, "moves": moves_between(before, after),
@@ -984,22 +1093,64 @@ def add_story(form: dict) -> None:
     _apply(f"Published: {headline}", mutate)
 
 
-def set_dpd(form: dict) -> None:
-    bid = (form.get("buyer_id", [""])[0] or "").strip()
-    raw = (form.get("dpd", [""])[0] or "").strip()
+def file_notification(form: dict) -> None:
+    """An overdue invoice, as a policyholder notifies one on the platform.
+
+    The only reason the live page files: the insurer's reason list is overdue-only, and
+    the score reads nothing but the original due date - another reason would be
+    accepted and move nothing.
+    """
+    line = (form.get("line", [""])[0] or "").strip()
+    due_raw = (form.get("due", [""])[0] or "").strip()
+    amount_raw = (form.get("amount", [""])[0] or "").strip()
+    bid, _, pid = line.partition("|")
+    loader = Loader()
+    name = loader.buyers_by_id().get(bid, {}).get("short_name", bid or "?")
 
     def mutate() -> str:
-        if bid not in Loader().buyers_by_id():
-            raise ValueError(f"no buyer {bid!r}")
+        lim = next((l for l in loader.credit_limits()
+                    if l["buyer_id"] == bid and l["policy_id"] == pid), None)
+        if lim is None:
+            raise ValueError(f"policy {pid or '?'} holds no limit on buyer {bid or '?'}")
         try:
-            LIVE["dpd"][bid] = int(raw)
+            amount = float(amount_raw)
         except ValueError as exc:
-            raise ValueError(f"days past due must be a whole number, got {raw!r}") from exc
-        Loader(dpd_overrides=LIVE["dpd"]).invoices()      # validate before re-running
+            raise ValueError(f"the amount at risk must be a number, got {amount_raw!r}") from exc
+        if not 0 < amount < 1e13:
+            raise ValueError("the amount at risk must be above zero")
+        today = date.today()
+        if not due_raw:
+            raise ValueError("an overdue invoice needs its original due date - the platform "
+                             "makes it mandatory")
+        try:
+            due = date.fromisoformat(due_raw)
+        except ValueError as exc:
+            raise ValueError(f"cannot read {due_raw!r} as a date") from exc
+        if due > today:
+            raise ValueError(f"an invoice due {due.isoformat()} is not overdue yet - "
+                             f"pick today or an earlier date")
+        if (today - due).days > MAX_LIVE_DPD:
+            raise ValueError(f"an overdue more than {MAX_LIVE_DPD} days old is a data-entry "
+                             f"slip, not a risk signal")
+        due_engine = engine_date(due).isoformat()
+        shown = {due_engine: due.isoformat()}
+        notified = engine_date(today).isoformat()
+        shown[notified] = today.isoformat()
+        eid = f"N-LIVE-{len(LIVE['events']) + 1:02d}"
+        LIVE["events"].append({
+            "event_id": eid, "policy_id": pid, "CORE_LIMIT_REQUEST_DEBTOR": bid,
+            "notification_date": notified, "NEV_REASON": "OVERDUE_INVOICE",
+            "NEV_ORIGINAL_DUE_DATE": due_engine, "NEV_AMOUNT_AT_RISK": str(amount),
+            "NEV_CURRENCY": lim["currency"], "shown_dates": shown})
+        Loader(extra_events=[_engine_event(ev) for ev in LIVE["events"]]).validate()
         return ""
 
-    name = Loader().buyers_by_id().get(bid, {}).get("short_name", bid)
-    _apply(f"Ledger updated: {name} now {raw} days past due", mutate)
+    days = ""
+    try:
+        days = f", {(date.today() - date.fromisoformat(due_raw)).days} days past due" if due_raw else ""
+    except ValueError:
+        pass
+    _apply(f"Overdue invoice filed: {name}{days}", mutate)
 
 
 def refresh_news(source: str = "Manual") -> None:
@@ -1083,14 +1234,15 @@ class Handler(BaseHTTPRequestHandler):
             path = urllib.parse.urlparse(self.path).path
             if path == "/live/story":
                 add_story(form)
-            elif path == "/live/ledger":
-                set_dpd(form)
+            elif path == "/live/notification":
+                file_notification(form)
             elif path == "/news/fetch" and LIVE_BOOK:
                 refresh_news()
-                return self._redirect("/")
+                back = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("back", ["/"])[0]
+                return self._redirect(back if back in ("/", "/live") else "/live")
             elif path == "/news/auto" and LIVE_BOOK:
                 set_auto((form.get("on", ["off"])[0] or "off") == "on")
-                return self._redirect("/")
+                return self._redirect("/live")
             else:
                 return self._send(page("Not found", "<h1>Not found</h1>"), code=404)
             self._redirect("/live")                  # POST-redirect-GET: no re-submit
@@ -1122,7 +1274,7 @@ class Handler(BaseHTTPRequestHandler):
         if url.path == "/live":
             return self._send(live_page())
         if url.path == "/live/reset":
-            LIVE.update(articles=[], dpd={}, last=None)
+            LIVE.update(articles=[], events=[], last=None)
             return self._redirect("/live")
         if parts[:1] == ["client"] and len(parts) == 2:
             body = client_page(parts[1])

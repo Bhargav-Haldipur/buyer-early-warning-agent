@@ -36,6 +36,8 @@ GENERIC_TOKENS = frozenset({
     "AB", "AS", "APS", "OY", "OYJ",
     # generic industry filler that appears in genuine mentions ("Rheinfels Inds.")
     "INDS",
+    # a connector: "Larsen and Toubro" is "Larsen & Toubro", whose "&" is already dropped
+    "AND",
 })
 
 
@@ -53,16 +55,25 @@ def strict_resolve(mention: str, candidates: list[dict]) -> dict | None:
 
     'Arcline Inds.'        -> Arcline Fabrications NV   (no distinguishing tokens)
     'Arcline Media BV'-> refused ('MEDIA' is not in the name)
+
+    A candidate may carry `aliases`, other spellings of its own name ("L&T",
+    "Voda Idea"); each is tried exactly as the name is, and every spelling counts as
+    the same one candidate.
     """
     tk = tokens(mention)
     if not tk:
         return None
     brand, rest = tk[0], set(tk[1:])
-    hits = [c for c in candidates if tokens(c["name"]) and tokens(c["name"])[0] == brand]
+    hits = {}                     # candidate id -> the spellings whose brand matched
+    for c in candidates:
+        for spelling in (c["name"], *c.get("aliases", ())):
+            st = tokens(spelling)
+            if st and st[0] == brand:
+                hits.setdefault(c["id"], (c, []))[1].append(set(st))
     if len(hits) != 1:            # unknown brand, or ambiguous between two entities
         return None
-    cand = hits[0]
-    if not rest.issubset(set(tokens(cand["name"]))):
+    cand, spellings = next(iter(hits.values()))
+    if not any(rest.issubset(st) for st in spellings):
         return None
     return cand
 
@@ -79,7 +90,7 @@ _GRADE_RULES: list[tuple[str, str, int]] = [
     (r"reviewing exposure|lenders review|review .*exposure", "lender_review", 4),
     (r"scales back|scaling back|halts production|capacity cut", "capacity_cut", 3),
     (r"legal notice|winding.up petition|insolvency petition", "legal_notice", 3),
-    # Real-world events (SBI book: press headlines and SEC 8-K item titles). After the
+    # Real-world events (live-news book: press headlines and SEC 8-K item titles). After the
     # synthetic rules so those grade exactly as before; before the neutral ones so a
     # "new plant... and 2,000 job cuts" story is not read as expansion.
     (r"bankruptcy or receivership|chapter 11|files? for bankruptcy|insolvency proceedings",

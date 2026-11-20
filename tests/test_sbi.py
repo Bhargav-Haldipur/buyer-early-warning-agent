@@ -1,4 +1,4 @@
-"""The SBI book: real companies, fetched news, an illustrative ledger. All offline."""
+"""The live-news book: real companies, fetched news, an illustrative ledger. All offline."""
 import csv
 import unittest
 
@@ -15,26 +15,110 @@ class Book(unittest.TestCase):
 
     def test_one_insurer_covers_every_buyer(self):
         lo = Loader(SBI)
-        self.assertEqual([c["client_name"] for c in lo.clients()], ["SBI Trade Credit"])
+        self.assertEqual([c["client_name"] for c in lo.clients()],
+                         ["Trade Credit Insurer"])
         self.assertEqual({l["buyer_id"] for l in lo.credit_limits()},
                          {b["buyer_id"] for b in lo.buyers()})
 
     def test_nothing_in_the_ledger_is_seriously_late(self):
-        """Illustrative payments must never invent distress at a real company."""
-        worst = max(int(i["days_past_due"] or 0) for i in Loader(SBI).invoices())
-        self.assertLess(worst, 30)
+        """Illustrative payments must never invent distress at a real company.
 
-    def test_every_buyer_is_on_the_news_watchlist(self):
+        Checked at the source: days past due follow from the as-of date, so the shipped
+        notifications age day by day until the book is re-seeded."""
+        from ews import sbi_seed
+        for b in sbi_seed.BUYERS:
+            if b.get("real"):
+                self.assertTrue(all(dpd < 30 for _, dpd, _ in b["open"]), b["short"])
+        notes = Loader(SBI).table("notifiable_events")
+        self.assertTrue(notes)
+        self.assertEqual({n["NEV_REASON"] for n in notes}, {"OVERDUE_INVOICE"})
+
+    def test_every_real_buyer_and_only_those_is_on_the_news_watchlist(self):
         with (SBI / "news_watchlist.csv").open() as fh:
             watch = {r["buyer_id"]: r for r in csv.DictReader(fh)}
+        buyers = Loader(SBI).buyers()
+        self.assertEqual(set(watch), {b["buyer_id"] for b in buyers if b["is_real"]})
+        for b in buyers:
+            if b["buyer_id"] in watch:
+                self.assertEqual(watch[b["buyer_id"]]["country"], b["country"])
+                if b["country"] == "USA":
+                    self.assertTrue(watch[b["buyer_id"]]["cik"].isdigit(), b["short_name"])
+
+    def test_the_grid_large_medium_small_by_india_and_overseas(self):
+        from collections import Counter
+        grid = Counter((b["size_band"], b["country"] == "IND") for b in Loader(SBI).buyers())
+        self.assertEqual(set(grid.values()), {3})
+        self.assertEqual(len(grid), 6)
         for b in Loader(SBI).buyers():
-            self.assertIn(b["buyer_id"], watch)
-            self.assertTrue(watch[b["buyer_id"]]["cik"].isdigit())
+            self.assertEqual(b["is_real"], b["size_band"] == "large", b["short_name"])
+
+    def test_indemnity_never_exceeds_80_per_cent(self):
+        for p in Loader(SBI).table("policies"):
+            self.assertLessEqual(float(p["INSURED_PERCENTAGE"]), 80, p["policy_id"])
+
+    def test_a_real_company_is_never_flagged_on_its_invented_ledger(self):
+        """Whatever moves a real company off Healthy must be real news."""
+        from ews import sbi_seed
+        from ews.config import W_PAYMENT, band, payment_score
+        for b in sbi_seed.BUYERS:
+            if b.get("real"):
+                worst = max((dpd for _, dpd, _ in b["open"]), default=0)
+                self.assertEqual(band(W_PAYMENT * payment_score(worst)), "Healthy", b["short"])
+
+    def test_illustrative_stories_are_only_about_invented_companies(self):
+        lo = Loader(SBI)
+        names = {b["buyer_name"]: b for b in lo.buyers()}
+        stories = lo.table("illustrative_articles")
+        self.assertTrue(stories)
+        for a in stories:
+            self.assertEqual(a["publication"], "Illustrative")
+            self.assertFalse(names[a["mentioned_entity_as_written"]]["is_real"], a["headline"])
 
     def test_fetched_news_has_the_columns_the_engine_reads(self):
         with (SBI / "news_articles.csv").open() as fh:
             self.assertEqual(tuple(csv.DictReader(fh).fieldnames), FIELDS)
 
+
+class Routing(unittest.TestCase):
+    """News is routed by the company's country: edition and trusted publishers."""
+
+    def test_each_country_gets_its_google_news_edition(self):
+        from ews.fetch_news import edition
+        self.assertEqual(edition("IND"), ("en-IN", "IN", "IN:en"))
+        self.assertEqual(edition("USA"), ("en-US", "US", "US:en"))
+        self.assertEqual(edition("DEU"), edition("USA"), "no edition listed: the US one")
+
+    def test_indian_publishers_are_trusted_only_for_indian_companies(self):
+        from ews.fetch_news import publishers_for
+        india, us = publishers_for(SBI, "IND"), publishers_for(SBI, "USA")
+        self.assertIn("Business Standard", india)
+        self.assertNotIn("Business Standard", us)
+        self.assertIn("Reuters", india)
+        self.assertIn("Reuters", us)
+
+    def test_an_indian_company_is_searched_in_the_india_edition(self):
+        from datetime import date
+        from unittest.mock import patch
+        from ews import fetch_news
+        asked = []
+
+        def fake_get(url, **kw):
+            asked.append(url)
+            return (b"<rss><channel><item><title>Tata Motors cuts output - Business Standard"
+                    b"</title><source>Business Standard</source><link>https://x/1</link>"
+                    b"<pubDate>Mon, 16 Nov 2026 10:00:00 GMT</pubDate></item>"
+                    b"<item><title>Tata Motors cuts output - Some Blog</title>"
+                    b"<source>Some Blog</source><link>https://x/2</link>"
+                    b"<pubDate>Mon, 16 Nov 2026 10:00:00 GMT</pubDate></item></channel></rss>")
+        with patch.object(fetch_news, "_get", fake_get), \
+                patch.object(fetch_news, "AS_OF", date(2026, 11, 19)):
+            kept, dropped = fetch_news.google_news(
+                {"buyer_name": "Tata Motors Limited"},
+                {"news_query": '"Tata Motors"', "aliases": "Tata Motors", "country": "IND"},
+                date(2026, 10, 1), fetch_news.publishers_for(SBI, "IND"), 12)
+        self.assertIn("hl=en-IN&gl=IN&ceid=IN:en", asked[0])
+        self.assertEqual([a["publication"] for a in kept], ["Business Standard"])
+        self.assertEqual(dropped, 1)
 
 class Resolution(unittest.TestCase):
     def setUp(self):
@@ -42,8 +126,9 @@ class Resolution(unittest.TestCase):
                       for b in Loader(SBI).buyers()]
 
     def test_us_legal_names_resolve_from_the_brand(self):
-        for mention, want in [("Nvidia", "US001"), ("The Boeing Company", "US007"),
-                              ("Ford Motor", "US008"), ("NIKE", "US009")]:
+        for mention, want in [("Intel", "OS01"), ("The Boeing Company", "OS02"),
+                              ("Ford Motor", "OS03"), ("Tata Motors", "IN01"),
+                              ("Vodafone Idea", "IN03")]:
             self.assertEqual(strict_resolve(mention, self.cands)["id"], want, mention)
 
     def test_a_different_business_on_the_same_brand_is_refused(self):

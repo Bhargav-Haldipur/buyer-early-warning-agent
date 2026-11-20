@@ -13,6 +13,7 @@ import json
 import re
 import subprocess
 import unittest
+from unittest.mock import patch
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -70,15 +71,20 @@ class Guards(unittest.TestCase):
 
     def test_fractional_policy_percentages_are_accepted(self):
         from ews.limits import _insured
-        got = _insured(1_000_000, {"indemnity_pct": "87.5", "deductible_pct": "10",
-                                   "max_liability_eur": "1e12"})
-        self.assertAlmostEqual(got, 1_000_000 * 0.875 * 0.9)
+        policy = {"INSURED_PERCENTAGE": "87.5", "ews_deductible_pct": "10",
+                  "SYS_MAX_LIABILITY": "1e12"}
+        self.assertAlmostEqual(_insured(1_000_000, policy), 1_000_000 * 0.875 * 0.9)
 
-    def test_a_settled_invoice_with_no_payment_date_names_itself(self):
+    def test_the_limit_decision_s_insured_percentage_wins_over_the_policy_s(self):
+        from ews.limits import _insured
+        policy = {"INSURED_PERCENTAGE": "90", "ews_deductible_pct": "0", "SYS_MAX_LIABILITY": "1e12"}
+        self.assertAlmostEqual(_insured(1_000_000, policy, "70"), 700_000)
+
+    def test_a_resolved_notification_with_no_date_names_itself(self):
         from ews.agents.payment import _days_late
         with self.assertRaises(DataError) as ctx:
-            _days_late({"invoice_id": "INV1", "payment_date": "", "due_date": "2026-01-01"})
-        self.assertIn("INV1", str(ctx.exception))
+            _days_late({"event_id": "NE1", "resolved_date": "", "original_due_date": "2026-01-01"})
+        self.assertIn("NE1", str(ctx.exception))
 
     def test_the_case_file_guard_does_not_accept_a_rupee_era_scaling(self):
         from ews.casefile import allowed_numbers
@@ -113,31 +119,148 @@ class Integrity(unittest.TestCase):
         with p.open("w", newline="") as f:
             w = csv.DictWriter(f, list(rs[0])); w.writeheader(); w.writerows(rs)
 
-    def test_duplicate_ids_are_caught(self):
+    def _broken(self, table, change, expect):
         def m(d):
-            r = self._rows(d / "buyers.csv"); r.append(dict(r[0])); self._write(d / "buyers.csv", r)
-        with self.assertRaises(DataError):
+            r = self._rows(d / f"{table}.csv"); change(r); self._write(d / f"{table}.csv", r)
+        with self.assertRaises(DataError) as ctx:
             Loader(self._corrupt(m)).validate()
+        self.assertIn(expect, str(ctx.exception))
+
+    def test_duplicate_ids_are_caught(self):
+        self._broken("legal_entities", lambda r: r.append(dict(r[-1])), "duplicate legal_entity_id")
 
     def test_a_buyer_on_no_insurers_book_is_caught(self):
-        def m(d):
-            r = self._rows(d / "credit_limits.csv"); self._write(d / "credit_limits.csv", r[1:])
-        with self.assertRaises(DataError):
-            Loader(self._corrupt(m)).validate()
+        self._broken("limits", lambda r: r.pop(0), "has no credit limit line")
 
-    def test_a_reference_to_an_absent_entity_is_caught(self):
-        def m(d):
-            r = self._rows(d / "buyers.csv"); r[0]["parent_id"] = "PAR99"
-            self._write(d / "buyers.csv", r)
-        with self.assertRaises(DataError):
-            Loader(self._corrupt(m)).validate()
+    def test_a_reference_to_an_absent_group_is_caught(self):
+        def change(r):
+            next(e for e in r if e["role"] == "BUYER")["legal_entity_parent_id"] = "PAR99"
+        self._broken("legal_entities", change, "absent group PAR99")
 
-    def test_an_invoice_for_an_unknown_buyer_is_caught(self):
-        def m(d):
-            r = self._rows(d / "invoices.csv"); r[0]["buyer_id"] = "BUY999"
-            self._write(d / "invoices.csv", r)
-        with self.assertRaises(DataError):
-            Loader(self._corrupt(m)).validate()
+    def test_a_notification_for_an_unknown_buyer_is_caught(self):
+        def change(r):
+            r[0]["CORE_LIMIT_REQUEST_DEBTOR"] = "BUY999"
+        self._broken("notifiable_events", change, "absent buyer BUY999")
+
+    def test_an_overdue_with_no_due_date_is_caught(self):
+        def change(r):
+            r[0]["NEV_ORIGINAL_DUE_DATE"] = ""
+        self._broken("notifiable_events", change, "overdue invoice with no due date")
+
+    def test_a_limit_in_another_currency_than_its_policy_is_caught(self):
+        def change(r):
+            r[0]["CORE_LIMIT_DECISION_CURRENCY"] = "INR"
+        self._broken("limits", change, "its policy in EUR")
+
+    def test_an_unknown_reason_is_caught(self):
+        def change(r):
+            r[0]["NEV_REASON"] = "BAD_VIBES"
+        self._broken("notifiable_events", change, "unknown reason")
+
+class DataModel(unittest.TestCase):
+    """The conversion from the legacy ledger is exact for scoring, and the notification
+    rules hold: what is known on the as-of date, nothing later."""
+
+    AS_OF = date(2026, 9, 25)
+
+    def _book(self, invoices):
+        from ews.data_model import from_legacy
+        clients = [{"client_id": "CL1", "client_name": "Ins", "city": "Milan", "policy_id": "P1",
+                    "indemnity_pct": "90", "deductible_pct": "10", "max_liability_eur": "1e9"}]
+        buyers = [{"buyer_id": "B1", "buyer_name": "Buyer One", "short_name": "One",
+                   "sector": "x", "city": "Lyon", "size_band": "small", "parent_id": ""}]
+        limits = [{"limit_id": "L1", "client_id": "CL1", "buyer_id": "B1",
+                   "credit_limit_eur": "100000", "payment_terms_days": "30",
+                   "limit_approved_date": "2025-01-01", "last_reviewed_date": "2026-01-01",
+                   "limit_status": "Active"}]
+        return from_legacy(clients, buyers, [], limits, invoices, as_of=self.AS_OF,
+                           currency="EUR", real=False)
+
+    @staticmethod
+    def _inv(i, due, amount, paid="", dpd="", status="Open"):
+        return {"invoice_id": i, "client_id": "CL1", "buyer_id": "B1", "due_date": due,
+                "invoice_amount_eur": str(amount), "payment_date": paid,
+                "days_past_due": str(dpd), "status": status}
+
+    # (score, days past due) for every sample buyer on the rules path, measured on the
+    # invoice ledger just before it was reshaped into notifications. Pins the conversion.
+    BEFORE = {"BUY002": (62.8, 45), "BUY003": (43.5, 40), "BUY004": (63.1, 55), "BUY005": (37.3, 32), "BUY009": (6.5, 10), "BUY010": (3.2, 5), "BUY011": (16.2, 25), "BUY013": (0.0, 0), "BUY014": (16.2, 25), "BUY015": (1.0, 0), "BUY016": (16.2, 25), "BUY017": (13.0, 20), "BUY018": (0.0, 0), "BUY019": (16.2, 25), "BUY021": (0.0, 0), "BUY023": (16.2, 25), "BUY024": (0.0, 0), "BUY025": (9.8, 15), "BUY026": (0.0, 0), "BUY029": (0.0, 0), "BUY031": (7.8, 12), "BUY032": (0.0, 0), "BUY033": (11.7, 18), "BUY034": (3.2, 5), "BUY035": (0.0, 0), "BUY036": (5.2, 8)}
+
+    def test_the_reshaped_sample_scores_exactly_as_the_invoice_ledger_did(self):
+        out = engine.run(llm=FallbackLLM(cache=False), commentary=False)
+        got = {r["buyer_id"]: (r["verdict"]["score"], r["verdict"]["payment"]["dpd"])
+               for r in out["buyers"]}
+        self.assertEqual(got, self.BEFORE)
+
+    def test_only_late_invoices_become_notifications(self):
+        book = self._book([
+            self._inv("I1", "2026-08-26", 1000, dpd=30),                       # open, overdue
+            self._inv("I2", "2026-10-10", 2000),                               # open, not due
+            self._inv("I3", "2026-05-01", 500, paid="2026-05-01", status="Paid"),  # on time
+            self._inv("I4", "2026-06-01", 700, paid="2026-06-20", status="Paid"),  # late
+        ])
+        ev = {e["event_id"]: e for e in book["notifiable_events"]}
+        self.assertEqual(set(ev), {"NE-I1", "NE-I4"})
+        self.assertEqual(ev["NE-I1"]["ews_status"], "OPEN")
+        self.assertEqual((ev["NE-I4"]["ews_status"], ev["NE-I4"]["ews_resolved_date"]),
+                         ("RESOLVED", "2026-06-20"))
+        self.assertEqual(ev["NE-I1"]["notification_date"], "2026-08-27", "the day after due")
+
+    def test_the_latest_open_notification_carries_the_whole_outstanding(self):
+        book = self._book([self._inv("I1", "2026-08-26", 1000, dpd=30),
+                           self._inv("I2", "2026-10-10", 2000)])
+        ageing = {a["NEV_OUTSTANDING_AGEING"]: a["NEV_OUTSTANDING_AMOUNT"]
+                  for a in book["notifiable_event_ageing"]}
+        self.assertEqual(ageing, {"OVERDUE_1_30_DAYS": "1000", "NOT_YET_DUE": "2000"})
+
+    def test_a_stored_dpd_that_disagrees_with_the_date_is_refused(self):
+        with self.assertRaises(ValueError):
+            self._book([self._inv("I1", "2026-08-26", 1000, dpd=31)])
+
+    def _loader(self, events, ageing=()):
+        import shutil, tempfile
+        from pathlib import Path as P
+        from ews.data_model import write
+        d = P(tempfile.mkdtemp())
+        book = self._book([])
+        book["notifiable_events"], book["notifiable_event_ageing"] = list(events), list(ageing)
+        write(d, book)
+        shutil.copy(ROOT / "data" / "news_articles.csv", d)
+        return Loader(d)
+
+    @staticmethod
+    def _ev(eid, notified, due, status="OPEN", resolved="", amount="1000"):
+        return {"event_id": eid, "reference": eid, "policy_id": "P1",
+                "CORE_LIMIT_REQUEST_DEBTOR": "B1", "status": "SUBMITTED",
+                "notification_date": notified, "NEV_REASON": "OVERDUE_INVOICE",
+                "NEV_ORIGINAL_DUE_DATE": due, "NEV_AMOUNT_AT_RISK": amount, "NEV_CURRENCY": "EUR",
+                "ews_status": status, "ews_resolved_date": resolved}
+
+    def test_a_notification_after_the_as_of_date_is_not_known_yet(self):
+        with patch("ews.loader.AS_OF", self.AS_OF):
+            notes = self._loader([self._ev("N1", "2026-09-30", "2026-09-01")]).notifications()
+        self.assertEqual(notes, [])
+
+    def test_resolved_after_the_as_of_date_was_still_open_then(self):
+        with patch("ews.loader.AS_OF", self.AS_OF):
+            [n] = self._loader([self._ev("N1", "2026-09-02", "2026-09-01", status="RESOLVED",
+                                         resolved="2026-10-15")]).notifications()
+        self.assertEqual((n["status"], n["dpd"]), ("OPEN", 24))
+
+    def test_without_ageing_the_owed_amount_is_the_amount_at_risk(self):
+        from ews.limits import owed_by_line
+        with patch("ews.loader.AS_OF", self.AS_OF):
+            notes = self._loader([self._ev("N1", "2026-09-02", "2026-09-01", amount="1200"),
+                                  self._ev("N2", "2026-09-10", "2026-09-09", amount="300")]
+                                 ).notifications()
+        self.assertEqual(owed_by_line(notes), {("B1", "P1"): 1500.0})
+
+    def test_notifications_piling_up_read_as_deteriorating(self):
+        from ews.agents.payment import rules_trend
+        acc = {"last_window": 3, "window_before": 1}
+        self.assertEqual(rules_trend([], acc), "deteriorating")
+        self.assertEqual(rules_trend([], {"last_window": 3, "window_before": 3}),
+                         "insufficient_history")
 
 class Determinism(unittest.TestCase):
     def test_same_inputs_give_identical_output(self):
@@ -149,9 +272,16 @@ class Determinism(unittest.TestCase):
 class Formula(unittest.TestCase):
     def test_payment_knees(self):
         self.assertAlmostEqual(config.payment_score(0), 0.0)
-        self.assertAlmostEqual(config.payment_score(30), 40.0)
-        self.assertAlmostEqual(config.payment_score(60), 100.0)
+        self.assertAlmostEqual(config.payment_score(30), 30.0)
+        self.assertAlmostEqual(config.payment_score(45), 60.0)
+        self.assertAlmostEqual(config.payment_score(65), 100.0)
         self.assertAlmostEqual(config.payment_score(90), 100.0, msg="must cap at 100")
+
+    def test_payment_alone_enters_watch_only_past_the_reporting_window(self):
+        on_payment = lambda d: config.band(config.W_PAYMENT * config.payment_score(d))
+        self.assertEqual(on_payment(25), "Healthy")
+        self.assertEqual(on_payment(30), "Healthy")
+        self.assertEqual(on_payment(31), "Watch")
 
     def test_band_boundaries(self):
         self.assertEqual(config.band(19.9), "Healthy")
@@ -235,6 +365,27 @@ class Resolution(unittest.TestCase):
     def test_resolves_parent(self):
         got = strict_resolve("Northpoint Industrial Holdings Ltd", self.CANDS)
         self.assertEqual((got["kind"], got["id"]), ("parent", "P3"))
+
+    def test_and_is_ampersand(self):
+        cands = [{"kind": "buyer", "id": "IN02", "name": "Larsen & Toubro Limited"}]
+        for mention in ("Larsen and Toubro", "Larsen & Toubro"):
+            self.assertEqual(strict_resolve(mention, cands)["id"], "IN02", mention)
+
+    def test_aliases_are_other_spellings_of_one_candidate(self):
+        cands = [{"kind": "buyer", "id": "IN03", "name": "Vodafone Idea Limited",
+                  "aliases": ["Vodafone Idea", "Voda Idea"]},
+                 {"kind": "buyer", "id": "IN02", "name": "Larsen & Toubro Limited",
+                  "aliases": ["L&T"]}]
+        self.assertEqual(strict_resolve("Voda Idea", cands)["id"], "IN03")
+        self.assertEqual(strict_resolve("Vodafone Idea", cands)["id"], "IN03")
+        self.assertEqual(strict_resolve("L&T", cands)["name"], "Larsen & Toubro Limited")
+        # an alias is held to the same strict rule as the name
+        self.assertIsNone(strict_resolve("Voda Idea Payments Bank", cands))
+
+    def test_alias_shared_by_two_candidates_is_ambiguous(self):
+        cands = [{"kind": "buyer", "id": "A", "name": "Tata Motors Limited"},
+                 {"kind": "buyer", "id": "B", "name": "Titan Company", "aliases": ["Tata Titan"]}]
+        self.assertIsNone(strict_resolve("Tata", cands))
 
     def test_grader_matches_dataset_categories(self):
         self.assertEqual(keyword_grade({"headline": "Workers protest over delayed wages",
@@ -572,9 +723,9 @@ class LiveInput(unittest.TestCase):
     def setUp(self):
         import dashboard.server as S
         self.S = S
-        S.LIVE.update(articles=[], dpd={}, last=None)
+        S.LIVE.update(articles=[], events=[], last=None)
         S._CACHE.clear()
-        self.addCleanup(lambda: S.LIVE.update(articles=[], dpd={}, last=None))
+        self.addCleanup(lambda: S.LIVE.update(articles=[], events=[], last=None))
 
     @staticmethod
     def _insurer_of(buyer_id: str) -> str:
@@ -586,6 +737,15 @@ class LiveInput(unittest.TestCase):
                 "body": "Staff protested over delayed wages.",
                 "date": (date.today() - timedelta(days=5)).isoformat()}
         self.S.add_story({k: [v] for k, v in {**base, **kw}.items()})
+        return self.S.LIVE["last"]
+
+    def _file(self, days=45, buyer="BUY019", amount="120000", policy=None, due=None, **extra):
+        policy = policy or next(l["policy_id"] for l in Loader().credit_limits()
+                                if l["buyer_id"] == buyer)
+        if due is None:
+            due = (date.today() - timedelta(days=days)).isoformat()
+        self.S.file_notification({"line": [f"{buyer}|{policy}"], "due": [due],
+                                  "amount": [amount], **{k: [v] for k, v in extra.items()}})
         return self.S.LIVE["last"]
 
     def test_a_genuine_story_moves_the_named_buyer(self):
@@ -640,40 +800,59 @@ class LiveInput(unittest.TestCase):
         self._story(headline="")                      # rejected
         self.assertEqual(len(self.S.LIVE["articles"]), 1)
 
-    def test_the_ledger_lever_crosses_a_band(self):
-        self.S.set_dpd({"buyer_id": ["BUY019"], "dpd": ["45"]})
-        m = self.S.LIVE["last"]["moves"]
+    def test_a_filed_overdue_crosses_a_band(self):
+        m = self._file(45)["moves"]
         self.assertEqual((m[0]["buyer_id"], m[0]["to_band"]), ("BUY019", "Watch"))
 
     def test_the_two_signals_together_reach_a_band_neither_reaches_alone(self):
-        """The fusion argument, as a number: at 45 days past due this buyer is Watch on
-        payment alone and High Risk once the wage story lands. Payment alone would not
-        get there until 57 days - the news is worth twelve days of lead time."""
-        self.S.set_dpd({"buyer_id": ["BUY019"], "dpd": ["45"]})
-        self.assertEqual(self.S.LIVE["last"]["moves"][0]["to_band"], "Watch")
+        """The fusion argument, as a number: 45 days past due is Watch on payment alone,
+        and High Risk once the wage story lands. Payment alone would not get there until
+        57 days - the news is worth twelve days of lead time."""
+        self.assertEqual(self._file(45)["moves"][0]["to_band"], "Watch")
         self._story()
         self.assertEqual(self.S.LIVE["last"]["moves"][0]["to_band"], "High Risk")
 
-        self.S.LIVE.update(articles=[], dpd={}, last=None)
-        self.S.set_dpd({"buyer_id": ["BUY019"], "dpd": ["57"]})
-        self.assertEqual(self.S.LIVE["last"]["moves"][0]["to_band"], "High Risk")
+        self.S.LIVE.update(articles=[], events=[], last=None)
+        self.assertEqual(self._file(57)["moves"][0]["to_band"], "High Risk")
 
-    def test_a_bad_dpd_is_refused_not_applied(self):
-        self.S.set_dpd({"buyer_id": ["BUY019"], "dpd": ["nope"]})
-        self.assertTrue(self.S.LIVE["last"]["error"])
-        self.assertEqual(self.S.LIVE["dpd"], {})
+    def test_a_notification_dated_today_reaches_the_engine_on_the_snapshot_day(self):
+        from ews.config import AS_OF
+        self._file(45)
+        ev = self.S.LIVE["events"][0]
+        self.assertEqual(ev["notification_date"], AS_OF.isoformat())
+        self.assertEqual(ev["NEV_ORIGINAL_DUE_DATE"], (AS_OF - timedelta(days=45)).isoformat())
+        self.assertEqual(self.S.shown_date(ev["event_id"], ev["NEV_ORIGINAL_DUE_DATE"]),
+                         (date.today() - timedelta(days=45)).isoformat())
 
-    def test_an_out_of_range_dpd_is_refused(self):
-        self.S.set_dpd({"buyer_id": ["BUY019"], "dpd": ["9999"]})
-        self.assertTrue(self.S.LIVE["last"]["error"])
-        self.assertEqual(self.S.LIVE["dpd"], {})
+    def test_a_notification_takes_the_policy_s_currency(self):
+        self._file(45)
+        policy = Loader().policies_by_id()[self.S.LIVE["events"][0]["policy_id"]]
+        self.assertEqual(self.S.LIVE["events"][0]["NEV_CURRENCY"], policy["CORE_CURRENCY"])
 
-    def test_an_override_does_not_leak_into_the_next_loader(self):
-        """table() hands back a cached list; an override must copy before writing."""
-        def worst(loader):
-            return max(int(i["days_past_due"] or 0) for i in loader.invoices()
-                       if i["buyer_id"] == "BUY019" and i["status"] == "Open")
-        self.assertEqual(worst(Loader(dpd_overrides={"BUY019": 99})), 99)
+    def test_a_bad_notification_is_refused_not_applied(self):
+        for kw, why in [({"amount": "nope"}, "number"), ({"amount": "0"}, "above zero"),
+                        ({"days": -3}, "not overdue yet"), ({"days": 9999}, "data-entry"),
+                        ({"due": ""}, "original due date"),
+                        ({"policy": "NO-SUCH-POLICY"}, "holds no limit")]:
+            last = self._file(**kw)
+            self.assertIn(why, last.get("error") or "", kw)
+            self.assertEqual(self.S.LIVE["events"], [], kw)
+
+    def test_the_live_page_files_only_overdue_invoices(self):
+        # a reason sent anyway (an old form, a crafted request) is ignored, not stored
+        last = self._file(reason="MARKET_RUMOUR")
+        self.assertIsNone(last.get("error"))
+        self.assertEqual([ev["NEV_REASON"] for ev in self.S.LIVE["events"]], ["OVERDUE_INVOICE"])
+
+    def test_a_filed_notification_does_not_leak_into_the_next_loader(self):
+        ev = {"event_id": "N-X", "policy_id": "TCI-CL05-2025", "CORE_LIMIT_REQUEST_DEBTOR": "BUY019",
+              "notification_date": "2026-09-25", "NEV_REASON": "OVERDUE_INVOICE",
+              "NEV_ORIGINAL_DUE_DATE": "2026-07-27", "NEV_AMOUNT_AT_RISK": "1", "NEV_CURRENCY": "EUR"}
+        policy = next(l["policy_id"] for l in Loader().credit_limits() if l["buyer_id"] == "BUY019")
+        ev["policy_id"] = policy
+        worst = lambda lo: max(n["dpd"] for n in lo.notifications()  # noqa: E731
+                               if n["buyer_id"] == "BUY019" and n["status"] == "OPEN")
+        self.assertEqual(worst(Loader(extra_events=[ev])), 60)
         self.assertEqual(worst(Loader()), 25)
 
     def test_live_input_never_reaches_the_shipped_dataset(self):
@@ -693,17 +872,17 @@ class LiveInput(unittest.TestCase):
         for page in (self.S.buyer_page("BUY019", "score"), self.S.client_page("CL01"),
                      self.S.home()):
             self.assertIn("Live input in play", page.decode())
-        self.assertIn("56.3", self.S.buyer_page("BUY019", "score").decode())
-        self.assertIn("56.3", self.S.client_page(self._insurer_of("BUY019")).decode())
+        self.assertIn("50.9", self.S.buyer_page("BUY019", "score").decode())
+        self.assertIn("50.9", self.S.client_page(self._insurer_of("BUY019")).decode())
 
     def test_resetting_puts_every_page_back(self):
         self.S._CACHE.clear()
         self._story()
-        self.S.LIVE.update(articles=[], dpd={}, last=None)
+        self.S.LIVE.update(articles=[], events=[], last=None)
         for page in (self.S.buyer_page("BUY019", "score"), self.S.client_page("CL01"),
                      self.S.home()):
             self.assertNotIn("Live input in play", page.decode())
-        self.assertIn("21.7", self.S.buyer_page("BUY019", "score").decode())
+        self.assertIn("16.2", self.S.buyer_page("BUY019", "score").decode())
 
     def test_skipping_commentary_does_not_move_a_single_score(self):
         from ews.llm import FallbackLLM
@@ -715,8 +894,9 @@ class LiveInput(unittest.TestCase):
 
 
     def test_live_commentary_is_fresh_only_for_the_touched_buyer(self):
-        """A ledger edit re-runs the adjudicator and Case File agent for that buyer only;
-        every other buyer replays its shipped review and never reaches the model."""
+        """A filed notification re-runs the adjudicator and Case File agent for that buyer only;
+        every other buyer replays its cached review, or falls back to the template, and
+        never reaches the model. Independent of whether the shipped cache is current."""
         from ews.agents.runtime import AgentError
         from ews.llm import _Cache
 
@@ -731,18 +911,30 @@ class LiveInput(unittest.TestCase):
             def create(self, **_):
                 raise AgentError("model called")
 
-        out = engine.run(llm=ModelOffline(), dpd_overrides={"BUY003": 70},
-                         commentary="changed")
+        policy = next(l["policy_id"] for l in Loader().credit_limits() if l["buyer_id"] == "BUY003")
+        filed = {"event_id": "N-LIVE-01", "policy_id": policy, "CORE_LIMIT_REQUEST_DEBTOR": "BUY003",
+                 "notification_date": "2026-09-25", "NEV_REASON": "OVERDUE_INVOICE",
+                 "NEV_ORIGINAL_DUE_DATE": "2026-07-17", "NEV_AMOUNT_AT_RISK": "50000",
+                 "NEV_CURRENCY": "EUR"}
+        out = engine.run(llm=ModelOffline(), extra_events=[filed], commentary="changed")
         self.assertEqual(out["commentary_fresh_for"], ["BUY003"])
         for r in out["buyers"]:
             rv, cf = r["verdict"]["review"], r["case_file"]["agent"]
+            if rv is None:
+                # no evidence at all - nothing for the adjudicator to review
+                self.assertFalse(r["evidence"], r["buyer_id"])
+                continue
             if r["buyer_id"] == "BUY003":
                 self.assertEqual(rv["agent"]["error"], "model called")
                 self.assertEqual(cf["error"], "model called")
             else:
-                self.assertEqual((rv["agent"]["mode"], rv["agent"]["cached"]), ("agent", True),
-                                 r["buyer_id"])
-                self.assertIn(cf["mode"], ("agent", "rules"), r["buyer_id"])
+                # replayed from the shipped cache, or - when the cache is stale - the
+                # template; never a call to the model for a buyer nobody changed
+                for run in (rv["agent"], cf):
+                    self.assertNotEqual(run["error"], "model called", r["buyer_id"])
+                    self.assertTrue(run["mode"] in ("agent", "rules")
+                                    or "did not change" in (run["error"] or ""),
+                                    r["buyer_id"])
 
 class TestsStayOffline(unittest.TestCase):
     """The documented way to run this project exports ANTHROPIC_API_KEY, and several

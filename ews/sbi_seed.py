@@ -1,133 +1,290 @@
-"""Build the SBI Trade Credit book: one insurer, ten real US companies.
+"""Build the live-news book: one trade credit insurer, four policies, eighteen buyers.
 
-    python3 -m ews.sbi_seed                  # ledger dated as of today
-    python3 -m ews.sbi_seed --as-of 2026-11-18
+    python3 -m ews.sbi_seed                  # dated as of today
+    python3 -m ews.sbi_seed --as-of 2026-11-19
 
-The companies, their SEC CIKs and their headquarters are real (checked against
-EDGAR). The insurer's book on them - credit limits, invoices, payments - is
-ILLUSTRATIVE: there is no real trade-credit ledger behind it. It is deliberately
-unremarkable - everyone pays on or near time, two buyers are a few days late - so
-that what moves a score in the demo is real news, never an invented payment problem
-at a real company.
+Written in the shape the insurance platform stores it (see data_model.py). Eighteen buyers on a 3 x 2
+grid - large, medium and small; Indian and overseas - three in each cell:
 
-Re-run before a presentation so invoice dates sit around the day it is shown. It
-rewrites everything in data/sbi/ except trusted_sources.csv and the fetched news.
+  * The six LARGE buyers are REAL listed companies (Tata Motors, Larsen & Toubro,
+    Vodafone Idea; Intel, Boeing, Ford) and their news is fetched from public sources.
+    Their credit limits and overdue notifications are ILLUSTRATIVE, and deliberately
+    unremarkable: never an overdue past 30 days, so whatever moves a real company's
+    score is real news, never an invented payment problem.
+  * The twelve MEDIUM and SMALL buyers are INVENTED, and so are their stories
+    (illustrative_articles.csv, marked "Illustrative"). The High Risk and FREEZE cases
+    in the book are all invented companies. Most small buyers have no news at all -
+    that is what a small company's coverage looks like.
+  * The four policyholders are invented, and so is the insurer: a generic Indian trade
+    credit insurer, with its policies, limits and notifications.
+
+Domestic limits are decided by hand and export limits through the Tinubu Risk team's
+recommendations, hence underwriter_type MANUAL / AUTOMATIC. The insurer uses one
+notifiable-event reason, overdue payment, so every notification is an overdue invoice.
+Indemnity is 80% throughout.
+
+Re-run before a presentation so the dates sit around the day it is shown. It rewrites
+everything in data/sbi/ except trusted_sources.csv and the fetched news.
 """
 from __future__ import annotations
 
 import argparse
 import csv
+from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
+from . import data_model
+
 DIR = Path(__file__).resolve().parent.parent / "data" / "sbi"
+CR, L = 10_000_000, 100_000        # one crore, one lakh
 
-CLIENT = {
-    "client_id": "SBI01", "client_name": "SBI Trade Credit", "sector": "Trade Credit Insurance",
-    "city": "Mumbai", "policy_id": "TCI-SBI01-2026", "overdue_reporting_window_days": 30,
-    "indemnity_pct": 90, "deductible_pct": 10, "max_liability_eur": 100_000_000,
-}
+INSURER = ("TCI", "Trade Credit Insurer", "Trade Credit Insurer", "Mumbai", "IND")
 
-# id, legal name, short, sector, HQ, CIK, ticker, Google News query, aliases,
-# credit limit (USD), invoice size (USD), days past due on the worst open invoice
-COMPANIES = [
-    ("US001", "NVIDIA Corporation", "Nvidia", "Semiconductors", "Santa Clara, CA",
-     1045810, "NVDA", '"Nvidia"', "Nvidia", 12_000_000, 900_000, 0),
-    ("US002", "Microsoft Corporation", "Microsoft", "Software", "Redmond, WA",
-     789019, "MSFT", '"Microsoft"', "Microsoft", 10_000_000, 750_000, 0),
-    ("US003", "Apple Inc.", "Apple", "Consumer Electronics", "Cupertino, CA",
-     320193, "AAPL", '"Apple Inc" OR "Apple shares" OR "Apple stock"', "Apple",
-     10_000_000, 800_000, 0),
-    ("US004", "Walmart Inc.", "Walmart", "Retail", "Bentonville, AR",
-     104169, "WMT", '"Walmart"', "Walmart", 8_000_000, 600_000, 0),
-    ("US005", "Caterpillar Inc.", "Caterpillar", "Construction Machinery", "Irving, TX",
-     18230, "CAT", '"Caterpillar"', "Caterpillar", 6_000_000, 450_000, 0),
-    ("US006", "Intel Corporation", "Intel", "Semiconductors", "Santa Clara, CA",
-     50863, "INTC", '"Intel"', "Intel", 7_000_000, 500_000, 0),
-    ("US007", "The Boeing Company", "Boeing", "Aerospace", "Arlington, VA",
-     12927, "BA", '"Boeing"', "Boeing", 9_000_000, 700_000, 0),
-    ("US008", "Ford Motor Company", "Ford", "Automotive", "Dearborn, MI",
-     37996, "F", '"Ford Motor" OR "Ford shares" OR "Ford stock"', "Ford Motor|Ford",
-     6_000_000, 450_000, 9),
-    ("US009", "NIKE, Inc.", "Nike", "Apparel & Footwear", "Beaverton, OR",
-     320187, "NKE", '"Nike"', "Nike", 4_000_000, 300_000, 0),
-    ("US010", "Starbucks Corporation", "Starbucks", "Restaurants", "Seattle, WA",
-     829224, "SBUX", '"Starbucks"', "Starbucks", 3_000_000, 220_000, 6),
+# id, legal name, usual name, town
+INSUREDS = [
+    ("INS01", "Velaris Polymers Private Limited", "Velaris Polymers", "Pune"),
+    ("INS02", "Orvana Steel Components Private Limited", "Orvana Steel", "Ahmedabad"),
+    ("INS03", "Tamrin Global Exports Limited", "Tamrin Exports", "Chennai"),
+    ("INS04", "Meridia Commercial Bank Limited", "Meridia Bank", "Mumbai"),
 ]
 
-TERMS = 60
-# days late on the six settled invoices, oldest first: on time give or take a few days,
-# so the settlement trend reads as stable for every buyer
-SETTLED_LATE = [(-2, 1, 0, 2, -1, 1), (0, -1, 1, 0, 2, 0), (1, 0, -2, 1, 0, 1),
-                (0, 2, 1, -1, 0, 0), (2, 0, 1, 0, -1, 2), (0, 1, 0, 2, 1, 0),
-                (1, 2, 0, 1, 0, 2), (0, 1, 2, 0, 1, 1), (-1, 0, 0, 1, 2, 0),
-                (2, 1, 0, 0, 1, 2)]
+# id, product, insured, currency, max liability, reporting threshold, underwriter
+POLICIES = [
+    ("TCI-WT-2026-0001", "WHOLE_TURNOVER", "INS01", "INR", 60 * CR, 5 * L, "MANUAL"),
+    ("TCI-WT-2026-0002", "WHOLE_TURNOVER", "INS02", "INR", 50 * CR, 5 * L, "MANUAL"),
+    ("TCI-EX-2026-0001", "EXPORT", "INS03", "USD", 25_000_000, 10_000, "AUTOMATIC"),
+    # the bank buys cover on invoices it discounts on a TReDS platform
+    ("TCI-SCF-2026-0001", "SUPPLY_CHAIN_FINANCE", "INS04", "INR", 20 * CR, 5 * L, "MANUAL"),
+]
+WT1, WT2, EXP, SCF = (p[0] for p in POLICIES)
+
+# Buyers. `limits` is [(policy, amount, payment terms)]; `open` is the overdues still
+# unpaid [(policy, days past due, amount)]; `paid` is [(policy, due days ago, days
+# late, amount)]; `not_due` is what the latest notification reports as not yet due.
+# `news` is set for the real ones (fetched) and the invented stories below.
+B = dict
+BUYERS = [
+    # ---- India, large, real ------------------------------------------------------
+    B(id="IN01", name="Tata Motors Limited", short="Tata Motors", sector="Automotive",
+      town="Mumbai", country="IND", size="large", real=True, exchange="NSE",
+      query='"Tata Motors"', aliases="Tata Motors",
+      limits=[(WT1, 45 * CR, 60)], open=[], paid=[(WT1, 150, 4, 2.2 * CR)]),
+    B(id="IN02", name="Larsen & Toubro Limited", short="L&T", sector="Engineering & Construction",
+      town="Mumbai", country="IND", size="large", real=True, exchange="NSE",
+      query='"Larsen & Toubro" OR "Larsen and Toubro"', aliases="Larsen & Toubro|Larsen and Toubro|L&T",
+      limits=[(WT2, 35 * CR, 90)], open=[(WT2, 12, 1.8 * CR)], not_due={WT2: 6.5 * CR},
+      paid=[(WT2, 210, 6, 1.4 * CR)]),
+    B(id="IN03", name="Vodafone Idea Limited", short="Vodafone Idea", sector="Telecommunications",
+      town="Mumbai", country="IND", size="large", real=True, exchange="NSE",
+      query='"Vodafone Idea" OR "Voda Idea"', aliases="Vodafone Idea|Voda Idea",
+      limits=[(SCF, 12 * CR, 90)], open=[(SCF, 18, 90 * L)], not_due={SCF: 3.1 * CR},
+      paid=[(SCF, 120, 9, 75 * L), (SCF, 240, 5, 60 * L)]),
+    # ---- India, medium, invented ------------------------------------------------
+    B(id="IN04", name="Shrivana Textile Mills Private Limited", short="Shrivana Textiles",
+      sector="Textiles", town="Tiruppur", country="IND", size="medium",
+      limits=[(WT1, 8 * CR, 60), (SCF, 2 * CR, 60)],
+      open=[(WT1, 50, 1.1 * CR), (SCF, 34, 40 * L), (WT1, 20, 60 * L)],
+      not_due={WT1: 2.5 * CR, SCF: 55 * L},
+      paid=[(WT1, 300, 10, 70 * L), (WT1, 240, 14, 85 * L), (WT1, 160, 22, 95 * L)]),
+    B(id="IN05", name="Vardhit Auto Components Limited", short="Vardhit Auto",
+      sector="Auto Components", town="Chennai", country="IND", size="medium",
+      limits=[(WT2, 6 * CR, 60)], open=[(WT2, 36, 70 * L)], not_due={WT2: 1.9 * CR},
+      paid=[(WT2, 330, 3, 40 * L), (WT2, 260, 5, 45 * L), (WT2, 190, 4, 38 * L),
+            (WT2, 120, 6, 52 * L)]),
+    B(id="IN06", name="Aranya Pharma Packaging Private Limited", short="Aranya Packaging",
+      sector="Pharma Packaging", town="Hyderabad", country="IND", size="medium",
+      limits=[(WT1, 5 * CR, 45)], open=[], paid=[(WT1, 280, 7, 30 * L), (WT1, 140, 3, 26 * L)]),
+    # ---- India, small, invented -------------------------------------------------
+    B(id="IN07", name="Mehtab Agro Foods", short="Mehtab Agro", sector="Food Processing",
+      town="Indore", country="IND", size="small",
+      limits=[(SCF, 1.5 * CR, 60), (WT2, 80 * L, 45)],
+      open=[(SCF, 64, 42 * L), (WT2, 41, 18 * L)], not_due={SCF: 35 * L, WT2: 12 * L},
+      paid=[(SCF, 200, 18, 25 * L)]),
+    B(id="IN08", name="Ravisha Engineering Works", short="Ravisha Engineering",
+      sector="Engineering", town="Ludhiana", country="IND", size="small",
+      limits=[(WT2, 60 * L, 45)], open=[], paid=[]),
+    B(id="IN09", name="Jyotsna Electricals", short="Jyotsna Electricals",
+      sector="Electrical Equipment", town="Coimbatore", country="IND", size="small",
+      limits=[(WT1, 40 * L, 30)], open=[(WT1, 22, 6 * L)], not_due={WT1: 9 * L}, paid=[]),
+    # ---- Overseas, large, real --------------------------------------------------
+    B(id="OS01", name="Intel Corporation", short="Intel", sector="Semiconductors",
+      town="Santa Clara, CA", country="USA", size="large", real=True, exchange="NASDAQ",
+      ticker="INTC", cik=50863, query='"Intel"', aliases="Intel",
+      limits=[(EXP, 7_000_000, 60)], open=[], paid=[]),
+    B(id="OS02", name="The Boeing Company", short="Boeing", sector="Aerospace",
+      town="Arlington, VA", country="USA", size="large", real=True, exchange="NYSE",
+      ticker="BA", cik=12927, query='"Boeing"', aliases="Boeing",
+      limits=[(EXP, 9_000_000, 60)], open=[], paid=[(EXP, 170, 3, 650_000)]),
+    B(id="OS03", name="Ford Motor Company", short="Ford", sector="Automotive",
+      town="Dearborn, MI", country="USA", size="large", real=True, exchange="NYSE",
+      ticker="F", cik=37996, query='"Ford Motor" OR "Ford shares" OR "Ford stock"',
+      aliases="Ford Motor|Ford", limits=[(EXP, 6_000_000, 60)],
+      open=[(EXP, 9, 450_000)], not_due={EXP: 1_200_000}, paid=[]),
+    # ---- Overseas, medium, invented ---------------------------------------------
+    B(id="OS04", name="Brightwell Home Retail Inc.", short="Brightwell Retail",
+      sector="Home Retail", town="Columbus, OH", country="USA", size="medium",
+      limits=[(EXP, 2_500_000, 60)], open=[(EXP, 15, 180_000)], not_due={EXP: 520_000},
+      paid=[(EXP, 190, 8, 150_000)]),
+    B(id="OS05", name="Qasr Meridian Trading LLC", short="Qasr Meridian",
+      sector="General Trading", town="Dubai", country="ARE", size="medium",
+      limits=[(EXP, 1_800_000, 90)], open=[], paid=[(EXP, 230, 11, 210_000), (EXP, 110, 6, 190_000)]),
+    B(id="OS06", name="Hessler Maschinenbau GmbH", short="Hessler", sector="Industrial Machinery",
+      town="Stuttgart", country="DEU", size="medium",
+      limits=[(EXP, 3_000_000, 60)], open=[(EXP, 52, 640_000)], not_due={EXP: 2_600_000},
+      paid=[(EXP, 260, 9, 400_000), (EXP, 150, 19, 450_000)]),
+    # ---- Overseas, small, invented ----------------------------------------------
+    B(id="OS07", name="Pinecrest Outdoor Supply LLC", short="Pinecrest Outdoor",
+      sector="Outdoor Retail", town="Boise, ID", country="USA", size="small",
+      limits=[(EXP, 400_000, 45)], open=[], paid=[]),
+    B(id="OS08", name="Kestrel Marine Parts Ltd", short="Kestrel Marine",
+      sector="Marine Equipment", town="Southampton", country="GBR", size="small",
+      limits=[(EXP, 500_000, 60)], open=[(EXP, 38, 70_000)], not_due={EXP: 95_000},
+      paid=[(EXP, 140, 12, 60_000)]),
+    B(id="OS09", name="Ostara Organics BV", short="Ostara Organics", sector="Organic Foods",
+      town="Utrecht", country="NLD", size="small",
+      limits=[(EXP, 300_000, 60)], open=[], paid=[(EXP, 180, 5, 40_000)]),
+]
+
+# Stories about invented companies. They will never appear in a real feed, so they are
+# written here, dated relative to the as-of date, and marked Illustrative everywhere.
+# (buyer, days ago, headline, body)
+STORIES = [
+    ("IN04", 30, "Lenders review exposure to Shrivana Textile Mills as orders slow",
+     "Two banks are reviewing their exposure to Shrivana Textile Mills after the Tiruppur "
+     "knitwear maker asked for longer credit on its working-capital lines, people familiar "
+     "with the matter said. Export orders from two European retailers were cut this quarter."),
+    ("OS04", 25, "Brightwell Home Retail scales back, closing 14 stores across the Midwest",
+     "Brightwell Home Retail Inc. said it is scaling back its store network, closing 14 "
+     "locations by January as same-store sales fell for a third straight quarter."),
+    ("OS06", 15, "Hessler Maschinenbau has fallen behind on payments to suppliers",
+     "Stuttgart machine builder Hessler Maschinenbau GmbH has fallen behind on payments to "
+     "several component suppliers, three of them told a regional business paper, after a "
+     "large customer postponed acceptance of two production lines."),
+]
 
 
-def _write(name: str, fields: list[str], rows: list[dict]) -> None:
+def _write(name: str, fields, rows: list[dict]) -> None:
     with (DIR / name).open("w", newline="", encoding="utf-8") as fh:
-        wr = csv.DictWriter(fh, fieldnames=fields)
+        wr = csv.DictWriter(fh, fieldnames=list(fields), restval="", lineterminator="\n")
         wr.writeheader()
         wr.writerows(rows)
 
 
+def _num(x: float) -> str:
+    return str(int(round(x)))
+
+
 def build(as_of: date) -> None:
     DIR.mkdir(parents=True, exist_ok=True)
-    _write("clients.csv", list(CLIENT), [CLIENT])
-    _write("parent_companies.csv", ["parent_id", "name", "hq", "listed"], [])
+    currency = {p[0]: p[3] for p in POLICIES}
+    d = lambda days: (as_of - timedelta(days=days)).isoformat()  # noqa: E731
 
-    buyers, watch, limits, invoices = [], [], [], []
+    entities = [{"legal_entity_id": INSURER[0], "role": "INSURER", "CORE_LGE_LEGAL_NAME": INSURER[1],
+                 "CORE_LGE_USUAL_NAME": INSURER[2], "CORE_LGE_LEGAL_ADDRESS_TOWN": INSURER[3],
+                 "CORE_LGE_COUNTRY": INSURER[4], "LGE_TRADE_SECTOR": "Trade Credit Insurance",
+                 "ews_is_real": "Y"}]
+    entities += [{"legal_entity_id": i, "role": "INSURED", "CORE_LGE_LEGAL_NAME": n,
+                  "CORE_LGE_USUAL_NAME": u, "CORE_LGE_LEGAL_ADDRESS_TOWN": t,
+                  "CORE_LGE_COUNTRY": "IND", "ews_is_real": "N"} for i, n, u, t in INSUREDS]
+    entities += [{"legal_entity_id": b["id"], "role": "BUYER", "CORE_LGE_LEGAL_NAME": b["name"],
+                  "CORE_LGE_USUAL_NAME": b["short"], "CORE_LGE_LEGAL_ADDRESS_TOWN": b["town"],
+                  "CORE_LGE_COUNTRY": b["country"], "LGE_TRADE_SECTOR": b["sector"],
+                  "ews_size_band": b["size"], "ews_is_real": "Y" if b.get("real") else "N",
+                  "ews_is_listed": "Y" if b.get("exchange") else "N"} for b in BUYERS]
+
+    policies = [{
+        "policy_id": pid, "reference": pid, "product_type": product, "CORE_INSURER": INSURER[0],
+        "CORE_MAIN_INSURED": insured, "CORE_CURRENCY": cur, "INSURED_PERCENTAGE": "80",
+        "SYS_MAX_LIABILITY": _num(cap), "SYS_CLM_WAIT_PERIOD": "150",
+        "OVERDUE_REPORTING_LIMIT": _num(threshold), "coverage_start": "2026-04-01",
+        "coverage_end": "2027-03-31", "ews_deductible_pct": "10",
+        "ews_overdue_reporting_window_days": "30",
+    } for pid, product, insured, cur, cap, threshold, _ in POLICIES]
+    underwriter = {p[0]: p[6] for p in POLICIES}
+
+    limits, events, ageing, watch = [], [], [], []
     n = 0
-    for k, (bid, name, short, sector, city, cik, ticker, query, aliases, limit, size,
-            dpd) in enumerate(COMPANIES):
-        buyers.append({"buyer_id": bid, "buyer_name": name, "short_name": short,
-                       "sector": sector, "city": city, "size_band": "large", "parent_id": "",
-                       "annual_turnover_eur": "", "relationship_start": "2023-01-15"})
-        watch.append({"buyer_id": bid, "cik": cik, "ticker": ticker,
-                      "news_query": query, "aliases": aliases})
-        limits.append({"limit_id": f"LIM-{bid}", "client_id": CLIENT["client_id"],
-                       "buyer_id": bid, "credit_limit_eur": limit, "payment_terms_days": TERMS,
-                       "limit_approved_date": "2025-01-20",
-                       "last_reviewed_date": (as_of - timedelta(days=120)).isoformat(),
-                       "limit_status": "Active"})
+    for k, b in enumerate(BUYERS):
+        for j, (pid, amount, terms) in enumerate(b["limits"]):
+            limits.append({
+                "limit_id": f"LIM-{b['id']}-{j + 1}", "policy_id": pid,
+                "CORE_LIMIT_REQUEST_DEBTOR": b["id"], "CORE_LIMIT_REQUEST_AMOUNT": _num(amount),
+                "CORE_LIMIT_DECISION_AMOUNT": _num(amount),
+                "CORE_LIMIT_DECISION_CURRENCY": currency[pid],
+                "LIMIT_DECISION_EFFECTIVE_DATE": d(400 + 7 * k),
+                "LIMIT_DECISION_EXPIRY_DATE": "2027-03-31",
+                "LIMIT_DECISION_PAYMENT_TERMS": str(terms), "decision_status": "ACCEPTED",
+                "underwriter_type": underwriter[pid], "decision_date": d(120 + 11 * k),
+            })
 
-        def inv(invoice_date: date, amount: int, paid: date | None, past_due: int | None):
+        def event(pid, due_ago, amount, resolved_after=None):
             nonlocal n
             n += 1
-            return {"invoice_id": f"SBI-INV{n:05d}", "client_id": CLIENT["client_id"],
-                    "buyer_id": bid, "invoice_date": invoice_date.isoformat(),
-                    "due_date": (invoice_date + timedelta(days=TERMS)).isoformat(),
-                    "invoice_amount_eur": amount,
-                    "payment_date": paid.isoformat() if paid else "",
-                    "days_past_due": "" if past_due is None else past_due,
-                    "status": "Paid" if paid else "Open"}
+            due = as_of - timedelta(days=due_ago)
+            notified = due + timedelta(days=1)   # an overdue is unpaid the day after it falls due
+            eid = f"N-{notified.strftime('%y%m%d')}-{n:05d}"
+            row = {"event_id": eid, "reference": eid, "policy_id": pid,
+                   "CORE_LIMIT_REQUEST_DEBTOR": b["id"], "status": "SUBMITTED",
+                   "notification_date": notified.isoformat(), "NEV_REASON": "OVERDUE_INVOICE",
+                   "NEV_ORIGINAL_DUE_DATE": due.isoformat(), "NEV_AMOUNT_AT_RISK": _num(amount),
+                   "NEV_CURRENCY": currency[pid]}
+            if resolved_after is None:
+                row.update(ews_status="OPEN", ews_resolved_date="")
+            else:
+                row.update(ews_status="RESOLVED",
+                           ews_resolved_date=(due + timedelta(days=resolved_after)).isoformat())
+            events.append(row)
+            return row
 
-        # six settled invoices, one a month, the last due about a month ago
-        for m, late in enumerate(SETTLED_LATE[k]):
-            due = as_of - timedelta(days=30 * (6 - m) + 5)
-            amount = size + 10_000 * ((k + m) % 5)
-            invoices.append(inv(due - timedelta(days=TERMS), amount,
-                                due + timedelta(days=late), None))
-        # two open: the older one is due now (or a few days overdue), one not yet due
-        due_now = as_of - timedelta(days=dpd)
-        invoices.append(inv(due_now - timedelta(days=TERMS), size, None, dpd or None))
-        invoices.append(inv(as_of + timedelta(days=25) - timedelta(days=TERMS), size, None, None))
+        for pid, due_ago, late, amount in b["paid"]:
+            event(pid, due_ago, amount, late)
+        latest: dict[str, dict] = {}
+        buckets: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
+        for pid, dpd, amount in sorted(b["open"], key=lambda o: -o[1]):
+            latest[pid] = event(pid, dpd, amount)          # oldest first: the last is latest
+            buckets[pid][data_model.bucket(dpd)] += amount
+        for pid, row in latest.items():
+            buckets[pid]["NOT_YET_DUE"] += b.get("not_due", {}).get(pid, 0)
+            for name in data_model.AGEING_BUCKETS:
+                if buckets[pid].get(name):
+                    ageing.append({"event_id": row["event_id"], "NEV_OUTSTANDING_AGEING": name,
+                                   "NEV_OUTSTANDING_AMOUNT": _num(buckets[pid][name])})
 
-    _write("buyers.csv", list(buyers[0]), buyers)
-    _write("news_watchlist.csv", list(watch[0]), watch)
-    _write("credit_limits.csv", list(limits[0]), limits)
-    _write("invoices.csv", list(invoices[0]), invoices)
-    news = DIR / "news_articles.csv"
-    if not news.exists():
-        from .fetch_news import FIELDS
-        _write("news_articles.csv", list(FIELDS), [])
-    print(f"SBI book written to {DIR} as of {as_of.isoformat()}: {len(buyers)} buyers, "
-          f"{len(invoices)} invoices")
+        if b.get("real"):
+            watch.append({"buyer_id": b["id"], "country": b["country"],
+                          "exchange": b.get("exchange", ""), "ticker": b.get("ticker", ""),
+                          "cik": b.get("cik", ""), "news_query": b["query"],
+                          "aliases": b["aliases"]})
+        for o in b["open"]:
+            if b.get("real") and o[1] >= 30:
+                raise ValueError(f"{b['short']} is a real company: no invented overdue past 30 days")
+
+    data_model.write(DIR, {"legal_entities": entities, "policies": policies, "limits": limits,
+                           "notifiable_events": events, "notifiable_event_ageing": ageing})
+    for legacy in data_model.LEGACY:
+        (DIR / f"{legacy}.csv").unlink(missing_ok=True)
+    _write("news_watchlist.csv",
+           ("buyer_id", "country", "exchange", "ticker", "cik", "news_query", "aliases"), watch)
+
+    from .fetch_news import FIELDS
+    _write("illustrative_articles.csv", FIELDS, [{
+        "article_id": f"ILL-{i + 1:03d}", "published_date": d(days),
+        "publication": "Illustrative", "headline": head, "body": body,
+        "mentioned_entity_as_written": next(b["name"] for b in BUYERS if b["id"] == bid),
+        "url": "",
+    } for i, (bid, days, head, body) in enumerate(STORIES)])
+    if not (DIR / "news_articles.csv").exists():
+        _write("news_articles.csv", FIELDS, [])
+    print(f"Live-news book written to {DIR} as of {as_of.isoformat()}: {len(BUYERS)} buyers "
+          f"({sum(1 for b in BUYERS if b.get('real'))} real), {len(policies)} policies, "
+          f"{len(limits)} limits, {len(events)} overdue notifications, {len(STORIES)} "
+          f"illustrative stories")
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Build the illustrative SBI Trade Credit book")
-    ap.add_argument("--as-of", default=None, help="ledger date (default: today)")
+    ap = argparse.ArgumentParser(description="Build the illustrative live-news book")
+    ap.add_argument("--as-of", default=None, help="book date (default: today)")
     args = ap.parse_args()
     build(date.fromisoformat(args.as_of) if args.as_of else date.today())
 

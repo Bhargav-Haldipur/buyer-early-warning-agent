@@ -40,6 +40,11 @@ class NewsDesk:
         self.subs = loader.subsidiaries()
         self.articles = loader.news()
         self.rules = FallbackLLM(cache=False)
+        # Other spellings, for the rule-based matcher only. Kept out of `candidates`:
+        # those are what Claude's cached decisions are keyed on.
+        aliases = loader.aliases()
+        self.rule_candidates = [{**c, "aliases": aliases.get(c["id"], [])}
+                                for c in self.candidates]
 
     # -- tools ------------------------------------------------------------
     def search_entities(self, name: str) -> list[dict]:
@@ -98,7 +103,7 @@ class NewsDesk:
 
     # -- the decision -----------------------------------------------------
     def rules_decision(self, art: dict) -> dict:
-        res = self.rules.resolve(art, self.candidates)
+        res = self.rules.resolve(art, self.rule_candidates)
         if res["kind"] == "none":
             return {**res, "severity": 0, "category": None}
         grade = self.rules.grade(art, res["name"])

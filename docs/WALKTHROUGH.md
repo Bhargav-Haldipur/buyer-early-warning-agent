@@ -13,7 +13,7 @@ point at any number, and say which function produced it and which CSV row it res
 A trade credit insurer covers a supplier against its *buyers* not paying. The insurer
 grants each buyer a **credit limit**. If a buyer is quietly heading for default, the
 insurer wants to cut that limit *before* the loss, not after. This system watches two
-signals — **how late the buyer pays** (internal, from the invoice ledger) and **what the
+signals — **how late the buyer pays** (internal, from its policyholders' overdue notifications) and **what the
 news says about it** (external, including news about its parent company) — fuses them
 into one 0–100 **risk score**, and turns that score into a **recommended limit action**
 with a euro figure attached. Four Claude agents do the reading and judging. **Code does
@@ -83,18 +83,20 @@ A baseline pass is **87 agent runs**: 26 payment + 31 news + 26 adjudicator + 4 
 Risk Score = 0.65 × PaymentScore + 0.35 × NewsScore
 ```
 
-**PaymentScore** — from DPD, the worst **Open** invoice on the buyer's ledger:
+**PaymentScore** — from DPD, the oldest **open** overdue notification on the buyer:
 
 ```
-DPD ≤ 30 :  (DPD / 30) × 40            gentle — 1.33 points a day
-DPD > 30 :  40 + min(60, (DPD−30) × 2) steep  — 2 points a day, caps at 100 (60 DPD)
+DPD ≤ 30 :  (DPD / 30) × 30            gentle — 1 point a day
+DPD > 30 :  30 + min(70, (DPD−30) × 2) steep  — 2 points a day, caps at 100 (65 DPD)
 ```
 
 The knee sits at 30 because that is every insurer's `overdue_reporting_window_days`.
+It is worth 30 points so that payment alone stays under the Watch line (0.65 × 30 = 19.5)
+until the window has passed; `config._validate()` refuses a value that breaks this.
 Inside the window lateness is friction; past it the policyholder is contractually obliged
-to report it, so the score treats it as a different kind of event. Only Open invoices
-count — settled ones go to the agent as history for the trend, never into the score. It
-is the **worst single invoice**, not an average, and the amount does not enter: size
+to report it, so the score treats it as a different kind of event. Only open overdues
+count — resolved ones go to the agent as history for the trend, never into the score. It
+is the **worst single overdue**, not an average, and the amount does not enter: size
 belongs in the exposure calculation, not the risk score.
 
 **NewsScore** — the **maximum** over the buyer's articles, never a sum:
@@ -180,16 +182,16 @@ system.
 | Action | When | Effect |
 |---|---|---|
 | **MAINTAIN** | PD ≤ 25% | no change |
-| **FREEZE** | PD > 25% **and** owed ≥ limit, or the liability cap already binds | stop insuring new invoices; there is nothing useful left to cut |
-| **REDUCE** | PD > 25% **and** owed < limit | cut to the revised limit |
+| **FREEZE** | PD > 25% **and** outstanding ≥ limit, or the liability cap already binds | stop insuring new invoices; there is nothing useful left to cut |
+| **REDUCE** | PD > 25% **and** outstanding < limit | cut to the revised limit |
 
 ```
 FormulaLimit = limit × PD_target / PD          the limit at which EL meets appetite
-RevisedLimit = min(limit, max(owed, FormulaLimit))
+RevisedLimit = min(limit, max(outstanding, FormulaLimit))
 ```
 
-Limits are **never raised** and **never cut below what is already owed** — you cannot
-un-insure invoices that have already been issued.
+Limits are **never raised** and **never cut below the outstanding exposure** — what the buyer
+already owes on the policy — because you cannot un-insure invoices that have already been issued.
 
 **Worked example — Arcline Fabrications NV, insured by Nordhaven**
 
@@ -197,25 +199,25 @@ un-insure invoices that have already been issued.
 score 63.3  →  PD 58.3%                        interpolated between (55,45%) and (80,85%)
 
 policy:  indemnity 85%   deductible 10%   max liability €6,000,000
-limit:   €820,000        owed: €559,900
+limit:   €820,000        outstanding: €559,900
 
 InsuredExposure = min(6,000,000, 820,000 × 0.85 × 0.90) = €627,300
 ExpectedLoss    = 0.583 × 627,300                       = €365,779
 
-PD 58.3% > 25%, the cap does not bind, owed < limit     → REDUCE
+PD 58.3% > 25%, the cap does not bind, outstanding < limit → REDUCE
 FormulaLimit  = 820,000 × 0.25 / 0.583                  = €351,570
-RevisedLimit  = min(820,000, max(559,900, 351,570))     = €559,900   ← the owed floor binds
+RevisedLimit  = min(820,000, max(559,900, 351,570))     = €559,900   ← the outstanding floor binds
 ExpectedLoss after = 0.583 × (559,900 × 0.85 × 0.90)    = €249,755
 ```
 
 The formula wanted to cut to €352k; it stops at €559,900 because that much is already
-owed. **That gap is the cost of being late to the signal** — and it is the argument for
+outstanding. **That gap is the cost of being late to the signal** — and it is the argument for
 watching daily rather than at review.
 
 **The other two shapes, from the same data**
 
 ```
-Halberg   PD 32.7% > 25%, but owed €527,100 ≥ limit €440,000   → FREEZE, nothing to cut
+Halberg   PD 32.7% > 25%, but outstanding €527,100 ≥ limit €440,000   → FREEZE, nothing to cut
 Oakhurst  PD 11.7% ≤ 25%                                       → MAINTAIN
 ```
 
@@ -232,12 +234,12 @@ get there.
 
 | File | Rows | What it is |
 |---|---|---|
-| `clients.csv` | 3 | The **insurers**. Carries the policy terms the money maths needs: `indemnity_pct`, `deductible_pct`, `max_liability_eur`, `overdue_reporting_window_days`. |
-| `buyers.csv` | 26 | The companies being watched. `parent_id` is what makes contagion possible. |
-| `credit_limits.csv` | 26 | One line per buyer per insurer — here exactly one each. The limit that may be cut. |
-| `invoices.csv` | 156 | 93 Open, 63 Paid. `days_past_due` on the Open rows is **the entire payment signal**. |
+| `legal_entities.csv` | 33 | Every company, as the platform's legal entities: 26 **buyers**, 3 **insurers**, 4 **groups** (parent companies). `legal_entity_parent_id` is what makes contagion possible. Columns are the platform's parameter codes (`CORE_LGE_*`, `LGE_*`); `ews_*` columns are the prototype's own. |
+| `policies.csv` | 3 | One policy per insurer, as the platform's policies: `CORE_INSURER`, `CORE_CURRENCY`, `INSURED_PERCENTAGE`, `SYS_MAX_LIABILITY`, plus the deductible and reporting window the money maths needs. |
+| `limits.csv` | 26 | One line per buyer per policy — here exactly one each. `CORE_LIMIT_DECISION_AMOUNT` is the limit that may be cut. |
+| `notifiable_events.csv` | 66 | **Overdue notifications**, as the platform's notifiable events record them: 4 open, 62 resolved. There is no invoice ledger — the original due date of an open overdue is **the entire payment signal**. `ews_status` / `ews_resolved_date` stand in for the lifecycle status that is planned but not built. |
+| `notifiable_event_ageing.csv` | 33 | The outstanding by ageing bucket, carried by the latest open notification on each line. |
 | `news_articles.csv` | 31 | Headline + body + `mentioned_entity_as_written`. Includes 4 decoys. |
-| `parent_companies.csv` | 4 | The holding companies news can arrive through. |
 | `ground_truth.csv` | 26 | **Answers. Harness only.** Who actually defaulted. `loader.py` raises if engine code opens it. |
 | `payment_behaviour_monthly.csv` | 451 | **Harness only.** Monthly aggregates — would hand the engine the trend it is meant to infer. |
 | `harness_articles.csv` | 7 | **Harness only.** Labelled stories the shipped news lacks — the only parent-company story and two decoys. The harness hands them to the engine label-stripped, as extra articles. |
@@ -279,7 +281,7 @@ would let a rename silently delete the check.
 ### `dashboard/`
 
 `server.py` — stdlib `ThreadingHTTPServer`, no framework, no build step. `theme.css` —
-TCS-Frontend tokens copied verbatim; a test asserts no colour appears anywhere else.
+Tinubu frontend tokens copied verbatim; a test asserts no colour appears anywhere else.
 
 ### `tests/` — 96 tests
 
@@ -311,11 +313,11 @@ thing at **`http://localhost:8000/api/run`** — that is the single source for e
 
 | Column | Source |
 |---|---|
-| Buyer | `buyers.csv` → `short_name`, `sector` |
+| Buyer | `legal_entities.csv` → `CORE_LGE_USUAL_NAME`, `LGE_TRADE_SECTOR` |
 | Risk Score (dial) | `verdict.score` ← `adjudicator.adjudicate()` |
 | Payment Score | `verdict.payment.raw` ← `config.payment_score(dpd)` |
 | News Score | `verdict.news.raw` ← `NEWS_BASE[severity] × decay(age)` |
-| DPD | `verdict.payment.dpd` ← worst Open invoice in `invoices.csv` |
+| DPD | `verdict.payment.dpd` ← oldest open overdue in `notifiable_events.csv` |
 | Worst news | `verdict.news` — severity badge, category, "via parent" flag |
 | Expected loss | `line.expected_loss_before` ← `pd × min(max_liability, limit × indemnity × (1−deductible))` |
 | Recommended action | `line.action` ← `ews/limits.py` |
@@ -335,11 +337,11 @@ would say *"model output discarded"* and you would be reading the template.
 severity → base → ×decay → ×0.35; sum; PD. The adjudicator's review sits underneath
 with its assessment pill. `verdict.trace` is the literal sum, printed.
 
-**Limit** — one row per insurer: current limit, owed, revised, action, reason, and
+**Limit** — one row per insurer: current limit, outstanding exposure, revised, action, reason, and
 expected loss before → after. All from `ews/limits.py`.
 
 **Payments** — `evidence` rows of kind `payment`, one per insurer line: open count,
-owed, worst DPD, and the invoice id behind it.
+outstanding exposure, worst DPD, and the notification id behind it.
 
 **News** — `evidence` of kind `news` and `parent`: date, headline, publication, the
 entity matched, severity, age in days, and **base → decayed** so you can see the

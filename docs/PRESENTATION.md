@@ -68,12 +68,12 @@ Nobody was asleep. The cycle is just slower than the risk."
 >   minutes per buyer**, with an expected **60–80% reduction**. That number is internal,
 >   so say "our own estimate" — it lands harder than anything you could assert yourself.
 >
-> **You are proving the software, not the insurance.** Tinubu sells TCS to carriers and
+> **You are proving the software, not the insurance.** Tinubu sells its platform to carriers and
 > MGAs; the risk underwriter is your customer's employee, not yours. Frame every benefit
-> as a TCS capability.
+> as a platform capability.
 >
-> **Both halves of this are already on the roadmap** — `Product / TCS Strategy & Vision /
-> Agentic AI`, product TCS-ATLAS: *AI Notifiable event — Early warning & portfolio
+> **Both halves of this are already on the roadmap** — the product team's Agentic AI
+> ideas: *AI Notifiable event — Early warning & portfolio
 > monitoring* (Gain: Medium) and *Automated Underwriting Brief — Buyer Intelligence
 > Synthesizer* (Gain: High). Naming them is a strength, not a weakness: this is not a
 > science project, it is two backlog items working. The Early Warning spec even lists
@@ -94,7 +94,7 @@ Nobody was asleep. The cycle is just slower than the risk."
 
 > *Click into Adlerhof — the book, sorted by expected loss.*
 
-"Two ideas already sit in the TCS-ATLAS backlog: **Early Warning**, and the **Automated
+"Two ideas already sit in our product backlog: **Early Warning**, and the **Automated
 Underwriting Brief**. We built both, fused into one.
 
 Two signals. **How the buyer pays us** — our invoice ledger, sixty-five percent.
@@ -319,7 +319,7 @@ happen. **One sentence, then stop.** Whoever built it takes it.
 | **"What if the agent gets it wrong?"** | S | "Three layers: it can only submit an entity it actually looked up, the Adjudicator can challenge a score but not change it, and every figure in the write-up is checked against the data — fail twice and a template renders and says so on the page." |
 | **"What if Claude is down?"** | S | "Every agent has a deterministic fallback; any failure drops that one item to rules and the run finishes. All eight gates pass with no API key." |
 | **"691 days? We review annually."** | B | "It's a synthetic book, built so the gap is visible on one screen. The mechanism doesn't depend on the number — at any cadence, deterioration that starts between reviews is invisible until someone looks, and on this book all four failures began deteriorating after their last review." |
-| **"Isn't this already on our roadmap?"** | S | "Yes — *AI Notifiable event* and *Automated Underwriting Brief*, both TCS-ATLAS, both Priority 2. That's why we picked it. The point isn't the idea, it's that it works, and the entity matching the spec lists as an optional advanced capability is in there." |
+| **"Isn't this already on our roadmap?"** | S | "Yes — *AI Notifiable event* and *Automated Underwriting Brief*, both on the product backlog, both Priority 2. That's why we picked it. The point isn't the idea, it's that it works, and the entity matching the spec lists as an optional advanced capability is in there." |
 | **"Doesn't the insurer already monitor buyers?"** | B | "Yes — grading and overdue reporting both exist. What doesn't exist is the two fused into one daily queue ranked by money with the limit action already drafted. We're not replacing the monitoring; we're deciding what the underwriter opens first." |
 | **"Who uses this on Monday?"** | B | "The **risk underwriter** — the one who sets limits on individual buyers, not the policy underwriter who prices the seller's contract. Today they work a queue driven by limit requests and triggers; this is a daily one ranked by money, with the file already drafted." |
 | **"How do you know it isn't tuned on the answers?"** | B | "The labels are unreadable to the engine — the loader raises, and a test greps every file to prove none of them even names them." |

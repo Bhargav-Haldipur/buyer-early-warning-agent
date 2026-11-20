@@ -29,15 +29,18 @@ python3 -m dashboard.server
 |---|---|
 | `ews.run` | scores every buyer, writes `out/runs/<date>.json` |
 | `harness.evaluate` | grades that run against the labels — 8 gates |
-| `unittest discover -s tests` | leakage, determinism, formulae, resolver, guard, theme, agent loop, agent definitions, settings, SBI book — 128 tests |
+| `unittest discover -s tests` | leakage, determinism, formulae, resolver, guard, theme, agent loop, agent definitions, settings, live-news book — 128 tests |
 | `dashboard.server` | serves the dashboard on http://localhost:8000 (Ctrl-C to stop) |
 
 **No install, no API key, no network.** Everything above runs on the Python 3 standard
 library. Run them from the repository root.
 
 The dashboard blocks the terminal, so give it its own window. The live input sandbox
-is at http://localhost:8000/live: type a story nobody prepared or age an invoice by hand,
-and the engine re-runs on it. [`docs/PRESENTATION.md`](docs/PRESENTATION.md) walks
+is at http://localhost:8000/live: file an overdue invoice the way a policyholder
+notifies one on the platform (buyer and policy, original due date, amount at risk), fetch the
+latest real news on the live-news book, or type a story nobody prepared - and the engine
+re-runs on it, with the adjudicator and the Case File agent re-reviewing the buyers it
+touched. [`docs/PRESENTATION.md`](docs/PRESENTATION.md) walks
 through it.
 
 ### Switching the agents on
@@ -121,41 +124,57 @@ The guardrails, with their defaults in `ews/settings.py`:
 
 | Agent | Decides | Guardrails (settings.py) | Always, in code |
 |---|---|---|---|
-| Payment Behaviour | settlement trend, concerns | must call `get_open_invoices` first; `must_match_ledger`; `max_concerns` | the score uses the ledger, never the agent |
+| Payment Behaviour | settlement trend, concerns | must call `get_open_notifications` first; `must_match_ledger`; `max_concerns` | the score uses the ledger, never the agent |
 | News Intelligence | which entity an article is about, severity | must call `search_entities` first; `entity_must_be_looked_up`; `allowed_severities` | entity must be in the registry; parent fan-out |
 | Risk Adjudicator | agree / caveats / challenge, with cited evidence | must call `get_evidence` first; `require_real_citations`; `verify_figures`; `max_concerns` | cannot change the score |
 | Case File | a draft for the risk underwriter to review and approve: structured fields (bottom line, driver notes, lift/worsen triggers) + a four-paragraph narrative; header, limits, trace and evidence are filled by code | must call `get_verdict` and `get_limits` first; `verify_figures` over every field; `figure_tolerance`; `max_list_items`; `run_for_bands` | template when the agent cannot produce a clean draft |
 
-### The SBI Trade Credit book (real companies, live news)
+### The live-news book (Indian and overseas buyers, live news)
 
-A second dataset under `data/sbi/`: one insurer, **SBI Trade Credit**, covering ten real
-US companies (Nvidia, Microsoft, Apple, Walmart, Caterpillar, Intel, Boeing, Ford, Nike,
-Starbucks). The companies, SEC CIKs and headquarters are real; **the credit limits,
-invoices and payments are illustrative** - everyone pays on or near time, so what moves
-a score is real news, never an invented payment problem at a real company. Every page
-says so.
+A second dataset under `data/sbi/`, in the platform's layout: one generic **trade credit insurer**,
+four policies held by invented policyholders (two domestic whole-turnover policies in
+INR, one export policy in USD, one bank's TReDS cover in INR), and **eighteen buyers on
+a 3 x 2 grid** - large, medium and small; Indian and overseas; three in each cell.
+
+| | India (INR) | Overseas (USD) |
+|---|---|---|
+| Large - **real**, news fetched | Tata Motors, Larsen & Toubro, Vodafone Idea | Intel, Boeing, Ford |
+| Medium - invented | Shrivana Textiles, Vardhit Auto, Aranya Packaging | Brightwell Retail, Qasr Meridian, Hessler |
+| Small - invented | Mehtab Agro, Ravisha Engineering, Jyotsna Electricals | Pinecrest Outdoor, Kestrel Marine, Ostara Organics |
+
+**A real company never carries an invented serious overdue** - none past 30 days, so
+payment alone keeps it Healthy and only real news can move it. The High Risk and FREEZE
+cases are invented companies, and so are their stories
+(`illustrative_articles.csv`, marked *Illustrative*). Most small buyers have no news at
+all, and the page says so rather than reading silence as good news. Indemnity is 80%;
+every notification is an overdue invoice, the one reason the insurer uses. Totals are in INR at a fixed FBIL/RBI reference rate (1 USD = 93.3461 INR,
+19 Nov 2026), printed next to every total.
 
 ```bash
 EWS_DATASET=sbi python3 -m ews.fetch_news            # fetch the last 180 days of news
 EWS_DATASET=sbi python3 -m ews.run                   # score it
 EWS_DATASET=sbi python3 -m dashboard.server 8001     # http://localhost:8001
-python3 -m ews.sbi_seed                              # re-date the ledger to today
+python3 -m ews.sbi_seed                              # rebuild the book, dated today
 ```
 
 News comes from the sources in `data/sbi/trusted_sources.csv` - edit it to change them:
 
 | Source | What | Notes |
 |---|---|---|
-| SEC EDGAR Form 8-K | what the company itself reported (bankruptcy, debt acceleration, restatement, restructuring, officer changes...) | free, official, no key; set `SEC_USER_AGENT` to your organisation and email |
-| Google News RSS | press coverage, **kept only from the listed publishers** (Reuters, AP, Bloomberg, WSJ, FT, CNBC...) | headline only - the feed carries no article body |
+| SEC EDGAR Form 8-K | what the company itself reported (bankruptcy, debt acceleration, restatement, restructuring, officer changes...) - US companies with a CIK | free, official, no key; set `SEC_USER_AGENT` to your organisation and email |
+| Google News RSS | press coverage in the **company's own country edition** (India: `en-IN`), **kept only from the listed publishers** - global ones (Reuters, AP, Bloomberg, WSJ, FT...) plus, for Indian companies, Business Standard, The Economic Times, Mint, BusinessLine, Moneycontrol, NDTV Profit, CNBC TV18 | headline and snippet only; not an official API |
+
+Each company on `news_watchlist.csv` is routed by its `country`; a publisher row with a
+`country` is trusted only for companies of that country. Only real companies are on the
+watchlist.
 
 Fetching writes `data/sbi/news_articles.csv`; the engine reads that file, so runs stay
-reproducible and the agent cache still works. The dashboard's **Fetch latest news**
+reproducible and the agent cache still works. The live page's **Fetch latest news**
 button does the same and re-scores.
 
 **Auto refresh** is an on/off switch next to that button. Off by default. While on, the
 dashboard fetches and re-scores every 15 minutes in the background, shows when the next
-fetch is due, and the open home page reloads itself each minute. Switching it on fetches
+fetch is due, and the open live page reloads itself each minute. Switching it on fetches
 straight away. The switch lives in **`settings.json`** at the project root:
 
 ```json
@@ -196,9 +215,11 @@ the case-file writer can explain a verdict but never change one.
 Risk Score = 0.65 × Payment Score + 0.35 × News Score      Healthy 0–19 · Watch 20–49 · High Risk 50–100
 ```
 
-**Payment** is the worst open invoice: linear to 40 points at 30 days past due — which
+**Payment** is the oldest open overdue notification: linear to 30 points at 30 days past due — which
 is every insurer's overdue reporting window — then two points a day, capped at 100 at
-60 days.
+65 days. At the knee payment contributes 0.65 × 30 = 19.5, just under the Watch line:
+a buyer still inside the reporting window is Healthy on payment alone, and enters Watch
+on the first day past it.
 
 **News** takes the buyer's strongest article, scores it by severity -
 0 / **20 / 40 / 60 / 80 / 100** for severity 0 / 1 / 2 / 3 / 4 / 5 -
@@ -222,9 +243,10 @@ scores 28 - and it returns to Healthy as the story decays. News alone never reac
 High Risk at 50; that takes the ledger too. Risk appetite (`PD_TARGET_SCORE`) stays at
 score 35, so a Watch buyer below 35 is watched but its limit is maintained.
 
-**The cost of the lower Watch line:** payment alone reaches it at 23 days past due. On
-the sample data that puts five buyers that never default (one invoice 25 days late, no
-news) on Watch, and the harness reports it - 17/22 survivors clean.
+**Why the knee is 30 points, not 40:** with the Watch line at 20, a 40-point knee let
+payment alone reach Watch at 23 days past due, and five sample buyers that never
+default (one invoice 25 days late, no news) were flagged - 17/22 survivors clean. At 30
+points they score 16.2 and stay Healthy; the harness passes 8/8.
 
 Vandermeer, the severity-5 trap in the baseline, stays Healthy: its story is 710 days
 old and has decayed to about 3 points.
@@ -261,16 +283,17 @@ risk appetite of 25%:
 
 | Action | When |
 |---|---|
-| **FREEZE** | above appetite and already owed at or above the limit |
+| **FREEZE** | above appetite and the outstanding exposure already at or above the limit |
 | **REDUCE** | above appetite — cut to the limit where expected loss meets appetite |
 | **MAINTAIN** | within appetite |
 
-Limits are never raised and never cut below what is already owed. Every recommendation
-awaits a risk underwriter.
+Limits are never raised and never cut below the **outstanding exposure**: what the buyer
+already owes on that policy, due and not yet due, as the policyholder reported it with
+its overdue notifications. Every recommendation awaits a risk underwriter.
 
 ### The dashboard
 
-Home → Client → Buyer, using TCS-Frontend's design tokens verbatim. Adlerhof renders in
+Home → Client → Buyer, using Tinubu's frontend design tokens verbatim. Adlerhof renders in
 its real theme variation; insurers without a published variation fall back to the
 default. No colour appears outside `theme.css`, and a test enforces it. Each insurer
 sees only its own buyers — and no rival is named anywhere on the page, including in the
@@ -313,15 +336,16 @@ checked against the engine's own numbers, none discarded.
 **The three severity disagreements look like the labels being coarse, not the model
 being wrong.** The labels map `capacity_cut → 3` mechanically; Claude read *"cut from
 three shifts to one, halted contract worker recall, slowed material procurement"* and
-called it 4. That is what moves Maasland from 62.2 to 66.9 on the Claude path.
+called it 4. That is what moves Maasland up on the Claude path.
 
-Baseline on the rules path: Arcline **63.3** and Maasland **62.2** High Risk; Halberg
-**42.7** and Emberline **37.2** Watch; 22 Healthy; 4 decoys refused. On Claude the
-same four are flagged, with Maasland at **66.9**.
+Baseline on the rules path: Maasland **63.1** and Arcline **62.8** High Risk; Halberg
+**43.5** and Emberline **37.3** Watch; 22 Healthy; 4 decoys refused. Claude-path figures
+are re-measured on the next full run.
 
-Emberline sits **2.2 points** above the Watch line and is the binding constraint — any
-change to the half-life, the news ladder or the 65/35 split must be re-checked against
-it first.
+The binding constraint is now the other side: the five survivors one invoice 25 days
+late score **16.2**, **3.8 points** under the Watch line. Any change to the knee, the
+65/35 split or the band lines must be re-checked against them first; Emberline, the
+closest defaulter, sits 17.3 points above it.
 
 ---
 
@@ -337,9 +361,9 @@ it first.
 | `ews/limits.py` · `ews/casefile.py` · `ews/run.py` | recommendations, case file + guard, orchestrator |
 | `ews/llm.py` | Claude client, deterministic fallback, disk cache |
 | `harness/evaluate.py` | the only module permitted to read the labels |
-| `dashboard/` | local multi-page app and the TCS design tokens |
+| `dashboard/` | local multi-page app and the Tinubu design tokens |
 | `tests/test_gates.py` | leakage, determinism, formulae, resolver, guard, theme |
-| `data/` | the synthetic dataset; `harness_articles.csv` holds labelled stories only the harness reads |
+| `data/` | the synthetic dataset, in the shape the insurance platform stores it (legal entities, policies, limits, overdue notifications - see `ews/data_model.py`); `harness_articles.csv` holds labelled stories only the harness reads |
 | `docs/PLAN.md` | the specification this was built from, with every decision and its evidence |
 | `docs/WALKTHROUGH.md` | what every file does, and where each number on screen comes from |
 | `docs/PRESENTATION.md` | the five minutes: the video script, the live demo, and the Q&A |

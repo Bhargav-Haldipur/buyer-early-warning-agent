@@ -5,15 +5,16 @@ from datetime import date
 
 # --- which book is being watched ----------------------------------------------
 # synthetic: the sample dataset under data/, graded by the harness.
-# sbi:       one insurer (SBI Trade Credit) covering real US companies, with news
-#            fetched from trusted external sources (python -m ews.fetch_news) and an
-#            illustrative payment ledger under data/sbi/. There are no labels for it.
+# sbi:       the live-news book: one trade credit insurer covering Indian and overseas
+#            buyers, the large ones real companies with news fetched from trusted
+#            external sources (python -m ews.fetch_news), and illustrative overdue
+#            notifications under data/sbi/. There are no labels for it.
 DATASETS = ("synthetic", "sbi")
 DATASET = os.environ.get("EWS_DATASET", "synthetic").strip().lower() or "synthetic"
 if DATASET not in DATASETS:
     raise ValueError(f"EWS_DATASET must be one of {DATASETS}, got {DATASET!r}")
 
-# The synthetic dataset is a fixed snapshot. The SBI book reads live news, so it is
+# The synthetic dataset is a fixed snapshot. The live-news book reads live news, so it is
 # scored as of today - a fixed date would score tomorrow's articles as unseen.
 # EWS_AS_OF pins either one, for a reproducible run.
 if os.environ.get("EWS_AS_OF"):
@@ -23,7 +24,27 @@ elif DATASET == "sbi":
 else:
     AS_OF = date(2026, 9, 25)      # dataset snapshot
 
-CURRENCY = {"synthetic": "EUR", "sbi": "USD"}[DATASET]
+# Each limit and notification carries its own currency (CORE_CURRENCY on its policy).
+# Totals across a book are shown in its reporting currency, converted at one fixed,
+# dated rate - never a live feed, so a re-run cannot move a total and the cache holds.
+REPORTING_CURRENCY = {"synthetic": "EUR", "sbi": "INR"}[DATASET]
+CURRENCY = REPORTING_CURRENCY
+FX_TO_REPORTING = {
+    "synthetic": {"EUR": 1.0},
+    # FBIL USD/INR reference rate, as published on rbi.org.in, 19 November 2026
+    "sbi": {"INR": 1.0, "USD": 93.3461},
+}[DATASET]
+FX_AS_OF = date(2026, 11, 19)
+FX_SOURCE = "FBIL USD/INR reference rate (rbi.org.in)"
+
+
+def to_reporting(amount: float, currency: str) -> float:
+    """An amount in the book's reporting currency. Unknown currency fails loudly."""
+    try:
+        return amount * FX_TO_REPORTING[currency]
+    except KeyError:
+        raise ValueError(f"no fixed rate from {currency} to {REPORTING_CURRENCY}; "
+                         f"add it to FX_TO_REPORTING") from None
 
 # --- D5: Risk Score ---------------------------------------------------------
 W_PAYMENT, W_NEWS = 0.65, 0.35
@@ -35,6 +56,12 @@ FULL_WEIGHT_SEVERITIES: frozenset[int] = frozenset()
 W_NEWS_SEVERE = 1.0
 SCORE_CAP = 100.0
 DPD_KNEE = 30                       # matches every insurer's overdue reporting window
+# Payment points at the knee. 30 x 0.65 = 19.5, just under the Watch line at 20: a buyer
+# still inside the reporting window is Healthy on payment alone and enters Watch on the
+# first day past it. At 40 (the earlier value) payment alone reached Watch at 23 DPD and
+# five sample buyers that never default, each one invoice 25 days late, were flagged.
+KNEE_POINTS = 30.0
+PAYMENT_SLOPE = 2.0                 # points per day past the knee
 NEWS_HALF_LIFE_DAYS = 365           # measured: <270d drops Emberline (see plan D5)
 # Decay alone never reaches zero: a 4-year-old severity-5 story still carries 1.6
 # points, enough to tip a buyer sitting just under a band line. A risk underwriter would
@@ -74,15 +101,15 @@ def _finite(name: str, x: float) -> float:
 
 
 def payment_score(dpd: int) -> float:
-    """D5. Linear to 40 at the knee, then 2 points per day, capped at 100 (60 DPD).
+    """D5. Linear to KNEE_POINTS (30) at the knee, then 2 points a day, capped at 100 (65 DPD).
 
     An invoice that is not yet due carries a negative days_past_due in some ledgers;
     it means 'not late', not 'better than on time', so it floors at zero.
     """
     dpd = max(0.0, _finite("days past due", dpd))
     if dpd <= DPD_KNEE:
-        return (dpd / DPD_KNEE) * 40.0
-    return 40.0 + min(60.0, (dpd - DPD_KNEE) * 2.0)
+        return (dpd / DPD_KNEE) * KNEE_POINTS
+    return KNEE_POINTS + min(100.0 - KNEE_POINTS, (dpd - DPD_KNEE) * PAYMENT_SLOPE)
 
 
 def news_weight(severity: int, via_parent: bool) -> float:
@@ -146,6 +173,11 @@ def _validate() -> None:
                         f"fade than horizon discounts even a same-day article")
     if DPD_KNEE <= 0:
         problems.append("DPD_KNEE must be positive")
+    if not 0 < KNEE_POINTS < 100 or PAYMENT_SLOPE <= 0:
+        problems.append("KNEE_POINTS must be in (0, 100) and PAYMENT_SLOPE positive")
+    if W_PAYMENT * KNEE_POINTS >= BAND_WATCH:
+        problems.append("payment alone must not reach Watch inside the reporting window: "
+                        "W_PAYMENT x KNEE_POINTS must stay below BAND_WATCH")
     if abs(W_PAYMENT + W_NEWS - 1.0) > 1e-9:
         problems.append(f"W_PAYMENT + W_NEWS must be 1.0, got {W_PAYMENT + W_NEWS}")
     if not 0 < W_NEWS_SEVERE <= 1.0 or W_NEWS_SEVERE < W_NEWS:

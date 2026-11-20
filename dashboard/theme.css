@@ -1,4 +1,4 @@
-/* TCS-Frontend design tokens, copied verbatim.
+/* Tinubu frontend design tokens, copied verbatim.
    Source: packages/ui-components/src/ThemeVariations/cssVariables.ts
            packages/ui-components/src/ThemeProvider/{commonTheme,defaultLightTheme}.ts
 
@@ -386,12 +386,18 @@ td a:hover { text-decoration: underline; }
   color: var(--theme-neutral-900); background: var(--theme-neutral-0);
   border: 1px solid var(--theme-neutral-300); border-radius: 6px;
 }
-.live-form input[type=number] { width: 6rem; display: inline-block; }
 .live-form textarea { resize: vertical; }
 .live-form input:focus, .live-form textarea:focus, .live-form select:focus {
   outline: 2px solid var(--theme-accent); outline-offset: 1px; border-color: transparent;
 }
 .live-form button { margin-top: .4rem; }
+.btn {
+  display: inline-block; padding: .55rem 1.1rem; border: 1px solid var(--theme-accent);
+  border-radius: 8px; background: var(--theme-accent); color: var(--theme-neutral-0);
+  font: 500 .875rem/1.2 Roboto, system-ui, sans-serif; cursor: pointer; text-decoration: none;
+}
+.btn:hover { filter: brightness(.95); }
+.btn.ghost { background: transparent; color: var(--theme-accent); }
 .live-form button[disabled] { opacity: .6; cursor: progress; }
 
 /* the result strip: what moved, and by how much */
