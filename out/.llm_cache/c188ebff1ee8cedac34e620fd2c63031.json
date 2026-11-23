@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS03",
+    "name": "Ford Motor Company",
+    "severity": 1,
+    "category": "stock_underperformance",
+    "reason": "Article only notes Ford's stock underperforming peers on a single trading day, a minor, non-fundamental negative with no indication of financial distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Ford"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS03\", \"name\": \"Ford Motor Company\", \"sector\": \"Automotive\", \"city\": \"Dearborn, MI\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "OS03"
+      },
+      "result": "{\"id\": \"OS03\", \"kind\": \"buyer\", \"name\": \"Ford Motor Company\", \"short_name\": \"Ford\", \"sector\": \"Automotive\", \"city\": \"Dearborn, MI\", \"size_band\": \"large\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS03",
+        "severity": 1,
+        "category": "stock_underperformance",
+        "reason": "Article only notes Ford's stock underperforming peers on a single trading day, a minor, non-fundamental negative with no indication of financial distress."
+      }
+    }
+  ],
+  "turns": 3
+}

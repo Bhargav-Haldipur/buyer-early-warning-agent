@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS03",
+    "name": "Ford Motor Company",
+    "severity": 0,
+    "category": "neutral",
+    "reason": "Article is a generic investment commentary asking whether Ford stock is a buy for its dividend; it contains no negative credit information about the company."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Ford"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS03\", \"name\": \"Ford Motor Company\", \"sector\": \"Automotive\", \"city\": \"Dearborn, MI\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS03",
+        "severity": 0,
+        "category": "neutral",
+        "reason": "Article is a generic investment commentary asking whether Ford stock is a buy for its dividend; it contains no negative credit information about the company."
+      }
+    }
+  ],
+  "turns": 2
+}

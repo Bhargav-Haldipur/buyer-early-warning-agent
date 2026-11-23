@@ -936,6 +936,61 @@ class LiveInput(unittest.TestCase):
                                     or "did not change" in (run["error"] or ""),
                                     r["buyer_id"])
 
+    def test_score_only_skips_the_commentary_and_never_calls_the_model_for_it(self):
+        """A score-only notification re-scores its buyer but neither the adjudicator
+        review nor the Case File agent reaches the model for it, and the score is the
+        one a full re-run gives."""
+        from ews.agents.runtime import AgentError
+        from ews.llm import _Cache
+
+        class ModelOffline:
+            name, agentic, disabled, degraded = "claude", True, False, 0
+            api_errors = ()
+
+            def __init__(self):
+                self.cache = _Cache(True)
+
+            def create(self, **_):
+                raise AgentError("model called")
+
+        policy = next(l["policy_id"] for l in Loader().credit_limits() if l["buyer_id"] == "BUY003")
+        filed = {"event_id": "N-LIVE-01", "policy_id": policy, "CORE_LIMIT_REQUEST_DEBTOR": "BUY003",
+                 "notification_date": "2026-09-25", "NEV_REASON": "OVERDUE_INVOICE",
+                 "NEV_ORIGINAL_DUE_DATE": "2026-07-17", "NEV_AMOUNT_AT_RISK": "50000",
+                 "NEV_CURRENCY": "EUR"}
+        full = engine.run(llm=ModelOffline(), extra_events=[filed], commentary="changed")
+        quick = engine.run(llm=ModelOffline(), extra_events=[filed], commentary="changed",
+                           score_only={"N-LIVE-01"})
+        self.assertEqual(quick["commentary_fresh_for"], [])
+        self.assertEqual(quick["commentary_skipped_for"], ["BUY003"])
+        self.assertEqual({r["buyer_id"]: r["verdict"]["score"] for r in full["buyers"]},
+                         {r["buyer_id"]: r["verdict"]["score"] for r in quick["buyers"]})
+        for r in quick["buyers"]:
+            rv, cf = r["verdict"]["review"], r["case_file"]["agent"]
+            for run in ([rv["agent"]] if rv else []) + [cf]:
+                self.assertNotEqual(run["error"], "model called", r["buyer_id"])
+        buyer = next(r for r in quick["buyers"] if r["buyer_id"] == "BUY003")
+        self.assertIn("score only", buyer["verdict"]["review"]["agent"]["error"])
+
+    def test_the_score_only_button_moves_the_same_scores_as_the_full_one(self):
+        full = self._file(days=45)["moves"]
+        self.S.LIVE.update(articles=[], events=[], last=None)
+        self.S._CACHE.clear()
+        quick = self._file(days=45, mode="score")
+        self.assertEqual(quick["moves"], full)
+        self.assertIn("score only", quick["title"])
+        self.assertTrue(self.S.LIVE["events"][0]["score_only"])
+        self.assertEqual(self.S.snapshot()["commentary_skipped_for"], ["BUY019"])
+
+    def test_a_score_only_story_still_shows_what_the_news_agent_decided(self):
+        last = self._story(mode="score")
+        self.assertEqual([m["buyer_id"] for m in last["moves"]], ["BUY019"])
+        self.assertIsNotNone(last["verdict"])
+        self.assertIn("score only", last["title"])
+
+    def test_the_live_page_offers_score_only_on_both_forms(self):
+        self.assertEqual(self.S.live_page().decode().count('name="mode" value="score"'), 2)
+
 class TestsStayOffline(unittest.TestCase):
     """The documented way to run this project exports ANTHROPIC_API_KEY, and several
     tests drive the full engine. Without the guard in tests/__init__.py the suite bills

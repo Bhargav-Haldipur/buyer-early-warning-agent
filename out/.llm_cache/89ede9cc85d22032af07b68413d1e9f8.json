@@ -1,0 +1,85 @@
+{
+  "result": {
+    "narrative": "Vodafone Idea sits at a score of 25.4 (PD 0.1544), placing it in the Watch band. The operating picture is mixed rather than deteriorating: Reuters reported on 2026-11-12 that the company narrowed its quarterly loss on bigger per-user revenue, an SBI-led consortium was reported in September to be providing $3.5 billion of fresh debt, and recent analyst coverage from Citi, Nomura and Jefferies is neutral to constructive. The adverse signal is in payment conduct, where resolution times have lengthened from 5 days to 9 days to the current 18 days, and that item is still open.\n\nThe band is driven by news, not payments. Of the 25.4 points, 13.7 come from news and 11.7 from payments (0.65 x 18.0 + 0.35 x 39.2 = 25.4), so payment conduct alone sits below the 20.0 Healthy threshold. The adjudicator agreed with the Watch outcome but with caveats, and challenged its basis: the entire news contribution comes from one severity-2 article whose retrieved body is identical to its headline and which reports a 3.5% share-price decline \u2014 a market reaction rather than a credit event. Reclassifying that single item to severity 1 would drop the score below 20.0 and reband the buyer to Healthy. The adjudicator also noted that the mitigating Reuters and SBI financing items score 0 and cannot offset the severity-2 item, and recommended treating this as a payment-conduct Watch rather than a news-driven one.\n\nThe recommendation is to maintain the limit on the single exposure, LIM-IN03-1 (Meridia Bank, supply chain finance, policy TCI-SCF-2026-0001) at INR 120,000,000, no change, on the basis that PD of 0.1544 is within the 0.25 appetite and max liability does not bind. Expected loss is unchanged at INR 13,340,160. Before acting, resolve the figure mismatch the adjudicator flagged: the notification records an owed value of INR 40,000,000, while the payment review states the open overdue invoice is INR 9.0M and that roughly 40M is total exposure against the 120M limit. Read as arrears, the 40M figure overstates the past-due position materially.\n\nClearing the open 18-day overdue and returning resolution times toward the earlier 5-to-9-day pattern would remove the payment concern, and the score needs to fall 5.4 points to reach the Healthy threshold of 20.0 \u2014 which a severity downgrade of the single profit-warning article would achieve on its own. Confirmation that the SBI-led financing has completed would further support the liquidity picture. Working the other way, the buyer is 24.6 points from High Risk at 50.0, equivalent to 43 DPD, so a further slide in the open item or a second policy showing arrears is the thing to watch.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the INR 120,000,000 limit on policy TCI-SCF-2026-0001 (Meridia Bank); PD of 0.1544 is within the 0.25 appetite and max liability does not bind. The adjudicator agreed with caveats: the Watch band rests entirely on one thinly-evidenced severity-2 article, and the INR 40,000,000 overdue figure in the notification conflicts with the INR 9.0M stated in the payment review \u2014 confirm it before acting.",
+      "payment_note": "One open overdue invoice of INR 9.0M due 2026-11-05 is now 18 days past due and unresolved, against a clearly deteriorating trend of lengthening resolution times (5 days, then 9 days, now 18 and counting) and notification frequency rising from 1 to 2 in the 180-day window, all from the single policy TCI-SCF-2026-0001.",
+      "news_note": "The only scoring article is a severity-2 profit warning reporting a 3.5% share-price decline on a wider-than-expected Q2 loss, whose full retrieved body is just its headline, while the unscored items run the other way \u2014 Reuters reporting a narrowed quarterly loss on bigger per-user revenue and Bloomberg reporting an SBI-led consortium providing $3.5 billion of fresh debt.",
+      "lifts_it": [
+        "Score falling 5.4 points to the Healthy threshold of 20.0 \u2014 reachable by downgrading the single severity-2 profit-warning article to severity 1",
+        "The open 18-day overdue cleared and resolution times returning toward the earlier 5-to-9-day pattern",
+        "Confirmation that the SBI-led $3.5 billion debt facility has completed"
+      ],
+      "worsens_it": [
+        "DPD reaching 43, the level that carries the score 24.6 points to High Risk at 50.0",
+        "The open overdue staying unresolved and lengthening further beyond 18 days",
+        "Arrears appearing on a second policy, given all current visibility is from TCI-SCF-2026-0001 alone"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN03\", \"score\": 25.4, \"band\": \"Watch\", \"pd\": 0.1544, \"payment\": {\"dpd\": 18, \"raw\": 18.0, \"weighted\": 11.7, \"worst_line\": \"TCI-SCF-2026-0001\"}, \"news\": {\"severity\": 2, \"category\": \"profit_warning\", \"article_id\": \"GN-1caacc272320\", \"age_days\": 10, \"headline\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\", \"via_parent\": false, \"parent_name\": null, \"raw\": 39.2, \"w"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN03-1\", \"buyer_id\": \"IN03\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-SCF-2026-0001\", \"insured_name\": \"Meridia Bank\", \"product_type\": \"SUPPLY_CHAIN_FINANCE\", \"currency\": \"INR\", \"current_limit\": 120000000, \"owed\": 40000000, \"revised_limit\": 120000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\""
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 24.6, \"dpd_for_next_band\": 43, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 5.4, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261106-00006\", \"kind\": \"payment\", \"date\": \"2026-11-05\", \"detail\": \"1 open overdue notification(s) under policy TCI-SCF-2026-0001; the oldest is 18 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"dpd\": 18, \"owed\": 40000000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261106-00006\", \"kind\": \"payment_review\", \"date\": \"2026-11-05\", \"detail\": \"Vodafone I"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-1caacc272320"
+      },
+      "result": "{\"article_id\": \"GN-1caacc272320\", \"published_date\": \"2026-11-13\", \"publication\": \"Business Standard\", \"headline\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\", \"body\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-f61f7063777f"
+      },
+      "result": "{\"article_id\": \"GN-f61f7063777f\", \"published_date\": \"2026-11-12\", \"publication\": \"Reuters\", \"headline\": \"India's Vodafone Idea narrows quarterly loss on bigger per-user revenue\", \"body\": \"India's Vodafone Idea narrows quarterly loss on bigger per-user revenue\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-9e2f89ddab6f"
+      },
+      "result": "{\"article_id\": \"GN-9e2f89ddab6f\", \"published_date\": \"2026-09-10\", \"publication\": \"Bloomberg.com\", \"headline\": \"SBI-Led Group Said to Provide $3.5 Billion Debt to Vodafone Idea\", \"body\": \"SBI-Led Group Said to Provide $3.5 Billion Debt to Vodafone Idea\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Vodafone Idea sits at a score of 25.4 (PD 0.1544), placing it in the Watch band. The operating picture is mixed rather than deteriorating: Reuters reported on 2026-11-12 that the company narrowed its quarterly loss on bigger per-user revenue, an SBI-led consortium was reported in September to be providing $3.5 billion of fresh debt, and recent analyst coverage from Citi, Nomura and Jefferies is neutral to constructive. The adverse signal is in payment conduct, where resolution times have lengthened from 5 days to 9 days to the current 18 days, and that item is still open.\n\nThe band is driven by news, not payments. Of the 25.4 points, 13.7 come from news and 11.7 from payments (0.65 x 18.0 + 0.35 x 39.2 = 25.4), so payment conduct alone sits below the 20.0 Healthy threshold. The adjudicator agreed with the Watch outcome but with caveats, and challenged its basis: the entire news contribution comes from one severity-2 article whose retrieved body is identical to its headline and which reports a 3.5% share-price decline \u2014 a market reaction rather than a credit event. Reclassifying that single item to severity 1 would drop the score below 20.0 and reband the buyer to Healthy. The adjudicator also noted that the mitigating Reuters and SBI financing items score 0 and cannot offset the severity-2 item, and recommended treating this as a payment-conduct Watch rather than a news-driven one.\n\nThe recommendation is to maintain the limit on the single exposure, LIM-IN03-1 (Meridia Bank, supply chain finance, policy TCI-SCF-2026-0001) at INR 120,000,000, no change, on the basis that PD of 0.1544 is within the 0.25 appetite and max liability does not bind. Expected loss is unchanged at INR 13,340,160. Before acting, resolve the figure mismatch the adjudicator flagged: the notification records an owed value of INR 40,000,000, while the payment review states the open overdue invoice is INR 9.0M and that roughly 40M is total exposure against the 120M limit. Read as arrears, the 40M figure overstates the past-due position materially.\n\nClearing the open 18-day overdue and returning resolution times toward the earlier 5-to-9-day pattern would remove the payment concern, and the score needs to fall 5.4 points to reach the Healthy threshold of 20.0 \u2014 which a severity downgrade of the single profit-warning article would achieve on its own. Confirmation that the SBI-led financing has completed would further support the liquidity picture. Working the other way, the buyer is 24.6 points from High Risk at 50.0, equivalent to 43 DPD, so a further slide in the open item or a second policy showing arrears is the thing to watch.",
+        "bottom_line": "Maintain the INR 120,000,000 limit on policy TCI-SCF-2026-0001 (Meridia Bank); PD of 0.1544 is within the 0.25 appetite and max liability does not bind. The adjudicator agreed with caveats: the Watch band rests entirely on one thinly-evidenced severity-2 article, and the INR 40,000,000 overdue figure in the notification conflicts with the INR 9.0M stated in the payment review \u2014 confirm it before acting.",
+        "payment_note": "One open overdue invoice of INR 9.0M due 2026-11-05 is now 18 days past due and unresolved, against a clearly deteriorating trend of lengthening resolution times (5 days, then 9 days, now 18 and counting) and notification frequency rising from 1 to 2 in the 180-day window, all from the single policy TCI-SCF-2026-0001.",
+        "news_note": "The only scoring article is a severity-2 profit warning reporting a 3.5% share-price decline on a wider-than-expected Q2 loss, whose full retrieved body is just its headline, while the unscored items run the other way \u2014 Reuters reporting a narrowed quarterly loss on bigger per-user revenue and Bloomberg reporting an SBI-led consortium providing $3.5 billion of fresh debt.",
+        "lifts_it": [
+          "Score falling 5.4 points to the Healthy threshold of 20.0 \u2014 reachable by downgrading the single severity-2 profit-warning article to severity 1",
+          "The open 18-day overdue cleared and resolution times returning toward the earlier 5-to-9-day pattern",
+          "Confirmation that the SBI-led $3.5 billion debt facility has completed"
+        ],
+        "worsens_it": [
+          "DPD reaching 43, the level that carries the score 24.6 points to High Risk at 50.0",
+          "The open overdue staying unresolved and lengthening further beyond 18 days",
+          "Arrears appearing on a second policy, given all current visibility is from TCI-SCF-2026-0001 alone"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN01",
+    "name": "Tata Motors Limited",
+    "severity": 0,
+    "category": "acquisition",
+    "reason": "Article reports Tata Motors successfully acquiring a majority stake in Iveco, a positive expansion development with no negative credit implications."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Tata Motors"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN01\", \"name\": \"Tata Motors Limited\", \"sector\": \"Automotive\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "IN01"
+      },
+      "result": "{\"id\": \"IN01\", \"kind\": \"buyer\", \"name\": \"Tata Motors Limited\", \"short_name\": \"Tata Motors\", \"sector\": \"Automotive\", \"city\": \"Mumbai\", \"size_band\": \"large\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN01",
+        "severity": 0,
+        "category": "acquisition",
+        "reason": "Article reports Tata Motors successfully acquiring a majority stake in Iveco, a positive expansion development with no negative credit implications."
+      }
+    }
+  ],
+  "turns": 3
+}

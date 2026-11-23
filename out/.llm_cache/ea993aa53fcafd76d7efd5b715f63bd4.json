@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN02",
+    "name": "Larsen & Toubro Limited",
+    "severity": 0,
+    "category": "analyst_recommendation",
+    "reason": "Article is a positive 'Buy' analyst recommendation with a price target, not a negative credit event."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsen"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN02\", \"name\": \"Larsen & Toubro Limited\", \"sector\": \"Engineering & Construction\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN02",
+        "severity": 0,
+        "category": "analyst_recommendation",
+        "reason": "Article is a positive 'Buy' analyst recommendation with a price target, not a negative credit event."
+      }
+    }
+  ],
+  "turns": 2
+}

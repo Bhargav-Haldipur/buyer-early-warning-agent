@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN02",
+    "name": "Larsen & Toubro Limited",
+    "severity": 0,
+    "category": "earnings_growth",
+    "reason": "L&T (Larsen & Toubro Limited) reported a 33% rise in Q2 profit and record order inflows, which is positive news with no credit risk implications."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "L&T"
+      },
+      "result": "[{\"note\": \"no covered entity shares a word with 'L&T'\"}]"
+    },
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsen"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN02\", \"name\": \"Larsen & Toubro Limited\", \"sector\": \"Engineering & Construction\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN02",
+        "severity": 0,
+        "category": "earnings_growth",
+        "reason": "L&T (Larsen & Toubro Limited) reported a 33% rise in Q2 profit and record order inflows, which is positive news with no credit risk implications."
+      }
+    }
+  ],
+  "turns": 3
+}

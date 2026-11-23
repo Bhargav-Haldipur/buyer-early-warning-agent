@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "Headline-only stock-pick segment mentioning Boeing among others with no substantive news or negative information about the company."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Boeing"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS02\", \"name\": \"The Boeing Company\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "Headline-only stock-pick segment mentioning Boeing among others with no substantive news or negative information about the company."
+      }
+    }
+  ],
+  "turns": 2
+}

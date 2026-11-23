@@ -45,6 +45,35 @@ TABS = ("case", "score", "limit", "payments", "news", "agents")
 
 _CACHE: dict[tuple[str, str], dict] = {}
 FETCH: dict = {"last": None}
+
+# The fetched news as it was when the dashboard started. A fetch rewrites these files,
+# so "Reset to the shipped dataset" puts them back: after a rehearsal the demo's fetch
+# finds the same new stories again.
+NEWS_FILES = ("news_articles.csv", fetch_news.LOG)
+
+
+def news_snapshot(data_dir: Path) -> dict[str, bytes | None]:
+    return {n: (data_dir / n).read_bytes() if (data_dir / n).exists() else None
+            for n in NEWS_FILES}
+
+
+def restore_news(saved: dict[str, bytes | None], data_dir: Path) -> bool:
+    """Write the saved news files back. True when anything had changed."""
+    changed = False
+    for name, blob in saved.items():
+        path = data_dir / name
+        now = path.read_bytes() if path.exists() else None
+        if now == blob:
+            continue
+        changed = True
+        if blob is None:
+            path.unlink()
+        else:
+            path.write_bytes(blob)
+    return changed
+
+
+NEWS_AT_START = news_snapshot(DATA_DIR) if LIVE_BOOK else {}
 _LOCK = threading.Lock()
 _FETCH_LOCK = threading.Lock()      # one fetch at a time: the button and the timer share it
 
@@ -82,6 +111,8 @@ def sync_settings() -> None:
 # through exactly the same engine.run() as the shipped dataset - there is no second
 # code path for it, which is the only reason showing it proves anything.
 LIVE: dict = {"articles": [], "events": [], "last": None}
+# appended to the result title of an input sent with the "Score only" button
+SCORE_ONLY_NOTE = " (score only: the adjudicator review and case file were not re-run)"
 
 
 def engine_date(shown: date) -> date:
@@ -108,7 +139,7 @@ _LIVE_CACHE: dict[str, dict] = {}
 
 def _engine_event(ev: dict) -> dict:
     """A filed notification as the engine reads it: platform columns only."""
-    return {k: v for k, v in ev.items() if k != "shown_dates"}
+    return {k: v for k, v in ev.items() if k not in ("shown_dates", "score_only")}
 
 
 def live_active() -> bool:
@@ -149,10 +180,16 @@ def snapshot() -> dict:
     key = (json.dumps(LIVE["articles"], sort_keys=True), json.dumps(LIVE["events"], sort_keys=True))
     with _LOCK:  # one engine run at a time now that requests are threaded
         if key not in _CACHE:
+            # "Score only" inputs: their evidence agent runs and the score moves, but the
+            # buyers they touch skip the two Opus runs (adjudicator review, case file)
+            quick = {x.get("article_id") or x.get("event_id")
+                     for x in LIVE["articles"] + LIVE["events"] if x.get("score_only")}
             _CACHE[key] = engine.run(
-                extra_articles=LIVE["articles"] or None,
+                extra_articles=[{k: v for k, v in a.items() if k != "score_only"}
+                                for a in LIVE["articles"]] or None,
                 extra_events=[_engine_event(ev) for ev in LIVE["events"]] or None,
-                commentary="changed" if live else True)
+                commentary="changed" if live else True,
+                score_only=quick or None)
         return _CACHE[key]
 
 
@@ -890,6 +927,80 @@ def _article_trace(data: dict, article_id: str) -> tuple[str, str]:
     return ('<span class="pill maintain">no entity matched</span>', "")
 
 
+def moves_html(moves: list[dict]) -> str:
+    """One row per buyer whose score moved: from, to, and the change."""
+    return "".join(
+        f'<div class="move {"crossed" if m["crossed"] else ""}">'
+        f'<a href="/buyer/{e(m["buyer_id"])}"><b>{e(m["name"])}</b></a>'
+        f'<span class="from">{m["from_score"]} {band_pill(m["from_band"])}</span>'
+        f'<span class="arrow">&rarr;</span>'
+        f'<span class="to">{m["to_score"]} {band_pill(m["to_band"])}</span>'
+        f'<span class="overline">{m["delta"]:+.1f}</span></div>' for m in moves)
+
+
+FETCH_ROWS = 12        # new stories listed on the page; the rest are counted
+
+
+def fetch_result_panel() -> str:
+    """What the last fetch changed, laid out like a typed story's result.
+
+    A fetch can bring back any number of stories, so the page shows its funnel (found,
+    dropped, kept, new), what the News agent decided about each new story, and which
+    scores moved because of them - the same evidence a typed story gets.
+    """
+    res = FETCH.get("result")
+    if not res:
+        return ""
+    f = res["funnel"]
+    steps = [f'{f["found"]} found']
+    if f["untrusted_dropped"]:
+        steps.append(f'{f["untrusted_dropped"]} dropped: publisher not on the list')
+    if f["outside_window_or_cap"]:
+        steps.append(f'{f["outside_window_or_cap"]} older than {res["days"]} days or past '
+                     f'the {res["per_company"]}-per-company cap')
+    if f["duplicates"]:
+        steps.append(f'{f["duplicates"]} duplicates')
+    steps.append(f'{f["kept"]} kept')
+    since = f' since the fetch at {e(res["previous"])}' if res["previous"] else ""
+    steps.append(f'<b>{len(res["new"])} new</b>{since}')
+    funnel = " &rarr; ".join(steps)
+
+    if res["new"]:
+        listed = res["new"][:FETCH_ROWS]
+        rows = "".join(
+            f'<tr><td>{e(a["published_date"])}</td><td>{e(a["publication"])}</td>'
+            f'<td><a href="{e(a["url"])}" target="_blank" rel="noopener">{e(a["headline"])}</a></td>'
+            f'<td>{outcome}</td></tr>' for a, outcome in listed)
+        more = (f'<p class="overline">and {len(res["new"]) - FETCH_ROWS} more, on each '
+                f'buyer&rsquo;s News tab</p>' if len(res["new"]) > FETCH_ROWS else "")
+        stories = (f'<h3>New stories, and what the News agent decided</h3>'
+                   f'<table><thead><tr><th>Published</th><th>Publisher</th><th>Headline</th>'
+                   f'<th>Decision</th></tr></thead><tbody>{rows}</tbody></table>{more}')
+    else:
+        stories = ('<p class="body2">Nothing new since the last fetch: every story was '
+                   'already graded, so nothing reached the agent and nothing was spent.</p>')
+    moves = moves_html(res["moves"]) or (
+        '<p class="body2">No score moved. On a quiet day that is the right answer: the new '
+        'stories were read, and none of them changes a buyer&rsquo;s risk.</p>')
+    return (f'<div class="panel result"><h3>{e(res["title"])}</h3>'
+            f'<p class="body2">{funnel}</p>{stories}<h3>Scores</h3>{moves}</div>')
+
+
+def _fetch_outcome(data: dict, article_id: str) -> str:
+    """One line: the buyer a fetched story was matched to and its severity, or why not."""
+    for r in data.get("buyers", []):
+        for ev in r["evidence"]:
+            if ev["source"] == article_id and ev["kind"] in ("news", "parent"):
+                d = ev["data"]
+                return (f'<span class="pill high">matched</span> <b>{e(d["entity"])}</b> '
+                        f'&middot; severity {d.get("parent_severity", d["severity"])}')
+    for x in data.get("refusals", []):
+        if x["source"] == article_id:
+            return (f'<span class="pill refused">refused</span> '
+                    f'<span class="body2">{e(x["data"].get("reason", ""))}</span>')
+    return '<span class="pill maintain">no buyer matched</span>'
+
+
 def result_panel() -> str:
     last = LIVE["last"]
     if not last:
@@ -900,16 +1011,9 @@ def result_panel() -> str:
                 f'<p class="overline">Nothing changed. The dataset is only ever '
                 f'written to through a check that can say no.</p></div>')
 
-    rows = "".join(
-        f'<div class="move {"crossed" if m["crossed"] else ""}">'
-        f'<a href="/buyer/{e(m["buyer_id"])}"><b>{e(m["name"])}</b></a>'
-        f'<span class="from">{m["from_score"]} {band_pill(m["from_band"])}</span>'
-        f'<span class="arrow">&rarr;</span>'
-        f'<span class="to">{m["to_score"]} {band_pill(m["to_band"])}</span>'
-        f'<span class="overline">{m["delta"]:+.1f}</span></div>' for m in last["moves"])
-    if not rows:
-        rows = ('<p class="body2">No score moved. That is a result, not a failure &mdash; '
-                'the engine read it and it changed nothing.</p>')
+    rows = moves_html(last["moves"]) or (
+        '<p class="body2">No score moved. That is a result, not a failure &mdash; '
+        'the engine read it and it changed nothing.</p>')
 
     trace = ""
     if last.get("verdict"):
@@ -980,10 +1084,12 @@ def live_page() -> bytes:
 <p class="sub">File an overdue invoice the way a policyholder notifies one on the platform,
 {"fetch the latest real news, " if LIVE_BOOK else ""}or type a story nobody has seen.
 The agents re-review every buyer your input touched, so each step
-takes about a minute with Claude connected.</p>
+takes about a minute with Claude connected; <b>Score only</b> skips that review and
+moves the score in seconds.</p>
 
 {result_panel()}
 {sources_panel("/live") if LIVE_BOOK else ""}
+{fetch_result_panel() if LIVE_BOOK else ""}
 
 <div class="live-grid">
 <form class="panel live-form" method="post" action="/live/story">
@@ -1001,8 +1107,10 @@ takes about a minute with Claude connected.</p>
   <label>Published <input type="date" name="date" value="{e(date.today().isoformat())}"
            max="{e(date.today().isoformat())}"></label>
   <button class="btn" type="submit">Publish &amp; re-run</button>
+  <button class="btn ghost" type="submit" name="mode" value="score">Score only</button>
   <p class="overline">The News agent searches the registry, checks sector and city, and
-  decides. A name it cannot place is refused.</p>
+  decides. A name it cannot place is refused. <b>Score only</b> runs just the News agent
+  and the score: seconds, not minutes.</p>
 </form>
 
 <form class="panel live-form" method="post" action="/live/notification">
@@ -1014,13 +1122,16 @@ takes about a minute with Claude connected.</p>
   <label>Amount at risk <span class="overline">in the policy&rsquo;s currency</span>
     <input type="number" name="amount" min="1" step="any" required placeholder="e.g. 4500000"></label>
   <button class="btn" type="submit">File overdue invoice &amp; re-run</button>
+  <button class="btn ghost" type="submit" name="mode" value="score">Score only</button>
+  <p class="overline"><b>Score only</b> runs just the Payment agent and the score:
+  seconds, not minutes.</p>
 </form>
 </div>
 
 <h2>What has been added</h2>
 {live_inputs_block()}
-<p style="margin:.9rem 0"><a class="btn ghost" href="/live/reset">Reset to the shipped
-dataset</a></p>
+<p style="margin:.9rem 0"><a class="btn ghost" href="/live/reset">Reset the Score only
+inputs</a> <span class="overline">full-run inputs and fetched news stay</span></p>
 
 <h2>Flagged right now</h2>
 {f'<table><thead><tr><th>Buyer</th><th class="num">Score</th><th>Band</th>'
@@ -1032,10 +1143,13 @@ document.querySelectorAll('.namechip').forEach(c => c.addEventListener('click', 
   const m = document.getElementById('mention');
   m.value = c.dataset.name; m.focus();
 }}));
-document.querySelectorAll('form.live-form').forEach(f => f.addEventListener('submit', () => {{
-  const b = f.querySelector('button');
-  b.disabled = true;
-  b.textContent = 'The agents are re-reviewing\u2026 about a minute';
+document.querySelectorAll('form.live-form').forEach(f => f.addEventListener('submit', ev => {{
+  // the button that was pressed: its name/value must still be sent, so the buttons are
+  // disabled only after the browser has collected the form
+  const b = ev.submitter || f.querySelector('button[type=submit]');
+  b.textContent = b.value === 'score' ? 'Scoring\u2026 a few seconds'
+                                      : 'The agents are re-reviewing\u2026 about a minute';
+  setTimeout(() => f.querySelectorAll('button[type=submit]').forEach(x => x.disabled = true), 0);
 }}));
 </script>""")
 
@@ -1065,6 +1179,7 @@ def add_story(form: dict) -> None:
     headline = (form.get("headline", [""])[0] or "").strip()
     body = (form.get("body", [""])[0] or "").strip()
     when = (form.get("date", [""])[0] or date.today().isoformat()).strip()
+    quick = (form.get("mode", [""])[0] or "") == "score"
 
     def mutate() -> str:
         # the company is optional: the agent finds it in the body. Offline the
@@ -1087,10 +1202,10 @@ def add_story(form: dict) -> None:
             # it reaches must say so - a screenshot must not read as real news
             "publication": "HYPOTHETICAL - typed in the room" if LIVE_BOOK else "Live input",
             "headline": (f"[HYPOTHETICAL] {headline}" if LIVE_BOOK else headline), "body": body,
-            "mentioned_entity_as_written": mention})
+            "mentioned_entity_as_written": mention, **({"score_only": True} if quick else {})})
         return aid
 
-    _apply(f"Published: {headline}", mutate)
+    _apply(f"Published: {headline}" + (SCORE_ONLY_NOTE if quick else ""), mutate)
 
 
 def file_notification(form: dict) -> None:
@@ -1103,6 +1218,7 @@ def file_notification(form: dict) -> None:
     line = (form.get("line", [""])[0] or "").strip()
     due_raw = (form.get("due", [""])[0] or "").strip()
     amount_raw = (form.get("amount", [""])[0] or "").strip()
+    quick = (form.get("mode", [""])[0] or "") == "score"
     bid, _, pid = line.partition("|")
     loader = Loader()
     name = loader.buyers_by_id().get(bid, {}).get("short_name", bid or "?")
@@ -1141,7 +1257,8 @@ def file_notification(form: dict) -> None:
             "event_id": eid, "policy_id": pid, "CORE_LIMIT_REQUEST_DEBTOR": bid,
             "notification_date": notified, "NEV_REASON": "OVERDUE_INVOICE",
             "NEV_ORIGINAL_DUE_DATE": due_engine, "NEV_AMOUNT_AT_RISK": str(amount),
-            "NEV_CURRENCY": lim["currency"], "shown_dates": shown})
+            "NEV_CURRENCY": lim["currency"], "shown_dates": shown,
+            **({"score_only": True} if quick else {})})
         Loader(extra_events=[_engine_event(ev) for ev in LIVE["events"]]).validate()
         return ""
 
@@ -1150,7 +1267,16 @@ def file_notification(form: dict) -> None:
         days = f", {(date.today() - date.fromisoformat(due_raw)).days} days past due" if due_raw else ""
     except ValueError:
         pass
-    _apply(f"Overdue invoice filed: {name}{days}", mutate)
+    _apply(f"Overdue invoice filed: {name}{days}" + (SCORE_ONLY_NOTE if quick else ""), mutate)
+
+
+def reset_live() -> None:
+    """Take out the inputs added with "Score only". Stories and overdues sent with the
+    full buttons stay, and so does the fetched news: those ran the whole pipeline and
+    are kept on screen. (restore_news() still exists for putting the news back by hand.)"""
+    LIVE.update(articles=[a for a in LIVE["articles"] if not a.get("score_only")],
+                events=[ev for ev in LIVE["events"] if not ev.get("score_only")],
+                last=None)
 
 
 def refresh_news(source: str = "Manual") -> None:
@@ -1160,6 +1286,7 @@ def refresh_news(source: str = "Manual") -> None:
         return
     AUTO["running"] = True
     try:
+        before = snapshot()         # the scores the room saw before this fetch
         try:
             rep = fetch_news.fetch(days=AUTO["days"], per_buyer=AUTO["per_company"],
                                    quiet=True)
@@ -1172,7 +1299,20 @@ def refresh_news(source: str = "Manual") -> None:
         FETCH["last"] = (f"{source} fetch at {stamp}: {rep['articles']} articles"
                          + (f"; {len(rep['errors'])} source error(s)" if rep["errors"] else "")
                          + ". Scores are re-run on them.")
-        snapshot()                  # re-score now, so the next page view does not wait
+        after = snapshot()          # re-score now, so the next page view does not wait
+        if rep.get("funnel"):
+            new = set(rep.get("new", []))
+            fresh = [a for a in fetch_news.read_articles(DATA_DIR) if a["article_id"] in new]
+            prev = rep.get("previous_fetch")
+            FETCH["result"] = {
+                "title": f"{source} fetch at {stamp}",
+                "funnel": rep["funnel"], "days": rep.get("days", AUTO["days"]),
+                "per_company": AUTO["per_company"],
+                "previous": prev.replace("T", " ")[:16] + " UTC" if prev else None,
+                "new": [(a, _fetch_outcome(after, a["article_id"])) for a in fresh],
+                "moves": (moves_between(before, after)
+                          if before.get("buyers") and after.get("buyers") else []),
+            }
     finally:
         AUTO["running"] = False
         _FETCH_LOCK.release()
@@ -1274,7 +1414,7 @@ class Handler(BaseHTTPRequestHandler):
         if url.path == "/live":
             return self._send(live_page())
         if url.path == "/live/reset":
-            LIVE.update(articles=[], events=[], last=None)
+            reset_live()
             return self._redirect("/live")
         if parts[:1] == ["client"] and len(parts) == 2:
             body = client_page(parts[1])

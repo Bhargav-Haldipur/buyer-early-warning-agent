@@ -1,0 +1,78 @@
+{
+  "result": {
+    "narrative": "Boeing presents as a large, operationally strained but financially well-supported buyer. There are no open overdue notifications: the entire payment file is a single $650k invoice resolved 3 days late in June 2026, reported by one policyholder, with no accumulation in the prior 6-month window. Recent news flow is two-sided. On the adverse side sit a confirmed 5% cut to the commercial-airplane workforce, a further statement leaving more layoffs open, and a persistent production-constraint theme: 737 Max ramp-up deferred to late 2027, Max 10 certification delayed by a software issue, and a Transportation Department watchdog audit of FAA oversight. On the positive side, the backlog has grown to $745B, the $20B F/A-XX Navy award went uncontested, a $12B aircraft sale was announced, September deliveries ticked up to 57 jets, and the FAA cleared the 737 Max software glitch as not a flight-safety issue.\n\nThe score of 27.8 places the buyer in Watch, and it is driven entirely by news: 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 79.5 (news) = 27.8. The adjudicator agreed with caveats. They confirmed the band is robust, because the next-ranked item is the confirmed 5% workforce cut at the same severity 4 with a decayed value of 77.9, only marginally below the 79.5 actually used, so removing the headline driver would not move the buyer out of Watch. But they flagged three things the underwriter should weigh: the article setting the score is speculative and body-less, scored at the same severity as the executed cut, so the headline 27.8 is inflated; the 0.0 payment input carries 65% of the weight yet rests on a file the review itself marks \"insufficient_history\", making it an absence of data rather than demonstrated good behaviour; and the formula uses only the single worst article, so the more durable production and certification cluster never aggregates while the material credit-positive evidence ($745B backlog, the Navy award, the aircraft sale, the FAA clearance) is scored 0.0 and cannot offset anything.\n\nThe recommendation is to maintain the one line in force: TCI's $9,000,000 export limit for Tamrin Exports, no change, with nothing currently owed. The probability of default of 0.1784 is within the 0.25 appetite threshold, maximum liability does not bind, and expected loss is unchanged at $1,156,032 before and after. Given the thin payment file, the sensible condition on approval is monitoring rather than a limit cut: the $9M line was last reviewed in April 2026 and the single resolved event is too slight to evidence a trend in either direction.\n\nA move down to Healthy requires 7.8 points, which would come from the news side as the current severity-4 items decay against a 365-day half-life, provided the payment record stays at 0 DPD and no new adverse article replaces them. Confirmation that the speculative layoff item does not convert into further announced cuts, together with evidence that the 737 Max ramp-up and Max 10 certification are back on track, would remove the operational-distress theme the adjudicator identified as genuine. Building a fuller payment history across more than one policyholder would also raise confidence in the 0.0 input that currently carries most of the weight.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain TCI's $9,000,000 export limit unchanged \u2014 probability of default of 0.1784 is within the 0.25 appetite and there are no open overdues, despite the Watch score of 27.8. The adjudicator agreed with caveats: the band holds, but the headline score is inflated by a speculative, body-less layoff article and the 0.0 payment input rests on an \"insufficient_history\" file.",
+      "payment_note": "No open overdue notifications and 0 DPD, but the entire record is a single $650k invoice resolved 3 days late in June 2026 from one policyholder, so the review marks the trend \"insufficient_history\" rather than a demonstrated good record.",
+      "news_note": "News drives the whole score: a severity-4 article on possible further layoffs (decayed 79.5) sets it, backed by a confirmed 5% commercial-airplane workforce cut (decayed 77.9) and a cluster of production, certification and regulatory-scrutiny items, while a $745B backlog, the uncontested $20B Navy award and a $12B aircraft sale score 0.0 and cannot offset them.",
+      "lifts_it": [
+        "7.8 points down reaches Healthy (below 20.0) as the severity-4 layoff items decay on a 365-day half-life",
+        "No new adverse articles and payment record held at 0 DPD",
+        "Production and certification setbacks resolving: 737 Max ramp-up and Max 10 certification back on track"
+      ],
+      "worsens_it": [
+        "22.2 points up reaches High Risk (50.0)",
+        "Payment deterioration to 33 DPD would reach the next band on its own",
+        "The speculative layoff item converting into further confirmed cuts, or any first open overdue on this thin file"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS02\", \"score\": 27.8, \"band\": \"Watch\", \"pd\": 0.1784, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 4, \"category\": \"layoffs\", \"article_id\": \"GN-8b97eceb4530\", \"age_days\": 3, \"headline\": \"Boeing leaves open possibility of more layoffs amid stalled production plans\", \"via_parent\": false, \"parent_name\": null, \"raw\": 79.5, \"weighted\": 27.8}, "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS02-1\", \"buyer_id\": \"OS02\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 9000000, \"owed\": 0, \"revised_limit\": 9000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1784, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 22.2, \"dpd_for_next_band\": 33, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 7.8, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-260607-00024\", \"kind\": \"payment_review\", \"date\": \"2026-06-06\", \"detail\": \"No open overdue notifications on Boeing. Only one historical event exists: a $650k invoice resolved just 3 days late (June 2026), reported by a single policyholder, with no accumulation in the prior 6-month window. One insurer (TCI) holds a $9M accepted credit line, last reviewed April 2026, consistent with this l"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-8b97eceb4530"
+      },
+      "result": "{\"article_id\": \"GN-8b97eceb4530\", \"published_date\": \"2026-11-20\", \"publication\": \"Reuters\", \"headline\": \"Boeing leaves open possibility of more layoffs amid stalled production plans\", \"body\": \"Boeing leaves open possibility of more layoffs amid stalled production plans\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-8b3ff62ef798"
+      },
+      "result": "{\"article_id\": \"GN-8b3ff62ef798\", \"published_date\": \"2026-11-09\", \"publication\": \"CNBC\", \"headline\": \"Boeing to cut 5% of commercial airplane workers as production increase takes longer than expected\", \"body\": \"Boeing to cut 5% of commercial airplane workers as production increase takes longer than expected\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Boeing presents as a large, operationally strained but financially well-supported buyer. There are no open overdue notifications: the entire payment file is a single $650k invoice resolved 3 days late in June 2026, reported by one policyholder, with no accumulation in the prior 6-month window. Recent news flow is two-sided. On the adverse side sit a confirmed 5% cut to the commercial-airplane workforce, a further statement leaving more layoffs open, and a persistent production-constraint theme: 737 Max ramp-up deferred to late 2027, Max 10 certification delayed by a software issue, and a Transportation Department watchdog audit of FAA oversight. On the positive side, the backlog has grown to $745B, the $20B F/A-XX Navy award went uncontested, a $12B aircraft sale was announced, September deliveries ticked up to 57 jets, and the FAA cleared the 737 Max software glitch as not a flight-safety issue.\n\nThe score of 27.8 places the buyer in Watch, and it is driven entirely by news: 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 79.5 (news) = 27.8. The adjudicator agreed with caveats. They confirmed the band is robust, because the next-ranked item is the confirmed 5% workforce cut at the same severity 4 with a decayed value of 77.9, only marginally below the 79.5 actually used, so removing the headline driver would not move the buyer out of Watch. But they flagged three things the underwriter should weigh: the article setting the score is speculative and body-less, scored at the same severity as the executed cut, so the headline 27.8 is inflated; the 0.0 payment input carries 65% of the weight yet rests on a file the review itself marks \"insufficient_history\", making it an absence of data rather than demonstrated good behaviour; and the formula uses only the single worst article, so the more durable production and certification cluster never aggregates while the material credit-positive evidence ($745B backlog, the Navy award, the aircraft sale, the FAA clearance) is scored 0.0 and cannot offset anything.\n\nThe recommendation is to maintain the one line in force: TCI's $9,000,000 export limit for Tamrin Exports, no change, with nothing currently owed. The probability of default of 0.1784 is within the 0.25 appetite threshold, maximum liability does not bind, and expected loss is unchanged at $1,156,032 before and after. Given the thin payment file, the sensible condition on approval is monitoring rather than a limit cut: the $9M line was last reviewed in April 2026 and the single resolved event is too slight to evidence a trend in either direction.\n\nA move down to Healthy requires 7.8 points, which would come from the news side as the current severity-4 items decay against a 365-day half-life, provided the payment record stays at 0 DPD and no new adverse article replaces them. Confirmation that the speculative layoff item does not convert into further announced cuts, together with evidence that the 737 Max ramp-up and Max 10 certification are back on track, would remove the operational-distress theme the adjudicator identified as genuine. Building a fuller payment history across more than one policyholder would also raise confidence in the 0.0 input that currently carries most of the weight.",
+        "bottom_line": "Maintain TCI's $9,000,000 export limit unchanged \u2014 probability of default of 0.1784 is within the 0.25 appetite and there are no open overdues, despite the Watch score of 27.8. The adjudicator agreed with caveats: the band holds, but the headline score is inflated by a speculative, body-less layoff article and the 0.0 payment input rests on an \"insufficient_history\" file.",
+        "payment_note": "No open overdue notifications and 0 DPD, but the entire record is a single $650k invoice resolved 3 days late in June 2026 from one policyholder, so the review marks the trend \"insufficient_history\" rather than a demonstrated good record.",
+        "news_note": "News drives the whole score: a severity-4 article on possible further layoffs (decayed 79.5) sets it, backed by a confirmed 5% commercial-airplane workforce cut (decayed 77.9) and a cluster of production, certification and regulatory-scrutiny items, while a $745B backlog, the uncontested $20B Navy award and a $12B aircraft sale score 0.0 and cannot offset them.",
+        "lifts_it": [
+          "7.8 points down reaches Healthy (below 20.0) as the severity-4 layoff items decay on a 365-day half-life",
+          "No new adverse articles and payment record held at 0 DPD",
+          "Production and certification setbacks resolving: 737 Max ramp-up and Max 10 certification back on track"
+        ],
+        "worsens_it": [
+          "22.2 points up reaches High Risk (50.0)",
+          "Payment deterioration to 33 DPD would reach the next band on its own",
+          "The speculative layoff item converting into further confirmed cuts, or any first open overdue on this thin file"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

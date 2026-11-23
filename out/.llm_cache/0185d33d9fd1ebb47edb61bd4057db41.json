@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN01",
+    "name": "Tata Motors Limited",
+    "severity": 2,
+    "category": "guidance_cut",
+    "reason": "Article reports a guidance cut and weak margins at JLR (Tata Motors' subsidiary) causing a sharp 7% share price drop, which is a notable negative signal but not a direct credit event like missed payments or defaults."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Tata Motors"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN01\", \"name\": \"Tata Motors Limited\", \"sector\": \"Automotive\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "IN01"
+      },
+      "result": "{\"id\": \"IN01\", \"kind\": \"buyer\", \"name\": \"Tata Motors Limited\", \"short_name\": \"Tata Motors\", \"sector\": \"Automotive\", \"city\": \"Mumbai\", \"size_band\": \"large\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN01",
+        "severity": 2,
+        "category": "guidance_cut",
+        "reason": "Article reports a guidance cut and weak margins at JLR (Tata Motors' subsidiary) causing a sharp 7% share price drop, which is a notable negative signal but not a direct credit event like missed payments or defaults."
+      }
+    }
+  ],
+  "turns": 3
+}

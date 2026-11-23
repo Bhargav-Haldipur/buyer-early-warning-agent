@@ -1,0 +1,85 @@
+{
+  "result": {
+    "narrative": "Intel is paying on time: the payment component is 0 DPD and contributes 0.0 of the 27.8 score, and nothing is currently owed against the USD 7,000,000 export limit. The news flow on file is twelve items, eleven of them severity 0, and the recent cluster is predominantly positive \u2014 a first external customer for the 18A foundry process (reported three times, by Yahoo Finance, CNBC and Barron's), a Microsoft Azure deal, improving server demand, and three routine 8-K filings with no adverse content.\n\nThe Watch band rests entirely on one item. GN-29a1a96091d0, a 20 November Yahoo Finance stock-tips column headlined \"How to Play INTC Stock as Intel Launches Another Round of Layoffs\", was scored severity 4, base 80.0, decayed 79.55, giving 0.35 x 79.5 = 27.8 against a payment leg of 0.65 x 0.0. The adjudicator challenged this. The retrievable body of that article is nothing but its own headline \u2014 no layoff count, no charge, no stated financial impact \u2014 and under max-severity logic the six contemporaneous positive items cannot offset it. Strip that single article and every remaining item is severity 0, the score is 0.0 and the band is Healthy.\n\nThe recommendation is to MAINTAIN the Trade Credit Insurer / Tamrin Exports export limit at USD 7,000,000, change 0. PD of 0.1784 sits inside the 0.25 appetite target, maximum liability does not bind, and expected loss is unchanged at 899,136 before and after. Given the adjudicator's challenge, the sensible condition on approval is to verify the underlying layoff announcement \u2014 scale, cost and timing \u2014 before treating the Watch designation as a reason to restrict; the band itself does not justify a reduction here.\n\nThe score sits 7.8 points above the Healthy line at 20.0. Because the payment leg already contributes zero, nothing on the payment side can lower it \u2014 the band will only fall if the layoffs item is re-severitied on verification or is withdrawn, or through time decay, which on a 365-day half-life is slow. In the other direction, High Risk is 22.2 points away at 50.0, reachable on the payment side at 33 DPD, or if a further substantive adverse item lands at higher severity than the current driver.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the USD 7,000,000 export limit unchanged \u2014 PD of 0.1784 is within the 0.25 appetite and the buyer is at 0 DPD. The adjudicator has challenged the Watch band: 100% of the 27.8 score comes from a single headline-only layoffs article, and without it the buyer scores 0.0 and bands Healthy, so verify the underlying layoff announcement before acting on the Watch designation.",
+      "payment_note": "The payment record is clean at 0 DPD with nothing owed, contributing 0.0 to the score, though the adjudicator noted there is no payment or payment-review evidence on file to confirm whether this reflects genuine on-time settlement or simply absent trade data.",
+      "news_note": "One matched layoffs article (GN-29a1a96091d0, severity 4, decayed 79.55) drives the entire score despite having no body text beyond its headline, while six contemporaneous items of equal or newer vintage \u2014 the first external 18A foundry customer, the Microsoft Azure deal and improving server demand \u2014 are all scored 0 and cannot offset it.",
+      "lifts_it": [
+        "Verification that the layoffs report is routine restructuring rather than distress \u2014 re-severitying or withdrawing GN-29a1a96091d0 drops the score to 0.0 (Healthy)",
+        "7.8 points of decline reaches the Healthy line at 20.0, but with payment already at 0.0 this can only come from the news leg",
+        "Time decay of the sole driver, though slow on a 365-day half-life"
+      ],
+      "worsens_it": [
+        "33 DPD on the payment leg would reach High Risk at 50.0",
+        "A further adverse news item scored above the current severity 4 driver",
+        "Confirmation of layoff scale, charges or financial impact that would support the severity 80 base assigned on headline wording alone"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS01\", \"score\": 27.8, \"band\": \"Watch\", \"pd\": 0.1784, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 4, \"category\": \"layoffs\", \"article_id\": \"GN-29a1a96091d0\", \"age_days\": 3, \"headline\": \"How to Play INTC Stock as Intel Launches Another Round of Layoffs\", \"via_parent\": false, \"parent_name\": null, \"raw\": 79.5, \"weighted\": 27.8}, \"trace\": \"0"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS01-1\", \"buyer_id\": \"OS01\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 7000000, \"owed\": 0, \"revised_limit\": 7000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1784, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 22.2, \"dpd_for_next_band\": 33, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 7.8, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"GN-b97c444dd8fd\", \"kind\": \"news\", \"date\": \"2026-11-22\", \"detail\": \"severity 0 (new_customer_win): Intel Says It Just Signed Its First Customer for Its Most Advanced Chipmaking Process. The Stock Is Still More Than 60% Below Its June Record.\", \"data\": {\"severity\": 0, \"category\": \"new_customer_win\", \"age_days\": 1, \"base\": 0.0, \"decayed\": 0.0, \"entity\": \"Intel Corporation\", \"via_parent\": fal"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-29a1a96091d0"
+      },
+      "result": "{\"article_id\": \"GN-29a1a96091d0\", \"published_date\": \"2026-11-20\", \"publication\": \"Yahoo Finance\", \"headline\": \"How to Play INTC Stock as Intel Launches Another Round of Layoffs\", \"body\": \"How to Play INTC Stock as Intel Launches Another Round of Layoffs\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-2164913418be"
+      },
+      "result": "{\"article_id\": \"GN-2164913418be\", \"published_date\": \"2026-11-20\", \"publication\": \"Yahoo Finance\", \"headline\": \"Intel Secures First External Customer For Advanced 18A Chips, Marking Major Foundry Breakthrough\", \"body\": \"Intel Secures First External Customer For Advanced 18A Chips, Marking Major Foundry Breakthrough\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-37195ba05478"
+      },
+      "result": "{\"article_id\": \"GN-37195ba05478\", \"published_date\": \"2026-11-20\", \"publication\": \"Yahoo Finance\", \"headline\": \"Did Microsoft Azure Deal Just Shift Intel's (INTC) Investment Narrative?\", \"body\": \"Did Microsoft Azure Deal Just Shift Intel's (INTC) Investment Narrative?\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Intel is paying on time: the payment component is 0 DPD and contributes 0.0 of the 27.8 score, and nothing is currently owed against the USD 7,000,000 export limit. The news flow on file is twelve items, eleven of them severity 0, and the recent cluster is predominantly positive \u2014 a first external customer for the 18A foundry process (reported three times, by Yahoo Finance, CNBC and Barron's), a Microsoft Azure deal, improving server demand, and three routine 8-K filings with no adverse content.\n\nThe Watch band rests entirely on one item. GN-29a1a96091d0, a 20 November Yahoo Finance stock-tips column headlined \"How to Play INTC Stock as Intel Launches Another Round of Layoffs\", was scored severity 4, base 80.0, decayed 79.55, giving 0.35 x 79.5 = 27.8 against a payment leg of 0.65 x 0.0. The adjudicator challenged this. The retrievable body of that article is nothing but its own headline \u2014 no layoff count, no charge, no stated financial impact \u2014 and under max-severity logic the six contemporaneous positive items cannot offset it. Strip that single article and every remaining item is severity 0, the score is 0.0 and the band is Healthy.\n\nThe recommendation is to MAINTAIN the Trade Credit Insurer / Tamrin Exports export limit at USD 7,000,000, change 0. PD of 0.1784 sits inside the 0.25 appetite target, maximum liability does not bind, and expected loss is unchanged at 899,136 before and after. Given the adjudicator's challenge, the sensible condition on approval is to verify the underlying layoff announcement \u2014 scale, cost and timing \u2014 before treating the Watch designation as a reason to restrict; the band itself does not justify a reduction here.\n\nThe score sits 7.8 points above the Healthy line at 20.0. Because the payment leg already contributes zero, nothing on the payment side can lower it \u2014 the band will only fall if the layoffs item is re-severitied on verification or is withdrawn, or through time decay, which on a 365-day half-life is slow. In the other direction, High Risk is 22.2 points away at 50.0, reachable on the payment side at 33 DPD, or if a further substantive adverse item lands at higher severity than the current driver.",
+        "bottom_line": "Maintain the USD 7,000,000 export limit unchanged \u2014 PD of 0.1784 is within the 0.25 appetite and the buyer is at 0 DPD. The adjudicator has challenged the Watch band: 100% of the 27.8 score comes from a single headline-only layoffs article, and without it the buyer scores 0.0 and bands Healthy, so verify the underlying layoff announcement before acting on the Watch designation.",
+        "payment_note": "The payment record is clean at 0 DPD with nothing owed, contributing 0.0 to the score, though the adjudicator noted there is no payment or payment-review evidence on file to confirm whether this reflects genuine on-time settlement or simply absent trade data.",
+        "news_note": "One matched layoffs article (GN-29a1a96091d0, severity 4, decayed 79.55) drives the entire score despite having no body text beyond its headline, while six contemporaneous items of equal or newer vintage \u2014 the first external 18A foundry customer, the Microsoft Azure deal and improving server demand \u2014 are all scored 0 and cannot offset it.",
+        "lifts_it": [
+          "Verification that the layoffs report is routine restructuring rather than distress \u2014 re-severitying or withdrawing GN-29a1a96091d0 drops the score to 0.0 (Healthy)",
+          "7.8 points of decline reaches the Healthy line at 20.0, but with payment already at 0.0 this can only come from the news leg",
+          "Time decay of the sole driver, though slow on a 365-day half-life"
+        ],
+        "worsens_it": [
+          "33 DPD on the payment leg would reach High Risk at 50.0",
+          "A further adverse news item scored above the current severity 4 driver",
+          "Confirmation of layoff scale, charges or financial impact that would support the severity 80 base assigned on headline wording alone"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -1,0 +1,104 @@
+{
+  "result": {
+    "narrative": "Mehtab Agro Foods is carrying two open overdue notifications, one under each of its policies: INR 7,700,000 at 64 days past due on TCI-SCF-2026-0001 (logged 2026-09-20) and INR 3,000,000 at 41 days past due on TCI-WT-2026-0002 (logged 2026-10-13). The payment review records the trend as deteriorating: notification volume has risen from 1 to 2 over the last six months and now spans both policies, against a single prior overdue that resolved in 18 days. There is no matched news and no parent linkage.\n\nThe band is entirely payment-driven. Payment scores raw 98.0 at 64 DPD and carries 0.65 of the weight; news contributes 0.0 across the remaining 0.35, giving 0.65 x 98.0 + 0.35 x 0.0 = 63.7 and a PD of 0.5892. The adjudicator agreed with the High Risk band but attached caveats: the payment review reports INR 6.0M of overdue when the two notifications separately record INR 7.7M and INR 3.0M, it gives the oldest item an original due date of 2026-09-20 while that same dated notification already shows it at 64 DPD, and the scored 64 DPD predates the 2026-10-13 notification, so the input may be stale and the true aging worse. The adjudicator also notes the 0.0 news component reflects no matched articles rather than a verified clean record. Each discrepancy points toward equal or greater risk, so the band stands, but exposure and aging should be re-sourced from the notifications.\n\nBoth lines are recommended for reduction, cut to the limit where expected loss meets the 25% appetite against a PD of 0.5892. On TCI-SCF-2026-0001 (Meridia Bank, supply chain finance), the limit falls from INR 15,000,000 to INR 7,700,000, taking expected loss from 6,363,360 to 3,266,525. On TCI-WT-2026-0002 (Orvana Steel, whole turnover), the limit falls from INR 8,000,000 to INR 3,394,433, taking expected loss from 3,393,792 to 1,440,000. Maximum liability does not bind on either line, and the reductions are shown in full in the limit table.\n\nThe score would need to fall 13.7 points to drop below 50.0 and reach Watch, and because news contributes nothing, only the payment record can deliver that. Clearing or materially aging down the 64-day item on TCI-SCF-2026-0001, settling the INR 3,000,000 at 41 DPD on TCI-WT-2026-0002, and returning to the single-policy, 18-day resolution pattern seen historically are what would move this buyer down a band. Re-sourcing the overdue balance and the true current DPD from the notifications should be done before the limit letters go out, since the corrected figures may support a deeper cut rather than a shallower one.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Reduce both lines to the 25% appetite level: TCI-SCF-2026-0001 from INR 15,000,000 to INR 7,700,000 and TCI-WT-2026-0002 from INR 8,000,000 to INR 3,394,433, on a wholly payment-driven High Risk score of 63.7 (PD 0.5892) with INR 7,700,000 sitting at 64 days past due. The adjudicator agreed with caveats: the review's overdue total and due date contradict the notifications and the scored 64 DPD predates the 2026-10-13 notification, so re-source the exposure and aging figures before this goes out.",
+      "payment_note": "Two open overdue notifications, INR 7,700,000 at 64 DPD on TCI-SCF-2026-0001 and INR 3,000,000 at 41 DPD on TCI-WT-2026-0002, with the trend recorded as deteriorating as notification volume rose from 1 to 2 in six months and spread across both policies, against a single prior overdue that resolved in 18 days.",
+      "news_note": "There is no matched news and no parent linkage, so news contributes 0.0 across 35% of the formula weight, which the adjudicator cautions reflects an absence of matches rather than a verified clean record.",
+      "lifts_it": [
+        "A 13.7 point fall in the score takes it below 50.0 and into Watch",
+        "Clearing the INR 7,700,000 item at 64 DPD on TCI-SCF-2026-0001",
+        "Settling the INR 3,000,000 at 41 DPD and returning to a single-policy pattern"
+      ],
+      "worsens_it": [
+        "High Risk is the top band, so there is no higher band in the outlook",
+        "Confirmation that the 64 DPD input is stale and the oldest line has aged further",
+        "Re-sourced overdue exposure above the INR 6.0M the payment review assumed"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN07\", \"score\": 63.7, \"band\": \"High Risk\", \"pd\": 0.5892, \"payment\": {\"dpd\": 64, \"raw\": 98.0, \"weighted\": 63.7, \"worst_line\": \"TCI-SCF-2026-0001\"}, \"news\": {\"severity\": 0, \"category\": null, \"article_id\": null, \"age_days\": null, \"headline\": null, \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x 98.0 (payment, 64 DPD) + 0.35 x 0.0 (news) = 63.7\", "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN07-1\", \"buyer_id\": \"IN07\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-SCF-2026-0001\", \"insured_name\": \"Meridia Bank\", \"product_type\": \"SUPPLY_CHAIN_FINANCE\", \"currency\": \"INR\", \"current_limit\": 15000000, \"owed\": 7700000, \"revised_limit\": 7700000, \"change\": -7300000, \"action\": \"REDUCE\", \"reason\": \"cut to the limit where expected loss meets 25% "
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": null, \"next_band_at\": null, \"points_to_next_band\": null, \"dpd_for_next_band\": null, \"lower_band\": \"Watch\", \"lower_band_below\": 50.0, \"points_to_lower_band\": 13.7, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-260921-00021\", \"kind\": \"payment\", \"date\": \"2026-09-20\", \"detail\": \"1 open overdue notification(s) under policy TCI-SCF-2026-0001; the oldest is 64 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"dpd\": 64, \"owed\": 7700000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261014-00022\", \"kind\": \"payment\", \"date\": \"2026-10-13\", \"detail\": \"1 open overdue not"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Mehtab Agro Foods is carrying two open overdue notifications, one under each of its policies: INR 7,700,000 at 64 days past due on TCI-SCF-2026-0001 (logged 2026-09-20) and INR 3,000,000 at 41 days past due on TCI-WT-2026-0002 (logged 2026-10-13). The payment review records the trend as deteriorating: notification volume has risen from 1 to 2 over the last six months and now spans both policies, against a single prior overdue that resolved in 18 days. There is no matched news and no parent linkage.\n\nThe band is entirely payment-driven. Payment scores raw 98.0 at 64 DPD and carries 0.65 of the weight; news contributes 0.0 across the remaining 0.35, giving 0.65 x 98.0 + 0.35 x 0.0 = 63.7 and a PD of 0.5892. The adjudicator agreed with the High Risk band but attached caveats: the payment review reports INR 6.0M of overdue when the two notifications separately record INR 7.7M and INR 3.0M, it gives the oldest item an original due date of 2026-09-20 while that same dated notification already shows it at 64 DPD, and the scored 64 DPD predates the 2026-10-13 notification, so the input may be stale and the true aging worse. The adjudicator also notes the 0.0 news component reflects no matched articles rather than a verified clean record. Each discrepancy points toward equal or greater risk, so the band stands, but exposure and aging should be re-sourced from the notifications.\n\nBoth lines are recommended for reduction, cut to the limit where expected loss meets the 25% appetite against a PD of 0.5892. On TCI-SCF-2026-0001 (Meridia Bank, supply chain finance), the limit falls from INR 15,000,000 to INR 7,700,000, a change of -7,300,000, taking expected loss from 6,363,360 to 3,266,525. On TCI-WT-2026-0002 (Orvana Steel, whole turnover), the limit falls from INR 8,000,000 to INR 3,394,433, a change of -4,605,567, taking expected loss from 3,393,792 to 1,440,000. Maximum liability does not bind on either line.\n\nThe score would need to fall 13.7 points to drop below 50.0 and reach Watch, and because news contributes nothing, only the payment record can deliver that. Clearing or materially aging down the 64-day item on TCI-SCF-2026-0001, settling the INR 3,000,000 at 41 DPD on TCI-WT-2026-0002, and returning to the single-policy, 18-day resolution pattern seen historically are what would move this buyer down a band. Re-sourcing the overdue balance and the true current DPD from the notifications should be done before the limit letters go out, since the corrected figures may support a deeper cut rather than a shallower one.",
+        "bottom_line": "Reduce both lines to the 25% appetite level: TCI-SCF-2026-0001 from INR 15,000,000 to INR 7,700,000 and TCI-WT-2026-0002 from INR 8,000,000 to INR 3,394,433, on a wholly payment-driven High Risk score of 63.7 (PD 0.5892) with INR 7,700,000 sitting at 64 days past due. The adjudicator agreed with caveats: the review's overdue total and due date contradict the notifications and the scored 64 DPD predates the 2026-10-13 notification, so re-source the exposure and aging figures before this goes out.",
+        "payment_note": "Two open overdue notifications, INR 7,700,000 at 64 DPD on TCI-SCF-2026-0001 and INR 3,000,000 at 41 DPD on TCI-WT-2026-0002, with the trend recorded as deteriorating as notification volume rose from 1 to 2 in six months and spread across both policies, against a single prior overdue that resolved in 18 days.",
+        "news_note": "There is no matched news and no parent linkage, so news contributes 0.0 across 35% of the formula weight, which the adjudicator cautions reflects an absence of matches rather than a verified clean record.",
+        "lifts_it": [
+          "A 13.7 point fall in the score takes it below 50.0 and into Watch",
+          "Clearing the INR 7,700,000 item at 64 DPD on TCI-SCF-2026-0001",
+          "Settling the INR 3,000,000 at 41 DPD and returning to a single-policy pattern"
+        ],
+        "worsens_it": [
+          "High Risk is the top band, so there is no higher band in the outlook",
+          "Confirmation that the 64 DPD input is stale and the oldest line has aged further",
+          "Re-sourced overdue exposure above the INR 6.0M the payment review assumed"
+        ]
+      },
+      "error": "these figures are not in the data: ['7,300,000,', '4,605,567,']. Use only the numbers the tools returned, then resubmit"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Mehtab Agro Foods is carrying two open overdue notifications, one under each of its policies: INR 7,700,000 at 64 days past due on TCI-SCF-2026-0001 (logged 2026-09-20) and INR 3,000,000 at 41 days past due on TCI-WT-2026-0002 (logged 2026-10-13). The payment review records the trend as deteriorating: notification volume has risen from 1 to 2 over the last six months and now spans both policies, against a single prior overdue that resolved in 18 days. There is no matched news and no parent linkage.\n\nThe band is entirely payment-driven. Payment scores raw 98.0 at 64 DPD and carries 0.65 of the weight; news contributes 0.0 across the remaining 0.35, giving 0.65 x 98.0 + 0.35 x 0.0 = 63.7 and a PD of 0.5892. The adjudicator agreed with the High Risk band but attached caveats: the payment review reports INR 6.0M of overdue when the two notifications separately record INR 7.7M and INR 3.0M, it gives the oldest item an original due date of 2026-09-20 while that same dated notification already shows it at 64 DPD, and the scored 64 DPD predates the 2026-10-13 notification, so the input may be stale and the true aging worse. The adjudicator also notes the 0.0 news component reflects no matched articles rather than a verified clean record. Each discrepancy points toward equal or greater risk, so the band stands, but exposure and aging should be re-sourced from the notifications.\n\nBoth lines are recommended for reduction, cut to the limit where expected loss meets the 25% appetite against a PD of 0.5892. On TCI-SCF-2026-0001 (Meridia Bank, supply chain finance), the limit falls from INR 15,000,000 to INR 7,700,000, a change of -7,300,000 that takes expected loss from 6,363,360 to 3,266,525. On TCI-WT-2026-0002 (Orvana Steel, whole turnover), the limit falls from INR 8,000,000 to INR 3,394,433, a change of -4,605,567 that takes expected loss from 3,393,792 to 1,440,000. Maximum liability does not bind on either line.\n\nThe score would need to fall 13.7 points to drop below 50.0 and reach Watch, and because news contributes nothing, only the payment record can deliver that. Clearing or materially aging down the 64-day item on TCI-SCF-2026-0001, settling the INR 3,000,000 at 41 DPD on TCI-WT-2026-0002, and returning to the single-policy, 18-day resolution pattern seen historically are what would move this buyer down a band. Re-sourcing the overdue balance and the true current DPD from the notifications should be done before the limit letters go out, since the corrected figures may support a deeper cut rather than a shallower one.",
+        "bottom_line": "Reduce both lines to the 25% appetite level: TCI-SCF-2026-0001 from INR 15,000,000 to INR 7,700,000 and TCI-WT-2026-0002 from INR 8,000,000 to INR 3,394,433, on a wholly payment-driven High Risk score of 63.7 (PD 0.5892) with INR 7,700,000 sitting at 64 days past due. The adjudicator agreed with caveats: the review's overdue total and due date contradict the notifications and the scored 64 DPD predates the 2026-10-13 notification, so re-source the exposure and aging figures before this goes out.",
+        "payment_note": "Two open overdue notifications, INR 7,700,000 at 64 DPD on TCI-SCF-2026-0001 and INR 3,000,000 at 41 DPD on TCI-WT-2026-0002, with the trend recorded as deteriorating as notification volume rose from 1 to 2 in six months and spread across both policies, against a single prior overdue that resolved in 18 days.",
+        "news_note": "There is no matched news and no parent linkage, so news contributes 0.0 across 35% of the formula weight, which the adjudicator cautions reflects an absence of matches rather than a verified clean record.",
+        "lifts_it": [
+          "A 13.7 point fall in the score takes it below 50.0 and into Watch",
+          "Clearing the INR 7,700,000 item at 64 DPD on TCI-SCF-2026-0001",
+          "Settling the INR 3,000,000 at 41 DPD and returning to a single-policy pattern"
+        ],
+        "worsens_it": [
+          "High Risk is the top band, so there is no higher band in the outlook",
+          "Confirmation that the 64 DPD input is stale and the oldest line has aged further",
+          "Re-sourced overdue exposure above the INR 6.0M the payment review assumed"
+        ]
+      },
+      "error": "these figures are not in the data: ['7,300,000', '4,605,567']. Use only the numbers the tools returned, then resubmit"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Mehtab Agro Foods is carrying two open overdue notifications, one under each of its policies: INR 7,700,000 at 64 days past due on TCI-SCF-2026-0001 (logged 2026-09-20) and INR 3,000,000 at 41 days past due on TCI-WT-2026-0002 (logged 2026-10-13). The payment review records the trend as deteriorating: notification volume has risen from 1 to 2 over the last six months and now spans both policies, against a single prior overdue that resolved in 18 days. There is no matched news and no parent linkage.\n\nThe band is entirely payment-driven. Payment scores raw 98.0 at 64 DPD and carries 0.65 of the weight; news contributes 0.0 across the remaining 0.35, giving 0.65 x 98.0 + 0.35 x 0.0 = 63.7 and a PD of 0.5892. The adjudicator agreed with the High Risk band but attached caveats: the payment review reports INR 6.0M of overdue when the two notifications separately record INR 7.7M and INR 3.0M, it gives the oldest item an original due date of 2026-09-20 while that same dated notification already shows it at 64 DPD, and the scored 64 DPD predates the 2026-10-13 notification, so the input may be stale and the true aging worse. The adjudicator also notes the 0.0 news component reflects no matched articles rather than a verified clean record. Each discrepancy points toward equal or greater risk, so the band stands, but exposure and aging should be re-sourced from the notifications.\n\nBoth lines are recommended for reduction, cut to the limit where expected loss meets the 25% appetite against a PD of 0.5892. On TCI-SCF-2026-0001 (Meridia Bank, supply chain finance), the limit falls from INR 15,000,000 to INR 7,700,000, taking expected loss from 6,363,360 to 3,266,525. On TCI-WT-2026-0002 (Orvana Steel, whole turnover), the limit falls from INR 8,000,000 to INR 3,394,433, taking expected loss from 3,393,792 to 1,440,000. Maximum liability does not bind on either line, and the reductions are shown in full in the limit table.\n\nThe score would need to fall 13.7 points to drop below 50.0 and reach Watch, and because news contributes nothing, only the payment record can deliver that. Clearing or materially aging down the 64-day item on TCI-SCF-2026-0001, settling the INR 3,000,000 at 41 DPD on TCI-WT-2026-0002, and returning to the single-policy, 18-day resolution pattern seen historically are what would move this buyer down a band. Re-sourcing the overdue balance and the true current DPD from the notifications should be done before the limit letters go out, since the corrected figures may support a deeper cut rather than a shallower one.",
+        "bottom_line": "Reduce both lines to the 25% appetite level: TCI-SCF-2026-0001 from INR 15,000,000 to INR 7,700,000 and TCI-WT-2026-0002 from INR 8,000,000 to INR 3,394,433, on a wholly payment-driven High Risk score of 63.7 (PD 0.5892) with INR 7,700,000 sitting at 64 days past due. The adjudicator agreed with caveats: the review's overdue total and due date contradict the notifications and the scored 64 DPD predates the 2026-10-13 notification, so re-source the exposure and aging figures before this goes out.",
+        "payment_note": "Two open overdue notifications, INR 7,700,000 at 64 DPD on TCI-SCF-2026-0001 and INR 3,000,000 at 41 DPD on TCI-WT-2026-0002, with the trend recorded as deteriorating as notification volume rose from 1 to 2 in six months and spread across both policies, against a single prior overdue that resolved in 18 days.",
+        "news_note": "There is no matched news and no parent linkage, so news contributes 0.0 across 35% of the formula weight, which the adjudicator cautions reflects an absence of matches rather than a verified clean record.",
+        "lifts_it": [
+          "A 13.7 point fall in the score takes it below 50.0 and into Watch",
+          "Clearing the INR 7,700,000 item at 64 DPD on TCI-SCF-2026-0001",
+          "Settling the INR 3,000,000 at 41 DPD and returning to a single-policy pattern"
+        ],
+        "worsens_it": [
+          "High Risk is the top band, so there is no higher band in the outlook",
+          "Confirmation that the 64 DPD input is stale and the oldest line has aged further",
+          "Re-sourced overdue exposure above the INR 6.0M the payment review assumed"
+        ]
+      }
+    }
+  ],
+  "turns": 4
+}

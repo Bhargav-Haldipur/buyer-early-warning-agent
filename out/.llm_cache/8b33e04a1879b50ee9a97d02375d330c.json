@@ -1,0 +1,41 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "General market commentary on a broad tech selloff with no specific covered entity named."
+  },
+  "trace": [
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "General market commentary on a broad tech selloff with no specific covered entity named."
+      },
+      "error": "call search_entities before submitting"
+    },
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Wall Street"
+      },
+      "result": "[{\"note\": \"no covered entity shares a word with 'Wall Street'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "General market commentary on a broad tech selloff with no specific covered entity named."
+      }
+    }
+  ],
+  "turns": 3
+}

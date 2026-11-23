@@ -156,11 +156,15 @@ def mention_in(text: str, aliases: list[str]) -> str:
     The rule-based fallback resolves on this field; leaving it empty when the name is
     absent means a story that only came back from the search is refused offline
     rather than pinned on the company by default.
+
+    A company's name is matched as written or in capitals, never in lower case:
+    "fantasy intel" in a sports headline is the word, not Intel.
     """
     for alias in aliases:
-        m = re.search(rf"(?<![A-Za-z0-9]){re.escape(alias)}(?![A-Za-z0-9])", text, re.I)
-        if m:
-            return m.group(0)
+        for spelling in dict.fromkeys((alias, alias.upper())):
+            m = re.search(rf"(?<![A-Za-z0-9]){re.escape(spelling)}(?![A-Za-z0-9])", text)
+            if m:
+                return m.group(0)
     return ""
 
 
@@ -202,8 +206,12 @@ def _strip(raw: str) -> str:
 
 
 def google_news(buyer: dict, watch: dict, since: date, publishers: list[str],
-                per_buyer: int) -> tuple[list[dict], int]:
-    """Stories from the trusted publishers only. Returns (kept, dropped as untrusted)."""
+                per_buyer: int, stats: dict | None = None) -> tuple[list[dict], int]:
+    """Stories from the trusted publishers only. Returns (kept, dropped as untrusted).
+
+    `stats`, when given, is filled with how many stories the search returned at all,
+    so a fetch can show its whole funnel: found, dropped, kept.
+    """
     days = max(1, (AS_OF - since).days)
     q = urllib.parse.quote(f"{watch['news_query']} when:{days}d")
     hl, gl, ceid = edition(watch.get("country", ""))
@@ -211,7 +219,10 @@ def google_news(buyer: dict, watch: dict, since: date, publishers: list[str],
     trusted = {p.lower(): p for p in publishers}
     aliases = [a.strip() for a in watch["aliases"].split("|") if a.strip()]
     kept, dropped = [], 0
-    for item in root.iter("item"):
+    items = list(root.iter("item"))
+    if stats is not None:
+        stats["returned"] = len(items)
+    for item in items:
         source = (item.findtext("source") or "").strip()
         if source.lower() not in trusted:
             dropped += 1
@@ -251,6 +262,10 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
     say = (lambda *a: None) if quiet else (lambda *a: print(*a))
     from .loader import Loader
     feeds, publishers = load_sources(data_dir)
+    out = data_dir / "news_articles.csv"
+    # what the engine had before this fetch, so the page can say what is new
+    had_ids = {r["article_id"] for r in _read(out)} if out.exists() else set()
+    previous = last_fetch(data_dir)
     buyers = Loader(data_dir).buyers_by_id()
     watchlist = _read(data_dir / "news_watchlist.csv")
     since = AS_OF - timedelta(days=days)
@@ -266,7 +281,7 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
         country = w.get("country", "") or b.get("country", "")
         w = {**w, "country": country}
         got = {"country": country, "edition": edition(country)[0], "sec_edgar": 0,
-               "google_news": 0, "untrusted_dropped": 0}
+               "google_news": 0, "untrusted_dropped": 0, "returned": 0}
         if "sec_edgar" in feeds and str(w.get("cik", "")).strip().isdigit():
             try:
                 for a in sec_filings(b, w, since):
@@ -277,8 +292,10 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
             time.sleep(0.15)          # the SEC asks for no more than ten requests a second
         if "google_news" in feeds:
             try:
+                stats: dict = {}
                 kept, dropped = google_news(b, w, since, publishers_for(data_dir, country),
-                                            per_buyer)
+                                            per_buyer, stats)
+                got["returned"] = stats.get("returned", 0)
                 for a in kept:
                     # one story can come back for two companies' searches: keep the copy
                     # that names a company, so the fallback still has something to resolve
@@ -301,7 +318,21 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
                          + "\n  ".join(report["errors"]))
     rows = sorted(articles.values(), key=lambda a: (a["published_date"], a["article_id"]),
                   reverse=True)
-    out = data_dir / "news_articles.csv"
+    per = report["buyers"].values()
+    kept_per_search = sum(g["coverage"] for g in per)
+    found = sum(g["returned"] + g["sec_edgar"] for g in per)
+    untrusted = sum(g["untrusted_dropped"] for g in per)
+    report["funnel"] = {
+        "found": found,
+        "untrusted_dropped": untrusted,
+        # trusted, but older than the window or past the per-company cap
+        "outside_window_or_cap": max(0, found - untrusted - kept_per_search),
+        # the same story returned by two companies' searches
+        "duplicates": max(0, kept_per_search - len(rows)),
+        "kept": len(rows),
+    }
+    report["new"] = [a["article_id"] for a in rows if a["article_id"] not in had_ids]
+    report["previous_fetch"] = previous["fetched_at"] if previous else None
     tmp = out.with_suffix(".csv.tmp")
     with tmp.open("w", newline="", encoding="utf-8") as fh:
         wr = csv.DictWriter(fh, fieldnames=FIELDS)
@@ -310,10 +341,16 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
     tmp.replace(out)
     report["articles"] = len(rows)
     (data_dir / LOG).write_text(json.dumps(report, indent=2))
-    say(f"  {len(rows)} articles -> {out}")
+    say(f"  {len(rows)} articles -> {out} ({len(report['new'])} new since the last fetch)")
     for err in report["errors"]:
         say(f"  ! {err}")
     return report
+
+
+def read_articles(data_dir: Path = DATA_DIR) -> list[dict]:
+    """The fetched stories as the last fetch wrote them (empty before the first)."""
+    out = data_dir / "news_articles.csv"
+    return _read(out) if out.exists() else []
 
 
 def last_fetch(data_dir: Path = DATA_DIR) -> dict | None:

@@ -1,0 +1,78 @@
+{
+  "result": {
+    "narrative": "Vodafone Idea sits at score 25.4, Watch, with PD 0.1544. There is one open overdue notification under policy TCI-SCF-2026-0001, 18 days past due, an invoice of INR 9.0M against a INR 120M limit with total exposure around 40M, so utilisation remains moderate. The payment review is flagged deteriorating: resolution times across the last three notifications have lengthened from 5 days late to 9 days to the current 18 and still open, and notification frequency has ticked up to 2 in the last 6 months against 1 in the prior window. The wider news picture is mixed rather than distressed, including an SBI-led group providing $3.5 billion of debt in September and a Reuters report of a narrowed quarterly loss on higher per-user revenue.\n\nThe band comes from 0.65 x 18.0 (payment, 18 DPD) + 0.35 x 39.2 (news) = 25.4. The adjudicator agreed with Watch but with caveats, and they matter here. The entire news contribution, weighted 13.7, rests on one article, GN-1caacc272320, a severity 2 profit_warning whose retrieved text is headline-only; the severity reads off a 3.5% share price decline, a market reaction rather than a credit event, and a Reuters item published the day before scored the same Q2 results severity 0. Payment alone contributes weighted 11.7, below the Watch threshold of 20, so the formula's band depends on that single news item holding. The adjudicator's view, which I share, is that the load-bearing evidence is the payment trajectory, which the score sees only as a point-in-time 18 DPD and therefore under-weights.\n\nThe recommendation is MAINTAIN the INR 120,000,000 limit on LIM-IN03-1 (Meridia Bank, supply chain finance), change 0, on the basis that PD 0.1544 is within the 0.25 appetite target and maximum liability does not bind; expected loss is unchanged at INR 13,340,160. Note one inconsistency the underwriter should resolve before signing: the notification records owed as INR 40,000,000 while the payment review describes the open past-due item as INR 9.0M with ~40M total exposure, so the 'owed' field appears to carry exposure rather than the past-due amount. All overdue notifications come from this one policy, so conduct elsewhere is unobserved.\n\nWhat would lift it is straightforward: clearing the open 18-day item and returning resolution times toward the earlier 5-to-9-day pattern would leave the payment leg at weighted 11.7, below the Watch floor of 20. The score needs to fall 5.4 points to reach Healthy below 20.0, which a reassessment of the severity 2 on GN-1caacc272320 would do on its own; failing that, the news item decays on a 365-day half-life. The outlook confirms news alone does not hold the band.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the INR 120,000,000 limit on LIM-IN03-1 (PD 0.1544 against a 0.25 target, no change to expected loss of INR 13,340,160), but treat the deteriorating payment trend as the real reason for Watch: the adjudicator agreed with caveats, flagging that the band currently rests on a single headline-only news item while payment alone (weighted 11.7) sits below the Watch threshold of 20.",
+      "payment_note": "One open overdue of INR 9.0M under policy TCI-SCF-2026-0001 at 18 days past due, with a clearly deteriorating trend: resolution times lengthening from 5 to 9 to the current 18 days still open, and notifications up to 2 in the last 6 months from 1 in the prior window.",
+      "news_note": "The only credit-negative match is GN-1caacc272320, a severity 2 profit_warning on a wider-than-expected Q2 loss and a 3.5% share decline that is headline-only on retrieval and contradicted by a Reuters item from the previous day reporting a narrowed quarterly loss at severity 0, against a background of neutral-to-positive coverage including $3.5 billion of new SBI-led debt.",
+      "lifts_it": [
+        "Open 18-day overdue cleared and resolution times back toward the prior 5-9 day pattern, leaving payment at weighted 11.7, below the Watch floor of 20",
+        "Reassessment of the severity 2 on GN-1caacc272320, which is headline-only and contradicted by the Reuters results item; 5.4 points takes the score to Healthy below 20.0",
+        "Decay of the November news item on the 365-day half-life with no new severity 2+ matches"
+      ],
+      "worsens_it": [
+        "Current overdue extending to 43 DPD, which reaches High Risk at 50.0 (24.6 points away)",
+        "Overdues appearing on a policy other than TCI-SCF-2026-0001, where all conduct is currently observed",
+        "Notification frequency rising beyond 2 in the 180-day window, or a new severity 2+ item backed by a company-issued guidance warning rather than a share price move"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN03\", \"score\": 25.4, \"band\": \"Watch\", \"pd\": 0.1544, \"payment\": {\"dpd\": 18, \"raw\": 18.0, \"weighted\": 11.7, \"worst_line\": \"TCI-SCF-2026-0001\"}, \"news\": {\"severity\": 2, \"category\": \"profit_warning\", \"article_id\": \"GN-1caacc272320\", \"age_days\": 10, \"headline\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\", \"via_parent\": false, \"parent_name\": null, \"raw\": 39.2, \"w"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN03-1\", \"buyer_id\": \"IN03\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-SCF-2026-0001\", \"insured_name\": \"Meridia Bank\", \"product_type\": \"SUPPLY_CHAIN_FINANCE\", \"currency\": \"INR\", \"current_limit\": 120000000, \"owed\": 40000000, \"revised_limit\": 120000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\""
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 24.6, \"dpd_for_next_band\": 43, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 5.4, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261106-00006\", \"kind\": \"payment\", \"date\": \"2026-11-05\", \"detail\": \"1 open overdue notification(s) under policy TCI-SCF-2026-0001; the oldest is 18 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"dpd\": 18, \"owed\": 40000000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261106-00006\", \"kind\": \"payment_review\", \"date\": \"2026-11-05\", \"detail\": \"Vodafone I"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-1caacc272320"
+      },
+      "result": "{\"article_id\": \"GN-1caacc272320\", \"published_date\": \"2026-11-13\", \"publication\": \"Business Standard\", \"headline\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\", \"body\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-f61f7063777f"
+      },
+      "result": "{\"article_id\": \"GN-f61f7063777f\", \"published_date\": \"2026-11-12\", \"publication\": \"Reuters\", \"headline\": \"India's Vodafone Idea narrows quarterly loss on bigger per-user revenue\", \"body\": \"India's Vodafone Idea narrows quarterly loss on bigger per-user revenue\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Vodafone Idea sits at score 25.4, Watch, with PD 0.1544. There is one open overdue notification under policy TCI-SCF-2026-0001, 18 days past due, an invoice of INR 9.0M against a INR 120M limit with total exposure around 40M, so utilisation remains moderate. The payment review is flagged deteriorating: resolution times across the last three notifications have lengthened from 5 days late to 9 days to the current 18 and still open, and notification frequency has ticked up to 2 in the last 6 months against 1 in the prior window. The wider news picture is mixed rather than distressed, including an SBI-led group providing $3.5 billion of debt in September and a Reuters report of a narrowed quarterly loss on higher per-user revenue.\n\nThe band comes from 0.65 x 18.0 (payment, 18 DPD) + 0.35 x 39.2 (news) = 25.4. The adjudicator agreed with Watch but with caveats, and they matter here. The entire news contribution, weighted 13.7, rests on one article, GN-1caacc272320, a severity 2 profit_warning whose retrieved text is headline-only; the severity reads off a 3.5% share price decline, a market reaction rather than a credit event, and a Reuters item published the day before scored the same Q2 results severity 0. Payment alone contributes weighted 11.7, below the Watch threshold of 20, so the formula's band depends on that single news item holding. The adjudicator's view, which I share, is that the load-bearing evidence is the payment trajectory, which the score sees only as a point-in-time 18 DPD and therefore under-weights.\n\nThe recommendation is MAINTAIN the INR 120,000,000 limit on LIM-IN03-1 (Meridia Bank, supply chain finance), change 0, on the basis that PD 0.1544 is within the 0.25 appetite target and maximum liability does not bind; expected loss is unchanged at INR 13,340,160. Note one inconsistency the underwriter should resolve before signing: the notification records owed as INR 40,000,000 while the payment review describes the open past-due item as INR 9.0M with ~40M total exposure, so the 'owed' field appears to carry exposure rather than the past-due amount. All overdue notifications come from this one policy, so conduct elsewhere is unobserved.\n\nWhat would lift it is straightforward: clearing the open 18-day item and returning resolution times toward the earlier 5-to-9-day pattern would leave the payment leg at weighted 11.7, below the Watch floor of 20. The score needs to fall 5.4 points to reach Healthy below 20.0, which a reassessment of the severity 2 on GN-1caacc272320 would do on its own; failing that, the news item decays on a 365-day half-life. The outlook confirms news alone does not hold the band.",
+        "bottom_line": "Maintain the INR 120,000,000 limit on LIM-IN03-1 (PD 0.1544 against a 0.25 target, no change to expected loss of INR 13,340,160), but treat the deteriorating payment trend as the real reason for Watch: the adjudicator agreed with caveats, flagging that the band currently rests on a single headline-only news item while payment alone (weighted 11.7) sits below the Watch threshold of 20.",
+        "payment_note": "One open overdue of INR 9.0M under policy TCI-SCF-2026-0001 at 18 days past due, with a clearly deteriorating trend: resolution times lengthening from 5 to 9 to the current 18 days still open, and notifications up to 2 in the last 6 months from 1 in the prior window.",
+        "news_note": "The only credit-negative match is GN-1caacc272320, a severity 2 profit_warning on a wider-than-expected Q2 loss and a 3.5% share decline that is headline-only on retrieval and contradicted by a Reuters item from the previous day reporting a narrowed quarterly loss at severity 0, against a background of neutral-to-positive coverage including $3.5 billion of new SBI-led debt.",
+        "lifts_it": [
+          "Open 18-day overdue cleared and resolution times back toward the prior 5-9 day pattern, leaving payment at weighted 11.7, below the Watch floor of 20",
+          "Reassessment of the severity 2 on GN-1caacc272320, which is headline-only and contradicted by the Reuters results item; 5.4 points takes the score to Healthy below 20.0",
+          "Decay of the November news item on the 365-day half-life with no new severity 2+ matches"
+        ],
+        "worsens_it": [
+          "Current overdue extending to 43 DPD, which reaches High Risk at 50.0 (24.6 points away)",
+          "Overdues appearing on a policy other than TCI-SCF-2026-0001, where all conduct is currently observed",
+          "Notification frequency rising beyond 2 in the 180-day window, or a new severity 2+ item backed by a company-issued guidance warning rather than a share price move"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

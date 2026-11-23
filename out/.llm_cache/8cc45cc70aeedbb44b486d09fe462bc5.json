@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS02",
+    "name": "The Boeing Company",
+    "severity": 0,
+    "category": "routine_filing",
+    "reason": "This is a standard Item 2.02 Form 8-K reporting results of operations with no indication of negative financial news or distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Boeing"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS02\", \"name\": \"The Boeing Company\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS02",
+        "severity": 0,
+        "category": "routine_filing",
+        "reason": "This is a standard Item 2.02 Form 8-K reporting results of operations with no indication of negative financial news or distress."
+      }
+    }
+  ],
+  "turns": 2
+}

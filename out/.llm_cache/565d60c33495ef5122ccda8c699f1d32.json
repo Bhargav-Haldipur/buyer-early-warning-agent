@@ -1,0 +1,78 @@
+{
+  "result": {
+    "narrative": "Intel pays on time: the payment leg records 0 DPD, no worst line and nothing owed on the single exposure. The news file is dominated by one Reuters item of 16 November, a shareholder suit following a 29% stock plunge, scored severity 3. Everything around it is either positive or low-grade market sentiment \u2014 the first external customer for the 18A process on 19 November (CNBC, Barron's and others), set against commentary on a 62% decline this year, a stock more than 60% below its June record, and a $3.5T chip rout, each scored severity 1 or 0. Three 8-K filings in the file are routine.\n\nThe band is Watch at 20.7. The trace is 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 59.2 (news) = 20.7, so the entire score comes from the news leg and, within it, from the single shareholder-lawsuit article. The adjudicator agreed with caveats and was pointed about them: the driving article's full text is one line identical to its headline, with no claim size, court or allegations; a suit by equity holders is not a trade-payment or liquidity signal; the 0.0 payment input is an absence of reported data rather than a verified clean record, as no payment or payment_review evidence is on file; and the 18A customer win, though newer than the lawsuit, scores severity 0 and cannot offset it under max-severity selection. The adjudicator also noted the score sits only 0.7 points above the threshold, so the band turns on the clock as much as on the credit.\n\nThe recommendation is to maintain the export limit for Tamrin Exports at USD 7,000,000, unchanged, with expected loss of 540,288 before and after. PD of 0.1072 is well inside the 0.25 target and maximum liability does not bind. Nothing in the file supports a reduction; the case for maintaining rests on a clean payment record and a positive operational development, both of which the score handles poorly in opposite directions. Worth confirming with the client that trade lines are actually being reported before treating the 0 DPD as reassurance.\n\nThe score is 0.7 points above the Healthy line at 20.0, and decay of the lawsuit item alone would carry it there without any change in the buyer's condition. Confirmation that trade lines are being reported and remain clean, or a resolution or dismissal of the shareholder suit, would make that move a genuine one rather than an artefact of ageing news.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the USD 7,000,000 export limit for Tamrin Exports \u2014 PD of 0.1072 is well within the 0.25 appetite and the buyer is at 0 DPD. The adjudicator agreed with caveats: the whole 20.7 Watch score comes from one headline-only shareholder-lawsuit article, the score sits just 0.7 points above the Healthy line, and the 0.0 payment leg reflects no reported payment data rather than a verified clean record.",
+      "payment_note": "The payment leg shows 0 DPD with no worst line and nothing owed, but there is no payment or payment_review evidence on file, so this is an absence of reported data rather than a verified settlement record and no trend can be read from it.",
+      "news_note": "One severity 3 item drives the band \u2014 a Reuters report of a shareholder suit after a 29% stock plunge, whose full text is a single line identical to the headline \u2014 while the newer first external 18A customer win and the stock-decline commentary (62% this year, more than 60% below the June record) score severity 0 and 1 and cannot offset it.",
+      "lifts_it": [
+        "Decay of the shareholder-lawsuit item: 0.7 points takes the score below 20.0 into Healthy",
+        "Resolution or dismissal of the shareholder suit, or detail showing no trade-creditor exposure",
+        "Confirmation that trade lines are being reported and the 0 DPD record is genuine"
+      ],
+      "worsens_it": [
+        "Arrears reaching 38 DPD, which alone would reach High Risk",
+        "A further 29.3 points of news severity, the gap to the High Risk line at 50.0",
+        "Any first evidence of cash burn or foundry capex funding strain, which no item in this file addresses"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS01\", \"score\": 20.7, \"band\": \"Watch\", \"pd\": 0.1072, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 3, \"category\": \"shareholder_lawsuit\", \"article_id\": \"GN-92904b4dcaa6\", \"age_days\": 7, \"headline\": \"Intel sued by shareholders following 29% stock plunge\", \"via_parent\": false, \"parent_name\": null, \"raw\": 59.2, \"weighted\": 20.7}, \"trace\": \"0"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS01-1\", \"buyer_id\": \"OS01\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 7000000, \"owed\": 0, \"revised_limit\": 7000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1072, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 29.3, \"dpd_for_next_band\": 38, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 0.7, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"GN-b97c444dd8fd\", \"kind\": \"news\", \"date\": \"2026-11-22\", \"detail\": \"severity 0 (new_customer_win): Intel Says It Just Signed Its First Customer for Its Most Advanced Chipmaking Process. The Stock Is Still More Than 60% Below Its June Record.\", \"data\": {\"severity\": 0, \"category\": \"new_customer_win\", \"age_days\": 1, \"base\": 0.0, \"decayed\": 0.0, \"entity\": \"Intel Corporation\", \"via_parent\": fal"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-92904b4dcaa6"
+      },
+      "result": "{\"article_id\": \"GN-92904b4dcaa6\", \"published_date\": \"2026-11-16\", \"publication\": \"Reuters\", \"headline\": \"Intel sued by shareholders following 29% stock plunge\", \"body\": \"Intel sued by shareholders following 29% stock plunge\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-7f4e6c3d7636"
+      },
+      "result": "{\"article_id\": \"GN-7f4e6c3d7636\", \"published_date\": \"2026-11-19\", \"publication\": \"CNBC\", \"headline\": \"Intel signs first external customer for advanced 18A chips\", \"body\": \"Intel signs first external customer for advanced 18A chips\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Intel pays on time: the payment leg records 0 DPD, no worst line and nothing owed on the single exposure. The news file is dominated by one Reuters item of 16 November, a shareholder suit following a 29% stock plunge, scored severity 3. Everything around it is either positive or low-grade market sentiment \u2014 the first external customer for the 18A process on 19 November (CNBC, Barron's and others), set against commentary on a 62% decline this year, a stock more than 60% below its June record, and a $3.5T chip rout, each scored severity 1 or 0. Three 8-K filings in the file are routine.\n\nThe band is Watch at 20.7. The trace is 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 59.2 (news) = 20.7, so the entire score comes from the news leg and, within it, from the single shareholder-lawsuit article. The adjudicator agreed with caveats and was pointed about them: the driving article's full text is one line identical to its headline, with no claim size, court or allegations; a suit by equity holders is not a trade-payment or liquidity signal; the 0.0 payment input is an absence of reported data rather than a verified clean record, as no payment or payment_review evidence is on file; and the 18A customer win, though newer than the lawsuit, scores severity 0 and cannot offset it under max-severity selection. The adjudicator also noted the score sits only 0.7 points above the threshold, so the band turns on the clock as much as on the credit.\n\nThe recommendation is to maintain the export limit for Tamrin Exports at USD 7,000,000, unchanged, with expected loss of 540,288 before and after. PD of 0.1072 is well inside the 0.25 target and maximum liability does not bind. Nothing in the file supports a reduction; the case for maintaining rests on a clean payment record and a positive operational development, both of which the score handles poorly in opposite directions. Worth confirming with the client that trade lines are actually being reported before treating the 0 DPD as reassurance.\n\nThe score is 0.7 points above the Healthy line at 20.0, and decay of the lawsuit item alone would carry it there without any change in the buyer's condition. Confirmation that trade lines are being reported and remain clean, or a resolution or dismissal of the shareholder suit, would make that move a genuine one rather than an artefact of ageing news.",
+        "bottom_line": "Maintain the USD 7,000,000 export limit for Tamrin Exports \u2014 PD of 0.1072 is well within the 0.25 appetite and the buyer is at 0 DPD. The adjudicator agreed with caveats: the whole 20.7 Watch score comes from one headline-only shareholder-lawsuit article, the score sits just 0.7 points above the Healthy line, and the 0.0 payment leg reflects no reported payment data rather than a verified clean record.",
+        "payment_note": "The payment leg shows 0 DPD with no worst line and nothing owed, but there is no payment or payment_review evidence on file, so this is an absence of reported data rather than a verified settlement record and no trend can be read from it.",
+        "news_note": "One severity 3 item drives the band \u2014 a Reuters report of a shareholder suit after a 29% stock plunge, whose full text is a single line identical to the headline \u2014 while the newer first external 18A customer win and the stock-decline commentary (62% this year, more than 60% below the June record) score severity 0 and 1 and cannot offset it.",
+        "lifts_it": [
+          "Decay of the shareholder-lawsuit item: 0.7 points takes the score below 20.0 into Healthy",
+          "Resolution or dismissal of the shareholder suit, or detail showing no trade-creditor exposure",
+          "Confirmation that trade lines are being reported and the 0 DPD record is genuine"
+        ],
+        "worsens_it": [
+          "Arrears reaching 38 DPD, which alone would reach High Risk",
+          "A further 29.3 points of news severity, the gap to the High Risk line at 50.0",
+          "Any first evidence of cash burn or foundry capex funding strain, which no item in this file addresses"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

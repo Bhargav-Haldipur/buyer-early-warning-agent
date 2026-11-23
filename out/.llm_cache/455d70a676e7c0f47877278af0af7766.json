@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS02",
+    "name": "The Boeing Company",
+    "severity": 0,
+    "category": "delivery_report",
+    "reason": "Routine report of monthly jet deliveries, a neutral/positive operational update with no negative credit implications."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Boeing"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS02\", \"name\": \"The Boeing Company\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS02",
+        "severity": 0,
+        "category": "delivery_report",
+        "reason": "Routine report of monthly jet deliveries, a neutral/positive operational update with no negative credit implications."
+      }
+    }
+  ],
+  "turns": 2
+}

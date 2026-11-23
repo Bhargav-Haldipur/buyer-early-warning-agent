@@ -1,6 +1,6 @@
 {
-  "fetched_at": "2026-11-20T12:35:39+00:00",
-  "as_of": "2026-11-20",
+  "fetched_at": "2026-11-23T11:10:19+00:00",
+  "as_of": "2026-11-23",
   "days": 180,
   "feeds": [
     "google_news",
@@ -26,12 +26,12 @@
     "ET Auto",
     "ET Telecom",
     "ET Infra",
-    "Livemint",
     "Mint",
-    "Moneycontrol.com",
+    "Livemint",
     "Moneycontrol",
-    "BusinessLine",
+    "Moneycontrol.com",
     "The Hindu BusinessLine",
+    "BusinessLine",
     "The Hindu",
     "NDTV Profit",
     "CNBC TV18",
@@ -46,23 +46,26 @@
       "edition": "en-IN",
       "sec_edgar": 0,
       "google_news": 12,
-      "untrusted_dropped": 73,
+      "untrusted_dropped": 52,
+      "returned": 70,
       "coverage": 12
     },
     "L&T": {
       "country": "IND",
       "edition": "en-IN",
       "sec_edgar": 0,
-      "google_news": 12,
-      "untrusted_dropped": 20,
-      "coverage": 12
+      "google_news": 11,
+      "untrusted_dropped": 31,
+      "returned": 42,
+      "coverage": 11
     },
     "Vodafone Idea": {
       "country": "IND",
       "edition": "en-IN",
       "sec_edgar": 0,
       "google_news": 12,
-      "untrusted_dropped": 61,
+      "untrusted_dropped": 44,
+      "returned": 58,
       "coverage": 12
     },
     "Intel": {
@@ -70,7 +73,8 @@
       "edition": "en-US",
       "sec_edgar": 3,
       "google_news": 12,
-      "untrusted_dropped": 57,
+      "untrusted_dropped": 67,
+      "returned": 100,
       "coverage": 15
     },
     "Boeing": {
@@ -78,7 +82,8 @@
       "edition": "en-US",
       "sec_edgar": 4,
       "google_news": 12,
-      "untrusted_dropped": 83,
+      "untrusted_dropped": 86,
+      "returned": 100,
       "coverage": 16
     },
     "Ford": {
@@ -86,10 +91,31 @@
       "edition": "en-US",
       "sec_edgar": 5,
       "google_news": 12,
-      "untrusted_dropped": 47,
+      "untrusted_dropped": 46,
+      "returned": 83,
       "coverage": 17
     }
   },
   "errors": [],
-  "articles": 84
+  "funnel": {
+    "found": 465,
+    "untrusted_dropped": 326,
+    "outside_window_or_cap": 56,
+    "duplicates": 0,
+    "kept": 83
+  },
+  "new": [
+    "GN-92904b4dcaa6",
+    "GN-7023c004e635",
+    "GN-b087b8cbdf67",
+    "GN-a46a3cf8f0c1",
+    "GN-b29fb55c7fb1",
+    "GN-4df91c2784a6",
+    "GN-6011226d1250",
+    "GN-457956163f73",
+    "GN-0b4d9c6899cb",
+    "GN-a55d91534f79"
+  ],
+  "previous_fetch": "2026-11-23T10:58:06+00:00",
+  "articles": 83
 }

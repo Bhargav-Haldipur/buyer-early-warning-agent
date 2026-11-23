@@ -1,0 +1,78 @@
+{
+  "result": {
+    "narrative": "Intel is paying us on time. The payment side of the score is 0 DPD with nothing owed on the covered line, contributing 0.0 of the 27.8 total, and there is no payment-review item or worst line on file. The news window is busy but mostly favourable: the first external customer for the 18A process (reported separately by Yahoo Finance, CNBC and Barron's between 19 and 22 November), a Microsoft Azure deal, improving server demand and three routine 8-K filings, all scored severity 0. Against that sits one severity 4 layoffs item dated 20 November.\n\nThe band is Watch solely because of that one article. The trace is 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 79.5 (news) = 27.8, so every point comes from GN-29a1a96091d0, scored severity 4 at base 80.0, decayed 79.55. The adjudicator agreed with caveats rather than agreeing outright, and the caveats are material: the retrieved full text of that article is nothing but its own headline repeated, with no headcount, cost or site detail to support an 80-point base; a similarly stock-framed piece (GN-6e8e51c1f675) was scored 0 as market commentary, so the same genre drew 80 and 0 with no stated basis; the five positive contemporaneous items cannot offset a negative under a worst-item formula; and a flagged item labelled '[HYPOTHETICAL] - typed in the room' (LIVE01, base 20.0) sits in the scored pool and would become the top-ranked item if the layoffs article were corrected.\n\nThe recommendation is MAINTAIN. The export limit for Tamrin Exports under TCI-EX-2026-0001 stays at USD 7,000,000, change 0, because PD of 0.1784 is inside the 0.25 target and maximum liability does not bind. Expected loss is 899,136 before and after. Nothing owed on the line today. Given the adjudicator's caveats, the sensible step before anything tighter is to confirm the layoff report against a primary source rather than re-price off a headline.\n\nA move back to Healthy needs only 7.8 points, and the single quickest route is correction or removal of the layoffs item: with it gone the next-highest evidence yields 0.35 x 20.0 = 7.0, which is Healthy. Otherwise the item decays on a 365-day half-life, so time alone is slow. Purging LIVE01 from the evidence pool would also stop an acknowledged non-article from becoming load-bearing.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the USD 7,000,000 export limit for Tamrin Exports \u2014 PD of 0.1784 is within the 0.25 appetite and the buyer is at 0 DPD. Note that the adjudicator agreed only with caveats: the entire 27.8 Watch score comes from one layoffs article whose full text is just its headline repeated, and the band collapses to Healthy if that item is corrected.",
+      "payment_note": "Payment behaviour is clean \u2014 0 DPD, nothing owed, no worst line recorded and no payment-review evidence on file \u2014 contributing 0.0 to the score, with no settlement trend visible in the data.",
+      "news_note": "The news window holds one severity 4 layoffs item from 20 November (base 80.0, decayed 79.55) that drives the whole score, set against five severity 0 positives including the first external 18A foundry customer win, a Microsoft Azure deal and improving server demand, plus a flagged hypothetical item in the pool.",
+      "lifts_it": [
+        "7.8 points moves it below 20.0 into Healthy",
+        "Correcting or removing the layoffs article GN-29a1a96091d0 \u2014 the next-highest item yields 0.35 x 20.0 = 7.0, i.e. Healthy",
+        "Purging the flagged hypothetical item LIVE01 (base 20.0) from the scored evidence pool"
+      ],
+      "worsens_it": [
+        "22.2 points reaches High Risk at 50.0",
+        "Payment slipping to 33 DPD would reach the next band on its own",
+        "A second, substantiated negative item while the layoffs severity 4 still stands (365-day half-life, so it decays slowly)"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS01\", \"score\": 27.8, \"band\": \"Watch\", \"pd\": 0.1784, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 4, \"category\": \"layoffs\", \"article_id\": \"GN-29a1a96091d0\", \"age_days\": 3, \"headline\": \"How to Play INTC Stock as Intel Launches Another Round of Layoffs\", \"via_parent\": false, \"parent_name\": null, \"raw\": 79.5, \"weighted\": 27.8}, \"trace\": \"0"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS01-1\", \"buyer_id\": \"OS01\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 7000000, \"owed\": 0, \"revised_limit\": 7000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1784, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 22.2, \"dpd_for_next_band\": 33, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 7.8, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"GN-b97c444dd8fd\", \"kind\": \"news\", \"date\": \"2026-11-22\", \"detail\": \"severity 0 (new_customer_win): Intel Says It Just Signed Its First Customer for Its Most Advanced Chipmaking Process. The Stock Is Still More Than 60% Below Its June Record.\", \"data\": {\"severity\": 0, \"category\": \"new_customer_win\", \"age_days\": 1, \"base\": 0.0, \"decayed\": 0.0, \"entity\": \"Intel Corporation\", \"via_parent\": fal"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-29a1a96091d0"
+      },
+      "result": "{\"article_id\": \"GN-29a1a96091d0\", \"published_date\": \"2026-11-20\", \"publication\": \"Yahoo Finance\", \"headline\": \"How to Play INTC Stock as Intel Launches Another Round of Layoffs\", \"body\": \"How to Play INTC Stock as Intel Launches Another Round of Layoffs\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-2164913418be"
+      },
+      "result": "{\"article_id\": \"GN-2164913418be\", \"published_date\": \"2026-11-20\", \"publication\": \"Yahoo Finance\", \"headline\": \"Intel Secures First External Customer For Advanced 18A Chips, Marking Major Foundry Breakthrough\", \"body\": \"Intel Secures First External Customer For Advanced 18A Chips, Marking Major Foundry Breakthrough\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Intel is paying us on time. The payment side of the score is 0 DPD with nothing owed on the covered line, contributing 0.0 of the 27.8 total, and there is no payment-review item or worst line on file. The news window is busy but mostly favourable: the first external customer for the 18A process (reported separately by Yahoo Finance, CNBC and Barron's between 19 and 22 November), a Microsoft Azure deal, improving server demand and three routine 8-K filings, all scored severity 0. Against that sits one severity 4 layoffs item dated 20 November.\n\nThe band is Watch solely because of that one article. The trace is 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 79.5 (news) = 27.8, so every point comes from GN-29a1a96091d0, scored severity 4 at base 80.0, decayed 79.55. The adjudicator agreed with caveats rather than agreeing outright, and the caveats are material: the retrieved full text of that article is nothing but its own headline repeated, with no headcount, cost or site detail to support an 80-point base; a similarly stock-framed piece (GN-6e8e51c1f675) was scored 0 as market commentary, so the same genre drew 80 and 0 with no stated basis; the five positive contemporaneous items cannot offset a negative under a worst-item formula; and a flagged item labelled '[HYPOTHETICAL] - typed in the room' (LIVE01, base 20.0) sits in the scored pool and would become the top-ranked item if the layoffs article were corrected.\n\nThe recommendation is MAINTAIN. The export limit for Tamrin Exports under TCI-EX-2026-0001 stays at USD 7,000,000, change 0, because PD of 0.1784 is inside the 0.25 target and maximum liability does not bind. Expected loss is 899,136 before and after. Nothing owed on the line today. Given the adjudicator's caveats, the sensible step before anything tighter is to confirm the layoff report against a primary source rather than re-price off a headline.\n\nA move back to Healthy needs only 7.8 points, and the single quickest route is correction or removal of the layoffs item: with it gone the next-highest evidence yields 0.35 x 20.0 = 7.0, which is Healthy. Otherwise the item decays on a 365-day half-life, so time alone is slow. Purging LIVE01 from the evidence pool would also stop an acknowledged non-article from becoming load-bearing.",
+        "bottom_line": "Maintain the USD 7,000,000 export limit for Tamrin Exports \u2014 PD of 0.1784 is within the 0.25 appetite and the buyer is at 0 DPD. Note that the adjudicator agreed only with caveats: the entire 27.8 Watch score comes from one layoffs article whose full text is just its headline repeated, and the band collapses to Healthy if that item is corrected.",
+        "payment_note": "Payment behaviour is clean \u2014 0 DPD, nothing owed, no worst line recorded and no payment-review evidence on file \u2014 contributing 0.0 to the score, with no settlement trend visible in the data.",
+        "news_note": "The news window holds one severity 4 layoffs item from 20 November (base 80.0, decayed 79.55) that drives the whole score, set against five severity 0 positives including the first external 18A foundry customer win, a Microsoft Azure deal and improving server demand, plus a flagged hypothetical item in the pool.",
+        "lifts_it": [
+          "7.8 points moves it below 20.0 into Healthy",
+          "Correcting or removing the layoffs article GN-29a1a96091d0 \u2014 the next-highest item yields 0.35 x 20.0 = 7.0, i.e. Healthy",
+          "Purging the flagged hypothetical item LIVE01 (base 20.0) from the scored evidence pool"
+        ],
+        "worsens_it": [
+          "22.2 points reaches High Risk at 50.0",
+          "Payment slipping to 33 DPD would reach the next band on its own",
+          "A second, substantiated negative item while the layoffs severity 4 still stands (365-day half-life, so it decays slowly)"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

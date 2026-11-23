@@ -40,7 +40,10 @@ is at http://localhost:8000/live: file an overdue invoice the way a policyholder
 notifies one on the platform (buyer and policy, original due date, amount at risk), fetch the
 latest real news on the live-news book, or type a story nobody prepared - and the engine
 re-runs on it, with the adjudicator and the Case File agent re-reviewing the buyers it
-touched. [`docs/PRESENTATION.md`](docs/PRESENTATION.md) walks
+touched. With Claude connected that review takes a minute or two; each form's **Score
+only** button skips it - only the News or Payment agent runs, the score, band and limit
+move exactly as they would, and the touched buyer's review and case file come from the
+rules. [`docs/PRESENTATION.md`](docs/PRESENTATION.md) walks
 through it.
 
 ### Switching the agents on
@@ -170,7 +173,11 @@ watchlist.
 
 Fetching writes `data/sbi/news_articles.csv`; the engine reads that file, so runs stay
 reproducible and the agent cache still works. The live page's **Fetch latest news**
-button does the same and re-scores.
+button does the same and re-scores, then shows what the fetch changed: how many stories
+were found, dropped (publisher not on the list) and kept, which are new since the last
+fetch and what the News agent decided about each, and whose score moved. **Reset to the
+shipped dataset** puts the news back as it was when the dashboard started, so a rehearsal
+fetch does not use up the stories the real one should find.
 
 **Auto refresh** is an on/off switch next to that button. Off by default. While on, the
 dashboard fetches and re-scores every 15 minutes in the background, shows when the next

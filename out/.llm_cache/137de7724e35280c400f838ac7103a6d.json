@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS02",
+    "name": "The Boeing Company",
+    "severity": 2,
+    "category": "regulatory_scrutiny",
+    "reason": "A government watchdog audit of FAA oversight of Boeing signals heightened regulatory scrutiny of Boeing's safety practices, which is a notable but indirect negative for the company."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Boeing"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS02\", \"name\": \"The Boeing Company\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS02",
+        "severity": 2,
+        "category": "regulatory_scrutiny",
+        "reason": "A government watchdog audit of FAA oversight of Boeing signals heightened regulatory scrutiny of Boeing's safety practices, which is a notable but indirect negative for the company."
+      }
+    }
+  ],
+  "turns": 2
+}

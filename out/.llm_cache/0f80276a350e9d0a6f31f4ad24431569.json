@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN02",
+    "name": "Larsen & Toubro Limited",
+    "severity": 0,
+    "category": "earnings_growth",
+    "reason": "Article reports a 14% increase in Q1 net profit and 7% sales growth for Larsen & Toubro, which is positive/neutral news with no credit risk implications."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsen"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN02\", \"name\": \"Larsen & Toubro Limited\", \"sector\": \"Engineering & Construction\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN02",
+        "severity": 0,
+        "category": "earnings_growth",
+        "reason": "Article reports a 14% increase in Q1 net profit and 7% sales growth for Larsen & Toubro, which is positive/neutral news with no credit risk implications."
+      }
+    }
+  ],
+  "turns": 2
+}

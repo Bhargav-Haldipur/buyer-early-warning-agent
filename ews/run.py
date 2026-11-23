@@ -23,7 +23,8 @@ OUT_DIR = Path(__file__).resolve().parent.parent / "out" / "runs"
 def run(llm=None, cache: bool = True,
         extra_articles: list[dict] | None = None,
         extra_events: list[dict] | None = None,
-        commentary: bool | str = True) -> dict:
+        commentary: bool | str = True,
+        score_only: set[str] | frozenset[str] | None = None) -> dict:
     """commentary controls the two agents that only write prose about a verdict.
 
     True runs the adjudicator review and the agent-written case file for every buyer;
@@ -35,6 +36,11 @@ def run(llm=None, cache: bool = True,
     publish costs two Opus runs per touched buyer, not one per buyer in the book.
 
     The score is the D5 formula in code, so it is byte-identical in every mode.
+
+    score_only names live inputs (article or notification ids) to score without fresh
+    commentary: their evidence agent still runs and the score moves, but a buyer touched
+    only by them gets cached or rule-based commentary instead of two Opus runs - seconds
+    instead of minutes in front of a room. Leaving it out changes nothing.
     """
     loader = Loader(extra_articles=extra_articles, extra_events=extra_events)
     loader.validate()          # fail on an inconsistent dataset, not halfway through scoring
@@ -45,14 +51,23 @@ def run(llm=None, cache: bool = True,
     newsvals = news_agent.assess(loader, llm, store)
 
     live_ids = {a["article_id"] for a in (extra_articles or [])}
-    changed = {ev["CORE_LIMIT_REQUEST_DEBTOR"] for ev in loader.extra_events} | {
-        e.buyer_id for e in store.all() if e.buyer_id and e.source in live_ids}
+    quick = set(score_only or ())
+    changed = {ev["CORE_LIMIT_REQUEST_DEBTOR"] for ev in loader.extra_events
+               if ev.get("event_id") not in quick} | {
+        e.buyer_id for e in store.all() if e.buyer_id and e.source in live_ids - quick}
+    skipped = ({ev["CORE_LIMIT_REQUEST_DEBTOR"] for ev in loader.extra_events
+                if ev.get("event_id") in quick} | {
+        e.buyer_id for e in store.all() if e.buyer_id and e.source in live_ids & quick}
+    ) - changed
     replay = _CacheOnly(llm)
+    quick_replay = _CacheOnly(llm, "score only: the agents' commentary was skipped for speed")
 
     def prose_llm(bid: str):
         """Which model writes this buyer's commentary; None skips it."""
         if commentary == "changed":
-            return llm if bid in changed else replay
+            if bid in changed:
+                return llm
+            return quick_replay if bid in skipped else replay
         return llm if commentary else None
 
     buyers = loader.buyers_by_id()
@@ -119,6 +134,7 @@ def run(llm=None, cache: bool = True,
         "spend": llm.spend() if hasattr(llm, "spend") else None,
         "commentary": commentary,
         "commentary_fresh_for": sorted(changed) if commentary == "changed" else None,
+        "commentary_skipped_for": sorted(skipped) if commentary == "changed" else None,
         # what the live sandbox added on top of the shipped dataset, so a run is
         # reproducible from its own output
         "live_articles": [a["article_id"] for a in (extra_articles or [])],
@@ -140,8 +156,9 @@ class _CacheOnly:
     instead of quietly calling Opus for a buyer nobody changed.
     """
 
-    def __init__(self, inner):
+    def __init__(self, inner, reason: str = "not in the cache, and this buyer's inputs did not change"):
         self._inner = inner
+        self._reason = reason
         self.degraded = 0
 
     def __getattr__(self, name):
@@ -149,7 +166,7 @@ class _CacheOnly:
 
     def create(self, **_):
         from .agents.runtime import AgentError
-        raise AgentError("not in the cache, and this buyer's inputs did not change")
+        raise AgentError(self._reason)
 
 
 def _agent_stats(records: list[dict], store: EvidenceStore) -> dict:

@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 2,
+    "category": "stock_plunge",
+    "reason": "Intel Corporation's stock fell sharply (45% in October), reflecting market concerns about its foundry business, a notable negative signal though not a direct credit event."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 2,
+        "category": "stock_plunge",
+        "reason": "Intel Corporation's stock fell sharply (45% in October), reflecting market concerns about its foundry business, a notable negative signal though not a direct credit event."
+      }
+    }
+  ],
+  "turns": 2
+}

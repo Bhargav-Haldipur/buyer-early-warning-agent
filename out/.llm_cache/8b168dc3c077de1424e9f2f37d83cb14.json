@@ -1,0 +1,85 @@
+{
+  "result": {
+    "narrative": "Vodafone Idea is holding a Watch score of 25.5 (PD 0.1552) on the back of one open overdue item and a cluster of negative news. There is a single open overdue notification under policy TCI-SCF-2026-0001, now 18 days past due, and the payment agent rates the trend deteriorating: resolution times have lengthened across the last three notifications (5 days late, then 9, now 18 and still open) and notification frequency has ticked up from 1 to 2 within the 180-day window. On the news side, a severity-2 subscriber_decline item (7 days old) sits three days after a separate severity-2 profit_warning on a wider-than-expected Q2 loss, while an SBI-led group was reported in September to be providing $3.5 billion of debt and the buyer reaffirmed a $4.7 billion capex plan in August.\n\nThe band is driven by 0.65 x 18.0 (payment, 18 DPD) + 0.35 x 39.5 (news) = 25.5, so payment contributes 11.7 and news 13.8 \u2014 neither component carries the file alone, and news alone would not hold the band. The adjudicator agreed with caveats and the caveats matter. The payment input is the raw DPD of an item that is still open, so the deterioration described above carries no weight and the figure climbs mechanically each day the item is unresolved. The news input takes only the single highest-severity article, so the severity-2 Q2 loss item contributes nothing despite being a second, independent negative in the same week. Conversely, the $3.5 billion facility is scored severity 0 and is absent from the trace, so a genuine liquidity mitigant gives no offset. The adjudicator also flagged that the two payment records under the same evidence id do not reconcile: the overdue notification shows owed INR 40,000,000 with open_count 1, while the payment review describes the open overdue invoice as INR 9.0M and treats roughly 40M as total exposure against the INR 120M limit. Finally, the scored article's body is identical to its headline, so the severity-2 rating rests on a headline with no figure for the size of the subscriber drop.\n\nThe recommended action is MAINTAIN: the INR 120,000,000 limit is unchanged (revised limit 120,000,000, change 0) against owed of INR 40,000,000, on the basis that PD of 0.1552 is within the 0.25 appetite target and maximum liability does not bind. Expected loss is 13,409,280 before and after. There is one insurer on the file, Meridia Bank under TCI-SCF-2026-0001, a supply chain finance product. Given the adjudicator's view that 25.5 should be read as a floor rather than a settled figure, the sensible accompaniment to maintaining the limit is to diarise the open item for resolution and confirm with the insured whether the amount actually past due is INR 9.0M or INR 40,000,000 before any further sizing decision.\n\nWhat would lift the file is straightforward: clearing the open overdue would strip the payment component out, and the score sits only 5.5 points above the Healthy line at 20.0, which news alone cannot hold. Confirmation that the exposure past due is the smaller INR 9.0M figure, and evidence that the $3.5 billion SBI-led facility is funding into near-term payment capacity, would both support a more constructive reading. In the other direction, the file is 24.5 points from High Risk at 50.0, which the open item would reach at 43 DPD on the current news weighting \u2014 a plausible trajectory if the item stays unresolved on the 5-to-9-to-18 trend.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the INR 120,000,000 limit on PD of 0.1552 against a 0.25 appetite target, with the file on Watch at 25.5 on an 18 DPD open item plus negative news. The adjudicator agreed with caveats: 25.5 should be treated as a floor, since the deteriorating payment trend and a second severity-2 news item carry no weight, and the two payment records disagree on whether INR 9.0M or INR 40,000,000 is actually past due.",
+      "payment_note": "One open overdue notification under policy TCI-SCF-2026-0001 is 18 days past due, and the trend is rated deteriorating \u2014 resolution times have lengthened from 5 to 9 to 18+ days across the last three notifications, with frequency up from 1 to 2 in the 180-day window.",
+      "news_note": "Two severity-2 negatives landed within a week \u2014 a q-o-q mobile subscriber decline (7 days old, decayed 39.47, the only one scored) and a wider-than-expected Q2 loss that knocked the shares 3.5% \u2014 against an unscored September report of an SBI-led $3.5 billion debt facility.",
+      "lifts_it": [
+        "Clearing the open 18 DPD item under TCI-SCF-2026-0001 \u2014 only 5.5 points sit between the score and the Healthy line at 20.0, and news alone does not hold the band",
+        "Confirmation that the amount actually past due is INR 9.0M rather than INR 40,000,000",
+        "Evidence the SBI-led $3.5 billion facility is supporting near-term payment capacity (currently scored 0 and absent from the trace)"
+      ],
+      "worsens_it": [
+        "The open item reaching 43 DPD, which takes the score to the High Risk line at 50.0 \u2014 24.5 points away",
+        "Any further overdue notification, given frequency has already risen from 1 to 2 in the 180-day window",
+        "A third severity-2 or higher news item extending the current one-week cluster of operational and financial negatives"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN03\", \"score\": 25.5, \"band\": \"Watch\", \"pd\": 0.1552, \"payment\": {\"dpd\": 18, \"raw\": 18.0, \"weighted\": 11.7, \"worst_line\": \"TCI-SCF-2026-0001\"}, \"news\": {\"severity\": 2, \"category\": \"subscriber_decline\", \"article_id\": \"GN-75cb48dc2523\", \"age_days\": 7, \"headline\": \"Why Vodafone Idea\\u2019s q-o-q drop in mobile subscriber base is a worrying sign\", \"via_parent\": false, \"parent_name\": null,"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN03-1\", \"buyer_id\": \"IN03\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-SCF-2026-0001\", \"insured_name\": \"Meridia Bank\", \"product_type\": \"SUPPLY_CHAIN_FINANCE\", \"currency\": \"INR\", \"current_limit\": 120000000, \"owed\": 40000000, \"revised_limit\": 120000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\""
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 24.5, \"dpd_for_next_band\": 43, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 5.5, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261106-00006\", \"kind\": \"payment\", \"date\": \"2026-11-05\", \"detail\": \"1 open overdue notification(s) under policy TCI-SCF-2026-0001; the oldest is 18 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"dpd\": 18, \"owed\": 40000000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261106-00006\", \"kind\": \"payment_review\", \"date\": \"2026-11-05\", \"detail\": \"Vodafone I"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-75cb48dc2523"
+      },
+      "result": "{\"article_id\": \"GN-75cb48dc2523\", \"published_date\": \"2026-11-16\", \"publication\": \"Livemint\", \"headline\": \"Why Vodafone Idea\\u2019s q-o-q drop in mobile subscriber base is a worrying sign\", \"body\": \"Why Vodafone Idea\\u2019s q-o-q drop in mobile subscriber base is a worrying sign\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-1caacc272320"
+      },
+      "result": "{\"article_id\": \"GN-1caacc272320\", \"published_date\": \"2026-11-13\", \"publication\": \"Business Standard\", \"headline\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\", \"body\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-9e2f89ddab6f"
+      },
+      "result": "{\"article_id\": \"GN-9e2f89ddab6f\", \"published_date\": \"2026-09-10\", \"publication\": \"Bloomberg.com\", \"headline\": \"SBI-Led Group Said to Provide $3.5 Billion Debt to Vodafone Idea\", \"body\": \"SBI-Led Group Said to Provide $3.5 Billion Debt to Vodafone Idea\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Vodafone Idea is holding a Watch score of 25.5 (PD 0.1552) on the back of one open overdue item and a cluster of negative news. There is a single open overdue notification under policy TCI-SCF-2026-0001, now 18 days past due, and the payment agent rates the trend deteriorating: resolution times have lengthened across the last three notifications (5 days late, then 9, now 18 and still open) and notification frequency has ticked up from 1 to 2 within the 180-day window. On the news side, a severity-2 subscriber_decline item (7 days old) sits three days after a separate severity-2 profit_warning on a wider-than-expected Q2 loss, while an SBI-led group was reported in September to be providing $3.5 billion of debt and the buyer reaffirmed a $4.7 billion capex plan in August.\n\nThe band is driven by 0.65 x 18.0 (payment, 18 DPD) + 0.35 x 39.5 (news) = 25.5, so payment contributes 11.7 and news 13.8 \u2014 neither component carries the file alone, and news alone would not hold the band. The adjudicator agreed with caveats and the caveats matter. The payment input is the raw DPD of an item that is still open, so the deterioration described above carries no weight and the figure climbs mechanically each day the item is unresolved. The news input takes only the single highest-severity article, so the severity-2 Q2 loss item contributes nothing despite being a second, independent negative in the same week. Conversely, the $3.5 billion facility is scored severity 0 and is absent from the trace, so a genuine liquidity mitigant gives no offset. The adjudicator also flagged that the two payment records under the same evidence id do not reconcile: the overdue notification shows owed INR 40,000,000 with open_count 1, while the payment review describes the open overdue invoice as INR 9.0M and treats roughly 40M as total exposure against the INR 120M limit. Finally, the scored article's body is identical to its headline, so the severity-2 rating rests on a headline with no figure for the size of the subscriber drop.\n\nThe recommended action is MAINTAIN: the INR 120,000,000 limit is unchanged (revised limit 120,000,000, change 0) against owed of INR 40,000,000, on the basis that PD of 0.1552 is within the 0.25 appetite target and maximum liability does not bind. Expected loss is 13,409,280 before and after. There is one insurer on the file, Meridia Bank under TCI-SCF-2026-0001, a supply chain finance product. Given the adjudicator's view that 25.5 should be read as a floor rather than a settled figure, the sensible accompaniment to maintaining the limit is to diarise the open item for resolution and confirm with the insured whether the amount actually past due is INR 9.0M or INR 40,000,000 before any further sizing decision.\n\nWhat would lift the file is straightforward: clearing the open overdue would strip the payment component out, and the score sits only 5.5 points above the Healthy line at 20.0, which news alone cannot hold. Confirmation that the exposure past due is the smaller INR 9.0M figure, and evidence that the $3.5 billion SBI-led facility is funding into near-term payment capacity, would both support a more constructive reading. In the other direction, the file is 24.5 points from High Risk at 50.0, which the open item would reach at 43 DPD on the current news weighting \u2014 a plausible trajectory if the item stays unresolved on the 5-to-9-to-18 trend.",
+        "bottom_line": "Maintain the INR 120,000,000 limit on PD of 0.1552 against a 0.25 appetite target, with the file on Watch at 25.5 on an 18 DPD open item plus negative news. The adjudicator agreed with caveats: 25.5 should be treated as a floor, since the deteriorating payment trend and a second severity-2 news item carry no weight, and the two payment records disagree on whether INR 9.0M or INR 40,000,000 is actually past due.",
+        "payment_note": "One open overdue notification under policy TCI-SCF-2026-0001 is 18 days past due, and the trend is rated deteriorating \u2014 resolution times have lengthened from 5 to 9 to 18+ days across the last three notifications, with frequency up from 1 to 2 in the 180-day window.",
+        "news_note": "Two severity-2 negatives landed within a week \u2014 a q-o-q mobile subscriber decline (7 days old, decayed 39.47, the only one scored) and a wider-than-expected Q2 loss that knocked the shares 3.5% \u2014 against an unscored September report of an SBI-led $3.5 billion debt facility.",
+        "lifts_it": [
+          "Clearing the open 18 DPD item under TCI-SCF-2026-0001 \u2014 only 5.5 points sit between the score and the Healthy line at 20.0, and news alone does not hold the band",
+          "Confirmation that the amount actually past due is INR 9.0M rather than INR 40,000,000",
+          "Evidence the SBI-led $3.5 billion facility is supporting near-term payment capacity (currently scored 0 and absent from the trace)"
+        ],
+        "worsens_it": [
+          "The open item reaching 43 DPD, which takes the score to the High Risk line at 50.0 \u2014 24.5 points away",
+          "Any further overdue notification, given frequency has already risen from 1 to 2 in the 180-day window",
+          "A third severity-2 or higher news item extending the current one-week cluster of operational and financial negatives"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

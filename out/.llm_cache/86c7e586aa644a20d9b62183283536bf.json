@@ -1,0 +1,71 @@
+{
+  "result": {
+    "narrative": "Brightwell Home Retail Inc. scores 23.1, placing it in the Watch band with a probability of default of 0.131. There is one open overdue notification under policy TCI-EX-2026-0001, 15 days past due, against $700,000 of total exposure on a $2.5M limit (28% utilization). Alongside that, a 25-day-old article reports the buyer closing 14 Midwest stores by January after same-store sales fell for a third straight quarter \u2014 a genuine contraction signal, correctly attributed to the buyer directly rather than via a parent.\n\nThe band is news-led rather than payment-led. The trace is 0.65 x 15.0 (payment, 15 DPD) + 0.35 x 38.1 (news) = 23.1, and the news component contributes weighted 13.4 against payment's weighted 9.8. The adjudicator agreed with caveats on exactly this point: the dominant driver is a single one-sentence article from one publication with no corroborating coverage in the evidence set, and the payment picture behind it is thin \u2014 only two notifications on record, all under one insurer, with the payment agent's own trend call recorded as insufficient_history. The adjudicator also flagged that the news input has already decayed from base 40.0 to 38.15 at 25 days, so the current designation reflects news recency as much as buyer condition, and noted that news alone does not hold the band.\n\nThe recommendation is to MAINTAIN the TCI limit at $2,500,000, no change, on the grounds that probability of default (0.131) is within the appetite target of 0.25; expected loss is unchanged at $235,800. Before signing off, the adjudicator asks that one figure be reconciled: the same evidence id records owed as $700,000 while the payment review describes the open item as a $180,000 invoice with $700,000 as total exposure. This does not affect the score, which is driven by DPD rather than amount, but it changes the size of the actual delinquency and should be settled before any limit decision.\n\nWhat would lift this buyer back to Healthy is modest: the score sits 3.1 points above the Healthy line at 20.0, and with no change in buyer behaviour continued news decay alone moves it that way over time. Clearing the open 15-day overdue, or corroborating (or discounting) the store-closure report with a second source, would both help. On the downside, High Risk is a long way off at 50.0 \u2014 26.9 points away, equivalent to roughly 44 DPD \u2014 so the realistic watch items are the next notification arriving later than 15 days or further contraction news.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the TCI limit at $2,500,000 (no change) \u2014 PD of 0.131 is within the 0.25 appetite target despite the Watch score of 23.1. The adjudicator agreed with caveats: the band is driven by a single thinly-sourced news article rather than payment behaviour, and a conflict between the $700,000 and $180,000 overdue figures should be reconciled before the decision is finalised.",
+      "payment_note": "One open overdue at 15 days past due under policy TCI-EX-2026-0001, on $700,000 exposure against a $2.5M limit (28% utilization); the only prior item resolved 8 days late in May 2026, so days late moved from 8 to 15, but with just two data points the recorded trend is insufficient_history.",
+      "news_note": "One matched item, severity 2 (store_closures), 25 days old: Brightwell is closing 14 Midwest stores by January after a third straight quarter of falling same-store sales \u2014 credible and correctly attributed, but a single one-sentence article from one publication with no corroboration.",
+      "lifts_it": [
+        "Clearing the open 15 DPD overdue under TCI-EX-2026-0001",
+        "Score is 3.1 points above the Healthy line at 20.0; continued news decay from 38.15 moves it that way with no behaviour change",
+        "Reconciling the $700,000 vs $180,000 overdue figure downward, and no second source confirming the store closures"
+      ],
+      "worsens_it": [
+        "Next notification arriving later than 15 DPD \u2014 High Risk at 50.0 needs about 44 DPD",
+        "Further contraction or distress news adding to the severity 2 store_closures item",
+        "Additional overdues or exposure beyond the current $700,000, especially from a second insurer"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS04\", \"score\": 23.1, \"band\": \"Watch\", \"pd\": 0.131, \"payment\": {\"dpd\": 15, \"raw\": 15.0, \"weighted\": 9.8, \"worst_line\": \"TCI-EX-2026-0001\"}, \"news\": {\"severity\": 2, \"category\": \"store_closures\", \"article_id\": \"ILL-002\", \"age_days\": 25, \"headline\": \"Brightwell Home Retail scales back, closing 14 stores across the Midwest\", \"via_parent\": false, \"parent_name\": null, \"raw\": 38.1, \"weighte"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS04-1\", \"buyer_id\": \"OS04\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 2500000, \"owed\": 700000, \"revised_limit\": 2500000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.131, \"pd_target"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 26.9, \"dpd_for_next_band\": 44, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 3.1, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261109-00027\", \"kind\": \"payment\", \"date\": \"2026-11-08\", \"detail\": \"1 open overdue notification(s) under policy TCI-EX-2026-0001; the oldest is 15 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"dpd\": 15, \"owed\": 700000.0, \"currency\": \"USD\", \"open_count\": 1}}, {\"id\": \"N-261109-00027\", \"kind\": \"payment_review\", \"date\": \"2026-11-08\", \"detail\": \"Brightwell Hom"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "ILL-002"
+      },
+      "result": "{\"article_id\": \"ILL-002\", \"published_date\": \"2026-10-29\", \"publication\": \"Illustrative\", \"headline\": \"Brightwell Home Retail scales back, closing 14 stores across the Midwest\", \"body\": \"Brightwell Home Retail Inc. said it is scaling back its store network, closing 14 locations by January as same-store sales fell for a third straight quarter.\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Brightwell Home Retail Inc. scores 23.1, placing it in the Watch band with a probability of default of 0.131. There is one open overdue notification under policy TCI-EX-2026-0001, 15 days past due, against $700,000 of total exposure on a $2.5M limit (28% utilization). Alongside that, a 25-day-old article reports the buyer closing 14 Midwest stores by January after same-store sales fell for a third straight quarter \u2014 a genuine contraction signal, correctly attributed to the buyer directly rather than via a parent.\n\nThe band is news-led rather than payment-led. The trace is 0.65 x 15.0 (payment, 15 DPD) + 0.35 x 38.1 (news) = 23.1, and the news component contributes weighted 13.4 against payment's weighted 9.8. The adjudicator agreed with caveats on exactly this point: the dominant driver is a single one-sentence article from one publication with no corroborating coverage in the evidence set, and the payment picture behind it is thin \u2014 only two notifications on record, all under one insurer, with the payment agent's own trend call recorded as insufficient_history. The adjudicator also flagged that the news input has already decayed from base 40.0 to 38.15 at 25 days, so the current designation reflects news recency as much as buyer condition, and noted that news alone does not hold the band.\n\nThe recommendation is to MAINTAIN the TCI limit at $2,500,000, no change, on the grounds that probability of default (0.131) is within the appetite target of 0.25; expected loss is unchanged at $235,800. Before signing off, the adjudicator asks that one figure be reconciled: the same evidence id records owed as $700,000 while the payment review describes the open item as a $180,000 invoice with $700,000 as total exposure. This does not affect the score, which is driven by DPD rather than amount, but it changes the size of the actual delinquency and should be settled before any limit decision.\n\nWhat would lift this buyer back to Healthy is modest: the score sits 3.1 points above the Healthy line at 20.0, and with no change in buyer behaviour continued news decay alone moves it that way over time. Clearing the open 15-day overdue, or corroborating (or discounting) the store-closure report with a second source, would both help. On the downside, High Risk is a long way off at 50.0 \u2014 26.9 points away, equivalent to roughly 44 DPD \u2014 so the realistic watch items are the next notification arriving later than 15 days or further contraction news.",
+        "bottom_line": "Maintain the TCI limit at $2,500,000 (no change) \u2014 PD of 0.131 is within the 0.25 appetite target despite the Watch score of 23.1. The adjudicator agreed with caveats: the band is driven by a single thinly-sourced news article rather than payment behaviour, and a conflict between the $700,000 and $180,000 overdue figures should be reconciled before the decision is finalised.",
+        "payment_note": "One open overdue at 15 days past due under policy TCI-EX-2026-0001, on $700,000 exposure against a $2.5M limit (28% utilization); the only prior item resolved 8 days late in May 2026, so days late moved from 8 to 15, but with just two data points the recorded trend is insufficient_history.",
+        "news_note": "One matched item, severity 2 (store_closures), 25 days old: Brightwell is closing 14 Midwest stores by January after a third straight quarter of falling same-store sales \u2014 credible and correctly attributed, but a single one-sentence article from one publication with no corroboration.",
+        "lifts_it": [
+          "Clearing the open 15 DPD overdue under TCI-EX-2026-0001",
+          "Score is 3.1 points above the Healthy line at 20.0; continued news decay from 38.15 moves it that way with no behaviour change",
+          "Reconciling the $700,000 vs $180,000 overdue figure downward, and no second source confirming the store closures"
+        ],
+        "worsens_it": [
+          "Next notification arriving later than 15 DPD \u2014 High Risk at 50.0 needs about 44 DPD",
+          "Further contraction or distress news adding to the severity 2 store_closures item",
+          "Additional overdues or exposure beyond the current $700,000, especially from a second insurer"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS02",
+    "name": "The Boeing Company",
+    "severity": 0,
+    "category": "neutral",
+    "reason": "Article describes American Airlines' premium cabin redesign on Boeing aircraft, a neutral/positive business update with no negative implications for Boeing's creditworthiness."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Boeing"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS02\", \"name\": \"The Boeing Company\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS02",
+        "severity": 0,
+        "category": "neutral",
+        "reason": "Article describes American Airlines' premium cabin redesign on Boeing aircraft, a neutral/positive business update with no negative implications for Boeing's creditworthiness."
+      }
+    }
+  ],
+  "turns": 2
+}

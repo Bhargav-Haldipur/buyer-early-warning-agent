@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN01",
+    "name": "Tata Motors Limited",
+    "severity": 2,
+    "category": "guidance_cut",
+    "reason": "Tata Motors reported a Q2 loss and revised JLR guidance downward, prompting multiple analyst price target cuts and an 8% share price drop, indicating a notable earnings/outlook deterioration."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Tata Motors"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN01\", \"name\": \"Tata Motors Limited\", \"sector\": \"Automotive\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN01",
+        "severity": 2,
+        "category": "guidance_cut",
+        "reason": "Tata Motors reported a Q2 loss and revised JLR guidance downward, prompting multiple analyst price target cuts and an 8% share price drop, indicating a notable earnings/outlook deterioration."
+      }
+    }
+  ],
+  "turns": 2
+}

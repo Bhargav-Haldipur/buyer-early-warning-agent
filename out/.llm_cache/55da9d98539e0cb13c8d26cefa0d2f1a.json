@@ -1,0 +1,85 @@
+{
+  "result": {
+    "narrative": "Intel is paying on time. The payment component is 0 DPD and contributes 0.0 of the score, and there is no overdue balance against the policy (owed 0). The news flow over the last few days is mixed but weighted to the positive: a first external customer for the advanced 18A foundry process (reported 19-20 November across CNBC, Yahoo Finance and Barron's), a Microsoft Azure deal, and commentary on improving server demand. The one negative item is a report of another round of layoffs. Recent SEC filings on file are routine 8-Ks with no adverse content.\n\nThe Watch band rests entirely on that single layoffs item. The trace is 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 79.5 (news) = 27.8, so GN-29a1a96091d0 produces 100% of the score. The adjudicator challenged this: the retrievable body of that article is nothing but its own headline, yet it carries a base severity of 80 (decayed 79.55) with no stated layoff count, charge or financial impact to corroborate it, and under max-severity logic the six contemporaneous positive items all score 0 and cannot offset it. Strip that one article out and the remaining eleven items are all severity 0, giving a score of 0.0 and a Healthy band. The adjudicator did not dispute the arithmetic, only that a one-band move for a zero-DPD buyer should not rest on one unverified headline.\n\nThe recommendation is to MAINTAIN the export limit for Tamrin Exports at USD 7,000,000, unchanged, with expected loss flat at 899,136. PD of 0.1784 is inside the 0.25 appetite target and maximum liability does not bind. Given the adjudicator's challenge, the sensible reading is that the Watch label should drive verification rather than exposure action: confirm the underlying layoff announcement \u2014 scale, cost and any associated charge \u2014 before treating the band as a credit signal, and confirm that 0 DPD reflects genuine on-time settlement rather than thin trade data, since no payment or payment-review evidence is on file at all.\n\nA move to Healthy needs 7.8 points, which the formula will not deliver on its own \u2014 the news half-life is 365 days and news alone holds the band, so the practical route down is a re-rating or removal of GN-29a1a96091d0 once the layoff report is verified as immaterial. In the other direction there is considerable headroom: High Risk begins at 50.0, 22.2 points away, and would need roughly 33 days past due on the payment side. Continued positive operational news will not help, as those items score 0 and cannot offset the negative.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the export limit at USD 7,000,000 for Tamrin Exports \u2014 PD of 0.1784 is within the 0.25 appetite and the buyer is at 0 DPD. Note that the adjudicator challenged the Watch band: all 27.8 points come from a single layoffs article whose body is just its headline, and without it the score is 0.0 (Healthy).",
+      "payment_note": "The payment record is clean at 0 DPD with nothing owed, contributing 0.0 to the score, though no payment or payment-review evidence is on file, so the adjudicator flagged that it is unclear whether this reflects genuine on-time settlement or simply absent trade data.",
+      "news_note": "One negative item drives the whole score \u2014 a severity 4 layoffs report (base 80.0, decayed 79.55, age 3 days) whose article body contains no text beyond the headline \u2014 against six contemporaneous positives on the first external 18A foundry customer, a Microsoft Azure deal and improving server demand, all scored 0 and unable to offset it.",
+      "lifts_it": [
+        "Verification that the layoffs report is immaterial, prompting a re-rating of GN-29a1a96091d0 \u2014 the only realistic route to the 7.8 points needed for Healthy below 20.0",
+        "Payment or payment-review evidence confirming the 0 DPD record reflects real on-time trade",
+        "Decay of the news item, though at a 365-day half-life this is slow and news alone currently holds the band"
+      ],
+      "worsens_it": [
+        "Arrears reaching around 33 days past due, which would take the score to the High Risk floor of 50.0",
+        "Corroboration of the layoffs with a stated scale, charge or financial impact",
+        "A further severity-rated negative item, 22.2 points being the gap to High Risk"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS01\", \"score\": 27.8, \"band\": \"Watch\", \"pd\": 0.1784, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 4, \"category\": \"layoffs\", \"article_id\": \"GN-29a1a96091d0\", \"age_days\": 3, \"headline\": \"How to Play INTC Stock as Intel Launches Another Round of Layoffs\", \"via_parent\": false, \"parent_name\": null, \"raw\": 79.5, \"weighted\": 27.8}, \"trace\": \"0"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS01-1\", \"buyer_id\": \"OS01\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 7000000, \"owed\": 0, \"revised_limit\": 7000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1784, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 22.2, \"dpd_for_next_band\": 33, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 7.8, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"GN-b97c444dd8fd\", \"kind\": \"news\", \"date\": \"2026-11-22\", \"detail\": \"severity 0 (new_customer_win): Intel Says It Just Signed Its First Customer for Its Most Advanced Chipmaking Process. The Stock Is Still More Than 60% Below Its June Record.\", \"data\": {\"severity\": 0, \"category\": \"new_customer_win\", \"age_days\": 1, \"base\": 0.0, \"decayed\": 0.0, \"entity\": \"Intel Corporation\", \"via_parent\": fal"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-29a1a96091d0"
+      },
+      "result": "{\"article_id\": \"GN-29a1a96091d0\", \"published_date\": \"2026-11-20\", \"publication\": \"Yahoo Finance\", \"headline\": \"How to Play INTC Stock as Intel Launches Another Round of Layoffs\", \"body\": \"How to Play INTC Stock as Intel Launches Another Round of Layoffs\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-2164913418be"
+      },
+      "result": "{\"article_id\": \"GN-2164913418be\", \"published_date\": \"2026-11-20\", \"publication\": \"Yahoo Finance\", \"headline\": \"Intel Secures First External Customer For Advanced 18A Chips, Marking Major Foundry Breakthrough\", \"body\": \"Intel Secures First External Customer For Advanced 18A Chips, Marking Major Foundry Breakthrough\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-37195ba05478"
+      },
+      "result": "{\"article_id\": \"GN-37195ba05478\", \"published_date\": \"2026-11-20\", \"publication\": \"Yahoo Finance\", \"headline\": \"Did Microsoft Azure Deal Just Shift Intel's (INTC) Investment Narrative?\", \"body\": \"Did Microsoft Azure Deal Just Shift Intel's (INTC) Investment Narrative?\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Intel is paying on time. The payment component is 0 DPD and contributes 0.0 of the score, and there is no overdue balance against the policy (owed 0). The news flow over the last few days is mixed but weighted to the positive: a first external customer for the advanced 18A foundry process (reported 19-20 November across CNBC, Yahoo Finance and Barron's), a Microsoft Azure deal, and commentary on improving server demand. The one negative item is a report of another round of layoffs. Recent SEC filings on file are routine 8-Ks with no adverse content.\n\nThe Watch band rests entirely on that single layoffs item. The trace is 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 79.5 (news) = 27.8, so GN-29a1a96091d0 produces 100% of the score. The adjudicator challenged this: the retrievable body of that article is nothing but its own headline, yet it carries a base severity of 80 (decayed 79.55) with no stated layoff count, charge or financial impact to corroborate it, and under max-severity logic the six contemporaneous positive items all score 0 and cannot offset it. Strip that one article out and the remaining eleven items are all severity 0, giving a score of 0.0 and a Healthy band. The adjudicator did not dispute the arithmetic, only that a one-band move for a zero-DPD buyer should not rest on one unverified headline.\n\nThe recommendation is to MAINTAIN the export limit for Tamrin Exports at USD 7,000,000, unchanged, with expected loss flat at 899,136. PD of 0.1784 is inside the 0.25 appetite target and maximum liability does not bind. Given the adjudicator's challenge, the sensible reading is that the Watch label should drive verification rather than exposure action: confirm the underlying layoff announcement \u2014 scale, cost and any associated charge \u2014 before treating the band as a credit signal, and confirm that 0 DPD reflects genuine on-time settlement rather than thin trade data, since no payment or payment-review evidence is on file at all.\n\nA move to Healthy needs 7.8 points, which the formula will not deliver on its own \u2014 the news half-life is 365 days and news alone holds the band, so the practical route down is a re-rating or removal of GN-29a1a96091d0 once the layoff report is verified as immaterial. In the other direction there is considerable headroom: High Risk begins at 50.0, 22.2 points away, and would need roughly 33 days past due on the payment side. Continued positive operational news will not help, as those items score 0 and cannot offset the negative.",
+        "bottom_line": "Maintain the export limit at USD 7,000,000 for Tamrin Exports \u2014 PD of 0.1784 is within the 0.25 appetite and the buyer is at 0 DPD. Note that the adjudicator challenged the Watch band: all 27.8 points come from a single layoffs article whose body is just its headline, and without it the score is 0.0 (Healthy).",
+        "payment_note": "The payment record is clean at 0 DPD with nothing owed, contributing 0.0 to the score, though no payment or payment-review evidence is on file, so the adjudicator flagged that it is unclear whether this reflects genuine on-time settlement or simply absent trade data.",
+        "news_note": "One negative item drives the whole score \u2014 a severity 4 layoffs report (base 80.0, decayed 79.55, age 3 days) whose article body contains no text beyond the headline \u2014 against six contemporaneous positives on the first external 18A foundry customer, a Microsoft Azure deal and improving server demand, all scored 0 and unable to offset it.",
+        "lifts_it": [
+          "Verification that the layoffs report is immaterial, prompting a re-rating of GN-29a1a96091d0 \u2014 the only realistic route to the 7.8 points needed for Healthy below 20.0",
+          "Payment or payment-review evidence confirming the 0 DPD record reflects real on-time trade",
+          "Decay of the news item, though at a 365-day half-life this is slow and news alone currently holds the band"
+        ],
+        "worsens_it": [
+          "Arrears reaching around 33 days past due, which would take the score to the High Risk floor of 50.0",
+          "Corroboration of the layoffs with a stated scale, charge or financial impact",
+          "A further severity-rated negative item, 22.2 points being the gap to High Risk"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

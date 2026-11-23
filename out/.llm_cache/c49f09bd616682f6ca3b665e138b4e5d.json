@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN02",
+    "name": "Larsen & Toubro Limited",
+    "severity": 0,
+    "category": "new_order",
+    "reason": "Article reports L&T winning a large $1.57 billion AI data centre order, which is positive business news and not a credit risk indicator."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsen"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN02\", \"name\": \"Larsen & Toubro Limited\", \"sector\": \"Engineering & Construction\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN02",
+        "severity": 0,
+        "category": "new_order",
+        "reason": "Article reports L&T winning a large $1.57 billion AI data centre order, which is positive business news and not a credit risk indicator."
+      }
+    }
+  ],
+  "turns": 2
+}

@@ -1,0 +1,78 @@
+{
+  "result": {
+    "narrative": "Intel Corporation shows no payment distress on our books: the record is 0 DPD, raw payment score 0.0, with no worst line recorded. The pressure is entirely external and entirely market-facing. Twelve negative news items cluster between 2026-10-29 and 2026-11-16, covering a 29% single-day stock plunge (worst day since 1974), a 45% fall across October, a guidance cut blamed on a PC slowdown, AI-driven headwinds to parts of the business, and \u2014 most relevant to credit \u2014 chip supply constraints and big cash burn reported on 2026-10-30. The most recent item, dated 2026-11-16, is a shareholder lawsuit following the stock plunge.\n\nThe score is 20.7, in the Watch band, built as 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 59.2 (news). The entire score comes from that one shareholder-lawsuit article (GN-92904b4dcaa6, severity 3, base 60.0, decayed 59.21, 7 days old), and it clears the Watch floor of 20.0 by 0.7 points. The adjudicator agreed with the band but added caveats: the news agent's own reason calls the suit \"not directly a payment or liquidity issue\" \u2014 it is an equity-holder claim, not a trade-creditor one \u2014 and the article body is identical to the headline, with no detail on the suit's claims, scale or stage. The same headline-only limitation applies to the other articles checked. The more credit-relevant items (cash burn, severity 2, decayed 38.22; guidance cut, severity 2, decayed 38.15) score nothing because only the maximum article counts. The adjudicator also notes the 0.65 payment weight reflects absent records rather than verified good behaviour: queries for payment and payment_review evidence both returned none.\n\nThe recommendation is MAINTAIN. The single export limit, LIM-OS01-1 for Tamrin Exports under policy TCI-EX-2026-0001, stays at USD 7,000,000 with no change, owed 0. PD is 0.1072 against a target of 0.25, so the exposure is within appetite and the maximum liability does not bind. Expected loss is 540,288 before and after. Before acting, confirm live exposure and payment history for this buyer, as the adjudicator requests \u2014 the payment leg carrying 0.65 weight cannot currently distinguish a reliable payer from one with no trade history or no drawn exposure.\n\nA move back to Healthy needs only 0.7 points. News alone holds the band, so natural decay on the lawsuit item will do it in time (news half-life 365 days), and a severity grade one step lower on GN-92904b4dcaa6 would take the buyer out of Watch immediately. Substantiating detail on the suit, or its dismissal, would be the cleanest route; so would evidence that the cash burn and supply constraints flagged on 2026-10-30 have eased.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the USD 7,000,000 export limit on Intel Corporation \u2014 PD of 0.1072 is well within the 0.25 target and the payment record is 0 DPD. The adjudicator agreed with the Watch band but with caveats: all 20.7 points come from a single shareholder-lawsuit headline that clears the band floor by 0.7 points, and the 0.65 payment weight reflects absent records rather than a verified payment history.",
+      "payment_note": "The payment record is clean at 0 DPD with raw score 0.0 and no worst line, but the adjudicator flags that no payment or payment_review evidence exists for this buyer, so the zero reflects absence of data rather than demonstrated good payment behaviour.",
+      "news_note": "Twelve negative items cluster between 2026-10-29 and 2026-11-16 \u2014 stock plunges of 29% and 45%, a guidance cut on PC slowdown, and chip supply constraints with big cash burn \u2014 but the band is set solely by the most recent, a severity 3 shareholder lawsuit (GN-92904b4dcaa6, decayed 59.21, 7 days old) whose article body is identical to its headline.",
+      "lifts_it": [
+        "0.7 points of decay or regrade takes the score below 20.0 and back to Healthy</n>",
+        "A severity grade one step lower on GN-92904b4dcaa6, or dismissal of the suit, would move the buyer out of Watch",
+        "Confirmation that the cash burn and chip supply constraints reported 2026-10-30 have eased"
+      ],
+      "worsens_it": [
+        "Payment slippage reaching 38 DPD would lift the score to the High Risk band at 50.0",
+        "A new item graded above severity 3, since the news leg alone currently holds the band",
+        "Any first sign of arrears, given 29.3 points of headroom rests on an unverified 0 DPD record"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS01\", \"score\": 20.7, \"band\": \"Watch\", \"pd\": 0.1072, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 3, \"category\": \"shareholder_lawsuit\", \"article_id\": \"GN-92904b4dcaa6\", \"age_days\": 7, \"headline\": \"Intel sued by shareholders following 29% stock plunge\", \"via_parent\": false, \"parent_name\": null, \"raw\": 59.2, \"weighted\": 20.7}, \"trace\": \"0"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS01-1\", \"buyer_id\": \"OS01\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 7000000, \"owed\": 0, \"revised_limit\": 7000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1072, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 29.3, \"dpd_for_next_band\": 38, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 0.7, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"GN-92904b4dcaa6\", \"kind\": \"news\", \"date\": \"2026-11-16\", \"detail\": \"severity 3 (shareholder_lawsuit): Intel sued by shareholders following 29% stock plunge\", \"data\": {\"severity\": 3, \"category\": \"shareholder_lawsuit\", \"age_days\": 7, \"base\": 60.0, \"decayed\": 59.21, \"entity\": \"Intel Corporation\", \"via_parent\": false, \"publication\": \"Reuters\", \"headline\": \"Intel sued by shareholders following "
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-92904b4dcaa6"
+      },
+      "result": "{\"article_id\": \"GN-92904b4dcaa6\", \"published_date\": \"2026-11-16\", \"publication\": \"Reuters\", \"headline\": \"Intel sued by shareholders following 29% stock plunge\", \"body\": \"Intel sued by shareholders following 29% stock plunge\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-1ef3aa1f6987"
+      },
+      "result": "{\"article_id\": \"GN-1ef3aa1f6987\", \"published_date\": \"2026-10-30\", \"publication\": \"Reuters\", \"headline\": \"Intel shares tumble after hours, hit by chip supply constraints, big cash burn\", \"body\": \"Intel shares tumble after hours, hit by chip supply constraints, big cash burn\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Intel Corporation shows no payment distress on our books: the record is 0 DPD, raw payment score 0.0, with no worst line recorded. The pressure is entirely external and entirely market-facing. Twelve negative news items cluster between 2026-10-29 and 2026-11-16, covering a 29% single-day stock plunge (worst day since 1974), a 45% fall across October, a guidance cut blamed on a PC slowdown, AI-driven headwinds to parts of the business, and \u2014 most relevant to credit \u2014 chip supply constraints and big cash burn reported on 2026-10-30. The most recent item, dated 2026-11-16, is a shareholder lawsuit following the stock plunge.\n\nThe score is 20.7, in the Watch band, built as 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 59.2 (news). The entire score comes from that one shareholder-lawsuit article (GN-92904b4dcaa6, severity 3, base 60.0, decayed 59.21, 7 days old), and it clears the Watch floor of 20.0 by 0.7 points. The adjudicator agreed with the band but added caveats: the news agent's own reason calls the suit \"not directly a payment or liquidity issue\" \u2014 it is an equity-holder claim, not a trade-creditor one \u2014 and the article body is identical to the headline, with no detail on the suit's claims, scale or stage. The same headline-only limitation applies to the other articles checked. The more credit-relevant items (cash burn, severity 2, decayed 38.22; guidance cut, severity 2, decayed 38.15) score nothing because only the maximum article counts. The adjudicator also notes the 0.65 payment weight reflects absent records rather than verified good behaviour: queries for payment and payment_review evidence both returned none.\n\nThe recommendation is MAINTAIN. The single export limit, LIM-OS01-1 for Tamrin Exports under policy TCI-EX-2026-0001, stays at USD 7,000,000 with no change, owed 0. PD is 0.1072 against a target of 0.25, so the exposure is within appetite and the maximum liability does not bind. Expected loss is 540,288 before and after. Before acting, confirm live exposure and payment history for this buyer, as the adjudicator requests \u2014 the payment leg carrying 0.65 weight cannot currently distinguish a reliable payer from one with no trade history or no drawn exposure.\n\nA move back to Healthy needs only 0.7 points. News alone holds the band, so natural decay on the lawsuit item will do it in time (news half-life 365 days), and a severity grade one step lower on GN-92904b4dcaa6 would take the buyer out of Watch immediately. Substantiating detail on the suit, or its dismissal, would be the cleanest route; so would evidence that the cash burn and supply constraints flagged on 2026-10-30 have eased.",
+        "bottom_line": "Maintain the USD 7,000,000 export limit on Intel Corporation \u2014 PD of 0.1072 is well within the 0.25 target and the payment record is 0 DPD. The adjudicator agreed with the Watch band but with caveats: all 20.7 points come from a single shareholder-lawsuit headline that clears the band floor by 0.7 points, and the 0.65 payment weight reflects absent records rather than a verified payment history.",
+        "payment_note": "The payment record is clean at 0 DPD with raw score 0.0 and no worst line, but the adjudicator flags that no payment or payment_review evidence exists for this buyer, so the zero reflects absence of data rather than demonstrated good payment behaviour.",
+        "news_note": "Twelve negative items cluster between 2026-10-29 and 2026-11-16 \u2014 stock plunges of 29% and 45%, a guidance cut on PC slowdown, and chip supply constraints with big cash burn \u2014 but the band is set solely by the most recent, a severity 3 shareholder lawsuit (GN-92904b4dcaa6, decayed 59.21, 7 days old) whose article body is identical to its headline.",
+        "lifts_it": [
+          "0.7 points of decay or regrade takes the score below 20.0 and back to Healthy</n>",
+          "A severity grade one step lower on GN-92904b4dcaa6, or dismissal of the suit, would move the buyer out of Watch",
+          "Confirmation that the cash burn and chip supply constraints reported 2026-10-30 have eased"
+        ],
+        "worsens_it": [
+          "Payment slippage reaching 38 DPD would lift the score to the High Risk band at 50.0",
+          "A new item graded above severity 3, since the news leg alone currently holds the band",
+          "Any first sign of arrears, given 29.3 points of headroom rests on an unverified 0 DPD record"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

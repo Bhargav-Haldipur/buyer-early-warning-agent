@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS03",
+    "name": "Ford Motor Company",
+    "severity": 0,
+    "category": "stock_commentary",
+    "reason": "The article is a generic buy/hold/sell stock analysis piece ahead of earnings with no substantive negative financial information about Ford Motor Company."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Ford"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS03\", \"name\": \"Ford Motor Company\", \"sector\": \"Automotive\", \"city\": \"Dearborn, MI\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS03",
+        "severity": 0,
+        "category": "stock_commentary",
+        "reason": "The article is a generic buy/hold/sell stock analysis piece ahead of earnings with no substantive negative financial information about Ford Motor Company."
+      }
+    }
+  ],
+  "turns": 2
+}

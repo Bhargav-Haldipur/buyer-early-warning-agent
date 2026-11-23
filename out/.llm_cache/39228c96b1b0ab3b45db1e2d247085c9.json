@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN01",
+    "name": "Tata Motors Limited",
+    "severity": 2,
+    "category": "margin_pressure",
+    "reason": "Tata Motors flags commodity cost uncertainty and another margin hit, indicating a notable negative profitability impact, though not an acute credit event."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Tata Motors"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN01\", \"name\": \"Tata Motors Limited\", \"sector\": \"Automotive\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "IN01"
+      },
+      "result": "{\"id\": \"IN01\", \"kind\": \"buyer\", \"name\": \"Tata Motors Limited\", \"short_name\": \"Tata Motors\", \"sector\": \"Automotive\", \"city\": \"Mumbai\", \"size_band\": \"large\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN01",
+        "severity": 2,
+        "category": "margin_pressure",
+        "reason": "Tata Motors flags commodity cost uncertainty and another margin hit, indicating a notable negative profitability impact, though not an acute credit event."
+      }
+    }
+  ],
+  "turns": 3
+}

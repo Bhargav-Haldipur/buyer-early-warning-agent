@@ -1,0 +1,130 @@
+{
+  "result": {
+    "assessment": "agree_with_caveats",
+    "rationale": "The Watch band is arithmetically correct and directionally defensible: 36 DPD yields payment raw 42.0, and 0.65 x 42.0 = 27.3, with exposure of INR 26m against an INR 60m limit. The payment agent's deterioration call is sound \u2014 the last four resolved notifications cleared within 3-6 days of due date, versus 36 days now. Two caveats: the single scored notification contains an unresolved contradiction, dated 2026-10-18 while citing an original due date of 2026-10-18 yet scored at 36 days past due; and the news component contributes 0.35 x 0.0 from a screen that returned no article, no parent and no evidence record of any kind, so that portion of the formula carries no information rather than confirming a clean record \u2014 absence of evidence, not evidence of absence, and it should be confirmed the screen actually ran.",
+    "concerns": [
+      {
+        "source_id": "N-261019-00017",
+        "issue": "Internal date contradiction in the sole scored input: the notification is dated 2026-10-18 and the review cites the invoice's original due date as 2026-10-18, yet it is scored at 36 DPD. A due date equal to the notification date cannot also be 36 days past due. Because DPD is the only driver of the 27.3 score, the band depends on which field is wrong \u2014 the DPD should be confirmed against the source ledger before the verdict is released."
+      },
+      {
+        "source_id": "N-261019-00017",
+        "issue": "Amount inconsistency between the structured record and the narrative: the data field reports owed 26,000,000 INR, while the review describes an open overdue invoice of INR 7.0m against total exposure of INR 26m on the policy. The sum actually past due is 7.0m, not 26m; the 'owed' field appears to hold total exposure. This materially changes the size of any limit action against the INR 60m limit."
+      },
+      {
+        "source_id": "N-261019-00017",
+        "issue": "Single-source, unresolved exposure. All notifications arise from one policy with one insurer (TCI), so there is no cross-validation of payment behaviour from other carriers, and no resolution date is recorded for the open item \u2014 true days-late can extend further and compound the deterioration beyond the 36 DPD currently scored."
+      },
+      {
+        "source_id": "N-261019-00017",
+        "issue": "The score is effectively payment-only: the news component returns severity 0 with no article_id and no headline, and the news and parent evidence queries are both empty, so this single notification carries the entire 27.3. There is no independent signal to corroborate or offset the payment deterioration, and the sudden shift from 3-6 days late to 36 days warrants monitoring for further extension regardless of the current band."
+      }
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_score_breakdown",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN05\", \"score\": 27.3, \"band\": \"Watch\", \"pd\": 0.173, \"payment\": {\"dpd\": 36, \"raw\": 42.0, \"weighted\": 27.3, \"worst_line\": \"TCI-WT-2026-0002\"}, \"news\": {\"severity\": 0, \"category\": null, \"article_id\": null, \"age_days\": null, \"headline\": null, \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x 42.0 (payment, 36 DPD) + 0.35 x 0.0 (news) = 27.3\"}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "all"
+      },
+      "result": "[{\"id\": \"N-261019-00017\", \"kind\": \"payment\", \"date\": \"2026-10-18\", \"detail\": \"1 open overdue notification(s) under policy TCI-WT-2026-0002; the oldest is 36 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0002\", \"dpd\": 36, \"owed\": 26000000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261019-00017\", \"kind\": \"payment_review\", \"date\": \"2026-10-18\", \"detail\": \"Vardhit Auto"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "news"
+      },
+      "result": "[{\"note\": \"no news evidence\"}]"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "parent"
+      },
+      "result": "[{\"note\": \"no parent evidence\"}]"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The Watch band is arithmetically correct and directionally defensible: 36 DPD yields payment raw 42.0, and 0.65 x 42.0 = 27.3, above the Watch floor of 20 and well below the High Risk threshold of 50, with exposure of INR 26m against an INR 60m limit. The payment agent's deterioration call is sound \u2014 four prior notifications cleared within 3-6 days of due date, versus 36 days now \u2014 so Watch rather than Healthy is right. However, the score rests entirely on one notification from one policy, and that record contains an unresolved contradiction: it is dated 2026-10-18 while citing an original due date of 2026-10-18, which cannot be 36 days past due. The news component contributes 0.0 from a null screen with no article or parent evidence, so 35% of the formula is carrying no information rather than confirming a clean record.",
+        "concerns": [
+          {
+            "source_id": "N-261019-00017",
+            "issue": "Internal date contradiction in the sole scored input: the notification is dated 2026-10-18 and the review cites the invoice's original due date as 2026-10-18, yet it is scored at 36 DPD. A due date equal to the notification date cannot also be 36 days past due. Because DPD is the only driver of the 27.3 score, the band depends on which field is wrong \u2014 the DPD should be confirmed against the source ledger before the verdict is released."
+          },
+          {
+            "source_id": "N-261019-00017",
+            "issue": "Amount inconsistency between the structured record and the narrative: the data field reports owed 26,000,000 INR, while the review describes an open overdue invoice of INR 7.0m against total exposure of INR 26m on the policy. The sum actually past due is 7.0m, not 26m; the 'owed' field appears to hold total exposure. This materially changes the size of any limit action against the INR 60m limit."
+          },
+          {
+            "source_id": "N-261019-00017",
+            "issue": "Single-source, unresolved exposure. All notifications arise from one policy with one insurer (TCI), so there is no cross-validation of payment behaviour from other carriers, and no resolution date is recorded for the open item \u2014 true days-late can extend further and compound the deterioration beyond the 36 DPD currently scored."
+          },
+          {
+            "source_id": "news",
+            "issue": "The news component scores 0.0 with severity 0, no article_id, no headline and no parent linkage, and both the news and parent evidence queries return empty. This is an absence of evidence rather than a verified clean screen, yet it carries the full 0.35 weight. The score is effectively payment-only and structurally capped: with news at zero, payment raw would have to reach roughly 77 to breach the High Risk threshold of 50. Confirm the news screen actually ran before relying on the Watch band."
+          }
+        ]
+      },
+      "error": "not evidence for this buyer: ['news']; cite ids from get_evidence"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The Watch band is arithmetically correct and directionally defensible: 36 DPD yields payment raw 42.0, and 0.65 x 42.0 = 27.3, above the Watch floor of 20 and well below the High Risk threshold of 50, with exposure of INR 26m against an INR 60m limit. The payment agent's deterioration call is sound \u2014 four prior notifications cleared within 3-6 days of due date, versus 36 days now. Two caveats: the single scored notification contains an unresolved contradiction, dated 2026-10-18 while citing an original due date of 2026-10-18 yet scored at 36 days past due; and the news component contributes 0.0 from a screen that returned no article, no parent and no evidence record of any kind, so 35% of the formula carries no information rather than confirming a clean record \u2014 absence of evidence, not evidence of absence, and it should be confirmed the screen actually ran.",
+        "concerns": [
+          {
+            "source_id": "N-261019-00017",
+            "issue": "Internal date contradiction in the sole scored input: the notification is dated 2026-10-18 and the review cites the invoice's original due date as 2026-10-18, yet it is scored at 36 DPD. A due date equal to the notification date cannot also be 36 days past due. Because DPD is the only driver of the 27.3 score, the band depends on which field is wrong \u2014 the DPD should be confirmed against the source ledger before the verdict is released."
+          },
+          {
+            "source_id": "N-261019-00017",
+            "issue": "Amount inconsistency between the structured record and the narrative: the data field reports owed 26,000,000 INR, while the review describes an open overdue invoice of INR 7.0m against total exposure of INR 26m on the policy. The sum actually past due is 7.0m, not 26m; the 'owed' field appears to hold total exposure. This materially changes the size of any limit action against the INR 60m limit."
+          },
+          {
+            "source_id": "N-261019-00017",
+            "issue": "Single-source, unresolved exposure. All notifications arise from one policy with one insurer (TCI), so there is no cross-validation of payment behaviour from other carriers, and no resolution date is recorded for the open item \u2014 true days-late can extend further and compound the deterioration beyond the 36 DPD currently scored."
+          },
+          {
+            "source_id": "N-261019-00017",
+            "issue": "The score is effectively payment-only: the news component returns severity 0, no article_id and no headline, and the news and parent evidence queries are both empty, so this single notification carries the entire 27.3. That makes the band structurally capped \u2014 with news at zero, payment raw would need to reach roughly 77 to breach the High Risk threshold of 50 \u2014 and leaves no independent signal to corroborate or offset the payment deterioration."
+          }
+        ]
+      },
+      "error": "these figures are not in the data: ['20', '50,', '77', '50']"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The Watch band is arithmetically correct and directionally defensible: 36 DPD yields payment raw 42.0, and 0.65 x 42.0 = 27.3, with exposure of INR 26m against an INR 60m limit. The payment agent's deterioration call is sound \u2014 the last four resolved notifications cleared within 3-6 days of due date, versus 36 days now. Two caveats: the single scored notification contains an unresolved contradiction, dated 2026-10-18 while citing an original due date of 2026-10-18 yet scored at 36 days past due; and the news component contributes 0.35 x 0.0 from a screen that returned no article, no parent and no evidence record of any kind, so that portion of the formula carries no information rather than confirming a clean record \u2014 absence of evidence, not evidence of absence, and it should be confirmed the screen actually ran.",
+        "concerns": [
+          {
+            "source_id": "N-261019-00017",
+            "issue": "Internal date contradiction in the sole scored input: the notification is dated 2026-10-18 and the review cites the invoice's original due date as 2026-10-18, yet it is scored at 36 DPD. A due date equal to the notification date cannot also be 36 days past due. Because DPD is the only driver of the 27.3 score, the band depends on which field is wrong \u2014 the DPD should be confirmed against the source ledger before the verdict is released."
+          },
+          {
+            "source_id": "N-261019-00017",
+            "issue": "Amount inconsistency between the structured record and the narrative: the data field reports owed 26,000,000 INR, while the review describes an open overdue invoice of INR 7.0m against total exposure of INR 26m on the policy. The sum actually past due is 7.0m, not 26m; the 'owed' field appears to hold total exposure. This materially changes the size of any limit action against the INR 60m limit."
+          },
+          {
+            "source_id": "N-261019-00017",
+            "issue": "Single-source, unresolved exposure. All notifications arise from one policy with one insurer (TCI), so there is no cross-validation of payment behaviour from other carriers, and no resolution date is recorded for the open item \u2014 true days-late can extend further and compound the deterioration beyond the 36 DPD currently scored."
+          },
+          {
+            "source_id": "N-261019-00017",
+            "issue": "The score is effectively payment-only: the news component returns severity 0 with no article_id and no headline, and the news and parent evidence queries are both empty, so this single notification carries the entire 27.3. There is no independent signal to corroborate or offset the payment deterioration, and the sudden shift from 3-6 days late to 36 days warrants monitoring for further extension regardless of the current band."
+          }
+        ]
+      }
+    }
+  ],
+  "turns": 5
+}

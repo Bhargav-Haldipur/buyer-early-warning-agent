@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 2,
+    "category": "stock_crash",
+    "reason": "Article reports a historic single-day stock price collapse for Intel triggering a broader chip sector selloff, reflecting serious market confidence erosion, though no direct payment or liquidity failure is described in this specific article."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "find_articles",
+      "input": {
+        "query": "Intel"
+      },
+      "result": "[{\"article_id\": \"GN-92904b4dcaa6\", \"date\": \"2026-11-16\", \"publication\": \"Reuters\", \"headline\": \"Intel sued by shareholders following 29% stock plunge\", \"mentioned_as\": \"Intel\"}, {\"article_id\": \"GN-c106af61116d\", \"date\": \"2026-11-04\", \"publication\": \"Yahoo Finance\", \"headline\": \"What Could Go Wrong At Intel From Here?\", \"mentioned_as\": \"Intel\"}, {\"article_id\": \"GN-f7a0a1dcde92\", \"date\": \"2026-11-02"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 2,
+        "category": "stock_crash",
+        "reason": "Article reports a historic single-day stock price collapse for Intel triggering a broader chip sector selloff, reflecting serious market confidence erosion, though no direct payment or liquidity failure is described in this specific article."
+      }
+    }
+  ],
+  "turns": 3
+}

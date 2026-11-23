@@ -1,0 +1,41 @@
+{
+  "result": {
+    "trend": "insufficient_history",
+    "summary": "Ostara Organics BV currently has no open overdue notifications. Only one historical case exists (invoice due 2026-05-27, resolved 2026-06-01, 5 days late, $40,000 at risk), reported by a single policy with no accumulation in the prior window. With just one resolved event on record, there is insufficient history to establish a clear trend; the sole insurer (TCI) maintains a $300,000 limit, well above the amount involved in the one past incident.",
+    "concerns": [
+      "Very limited notification history (only one resolved event) makes trend assessment unreliable",
+      "Monitor for recurrence or accumulation across policies in future windows"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"note\": \"no open overdue notifications\"}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260528-00035\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-05-27\", \"resolved_date\": \"2026-06-01\", \"amount_at_risk\": 40000.0, \"days_late\": 5}], \"accumulation\": {\"window_days\": 180, \"last_window\": 1, \"window_before\": 0, \"policies_reporting_last_window\": 1}}"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"credit_limit\": 300000.0, \"currency\": \"USD\", \"payment_terms_days\": 60, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-01-20\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 0,
+        "worst_event_id": "",
+        "trend": "insufficient_history",
+        "summary": "Ostara Organics BV currently has no open overdue notifications. Only one historical case exists (invoice due 2026-05-27, resolved 2026-06-01, 5 days late, $40,000 at risk), reported by a single policy with no accumulation in the prior window. With just one resolved event on record, there is insufficient history to establish a clear trend; the sole insurer (TCI) maintains a $300,000 limit, well above the amount involved in the one past incident.",
+        "concerns": [
+          "Very limited notification history (only one resolved event) makes trend assessment unreliable",
+          "Monitor for recurrence or accumulation across policies in future windows"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

@@ -1,0 +1,41 @@
+{
+  "result": {
+    "trend": "improving",
+    "summary": "No overdue notifications are currently open for Aranya Pharma Packaging. The two prior overdue events (both reported by the same insurer, TCI) resolved quickly\u20147 days late in Feb 2026, improving to 3 days late in Jul 2026\u2014with no signs of notifications piling up (1 per 6-month window, single policy). The sole credit line (INR 50M, 45-day terms) remains accepted and appears well supported by this payment behaviour, though the short history (only 2 events) limits confidence.",
+    "concerns": [
+      "Only two resolved events on record, so the improving trend is based on limited history",
+      "Single insurer/policy reporting exposure\u2014no cross-policy corroboration of buyer's payment habits"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"note\": \"no open overdue notifications\"}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260217-00018\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-02-16\", \"resolved_date\": \"2026-02-23\", \"amount_at_risk\": 3000000.0, \"days_late\": 7}, {\"event_id\": \"N-260707-00019\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-07-06\", \"resolved_date\": \"2026-07-09\", \"amount_at_risk\": 2600000.0, \"days_late\": 3}], \""
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"credit_limit\": 50000000.0, \"currency\": \"INR\", \"payment_terms_days\": 45, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-06-01\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 0,
+        "worst_event_id": "",
+        "trend": "improving",
+        "summary": "No overdue notifications are currently open for Aranya Pharma Packaging. The two prior overdue events (both reported by the same insurer, TCI) resolved quickly\u20147 days late in Feb 2026, improving to 3 days late in Jul 2026\u2014with no signs of notifications piling up (1 per 6-month window, single policy). The sole credit line (INR 50M, 45-day terms) remains accepted and appears well supported by this payment behaviour, though the short history (only 2 events) limits confidence.",
+        "concerns": [
+          "Only two resolved events on record, so the improving trend is based on limited history",
+          "Single insurer/policy reporting exposure\u2014no cross-policy corroboration of buyer's payment habits"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

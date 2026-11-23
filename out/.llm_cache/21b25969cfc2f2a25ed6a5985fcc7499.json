@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Kestrel Marine Parts Ltd scores 29.9 with a probability of default of 0.199, placing it in the Watch band. The whole signal comes from payments: one open overdue notification under policy TCI-EX-2026-0001, 38 days past due, dated 2026-10-16. The payment review marks the trend as deteriorating - the previous overdue in Jul-2026 cleared in 12 days, while the current one has been open 38+ days, and notification count has gone from 0 to 2 over the trailing 180 days. There is no news or parent evidence to set against this.\n\nThe band traces as 0.65 x 46.0 (payment, 38 DPD) + 0.35 x 0.0 (news) = 29.9. Because the news input contributes nothing, DPD is the sole driver of the score. The adjudicator agreed with the Watch band but attached caveats: the band holds on payment evidence alone and no re-reading of the news input moves it to High Risk, yet two internal inconsistencies in the payment evidence need resolving. The notification records owed of $165,000 against an open count of 1, while the payment review describes a single open overdue invoice of $70,000 and treats $165,000 as total exposure; and the review gives an original due date of 2026-10-16 on a notification of the same date, which cannot coexist with 38 DPD. The adjudicator also notes the signal is single-source - one policyholder, one policy, with nothing to triangulate against.\n\nThe recommendation is MAINTAIN the $500,000 limit for Tamrin Exports under policy TCI-EX-2026-0001, on the grounds that probability of default of 0.199 is within the 0.25 appetite target and the maximum liability does not bind. Expected loss is unchanged at $71,640 before and after. Current amount owed is $165,000. Given the adjudicator's caveat that the due-date discrepancy bears directly on the only input driving the payment score, confirm the DPD figure and reconcile the $70,000 versus $165,000 overdue amount before relying on this file for the limit decision.\n\nSettlement of the open overdue would remove the only live input and take the score toward the Healthy line at 20.0, 9.9 points below the current position. A return to the earlier resolution pattern - overdues clearing in around 12 days - and no further notifications would support that. In the other direction, the score reaches High Risk at 50.0, which is 20.1 points away and corresponds to 54 DPD on the current item; a second policy reporting would also warrant re-running the file, since it would turn a bilateral signal into a systemic one.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the $500,000 limit on policy TCI-EX-2026-0001 - probability of default of 0.199 is within the 0.25 appetite target despite the Watch band. The adjudicator agreed with caveats: confirm the 38 DPD figure and reconcile the conflicting $70,000 / $165,000 overdue amount before relying on this file.",
+      "payment_note": "One open overdue notification at 38 days past due under a single policy, with a deteriorating trend - the prior Jul-2026 overdue resolved in 12 days and notifications have risen from 0 to 2 over the last 180 days.",
+      "news_note": "No news evidence was matched to this buyer; news severity is 0 and contributes 0.0 to the score.",
+      "lifts_it": [
+        "Settlement of the open overdue - 9.9 points below is the Healthy line at 20.0",
+        "Return to the earlier resolution pattern of around 12 days",
+        "No further notifications over the next 180 days"
+      ],
+      "worsens_it": [
+        "Current item reaching 54 DPD - High Risk at 50.0, 20.1 points away",
+        "A second policy reporting overdues, confirming the friction is systemic",
+        "Overdue amount confirmed at $165,000 rather than $70,000"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS08\", \"score\": 29.9, \"band\": \"Watch\", \"pd\": 0.199, \"payment\": {\"dpd\": 38, \"raw\": 46.0, \"weighted\": 29.9, \"worst_line\": \"TCI-EX-2026-0001\"}, \"news\": {\"severity\": 0, \"category\": null, \"article_id\": null, \"age_days\": null, \"headline\": null, \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x 46.0 (payment, 38 DPD) + 0.35 x 0.0 (news) = 29.9\", \"revie"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS08-1\", \"buyer_id\": \"OS08\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 500000, \"owed\": 165000, \"revised_limit\": 500000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.199, \"pd_target\":"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 20.1, \"dpd_for_next_band\": 54, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 9.9, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261017-00034\", \"kind\": \"payment\", \"date\": \"2026-10-16\", \"detail\": \"1 open overdue notification(s) under policy TCI-EX-2026-0001; the oldest is 38 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"dpd\": 38, \"owed\": 165000.0, \"currency\": \"USD\", \"open_count\": 1}}, {\"id\": \"N-261017-00034\", \"kind\": \"payment_review\", \"date\": \"2026-10-16\", \"detail\": \"Kestrel Marine"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Kestrel Marine Parts Ltd scores 29.9 with a probability of default of 0.199, placing it in the Watch band. The whole signal comes from payments: one open overdue notification under policy TCI-EX-2026-0001, 38 days past due, dated 2026-10-16. The payment review marks the trend as deteriorating - the previous overdue in Jul-2026 cleared in 12 days, while the current one has been open 38+ days, and notification count has gone from 0 to 2 over the trailing 180 days. There is no news or parent evidence to set against this.\n\nThe band traces as 0.65 x 46.0 (payment, 38 DPD) + 0.35 x 0.0 (news) = 29.9. Because the news input contributes nothing, DPD is the sole driver of the score. The adjudicator agreed with the Watch band but attached caveats: the band holds on payment evidence alone and no re-reading of the news input moves it to High Risk, yet two internal inconsistencies in the payment evidence need resolving. The notification records owed of $165,000 against an open count of 1, while the payment review describes a single open overdue invoice of $70,000 and treats $165,000 as total exposure; and the review gives an original due date of 2026-10-16 on a notification of the same date, which cannot coexist with 38 DPD. The adjudicator also notes the signal is single-source - one policyholder, one policy, with nothing to triangulate against.\n\nThe recommendation is MAINTAIN the $500,000 limit for Tamrin Exports under policy TCI-EX-2026-0001, on the grounds that probability of default of 0.199 is within the 0.25 appetite target and the maximum liability does not bind. Expected loss is unchanged at $71,640 before and after. Current amount owed is $165,000. Given the adjudicator's caveat that the due-date discrepancy bears directly on the only input driving the payment score, confirm the DPD figure and reconcile the $70,000 versus $165,000 overdue amount before relying on this file for the limit decision.\n\nSettlement of the open overdue would remove the only live input and take the score toward the Healthy line at 20.0, 9.9 points below the current position. A return to the earlier resolution pattern - overdues clearing in around 12 days - and no further notifications would support that. In the other direction, the score reaches High Risk at 50.0, which is 20.1 points away and corresponds to 54 DPD on the current item; a second policy reporting would also warrant re-running the file, since it would turn a bilateral signal into a systemic one.",
+        "bottom_line": "Maintain the $500,000 limit on policy TCI-EX-2026-0001 - probability of default of 0.199 is within the 0.25 appetite target despite the Watch band. The adjudicator agreed with caveats: confirm the 38 DPD figure and reconcile the conflicting $70,000 / $165,000 overdue amount before relying on this file.",
+        "payment_note": "One open overdue notification at 38 days past due under a single policy, with a deteriorating trend - the prior Jul-2026 overdue resolved in 12 days and notifications have risen from 0 to 2 over the last 180 days.",
+        "news_note": "No news evidence was matched to this buyer; news severity is 0 and contributes 0.0 to the score.",
+        "lifts_it": [
+          "Settlement of the open overdue - 9.9 points below is the Healthy line at 20.0",
+          "Return to the earlier resolution pattern of around 12 days",
+          "No further notifications over the next 180 days"
+        ],
+        "worsens_it": [
+          "Current item reaching 54 DPD - High Risk at 50.0, 20.1 points away",
+          "A second policy reporting overdues, confirming the friction is systemic",
+          "Overdue amount confirmed at $165,000 rather than $70,000"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS03",
+    "name": "Ford Motor Company",
+    "severity": 1,
+    "category": "officer_departure",
+    "reason": "Routine 8-K disclosing a director/officer departure and Reg FD item; no specifics on which executive or reason, so treated as a minor governance disclosure rather than a major credit event."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Ford"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS03\", \"name\": \"Ford Motor Company\", \"sector\": \"Automotive\", \"city\": \"Dearborn, MI\"}]"
+    },
+    {
+      "tool": "find_articles",
+      "input": {
+        "query": "Ford Motor Company 8-K director officer"
+      },
+      "result": "[{\"note\": \"no other article mentions 'Ford Motor Company 8-K director officer'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS03",
+        "severity": 1,
+        "category": "officer_departure",
+        "reason": "Routine 8-K disclosing a director/officer departure and Reg FD item; no specifics on which executive or reason, so treated as a minor governance disclosure rather than a major credit event."
+      }
+    }
+  ],
+  "turns": 3
+}

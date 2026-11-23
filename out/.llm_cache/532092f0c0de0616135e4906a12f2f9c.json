@@ -1,0 +1,85 @@
+{
+  "result": {
+    "narrative": "Boeing is paying on time. The payment leg records 0 DPD with no open overdue notifications, and the only historical event on file is a single $650k invoice resolved 3 days late in June 2026, reported by one policyholder with no accumulation in the prior six-month window. TCI's $9M export line shows nothing owed. The negative signal is entirely in the news: a 9 November CNBC item reporting a 5% cut to the commercial airplane workforce as the production increase takes longer than expected, scored severity 4, base 80.0 decayed to 77.9 at 14 days old. Behind it sits a consistent 737 Max production and certification storyline from September to November - the late-2027 ramp-up deferral (38.0), the Max 10 certification delay (35.96) and the software glitch disclosure (35.83) - alongside neutral items including 57 September deliveries and an FAA finding that the software glitch is not a flight-safety issue.\n\nThe band is Watch at 27.3, from 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 77.9 (news). The adjudicator agreed with caveats and the caveats matter here. The entire score comes from one article: with payment contributing 0.0, nothing else enters the formula, and the retrieved body of that article contains no text beyond the headline repeated - I confirmed this directly. The adjudicator also questions whether a 5% cut attributed to production timing supports a severity 4 mass-layoffs reading rather than an output and cost alignment story, and notes the 0.0 payment leg carrying 65% of the weight rests on a record the payment agent itself marks insufficient_history, last reviewed 2026-06-06 against news running to 2026-11-09. The three 737 Max items are correlated to one root cause, so they support Watch directionally but are not three independent confirmations.\n\nThe recommendation is MAINTAIN the TCI line at $9,000,000 for Tamrin Exports, unchanged, on the grounds that PD of 0.1727 sits within the 0.25 appetite target. Expected loss is 1,119,096 before and after, and maximum liability does not bind. Nothing in the payment record argues for a reduction, and the news that drives the band is not evidenced well enough to justify cutting exposure on it.\n\nTwo things would lift this. The score is 7.3 points above the Healthy line at 20.0, and because the news half-life is 365 days decay alone will be slow - so the faster route is manual confirmation of the 9 November report. If the underlying source shows a production-timing adjustment rather than distress, the severity 4 rating and with it the whole band should be revisited. A refreshed payment review confirming 0 DPD over the period in which the news cluster arose would also firm up the 65% of the score that is currently resting on thin, stale data.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the TCI export line at $9,000,000 unchanged: PD of 0.1727 is within the 0.25 appetite target and the buyer is at 0 DPD. The adjudicator agreed with caveats - the entire 27.3 Watch score comes from one article whose retrieved body is only its headline repeated, so confirm that report before relying on the band.",
+      "payment_note": "Clean at 0 DPD with no open overdue notifications and nothing owed, but the trend is marked insufficient_history - the only event on file is one $650k invoice resolved 3 days late in June 2026 from a single policyholder, last reviewed 2026-06-06.",
+      "news_note": "A 9 November CNBC report of a 5% commercial airplane workforce cut, scored severity 4 at 77.9, drives the whole score, supported directionally by a correlated 737 Max production and certification cluster (38.0, 35.96, 35.83) and offset by neutral items on 57 September deliveries and the FAA clearing the software glitch as not a flight-safety issue.",
+      "lifts_it": [
+        "Manual confirmation that the 9 November layoffs report is production-timing rather than distress, which would reopen the severity 4 rating that produces the entire score",
+        "A 7.3 point fall to reach Healthy below 20.0, though the 365-day news half-life makes decay alone slow",
+        "A refreshed payment review re-confirming 0 DPD over the period the news cluster arose"
+      ],
+      "worsens_it": [
+        "33 DPD would reach High Risk at 50.0, currently 22.7 points away",
+        "Any recurrence of overdue notifications, given the single-data-point history",
+        "A further severity 4 news item, since news alone currently holds the band"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS02\", \"score\": 27.3, \"band\": \"Watch\", \"pd\": 0.1727, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 4, \"category\": \"layoffs\", \"article_id\": \"GN-8b3ff62ef798\", \"age_days\": 14, \"headline\": \"Boeing to cut 5% of commercial airplane workers as production increase takes longer than expected\", \"via_parent\": false, \"parent_name\": null, \"raw\": 77."
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS02-1\", \"buyer_id\": \"OS02\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 9000000, \"owed\": 0, \"revised_limit\": 9000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1727, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 22.7, \"dpd_for_next_band\": 33, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 7.3, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-260607-00024\", \"kind\": \"payment_review\", \"date\": \"2026-06-06\", \"detail\": \"No open overdue notifications on Boeing. Only one historical event exists: a $650k invoice resolved just 3 days late (June 2026), reported by a single policyholder, with no accumulation in the prior 6-month window. One insurer (TCI) holds a $9M accepted credit line, last reviewed April 2026, consistent with this l"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-8b3ff62ef798"
+      },
+      "result": "{\"article_id\": \"GN-8b3ff62ef798\", \"published_date\": \"2026-11-09\", \"publication\": \"CNBC\", \"headline\": \"Boeing to cut 5% of commercial airplane workers as production increase takes longer than expected\", \"body\": \"Boeing to cut 5% of commercial airplane workers as production increase takes longer than expected\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-dccc8a1c0d90"
+      },
+      "result": "{\"article_id\": \"GN-dccc8a1c0d90\", \"published_date\": \"2026-09-28\", \"publication\": \"CNBC\", \"headline\": \"Boeing 737 Max 10 certification delayed by software issue, FAA says\", \"body\": \"Boeing 737 Max 10 certification delayed by software issue, FAA says\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-0cd1194afea2"
+      },
+      "result": "{\"article_id\": \"GN-0cd1194afea2\", \"published_date\": \"2026-09-26\", \"publication\": \"CNBC\", \"headline\": \"Boeing flags 737 Max software glitch affecting some automated approach functions\", \"body\": \"Boeing flags 737 Max software glitch affecting some automated approach functions\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Boeing is paying on time. The payment leg records 0 DPD with no open overdue notifications, and the only historical event on file is a single $650k invoice resolved 3 days late in June 2026, reported by one policyholder with no accumulation in the prior six-month window. TCI's $9M export line shows nothing owed. The negative signal is entirely in the news: a 9 November CNBC item reporting a 5% cut to the commercial airplane workforce as the production increase takes longer than expected, scored severity 4, base 80.0 decayed to 77.9 at 14 days old. Behind it sits a consistent 737 Max production and certification storyline from September to November - the late-2027 ramp-up deferral (38.0), the Max 10 certification delay (35.96) and the software glitch disclosure (35.83) - alongside neutral items including 57 September deliveries and an FAA finding that the software glitch is not a flight-safety issue.\n\nThe band is Watch at 27.3, from 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 77.9 (news). The adjudicator agreed with caveats and the caveats matter here. The entire score comes from one article: with payment contributing 0.0, nothing else enters the formula, and the retrieved body of that article contains no text beyond the headline repeated - I confirmed this directly. The adjudicator also questions whether a 5% cut attributed to production timing supports a severity 4 mass-layoffs reading rather than an output and cost alignment story, and notes the 0.0 payment leg carrying 65% of the weight rests on a record the payment agent itself marks insufficient_history, last reviewed 2026-06-06 against news running to 2026-11-09. The three 737 Max items are correlated to one root cause, so they support Watch directionally but are not three independent confirmations.\n\nThe recommendation is MAINTAIN the TCI line at $9,000,000 for Tamrin Exports, unchanged, on the grounds that PD of 0.1727 sits within the 0.25 appetite target. Expected loss is 1,119,096 before and after, and maximum liability does not bind. Nothing in the payment record argues for a reduction, and the news that drives the band is not evidenced well enough to justify cutting exposure on it.\n\nTwo things would lift this. The score is 7.3 points above the Healthy line at 20.0, and because the news half-life is 365 days decay alone will be slow - so the faster route is manual confirmation of the 9 November report. If the underlying source shows a production-timing adjustment rather than distress, the severity 4 rating and with it the whole band should be revisited. A refreshed payment review confirming 0 DPD over the period in which the news cluster arose would also firm up the 65% of the score that is currently resting on thin, stale data.",
+        "bottom_line": "Maintain the TCI export line at $9,000,000 unchanged: PD of 0.1727 is within the 0.25 appetite target and the buyer is at 0 DPD. The adjudicator agreed with caveats - the entire 27.3 Watch score comes from one article whose retrieved body is only its headline repeated, so confirm that report before relying on the band.",
+        "payment_note": "Clean at 0 DPD with no open overdue notifications and nothing owed, but the trend is marked insufficient_history - the only event on file is one $650k invoice resolved 3 days late in June 2026 from a single policyholder, last reviewed 2026-06-06.",
+        "news_note": "A 9 November CNBC report of a 5% commercial airplane workforce cut, scored severity 4 at 77.9, drives the whole score, supported directionally by a correlated 737 Max production and certification cluster (38.0, 35.96, 35.83) and offset by neutral items on 57 September deliveries and the FAA clearing the software glitch as not a flight-safety issue.",
+        "lifts_it": [
+          "Manual confirmation that the 9 November layoffs report is production-timing rather than distress, which would reopen the severity 4 rating that produces the entire score",
+          "A 7.3 point fall to reach Healthy below 20.0, though the 365-day news half-life makes decay alone slow",
+          "A refreshed payment review re-confirming 0 DPD over the period the news cluster arose"
+        ],
+        "worsens_it": [
+          "33 DPD would reach High Risk at 50.0, currently 22.7 points away",
+          "Any recurrence of overdue notifications, given the single-data-point history",
+          "A further severity 4 news item, since news alone currently holds the band"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

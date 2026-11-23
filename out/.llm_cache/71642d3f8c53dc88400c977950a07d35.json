@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS02",
+    "name": "The Boeing Company",
+    "severity": 2,
+    "category": "product_defect",
+    "reason": "Boeing disclosed a software glitch in the 737 Max affecting automated approach functions, a notable technical/safety issue that could invite regulatory scrutiny and reputational cost, though not an immediate financial distress signal."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Boeing"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS02\", \"name\": \"The Boeing Company\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS02",
+        "severity": 2,
+        "category": "product_defect",
+        "reason": "Boeing disclosed a software glitch in the 737 Max affecting automated approach functions, a notable technical/safety issue that could invite regulatory scrutiny and reputational cost, though not an immediate financial distress signal."
+      }
+    }
+  ],
+  "turns": 2
+}

@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 2,
+    "category": "stock_plunge",
+    "reason": "Intel Corporation's stock fell nearly 29% in a single day, its worst since 1974, signaling severe market concern about the company's outlook, though no direct payment or liquidity issue is reported."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 2,
+        "category": "stock_plunge",
+        "reason": "Intel Corporation's stock fell nearly 29% in a single day, its worst since 1974, signaling severe market concern about the company's outlook, though no direct payment or liquidity issue is reported."
+      }
+    }
+  ],
+  "turns": 2
+}

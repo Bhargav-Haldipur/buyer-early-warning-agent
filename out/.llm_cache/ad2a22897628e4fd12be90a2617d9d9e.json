@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 0,
+    "category": "routine_filing",
+    "reason": "This is a standard 8-K disclosure of quarterly results of operations, a routine regulatory filing with no negative content indicated."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 0,
+        "category": "routine_filing",
+        "reason": "This is a standard 8-K disclosure of quarterly results of operations, a routine regulatory filing with no negative content indicated."
+      }
+    }
+  ],
+  "turns": 2
+}

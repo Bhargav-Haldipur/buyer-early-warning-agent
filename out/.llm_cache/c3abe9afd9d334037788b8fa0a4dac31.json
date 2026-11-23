@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "Article is a generic stock-watch headline listing several companies with no substantive news content about Vodafone Idea's financial or operational condition."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Vodafone Idea"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN03\", \"name\": \"Vodafone Idea Limited\", \"sector\": \"Telecommunications\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "Article is a generic stock-watch headline listing several companies with no substantive news content about Vodafone Idea's financial or operational condition."
+      }
+    }
+  ],
+  "turns": 2
+}

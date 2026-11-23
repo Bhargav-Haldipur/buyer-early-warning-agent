@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN01",
+    "name": "Tata Motors Limited",
+    "severity": 1,
+    "category": "margin_pressure",
+    "reason": "Article reports Tata Motors PV considering price hikes due to rising commodity costs squeezing margins, a minor negative signal but not indicative of payment distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Tata Motors"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN01\", \"name\": \"Tata Motors Limited\", \"sector\": \"Automotive\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN01",
+        "severity": 1,
+        "category": "margin_pressure",
+        "reason": "Article reports Tata Motors PV considering price hikes due to rising commodity costs squeezing margins, a minor negative signal but not indicative of payment distress."
+      }
+    }
+  ],
+  "turns": 2
+}

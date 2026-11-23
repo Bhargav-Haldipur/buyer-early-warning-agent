@@ -192,10 +192,13 @@ class FallbackLLM:
 
     def resolve(self, article: dict, candidates: list[dict]) -> dict:
         self.calls += 1
-        hit = strict_resolve(article["mentioned_entity_as_written"], candidates)
+        mention = article["mentioned_entity_as_written"]
+        hit = strict_resolve(mention, candidates)
         if hit is None:
-            return {"kind": "none", "id": "", "name": "",
-                    "reason": "no candidate whose own name contains every distinguishing token"}
+            # said on the page, so in words a person reads, not the matcher's terms
+            why = (f"\u201c{mention}\u201d is not the name of any company on the book"
+                   if mention.strip() else "the headline names no company on the book")
+            return {"kind": "none", "id": "", "name": "", "reason": why}
         return {"kind": hit["kind"], "id": hit["id"], "name": hit["name"],
                 "reason": "brand token matched one candidate and all remaining tokens are in its name"}
 

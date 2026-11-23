@@ -1,0 +1,44 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN02",
+    "name": "Larsen & Toubro Limited",
+    "severity": 0,
+    "category": "new_order_win",
+    "reason": "L&T (Larsen & Toubro Limited) has won a large order for the Dhaka Metro project, which is a positive business development and not a credit risk signal."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "L&T"
+      },
+      "result": "[{\"note\": \"no covered entity shares a word with 'L&T'\"}]"
+    },
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsen"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN02\", \"name\": \"Larsen & Toubro Limited\", \"sector\": \"Engineering & Construction\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "IN02"
+      },
+      "result": "{\"id\": \"IN02\", \"kind\": \"buyer\", \"name\": \"Larsen & Toubro Limited\", \"short_name\": \"L&T\", \"sector\": \"Engineering & Construction\", \"city\": \"Mumbai\", \"size_band\": \"large\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN02",
+        "severity": 0,
+        "category": "new_order_win",
+        "reason": "L&T (Larsen & Toubro Limited) has won a large order for the Dhaka Metro project, which is a positive business development and not a credit risk signal."
+      }
+    }
+  ],
+  "turns": 4
+}

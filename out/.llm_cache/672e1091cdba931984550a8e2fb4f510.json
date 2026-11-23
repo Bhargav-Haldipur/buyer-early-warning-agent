@@ -1,0 +1,78 @@
+{
+  "result": {
+    "narrative": "Larsen & Toubro is performing well on the fundamentals visible to us. Q2 profit rose 33% to \u20b95,202 crore with record order inflows of \u20b9147,665 crore, the group won orders worth up to \u20b910,000 crore for the Dhaka Metro project, and three brokers carry Buy ratings. On the payment side there is one open overdue notification under policy TCI-WT-2026-0002 at 12 days past due, against a 350,000,000 INR limit on 90-day terms, with only one prior overdue on record (resolved 6 days late). Nothing in this picture points to distress.\n\nThe buyer sits in Watch at 28.4 almost entirely because of news. The trace is 0.65 x 12.0 (payment, 12 DPD) + 0.35 x 58.8 (news) = 28.4: the news component contributes 20.6 points and payment only 7.8. The single driver is a severity 3 regulatory_action item, a Karnataka minister asking officials to blacklist L&T for delaying works. The adjudicator agreed with caveats and flagged that without this article the score is 7.8, inside Healthy, that the stored article body is just a repetition of the headline so there is no substantive text behind the severity 3 classification, and that the event is a request rather than an executed debarment. The adjudicator also flagged that the notification records owed of 83,000,000 INR while the payment review under the same notification id describes an open overdue of INR 18M; these cannot both be correct and the exposure figure should be confirmed.\n\nThe recommendation is to MAINTAIN the limit at 350,000,000 INR for Trade Credit Insurer under policy TCI-WT-2026-0002, no change, on the basis that probability of default at 0.1837 is within the 0.25 appetite and maximum liability does not bind. Expected loss is unchanged at 46,292,400 either side of the action. Watch here is a monitoring flag rather than a reason to cut, but the underwriter should treat the regulatory item as unverified pending confirmation that any debarment has actually been issued, and reconcile the owed figure before the file is relied on.\n\nThe path back to Healthy is short: 8.4 points, with the Healthy line at 20.0. Clearing the open overdue removes the payment contribution, though on its own that is not enough because the news item alone holds the band; the decisive move is confirming that no blacklisting was executed so the severity 3 item can be downgraded or withdrawn. Failing that, the item decays on a 365-day half-life. Deterioration would have to be substantial to matter: High Risk begins at 50.0, which is 21.6 points away and would need roughly 38 DPD on the payment side.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the 350,000,000 INR limit unchanged \u2014 PD of 0.1837 is within the 0.25 appetite and the Watch band is a monitoring flag, not a credit deterioration. The adjudicator agreed only with caveats: the band rests entirely on one unverified news item, and the amount owed is recorded inconsistently and should be confirmed.",
+      "payment_note": "One open overdue at 12 days past due under policy TCI-WT-2026-0002, contributing just 7.8 of the 28.4 score, with trend assessed as insufficient_history \u2014 only one prior overdue on record, resolved 6 days late \u2014 and a conflict in the file between owed of 83,000,000 INR and the review's reference to INR 18M.",
+      "news_note": "The only negative item is a severity 3 report that a Karnataka minister has asked officials to blacklist L&T for delaying works, which contributes 20.6 points and alone holds the Watch band, set against unscored positives including 33% Q2 profit growth to \u20b95,202 crore, record order inflows of \u20b9147,665 crore and a \u20b910,000 crore Dhaka Metro win.",
+      "lifts_it": [
+        "Confirmation that no blacklisting or debarment was actually issued, which would strip out the severity 3 item and drop the score to 7.8",
+        "Clearing the single open overdue at 12 DPD",
+        "Decay of the regulatory item on its 365-day half-life; 8.4 points returns the buyer to Healthy below 20.0"
+      ],
+      "worsens_it": [
+        "An executed debarment or formal contract termination in Karnataka, upgrading the regulatory item from a request to a completed action",
+        "Payment slippage toward 38 DPD, the level that would reach High Risk",
+        "Further overdue notifications, particularly from a second policy, given current visibility is from a single policy only"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN02\", \"score\": 28.4, \"band\": \"Watch\", \"pd\": 0.1837, \"payment\": {\"dpd\": 12, \"raw\": 12.0, \"weighted\": 7.8, \"worst_line\": \"TCI-WT-2026-0002\"}, \"news\": {\"severity\": 3, \"category\": \"regulatory_action\", \"article_id\": \"GN-fba6c04b5bc2\", \"age_days\": 11, \"headline\": \"Karnataka Minister Eshwar Khandre asks officials to blacklist Larsen & Toubro for \\u2018delaying\\u2019 works\", \"via_parent\": f"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN02-1\", \"buyer_id\": \"IN02\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-WT-2026-0002\", \"insured_name\": \"Orvana Steel\", \"product_type\": \"WHOLE_TURNOVER\", \"currency\": \"INR\", \"current_limit\": 350000000, \"owed\": 83000000, \"revised_limit\": 350000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.183"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 21.6, \"dpd_for_next_band\": 38, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 8.4, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261112-00003\", \"kind\": \"payment\", \"date\": \"2026-11-11\", \"detail\": \"1 open overdue notification(s) under policy TCI-WT-2026-0002; the oldest is 12 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0002\", \"dpd\": 12, \"owed\": 83000000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261112-00003\", \"kind\": \"payment_review\", \"date\": \"2026-11-11\", \"detail\": \"Larsen & Tou"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-fba6c04b5bc2"
+      },
+      "result": "{\"article_id\": \"GN-fba6c04b5bc2\", \"published_date\": \"2026-11-12\", \"publication\": \"The Hindu\", \"headline\": \"Karnataka Minister Eshwar Khandre asks officials to blacklist Larsen & Toubro for \\u2018delaying\\u2019 works\", \"body\": \"Karnataka Minister Eshwar Khandre asks officials to blacklist Larsen & Toubro for \\u2018delaying\\u2019 works\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-e0724bfb4a0c"
+      },
+      "result": "{\"article_id\": \"GN-e0724bfb4a0c\", \"published_date\": \"2026-10-28\", \"publication\": \"ET Infra\", \"headline\": \"L&T Q2 profit rose 33% to \\u20b95,202 crore; logs record order inflows of \\u20b9147,665 crore\", \"body\": \"L&T Q2 profit rose 33% to \\u20b95,202 crore; logs record order inflows of \\u20b9147,665 crore\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Larsen & Toubro is performing well on the fundamentals visible to us. Q2 profit rose 33% to \u20b95,202 crore with record order inflows of \u20b9147,665 crore, the group won orders worth up to \u20b910,000 crore for the Dhaka Metro project, and three brokers carry Buy ratings. On the payment side there is one open overdue notification under policy TCI-WT-2026-0002 at 12 days past due, against a 350,000,000 INR limit on 90-day terms, with only one prior overdue on record (resolved 6 days late). Nothing in this picture points to distress.\n\nThe buyer sits in Watch at 28.4 almost entirely because of news. The trace is 0.65 x 12.0 (payment, 12 DPD) + 0.35 x 58.8 (news) = 28.4: the news component contributes 20.6 points and payment only 7.8. The single driver is a severity 3 regulatory_action item, a Karnataka minister asking officials to blacklist L&T for delaying works. The adjudicator agreed with caveats and flagged that without this article the score is 7.8, inside Healthy, that the stored article body is just a repetition of the headline so there is no substantive text behind the severity 3 classification, and that the event is a request rather than an executed debarment. The adjudicator also flagged that the notification records owed of 83,000,000 INR while the payment review under the same notification id describes an open overdue of INR 18M; these cannot both be correct and the exposure figure should be confirmed.\n\nThe recommendation is to MAINTAIN the limit at 350,000,000 INR for Trade Credit Insurer under policy TCI-WT-2026-0002, no change, on the basis that probability of default at 0.1837 is within the 0.25 appetite and maximum liability does not bind. Expected loss is unchanged at 46,292,400 either side of the action. Watch here is a monitoring flag rather than a reason to cut, but the underwriter should treat the regulatory item as unverified pending confirmation that any debarment has actually been issued, and reconcile the owed figure before the file is relied on.\n\nThe path back to Healthy is short: 8.4 points, with the Healthy line at 20.0. Clearing the open overdue removes the payment contribution, though on its own that is not enough because the news item alone holds the band; the decisive move is confirming that no blacklisting was executed so the severity 3 item can be downgraded or withdrawn. Failing that, the item decays on a 365-day half-life. Deterioration would have to be substantial to matter: High Risk begins at 50.0, which is 21.6 points away and would need roughly 38 DPD on the payment side.",
+        "bottom_line": "Maintain the 350,000,000 INR limit unchanged \u2014 PD of 0.1837 is within the 0.25 appetite and the Watch band is a monitoring flag, not a credit deterioration. The adjudicator agreed only with caveats: the band rests entirely on one unverified news item, and the amount owed is recorded inconsistently and should be confirmed.",
+        "payment_note": "One open overdue at 12 days past due under policy TCI-WT-2026-0002, contributing just 7.8 of the 28.4 score, with trend assessed as insufficient_history \u2014 only one prior overdue on record, resolved 6 days late \u2014 and a conflict in the file between owed of 83,000,000 INR and the review's reference to INR 18M.",
+        "news_note": "The only negative item is a severity 3 report that a Karnataka minister has asked officials to blacklist L&T for delaying works, which contributes 20.6 points and alone holds the Watch band, set against unscored positives including 33% Q2 profit growth to \u20b95,202 crore, record order inflows of \u20b9147,665 crore and a \u20b910,000 crore Dhaka Metro win.",
+        "lifts_it": [
+          "Confirmation that no blacklisting or debarment was actually issued, which would strip out the severity 3 item and drop the score to 7.8",
+          "Clearing the single open overdue at 12 DPD",
+          "Decay of the regulatory item on its 365-day half-life; 8.4 points returns the buyer to Healthy below 20.0"
+        ],
+        "worsens_it": [
+          "An executed debarment or formal contract termination in Karnataka, upgrading the regulatory item from a request to a completed action",
+          "Payment slippage toward 38 DPD, the level that would reach High Risk",
+          "Further overdue notifications, particularly from a second policy, given current visibility is from a single policy only"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

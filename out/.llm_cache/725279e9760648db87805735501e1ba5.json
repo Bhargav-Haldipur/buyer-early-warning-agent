@@ -1,0 +1,78 @@
+{
+  "result": {
+    "narrative": "Intel is trading without any recorded payment problem: the payment component is 0 DPD, raw 0.0, and contributes 0.0 to the score. The recent news record is dominated by positive or neutral items \u2014 eight severity-0 entries aged 1 to 25 days, including the first external customer for the 18A process (CNBC GN-7f4e6c3d7636, Barron's GN-1a76669797df) and two routine 8-K filings. The negative material is confined to share-price weakness and an equity-holder claim arising from it, not to trade terms or liquidity. PD is 0.1072 against a target of 0.25.\n\nThe Watch band rests on a single item. The trace is 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 59.2 (news) = 20.7, so the entire score comes from GN-92904b4dcaa6, a Reuters report of a shareholder suit following a 29% stock plunge, rated severity 3 / base 60.0 and decayed to 59.21 at 7 days old. The adjudicator agreed with caveats rather than endorsing the band outright: the article's full text is a single line identical to its headline, the news agent's own reason field concedes the event is \"not directly a payment or liquidity issue\", and the score clears the Healthy line of 20.0 by only 0.7. The adjudicator also noted that no payment or payment_review evidence exists at all, so the 0 DPD carrying 65% of the weight is an absence of data rather than demonstrated good behaviour \u2014 which is why they stopped short of calling this Healthy.\n\nThe recommendation is to MAINTAIN the USD 7,000,000 export limit on policy TCI-EX-2026-0001 (insured Tamrin Exports), an unchanged limit with expected loss of 540,288 before and after. Nothing in the file supports a reduction: PD of 0.1072 sits well within the 0.25 appetite, maximum liability does not bind, and current amount owed is 0. Treat this as a monitoring flag and use the review period to confirm an actual payment ledger, as the adjudicator asked.\n\nTwo things would lift it. The score needs to fall only 0.7 points to reach Healthy below 20.0, and with a news half-life of 365 days the lawsuit item decays slowly, so the practical route is confirmation that the suit carries no trade-creditor or liquidity consequence, which would remove the sole driver. Obtaining real payment history to replace the empty ledger would also convert the 0 DPD input from absent data into verified performance and settle the adjudicator's main caveat.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the USD 7,000,000 export limit \u2014 PD of 0.1072 is well inside the 0.25 appetite and there is no payment deterioration. Note that the adjudicator agreed only with caveats: the Watch band rests entirely on one headline-only shareholder-lawsuit article and clears the Healthy line by just 0.7 points.",
+      "payment_note": "The payment record shows 0 DPD contributing 0.0 to the score, but no payment or payment_review evidence is on file, so this reflects absent data rather than a demonstrated settlement trend.",
+      "news_note": "The only credit-negative match is a 7-day-old Reuters report of a shareholder suit after a 29% stock plunge (severity 3, decayed 59.21) whose full text is identical to its headline, against eight severity-0 items including Intel signing its first external 18A customer.",
+      "lifts_it": [
+        "A 0.7-point fall takes the score below 20.0 into Healthy",
+        "Confirmation that the shareholder suit carries no trade-creditor or liquidity exposure, removing the sole driver",
+        "An actual payment ledger verifying the 0 DPD input that carries 65% of the weight"
+      ],
+      "worsens_it": [
+        "A 29.3-point rise to 50.0 would band High Risk",
+        "Arrears reaching 38 DPD would reach the next band",
+        "Any news item evidencing payment or liquidity distress rather than equity-holder grievance"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS01\", \"score\": 20.7, \"band\": \"Watch\", \"pd\": 0.1072, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 3, \"category\": \"shareholder_lawsuit\", \"article_id\": \"GN-92904b4dcaa6\", \"age_days\": 7, \"headline\": \"Intel sued by shareholders following 29% stock plunge\", \"via_parent\": false, \"parent_name\": null, \"raw\": 59.2, \"weighted\": 20.7}, \"trace\": \"0"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS01-1\", \"buyer_id\": \"OS01\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 7000000, \"owed\": 0, \"revised_limit\": 7000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1072, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 29.3, \"dpd_for_next_band\": 38, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 0.7, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"GN-b97c444dd8fd\", \"kind\": \"news\", \"date\": \"2026-11-22\", \"detail\": \"severity 0 (new_customer_win): Intel Says It Just Signed Its First Customer for Its Most Advanced Chipmaking Process. The Stock Is Still More Than 60% Below Its June Record.\", \"data\": {\"severity\": 0, \"category\": \"new_customer_win\", \"age_days\": 1, \"base\": 0.0, \"decayed\": 0.0, \"entity\": \"Intel Corporation\", \"via_parent\": fal"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-92904b4dcaa6"
+      },
+      "result": "{\"article_id\": \"GN-92904b4dcaa6\", \"published_date\": \"2026-11-16\", \"publication\": \"Reuters\", \"headline\": \"Intel sued by shareholders following 29% stock plunge\", \"body\": \"Intel sued by shareholders following 29% stock plunge\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-02fc251320f6"
+      },
+      "result": "{\"article_id\": \"GN-02fc251320f6\", \"published_date\": \"2026-11-21\", \"publication\": \"Yahoo Finance\", \"headline\": \"After Plummeting 62% This Year, Could Buying Intel Stock Today Set You Up for Life?\", \"body\": \"After Plummeting 62% This Year, Could Buying Intel Stock Today Set You Up for Life?\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Intel is trading without any recorded payment problem: the payment component is 0 DPD, raw 0.0, and contributes 0.0 to the score. The recent news record is dominated by positive or neutral items \u2014 eight severity-0 entries aged 1 to 25 days, including the first external customer for the 18A process (CNBC GN-7f4e6c3d7636, Barron's GN-1a76669797df) and two routine 8-K filings. The negative material is confined to share-price weakness and an equity-holder claim arising from it, not to trade terms or liquidity. PD is 0.1072 against a target of 0.25.\n\nThe Watch band rests on a single item. The trace is 0.65 x 0.0 (payment, 0 DPD) + 0.35 x 59.2 (news) = 20.7, so the entire score comes from GN-92904b4dcaa6, a Reuters report of a shareholder suit following a 29% stock plunge, rated severity 3 / base 60.0 and decayed to 59.21 at 7 days old. The adjudicator agreed with caveats rather than endorsing the band outright: the article's full text is a single line identical to its headline, the news agent's own reason field concedes the event is \"not directly a payment or liquidity issue\", and the score clears the Healthy line of 20.0 by only 0.7. The adjudicator also noted that no payment or payment_review evidence exists at all, so the 0 DPD carrying 65% of the weight is an absence of data rather than demonstrated good behaviour \u2014 which is why they stopped short of calling this Healthy.\n\nThe recommendation is to MAINTAIN the USD 7,000,000 export limit on policy TCI-EX-2026-0001 (insured Tamrin Exports), an unchanged limit with expected loss of 540,288 before and after. Nothing in the file supports a reduction: PD of 0.1072 sits well within the 0.25 appetite, maximum liability does not bind, and current amount owed is 0. Treat this as a monitoring flag and use the review period to confirm an actual payment ledger, as the adjudicator asked.\n\nTwo things would lift it. The score needs to fall only 0.7 points to reach Healthy below 20.0, and with a news half-life of 365 days the lawsuit item decays slowly, so the practical route is confirmation that the suit carries no trade-creditor or liquidity consequence, which would remove the sole driver. Obtaining real payment history to replace the empty ledger would also convert the 0 DPD input from absent data into verified performance and settle the adjudicator's main caveat.",
+        "bottom_line": "Maintain the USD 7,000,000 export limit \u2014 PD of 0.1072 is well inside the 0.25 appetite and there is no payment deterioration. Note that the adjudicator agreed only with caveats: the Watch band rests entirely on one headline-only shareholder-lawsuit article and clears the Healthy line by just 0.7 points.",
+        "payment_note": "The payment record shows 0 DPD contributing 0.0 to the score, but no payment or payment_review evidence is on file, so this reflects absent data rather than a demonstrated settlement trend.",
+        "news_note": "The only credit-negative match is a 7-day-old Reuters report of a shareholder suit after a 29% stock plunge (severity 3, decayed 59.21) whose full text is identical to its headline, against eight severity-0 items including Intel signing its first external 18A customer.",
+        "lifts_it": [
+          "A 0.7-point fall takes the score below 20.0 into Healthy",
+          "Confirmation that the shareholder suit carries no trade-creditor or liquidity exposure, removing the sole driver",
+          "An actual payment ledger verifying the 0 DPD input that carries 65% of the weight"
+        ],
+        "worsens_it": [
+          "A 29.3-point rise to 50.0 would band High Risk",
+          "Arrears reaching 38 DPD would reach the next band",
+          "Any news item evidencing payment or liquidity distress rather than equity-holder grievance"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

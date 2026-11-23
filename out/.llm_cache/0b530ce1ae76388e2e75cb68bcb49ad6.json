@@ -1,0 +1,104 @@
+{
+  "result": {
+    "assessment": "agree_with_caveats",
+    "rationale": "The High Risk band is supported: the score is wholly payment-driven (0.65 x 98.0 at 64 DPD = 63.7), resting on two open overdue notifications spread across both policies and a documented deteriorating trend versus a single prior overdue that resolved in 18 days. However, the payment review's own figures contradict the underlying notifications \u2014 it reports INR 6.0M of overdue when the two notifications separately record INR 7.7M and INR 3.0M owed, and it assigns the oldest item a due date identical to the date it was already logged at 64 DPD. The scored 64 DPD also predates a later notification dated 2026-10-13, so the input may be stale and the true aging worse. Every discrepancy points toward equal or greater risk, so the band stands, but the exposure and aging figures should be re-sourced from the notifications before this goes out.",
+    "concerns": [
+      {
+        "source_id": "N-260921-00021",
+        "issue": "Exposure reconciliation failure: the payment_review states the two open overdue notifications total INR 6.0M, but the notification records show owed amounts of INR 7.7M on TCI-SCF-2026-0001 and INR 3.0M on TCI-WT-2026-0002. The INR 7.7M figure on this single notification alone already exceeds the INR 6.0M the review treats as the combined overdue balance. The review's reclassification of INR 4.7M as 'not-yet-due' is not supported by the notification records, which book these sums as overdue, and it understates overdue utilisation against the combined INR 23M credit limits."
+      },
+      {
+        "source_id": "N-260921-00021",
+        "issue": "Impossible date in the payment_review: the oldest overdue is given an 'original due date 2026-09-20', yet this notification, dated 2026-09-20, already reports it at 64 days past due. An obligation cannot be 64 days past due on its own due date, so either the stated due date or the 64 DPD figure feeding the score is wrong."
+      },
+      {
+        "source_id": "N-261014-00022",
+        "issue": "Possible stale scoring input: the formula uses 64 DPD sourced from the 2026-09-20 notification, but this later notification is dated 2026-10-13 and reports 41 DPD on the second policy. If the oldest line remains open, actual DPD on it now materially exceeds the scored 64; if it has cleared, the worst_line attribution to TCI-SCF-2026-0001 requires re-verification. The score is not aligned to the most recent evidence date."
+      },
+      {
+        "source_id": "N-260921-00021",
+        "issue": "The news component contributes 0.0 across 35% of the formula weight, but this reflects no matched articles and no parent linkage rather than a verified clean record. This suppresses rather than inflates the score, since payment raw 98.0 bands High Risk on its own, but 0.0 should not be read as evidence of reputational calm."
+      }
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_score_breakdown",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN07\", \"score\": 63.7, \"band\": \"High Risk\", \"pd\": 0.5892, \"payment\": {\"dpd\": 64, \"raw\": 98.0, \"weighted\": 63.7, \"worst_line\": \"TCI-SCF-2026-0001\"}, \"news\": {\"severity\": 0, \"category\": null, \"article_id\": null, \"age_days\": null, \"headline\": null, \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x 98.0 (payment, 64 DPD) + 0.35 x 0.0 (news) = 63.7\"}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "all"
+      },
+      "result": "[{\"id\": \"N-260921-00021\", \"kind\": \"payment\", \"date\": \"2026-09-20\", \"detail\": \"1 open overdue notification(s) under policy TCI-SCF-2026-0001; the oldest is 64 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"dpd\": 64, \"owed\": 7700000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261014-00022\", \"kind\": \"payment\", \"date\": \"2026-10-13\", \"detail\": \"1 open overdue not"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "news"
+      },
+      "result": "[{\"note\": \"no news evidence\"}]"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "parent"
+      },
+      "result": "[{\"note\": \"no parent evidence\"}]"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The High Risk band is supported: the score is wholly payment-driven (0.65 x 98.0 at 64 DPD = 63.7), resting on two open overdue notifications spread across both policies and a documented deteriorating trend versus a single prior overdue that resolved in 18 days. However, the payment review's own figures contradict the underlying notifications \u2014 it reports INR 6.0M of overdue when the two notifications record INR 7.7M and INR 3.0M owed, and it assigns the oldest item a due date identical to the date it was already logged at 64 DPD. The scored 64 DPD also predates a later notification dated 2026-10-13, so the input may be stale and the true aging worse. Every discrepancy points toward equal or greater risk, so the band stands, but the exposure and aging figures should be re-sourced from the notifications before this goes out.",
+        "concerns": [
+          {
+            "source_id": "N-260921-00021",
+            "issue": "Exposure reconciliation failure: the payment_review states two open overdue notifications totaling INR 6.0M, but the notification records show owed amounts of INR 7.7M (N-260921-00021) and INR 3.0M (N-261014-00022), i.e. INR 10.7M. The review reclassifies INR 4.7M as 'not-yet-due', contradicting the notifications that book those sums as overdue. Against the combined INR 23M credit limits this is a materially different utilisation picture and understates overdue exposure."
+          },
+          {
+            "source_id": "N-260921-00021",
+            "issue": "Impossible date in the payment_review: the oldest overdue is given an 'original due date 2026-09-20', yet the notification dated 2026-09-20 already reports it at 64 days past due. An obligation cannot be 64 days past due on its own due date, so either the due date or the DPD figure feeding the score is wrong."
+          },
+          {
+            "source_id": "N-261014-00022",
+            "issue": "Possible stale scoring input: the formula uses 64 DPD sourced from the 2026-09-20 notification, but a later notification dated 2026-10-13 exists. If the oldest line remains open, actual DPD now materially exceeds the scored 64; if it has cleared, the worst_line attribution to TCI-SCF-2026-0001 requires re-verification. The score is not aligned to the most recent evidence date."
+          },
+          {
+            "source_id": "N-260921-00021",
+            "issue": "The news component contributes 0.0 across 35% of the formula weight, but this reflects no matched articles and no parent linkage rather than a verified clean record. This suppresses rather than inflates the score (payment raw 98.0 bands High Risk on its own), but 0.0 should not be read as evidence of reputational calm."
+          }
+        ]
+      },
+      "error": "these figures are not in the data: ['10.7M']"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The High Risk band is supported: the score is wholly payment-driven (0.65 x 98.0 at 64 DPD = 63.7), resting on two open overdue notifications spread across both policies and a documented deteriorating trend versus a single prior overdue that resolved in 18 days. However, the payment review's own figures contradict the underlying notifications \u2014 it reports INR 6.0M of overdue when the two notifications separately record INR 7.7M and INR 3.0M owed, and it assigns the oldest item a due date identical to the date it was already logged at 64 DPD. The scored 64 DPD also predates a later notification dated 2026-10-13, so the input may be stale and the true aging worse. Every discrepancy points toward equal or greater risk, so the band stands, but the exposure and aging figures should be re-sourced from the notifications before this goes out.",
+        "concerns": [
+          {
+            "source_id": "N-260921-00021",
+            "issue": "Exposure reconciliation failure: the payment_review states the two open overdue notifications total INR 6.0M, but the notification records show owed amounts of INR 7.7M on TCI-SCF-2026-0001 and INR 3.0M on TCI-WT-2026-0002. The INR 7.7M figure on this single notification alone already exceeds the INR 6.0M the review treats as the combined overdue balance. The review's reclassification of INR 4.7M as 'not-yet-due' is not supported by the notification records, which book these sums as overdue, and it understates overdue utilisation against the combined INR 23M credit limits."
+          },
+          {
+            "source_id": "N-260921-00021",
+            "issue": "Impossible date in the payment_review: the oldest overdue is given an 'original due date 2026-09-20', yet this notification, dated 2026-09-20, already reports it at 64 days past due. An obligation cannot be 64 days past due on its own due date, so either the stated due date or the 64 DPD figure feeding the score is wrong."
+          },
+          {
+            "source_id": "N-261014-00022",
+            "issue": "Possible stale scoring input: the formula uses 64 DPD sourced from the 2026-09-20 notification, but this later notification is dated 2026-10-13 and reports 41 DPD on the second policy. If the oldest line remains open, actual DPD on it now materially exceeds the scored 64; if it has cleared, the worst_line attribution to TCI-SCF-2026-0001 requires re-verification. The score is not aligned to the most recent evidence date."
+          },
+          {
+            "source_id": "N-260921-00021",
+            "issue": "The news component contributes 0.0 across 35% of the formula weight, but this reflects no matched articles and no parent linkage rather than a verified clean record. This suppresses rather than inflates the score, since payment raw 98.0 bands High Risk on its own, but 0.0 should not be read as evidence of reputational calm."
+          }
+        ]
+      }
+    }
+  ],
+  "turns": 4
+}

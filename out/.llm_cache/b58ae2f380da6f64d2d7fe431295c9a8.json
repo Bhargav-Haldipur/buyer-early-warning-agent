@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 4,
+    "category": "layoffs",
+    "reason": "Article reports Intel is launching another round of layoffs, indicating ongoing cost-cutting and workforce reduction, a moderate negative credit signal."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 4,
+        "category": "layoffs",
+        "reason": "Article reports Intel is launching another round of layoffs, indicating ongoing cost-cutting and workforce reduction, a moderate negative credit signal."
+      }
+    }
+  ],
+  "turns": 2
+}

@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 1,
+    "category": "stock_decline",
+    "reason": "Article reports a stock price collapse for Intel amid a broader chip sector selloff, which is a market sentiment event rather than evidence of operational or payment distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "OS01"
+      },
+      "result": "{\"id\": \"OS01\", \"kind\": \"buyer\", \"name\": \"Intel Corporation\", \"short_name\": \"Intel\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\", \"size_band\": \"large\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 1,
+        "category": "stock_decline",
+        "reason": "Article reports a stock price collapse for Intel amid a broader chip sector selloff, which is a market sentiment event rather than evidence of operational or payment distress."
+      }
+    }
+  ],
+  "turns": 3
+}

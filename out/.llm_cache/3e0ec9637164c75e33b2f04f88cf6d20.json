@@ -1,0 +1,92 @@
+{
+  "result": {
+    "narrative": "Hessler Maschinenbau is a deteriorating buyer on first-party data. One overdue invoice of USD 640,000 is open under policy TCI-EX-2026-0001, now 52 days past due, and prior resolved overdues show lengthening delays of 9 days late in March and 19 days late in June before the current 52. Combined outstanding of 3.24M (640k overdue plus 2.6M not yet due) exceeds the 3.0M credit limit on the sole reporting policy, all exposure sits with a single insurer, and notification frequency has ticked up in the latest six-month window.\n\nThe score is 75.3, High Risk, from 0.65 x 74.0 (payment, 52 DPD) + 0.35 x 77.8 (news), with PD 0.775. The adjudicator agreed with caveats and the caveats matter: payment weighted alone is 48.1, short of the High Risk cutoff, so the 27.2 weighted points from ILL-003 are what carry the score across it. That article is recorded under publication \"Illustrative\" and attributes the claim to three unnamed suppliers speaking to an unnamed regional business paper, yet is scored severity 4 on base 80.0. The adjudicator also flags a probable double-count, since the article's cause (a large customer postponing acceptance of two production lines) is plausibly the same liquidity event behind the overdue invoice, and an ambiguous as-of date for the 52 DPD input, which was recorded 2026-10-02 while the article published 2026-11-08 at 15 days old.\n\nThe recommendation is FREEZE on LIM-OS06-1 (TCI, Tamrin Exports, EXPORT, USD): current limit 3,000,000 held at a revised 3,000,000, change 0, because outstanding exposure is already at or above the limit and there is nothing left to cut. Expected loss is 1,674,000 before and after, so the freeze stops new exposure rather than reducing what is already written. PD of 0.775 is well above the 0.25 target. Before releasing the High Risk band, the underwriter should confirm the underlying supplier report and resolve whether 52 DPD is current or a stale snapshot.\n\nTo move down, the score needs to fall 25.3 points to reach Watch below 50.0. Settlement of the 640,000 overdue and a return of combined outstanding to within the 3.0M limit would do most of the work on the payment leg; on the news side, the item decays on a 365-day half-life, and the outlook confirms news alone does not hold the band, so a corrected or unsubstantiated ILL-003 would remove the contribution that pushed the score over the line.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Freeze the TCI limit at 3,000,000 (no reduction possible \u2014 outstanding of 3.24M already exceeds it) on a High Risk score of 75.3. The adjudicator agreed with caveats: payment alone weighs 48.1, short of the cutoff, so the band rests on a single anonymously sourced article that should be confirmed before the High Risk band is released.",
+      "payment_note": "The trend is deteriorating \u2014 days late have lengthened from 9 in March to 19 in June to the current open overdue of USD 640,000 at 52 days, with combined outstanding of 3.24M now above the 3.0M limit on the sole reporting policy.",
+      "news_note": "One matched item, ILL-003 of 2026-11-08 (severity 4, unpaid_vendors, age 15 days, base 80.0 decayed to 77.75), reports Hessler falling behind with component suppliers after a customer postponed acceptance of two production lines, but it is sourced to three unnamed suppliers via an unnamed regional paper and carries the 27.2 weighted points that lift the score into High Risk.",
+      "lifts_it": [
+        "Settlement of the USD 640,000 overdue and DPD falling back from 52, with combined outstanding back within the 3.0M limit",
+        "ILL-003 failing confirmation or decaying (365-day half-life) \u2014 news alone does not hold the band",
+        "A fall of 25.3 points to reach Watch below 50.0"
+      ],
+      "worsens_it": [
+        "High Risk is the top band \u2014 the outlook shows no higher band or DPD threshold above it",
+        "DPD rising beyond 52 if 2026-10-02 proves to be a stale observation date",
+        "Further overdue notifications, or corroboration of the supplier arrears in ILL-003"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS06\", \"score\": 75.3, \"band\": \"High Risk\", \"pd\": 0.775, \"payment\": {\"dpd\": 52, \"raw\": 74.0, \"weighted\": 48.1, \"worst_line\": \"TCI-EX-2026-0001\"}, \"news\": {\"severity\": 4, \"category\": \"unpaid_vendors\", \"article_id\": \"ILL-003\", \"age_days\": 15, \"headline\": \"Hessler Maschinenbau has fallen behind on payments to suppliers\", \"via_parent\": false, \"parent_name\": null, \"raw\": 77.8, \"weighted\": "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS06-1\", \"buyer_id\": \"OS06\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 3000000, \"owed\": 3240000, \"revised_limit\": 3000000, \"change\": 0, \"action\": \"FREEZE\", \"reason\": \"outstanding exposure already at or above the limit - nothing left to"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": null, \"next_band_at\": null, \"points_to_next_band\": null, \"dpd_for_next_band\": null, \"lower_band\": \"Watch\", \"lower_band_below\": 50.0, \"points_to_lower_band\": 25.3, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261003-00032\", \"kind\": \"payment\", \"date\": \"2026-10-02\", \"detail\": \"1 open overdue notification(s) under policy TCI-EX-2026-0001; the oldest is 52 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"dpd\": 52, \"owed\": 3240000.0, \"currency\": \"USD\", \"open_count\": 1}}, {\"id\": \"N-261003-00032\", \"kind\": \"payment_review\", \"date\": \"2026-10-02\", \"detail\": \"Hessler Masch"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "ILL-003"
+      },
+      "result": "{\"article_id\": \"ILL-003\", \"published_date\": \"2026-11-08\", \"publication\": \"Illustrative\", \"headline\": \"Hessler Maschinenbau has fallen behind on payments to suppliers\", \"body\": \"Stuttgart machine builder Hessler Maschinenbau GmbH has fallen behind on payments to several component suppliers, three of them told a regional business paper, after a large customer postponed acceptance of two production l"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Hessler Maschinenbau is a deteriorating buyer on first-party data. One overdue invoice of USD 640,000 is open under policy TCI-EX-2026-0001, now 52 days past due, and prior resolved overdues show lengthening delays of 9 days late in March and 19 days late in June before the current 52. Combined outstanding of 3.24M (640k overdue plus 2.6M not yet due) exceeds the 3.0M credit limit on the sole reporting policy, all exposure sits with a single insurer, and notification frequency has ticked up in the latest six-month window.\n\nThe score is 75.3, High Risk, from 0.65 x 74.0 (payment, 52 DPD) + 0.35 x 77.8 (news), with PD 0.775. The adjudicator agreed with caveats and the caveats matter: payment weighted alone is 48.1, short of the High Risk cutoff, so the 27.2 weighted points from ILL-003 are what carry the score across it. That article is recorded under publication \"Illustrative\" and attributes the claim to three unnamed suppliers speaking to an unnamed regional business paper, yet is scored severity 4 on base 80.0. The adjudicator also flags a probable double-count, since the article's cause (a large customer postponing acceptance of two production lines) is plausibly the same liquidity event behind the overdue invoice, and an ambiguous as-of date for the 52 DPD input, which was recorded 2026-10-02 while the article published 2026-11-08 at 15 days old.\n\nThe recommendation is FREEZE on LIM-OS06-1 (TCI, Tamrin Exports, EXPORT, USD): current limit 3,000,000 held at a revised 3,000,000, change 0, because outstanding exposure is already at or above the limit and there is nothing left to cut. Expected loss is 1,674,000 before and after, so the freeze stops new exposure rather than reducing what is already written. PD of 0.775 is well above the 0.25 target. Before releasing the High Risk band, the underwriter should confirm the underlying supplier report and resolve whether 52 DPD is current or a stale snapshot.\n\nTo move down, the score needs to fall 25.3 points to reach Watch below 50.0. Settlement of the 640,000 overdue and a return of combined outstanding to within the 3.0M limit would do most of the work on the payment leg; on the news side, the item decays on a 365-day half-life, and the outlook confirms news alone does not hold the band, so a corrected or unsubstantiated ILL-003 would remove the contribution that pushed the score over the line.",
+        "bottom_line": "Freeze the TCI limit at 3,000,000 (no reduction possible \u2014 outstanding of 3.24M already exceeds it) on a High Risk score of 75.3. The adjudicator agreed with caveats: payment alone weighs 48.1, short of the cutoff, so the band rests on a single anonymously sourced article that should be confirmed before the High Risk band is released.",
+        "payment_note": "The trend is deteriorating \u2014 days late have lengthened from 9 in March to 19 in June to the current open overdue of USD 640,000 at 52 days, with combined outstanding of 3.24M now above the 3.0M limit on the sole reporting policy.",
+        "news_note": "One matched item, ILL-003 of 2026-11-08 (severity 4, unpaid_vendors, age 15 days, base 80.0 decayed to 77.75), reports Hessler falling behind with component suppliers after a customer postponed acceptance of two production lines, but it is sourced to three unnamed suppliers via an unnamed regional paper and carries the 27.2 weighted points that lift the score into High Risk.",
+        "lifts_it": [
+          "Settlement of the USD 640,000 overdue and DPD falling back from 52",
+          ", combined outstanding returning within the 3.0M limit",
+          "ILL-003 failing confirmation or decaying (365-day half-life) \u2014 news alone does not hold the band",
+          "A fall of 25.3 points to reach Watch below 50.0"
+        ],
+        "worsens_it": [
+          "High Risk is the top band \u2014 the outlook shows no higher band or DPD threshold above it",
+          "DPD rising beyond 52 if 2026-10-02 proves to be a stale observation date",
+          "Further overdue notifications, or corroboration of the supplier arrears in ILL-003"
+        ]
+      },
+      "error": "lifts_it needs 1 to 3 items; keep the ones that matter most"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Hessler Maschinenbau is a deteriorating buyer on first-party data. One overdue invoice of USD 640,000 is open under policy TCI-EX-2026-0001, now 52 days past due, and prior resolved overdues show lengthening delays of 9 days late in March and 19 days late in June before the current 52. Combined outstanding of 3.24M (640k overdue plus 2.6M not yet due) exceeds the 3.0M credit limit on the sole reporting policy, all exposure sits with a single insurer, and notification frequency has ticked up in the latest six-month window.\n\nThe score is 75.3, High Risk, from 0.65 x 74.0 (payment, 52 DPD) + 0.35 x 77.8 (news), with PD 0.775. The adjudicator agreed with caveats and the caveats matter: payment weighted alone is 48.1, short of the High Risk cutoff, so the 27.2 weighted points from ILL-003 are what carry the score across it. That article is recorded under publication \"Illustrative\" and attributes the claim to three unnamed suppliers speaking to an unnamed regional business paper, yet is scored severity 4 on base 80.0. The adjudicator also flags a probable double-count, since the article's cause (a large customer postponing acceptance of two production lines) is plausibly the same liquidity event behind the overdue invoice, and an ambiguous as-of date for the 52 DPD input, which was recorded 2026-10-02 while the article published 2026-11-08 at 15 days old.\n\nThe recommendation is FREEZE on LIM-OS06-1 (TCI, Tamrin Exports, EXPORT, USD): current limit 3,000,000 held at a revised 3,000,000, change 0, because outstanding exposure is already at or above the limit and there is nothing left to cut. Expected loss is 1,674,000 before and after, so the freeze stops new exposure rather than reducing what is already written. PD of 0.775 is well above the 0.25 target. Before releasing the High Risk band, the underwriter should confirm the underlying supplier report and resolve whether 52 DPD is current or a stale snapshot.\n\nTo move down, the score needs to fall 25.3 points to reach Watch below 50.0. Settlement of the 640,000 overdue and a return of combined outstanding to within the 3.0M limit would do most of the work on the payment leg; on the news side, the item decays on a 365-day half-life, and the outlook confirms news alone does not hold the band, so a corrected or unsubstantiated ILL-003 would remove the contribution that pushed the score over the line.",
+        "bottom_line": "Freeze the TCI limit at 3,000,000 (no reduction possible \u2014 outstanding of 3.24M already exceeds it) on a High Risk score of 75.3. The adjudicator agreed with caveats: payment alone weighs 48.1, short of the cutoff, so the band rests on a single anonymously sourced article that should be confirmed before the High Risk band is released.",
+        "payment_note": "The trend is deteriorating \u2014 days late have lengthened from 9 in March to 19 in June to the current open overdue of USD 640,000 at 52 days, with combined outstanding of 3.24M now above the 3.0M limit on the sole reporting policy.",
+        "news_note": "One matched item, ILL-003 of 2026-11-08 (severity 4, unpaid_vendors, age 15 days, base 80.0 decayed to 77.75), reports Hessler falling behind with component suppliers after a customer postponed acceptance of two production lines, but it is sourced to three unnamed suppliers via an unnamed regional paper and carries the 27.2 weighted points that lift the score into High Risk.",
+        "lifts_it": [
+          "Settlement of the USD 640,000 overdue and DPD falling back from 52, with combined outstanding back within the 3.0M limit",
+          "ILL-003 failing confirmation or decaying (365-day half-life) \u2014 news alone does not hold the band",
+          "A fall of 25.3 points to reach Watch below 50.0"
+        ],
+        "worsens_it": [
+          "High Risk is the top band \u2014 the outlook shows no higher band or DPD threshold above it",
+          "DPD rising beyond 52 if 2026-10-02 proves to be a stale observation date",
+          "Further overdue notifications, or corroboration of the supplier arrears in ILL-003"
+        ]
+      }
+    }
+  ],
+  "turns": 4
+}

@@ -137,6 +137,8 @@ class Resolution(unittest.TestCase):
     def test_the_mention_is_only_what_the_headline_says(self):
         self.assertEqual(mention_in("Why Intel stock just dropped", ["Intel"]), "Intel")
         self.assertEqual(mention_in("Artificial intelligence spending booms", ["Intel"]), "")
+        self.assertEqual(mention_in("Week 11 fantasy intel: who to start", ["Intel"]), "")
+        self.assertEqual(mention_in("INTEL CUTS 5% OF STAFF", ["Intel"]), "INTEL")
         self.assertEqual(mention_in("Ford Motor reports results", ["Ford Motor", "Ford"]),
                          "Ford Motor")
 
@@ -174,6 +176,57 @@ class Grading(unittest.TestCase):
     def cands(self):
         return [{"kind": "buyer", "id": b["buyer_id"], "name": b["buyer_name"]}
                 for b in Loader(SBI).buyers()]
+
+
+class FetchFunnel(unittest.TestCase):
+    """A fetch says what it found, dropped and kept, and which stories are new."""
+
+    RSS = (b"<rss><channel>"
+           b"<item><title>Old story - Reuters</title><source>Reuters</source>"
+           b"<link>https://x/old</link><pubDate>Mon, 16 Nov 2026 10:00:00 GMT</pubDate></item>"
+           b"<item><title>New story - Reuters</title><source>Reuters</source>"
+           b"<link>https://x/new</link><pubDate>Tue, 17 Nov 2026 10:00:00 GMT</pubDate></item>"
+           b"<item><title>Blog story - Some Blog</title><source>Some Blog</source>"
+           b"<link>https://x/blog</link><pubDate>Tue, 17 Nov 2026 10:00:00 GMT</pubDate></item>"
+           b"</channel></rss>")
+
+    def test_the_funnel_and_the_new_stories(self):
+        import hashlib
+        import shutil
+        import tempfile
+        from datetime import date
+        from pathlib import Path
+        from unittest.mock import patch
+        from ews import fetch_news
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp) / "book"
+            shutil.copytree(SBI, d)
+            # Google News only: the SEC feed would need its own fixture
+            with (d / "trusted_sources.csv").open(newline="") as fh:
+                rows = list(csv.DictReader(fh))
+            for r in rows:
+                if r["name"] == "sec_edgar":
+                    r["enabled"] = "N"
+            with (d / "trusted_sources.csv").open("w", newline="") as fh:
+                w = csv.DictWriter(fh, fieldnames=list(rows[0]))
+                w.writeheader()
+                w.writerows(rows)
+            old_id = "GN-" + hashlib.sha1(b"https://x/old").hexdigest()[:12]
+            with (d / "news_articles.csv").open("w", newline="") as fh:
+                w = csv.DictWriter(fh, fieldnames=FIELDS)
+                w.writeheader()
+                w.writerow({"article_id": old_id, "published_date": "2026-11-16",
+                            "publication": "Reuters", "headline": "Old story", "body": "",
+                            "mentioned_entity_as_written": "", "url": "https://x/old"})
+            with patch.object(fetch_news, "_get", lambda url, **kw: self.RSS), \
+                    patch.object(fetch_news, "AS_OF", date(2026, 11, 19)), \
+                    patch.object(fetch_news, "DATASET", "sbi"):
+                rep = fetch_news.fetch(days=180, per_buyer=12, data_dir=d, quiet=True)
+        buyers = len(rep["buyers"])                       # every real buyer gets the same feed
+        self.assertEqual(rep["funnel"], {
+            "found": 3 * buyers, "untrusted_dropped": buyers, "outside_window_or_cap": 0,
+            "duplicates": 2 * buyers - 2, "kept": 2})
+        self.assertEqual(rep["new"], ["GN-" + hashlib.sha1(b"https://x/new").hexdigest()[:12]])
 
 
 class AutoRefresh(unittest.TestCase):
@@ -296,3 +349,89 @@ class SettingsFile(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class FetchResultPanel(unittest.TestCase):
+    """After a fetch the page shows its funnel, each new story's outcome, and what moved."""
+
+    def test_a_fetch_reports_like_a_typed_story(self):
+        from unittest.mock import patch
+        import dashboard.server as S
+        story = {"article_id": "GN-1", "published_date": "2026-11-21", "publication": "Reuters",
+                 "headline": "Intel announces job cuts", "body": "", "url": "https://x/1",
+                 "mentioned_entity_as_written": "Intel"}
+        buyer = {"buyer_id": "OS01", "short_name": "Intel", "evidence": [], "verdict":
+                 {"score": 0.0, "band": "Healthy"}}
+        after_buyer = {**buyer, "verdict": {"score": 28.0, "band": "Watch"},
+                       "evidence": [{"source": "GN-1", "kind": "news", "data": {
+                           "entity": "Intel Corporation", "severity": 4}}]}
+        snaps = iter([{"buyers": [buyer], "refusals": []},
+                      {"buyers": [after_buyer], "refusals": []}])
+        rep = {"articles": 84, "errors": [], "days": 180, "new": ["GN-1"],
+               "previous_fetch": "2026-11-20T12:35:39+00:00",
+               "funnel": {"found": 425, "untrusted_dropped": 341, "outside_window_or_cap": 0,
+                          "duplicates": 0, "kept": 84}}
+        saved = dict(S.FETCH)
+        try:
+            with patch.object(S.fetch_news, "fetch", lambda **kw: rep), \
+                    patch.object(S.fetch_news, "read_articles", lambda d: [story]), \
+                    patch.object(S, "snapshot", lambda: next(snaps)):
+                S.refresh_news("Manual")
+            html = S.fetch_result_panel()
+        finally:
+            S.FETCH.clear(); S.FETCH.update(saved)
+        self.assertIn("425 found", html)
+        self.assertIn("341 dropped", html)
+        self.assertIn("<b>1 new</b> since the fetch at 2026-11-20 12:35 UTC", html)
+        self.assertIn("Intel announces job cuts", html)
+        self.assertIn("<b>Intel Corporation</b> &middot; severity 4", html)
+        self.assertIn("28.0", html)                      # the score that moved
+
+
+class ResetRestoresTheNews(unittest.TestCase):
+    """Reset puts the fetched news back as the dashboard started with it, so a
+    rehearsal fetch does not use up the stories the demo's fetch should find."""
+
+    def test_reset_undoes_a_fetch(self):
+        import tempfile
+        from pathlib import Path
+        import dashboard.server as S
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp)
+            (d / "news_articles.csv").write_text("article_id\nOLD\n")
+            saved = S.news_snapshot(d)
+            (d / "news_articles.csv").write_text("article_id\nOLD\nNEW\n")   # a fetch
+            (d / S.fetch_news.LOG).write_text("{}")                          # and its log
+            self.assertTrue(S.restore_news(saved, d))
+            self.assertEqual((d / "news_articles.csv").read_text(), "article_id\nOLD\n")
+            self.assertFalse((d / S.fetch_news.LOG).exists())
+            self.assertFalse(S.restore_news(saved, d))                       # nothing left
+
+    def test_reset_keeps_the_fetched_news_and_its_result(self):
+        from unittest.mock import patch
+        import dashboard.server as S
+        saved = dict(S.FETCH)
+        try:
+            S.FETCH.update(last="Manual fetch at 10:00 UTC", result={"title": "x"})
+            with patch.object(S, "LIVE_BOOK", True), \
+                    patch.object(S, "restore_news", lambda saved, d: self.fail("news restored")):
+                S.reset_live()
+            self.assertEqual(S.FETCH["result"], {"title": "x"})
+        finally:
+            S.FETCH.clear(); S.FETCH.update(saved)
+
+    def test_reset_takes_out_only_the_score_only_inputs(self):
+        import dashboard.server as S
+        keep = dict(S.LIVE)
+        try:
+            S.LIVE.update(articles=[{"article_id": "LIVE01"},
+                                    {"article_id": "LIVE02", "score_only": True}],
+                          events=[{"event_id": "N-LIVE-01", "score_only": True},
+                                  {"event_id": "N-LIVE-02"}],
+                          last={"title": "x"})
+            S.reset_live()
+            self.assertEqual([a["article_id"] for a in S.LIVE["articles"]], ["LIVE01"])
+            self.assertEqual([e["event_id"] for e in S.LIVE["events"]], ["N-LIVE-02"])
+            self.assertIsNone(S.LIVE["last"])
+        finally:
+            S.LIVE.clear(); S.LIVE.update(keep)

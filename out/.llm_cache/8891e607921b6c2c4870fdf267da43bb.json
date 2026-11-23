@@ -1,0 +1,44 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "The rocket failure is attributed to the Boeing-Lockheed joint venture (United Launch Alliance), a distinct entity not matching the registered 'The Boeing Company' alone; Lockheed is not part of Boeing's registered name, so this does not satisfy the matching criteria."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Boeing"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS02\", \"name\": \"The Boeing Company\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\"}]"
+    },
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Lockheed"
+      },
+      "result": "[{\"note\": \"no covered entity shares a word with 'Lockheed'\"}]"
+    },
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "United Launch"
+      },
+      "result": "[{\"note\": \"no covered entity shares a word with 'United Launch'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "The rocket failure is attributed to the Boeing-Lockheed joint venture (United Launch Alliance), a distinct entity not matching the registered 'The Boeing Company' alone; Lockheed is not part of Boeing's registered name, so this does not satisfy the matching criteria."
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -1,0 +1,123 @@
+{
+  "result": {
+    "assessment": "agree_with_caveats",
+    "rationale": "Watch is a defensible posture for Intel, but the band is right for largely the wrong reason and sits 0.7 points above the threshold. The payment leg contributes 0.0 (0 DPD, worst_line null) with no payment or payment_review evidence on file, so the entire 20.7 derives from one headline-only article about a shareholder lawsuit \u2014 an equity-holder claim that is not a trade-payment or liquidity signal. The newest substantive news (first external 18A customer, 2026-11-19 to 11-22) post-dates the lawsuit but scores severity 0 and cannot offset it under max-severity selection. Genuine background stress exists (62% decline this year, 60% below the June record) but it is captured only as low-severity sentiment, and no evidence here addresses the actual credit question of cash burn.",
+    "concerns": [
+      {
+        "source_id": "GN-92904b4dcaa6",
+        "issue": "Sole driver of the band. Full text retrieved is a single line identical to the headline \u2014 no claim size, court, allegations or financial detail \u2014 yet it carries severity 3 (base 60.0, decayed 59.21). A shareholder suit following a 29% stock plunge is a claim by equity holders against the company, not evidence of trade-payable, liquidity or covenant distress; it is a weak predictor of supplier non-payment and thin support for an entire band."
+      },
+      {
+        "source_id": "GN-92904b4dcaa6",
+        "issue": "Band fragility: score 20.7 against a Watch threshold of 20. This single item already decayed from 60.0 to 59.21 over 7 days; continued decay alone drops the score below 20 and flips the band to Healthy with no change whatsoever in the buyer's condition. The band is driven by the clock, not the credit."
+      },
+      {
+        "source_id": "GN-92904b4dcaa6",
+        "issue": "Score composition is one-legged. Because the 0.65-weighted payment leg returns 0.0 (0 DPD, worst_line null) with no payment records and no payment_review retrievable, this one article determines the outcome via the 0.35 news weight alone. The 0.0 payment input is an absence of data rather than a verified clean payment history; confirm trade lines are actually being reported before treating the clean payment signal as reassurance."
+      },
+      {
+        "source_id": "GN-7f4e6c3d7636",
+        "issue": "Material counter-evidence is structurally invisible to the score. This CNBC report of Intel's first external 18A customer (2026-11-19), corroborated by GN-e8dbffbb6cdf, GN-1a76669797df and GN-b97c444dd8fd through 11-22, post-dates the 11-16 lawsuit but scores severity 0, so under max-severity selection the newer positive operational development cannot reduce the band."
+      },
+      {
+        "source_id": "GN-796482ba8f92",
+        "issue": "The genuine stress signals are the ones the model discounts. This item and GN-02fc251320f6 describe a 62% decline this year, a level more than 60% below the June record, and a $3.5T chip rout, scored only severity 1 (decayed 19.22 and 19.92). Note these are substantially sector-wide market sentiment rather than Intel-specific distress; the real credit question is Intel's cash burn and foundry capex funding, which no evidence in this file addresses either way."
+      }
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_score_breakdown",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS01\", \"score\": 20.7, \"band\": \"Watch\", \"pd\": 0.1072, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 3, \"category\": \"shareholder_lawsuit\", \"article_id\": \"GN-92904b4dcaa6\", \"age_days\": 7, \"headline\": \"Intel sued by shareholders following 29% stock plunge\", \"via_parent\": false, \"parent_name\": null, \"raw\": 59.2, \"weighted\": 20.7}, \"trace\": \"0"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "all"
+      },
+      "result": "[{\"id\": \"GN-b97c444dd8fd\", \"kind\": \"news\", \"date\": \"2026-11-22\", \"detail\": \"severity 0 (new_customer_win): Intel Says It Just Signed Its First Customer for Its Most Advanced Chipmaking Process. The Stock Is Still More Than 60% Below Its June Record.\", \"data\": {\"severity\": 0, \"category\": \"new_customer_win\", \"age_days\": 1, \"base\": 0.0, \"decayed\": 0.0, \"entity\": \"Intel Corporation\", \"via_parent\": fal"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-92904b4dcaa6"
+      },
+      "result": "{\"article_id\": \"GN-92904b4dcaa6\", \"published_date\": \"2026-11-16\", \"publication\": \"Reuters\", \"headline\": \"Intel sued by shareholders following 29% stock plunge\", \"body\": \"Intel sued by shareholders following 29% stock plunge\"}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "payment_review"
+      },
+      "result": "[{\"note\": \"no payment_review evidence\"}]"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "payment"
+      },
+      "result": "[{\"note\": \"no payment evidence\"}]"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "Watch is a defensible posture for Intel, but the band is right for largely the wrong reason and sits 0.7 points above the threshold. The payment leg contributes 0.0 (0 DPD, worst_line null) with no payment or payment_review evidence on file, so the entire 20.7 derives from one headline-only article about a shareholder lawsuit \u2014 an equity-holder claim that is not a trade-payment or liquidity signal. The newest substantive news (first external 18A customer, 2026-11-19 to 11-22) post-dates the lawsuit but scores severity 0 and cannot offset it under max-severity selection. Genuine background stress exists (62% decline this year, 60% below the June record) but it is captured only as low-severity sentiment, and no evidence here addresses the actual credit question of cash burn.",
+        "concerns": [
+          {
+            "source_id": "GN-92904b4dcaa6",
+            "issue": "Sole driver of the band. Full text retrieved is a single line identical to the headline \u2014 no claim size, court, allegations or financial detail \u2014 yet it carries severity 3 (base 60.0, decayed 59.21). A shareholder suit following a 29% stock plunge is a claim by equity holders against the company, not evidence of trade-payable, liquidity or covenant distress; it is a weak predictor of supplier non-payment and thin support for an entire band."
+          },
+          {
+            "source_id": "GN-92904b4dcaa6",
+            "issue": "Band fragility: score 20.7 against a Watch threshold of 20. This single item already decayed from 60.0 to 59.21 over 7 days; continued decay alone drops the score below 20 and flips the band to Healthy with no change whatsoever in the buyer's condition. The band is driven by the clock, not the credit."
+          },
+          {
+            "source_id": "OS01",
+            "issue": "The 0.65-weighted payment leg reports 0 DPD and worst_line null, but get_evidence returned no payment records and no payment_review. The 0.0 is an absence of data rather than a verified clean payment history, so the dominant input to the formula is unexamined. Confirm trade lines are actually being reported before relying on the clean payment signal."
+          },
+          {
+            "source_id": "GN-7f4e6c3d7636",
+            "issue": "Material counter-evidence is structurally invisible to the score. This CNBC report of Intel's first external 18A customer (2026-11-19), corroborated by GN-e8dbffbb6cdf, GN-1a76669797df and GN-b97c444dd8fd through 11-22, post-dates the 11-16 lawsuit but scores severity 0, so under max-severity selection the newer positive operational development cannot reduce the band."
+          },
+          {
+            "source_id": "GN-796482ba8f92",
+            "issue": "The genuine stress signals are the ones the model discounts. This item and GN-02fc251320f6 describe a 62% decline this year, a level more than 60% below the June record, and a $3.5T chip rout, scored only severity 1 (decayed 19.22 and 19.92). Note these are substantially sector-wide market sentiment rather than Intel-specific distress; the real credit question is Intel's cash burn and foundry capex funding, which no evidence in this file addresses either way."
+          }
+        ]
+      },
+      "error": "not evidence for this buyer: ['OS01']; cite ids from get_evidence"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "Watch is a defensible posture for Intel, but the band is right for largely the wrong reason and sits 0.7 points above the threshold. The payment leg contributes 0.0 (0 DPD, worst_line null) with no payment or payment_review evidence on file, so the entire 20.7 derives from one headline-only article about a shareholder lawsuit \u2014 an equity-holder claim that is not a trade-payment or liquidity signal. The newest substantive news (first external 18A customer, 2026-11-19 to 11-22) post-dates the lawsuit but scores severity 0 and cannot offset it under max-severity selection. Genuine background stress exists (62% decline this year, 60% below the June record) but it is captured only as low-severity sentiment, and no evidence here addresses the actual credit question of cash burn.",
+        "concerns": [
+          {
+            "source_id": "GN-92904b4dcaa6",
+            "issue": "Sole driver of the band. Full text retrieved is a single line identical to the headline \u2014 no claim size, court, allegations or financial detail \u2014 yet it carries severity 3 (base 60.0, decayed 59.21). A shareholder suit following a 29% stock plunge is a claim by equity holders against the company, not evidence of trade-payable, liquidity or covenant distress; it is a weak predictor of supplier non-payment and thin support for an entire band."
+          },
+          {
+            "source_id": "GN-92904b4dcaa6",
+            "issue": "Band fragility: score 20.7 against a Watch threshold of 20. This single item already decayed from 60.0 to 59.21 over 7 days; continued decay alone drops the score below 20 and flips the band to Healthy with no change whatsoever in the buyer's condition. The band is driven by the clock, not the credit."
+          },
+          {
+            "source_id": "GN-92904b4dcaa6",
+            "issue": "Score composition is one-legged. Because the 0.65-weighted payment leg returns 0.0 (0 DPD, worst_line null) with no payment records and no payment_review retrievable, this one article determines the outcome via the 0.35 news weight alone. The 0.0 payment input is an absence of data rather than a verified clean payment history; confirm trade lines are actually being reported before treating the clean payment signal as reassurance."
+          },
+          {
+            "source_id": "GN-7f4e6c3d7636",
+            "issue": "Material counter-evidence is structurally invisible to the score. This CNBC report of Intel's first external 18A customer (2026-11-19), corroborated by GN-e8dbffbb6cdf, GN-1a76669797df and GN-b97c444dd8fd through 11-22, post-dates the 11-16 lawsuit but scores severity 0, so under max-severity selection the newer positive operational development cannot reduce the band."
+          },
+          {
+            "source_id": "GN-796482ba8f92",
+            "issue": "The genuine stress signals are the ones the model discounts. This item and GN-02fc251320f6 describe a 62% decline this year, a level more than 60% below the June record, and a $3.5T chip rout, scored only severity 1 (decayed 19.22 and 19.92). Note these are substantially sector-wide market sentiment rather than Intel-specific distress; the real credit question is Intel's cash burn and foundry capex funding, which no evidence in this file addresses either way."
+          }
+        ]
+      }
+    }
+  ],
+  "turns": 4
+}

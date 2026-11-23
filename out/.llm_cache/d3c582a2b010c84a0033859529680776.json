@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 1,
+    "category": "stock_drop",
+    "reason": "Article reports a sharp one-day stock price decline for Intel Corporation, impacting the government's equity stake; this is a market valuation event rather than a direct indicator of payment capability."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 1,
+        "category": "stock_drop",
+        "reason": "Article reports a sharp one-day stock price decline for Intel Corporation, impacting the government's equity stake; this is a market valuation event rather than a direct indicator of payment capability."
+      }
+    }
+  ],
+  "turns": 2
+}

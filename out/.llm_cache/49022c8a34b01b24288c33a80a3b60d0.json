@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS03",
+    "name": "Ford Motor Company",
+    "severity": 1,
+    "category": "stock_commentary",
+    "reason": "Article is a generic stock analysis headline about Ford's share price with no substantive operational or financial distress details, consistent with minor negative market commentary."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Ford"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS03\", \"name\": \"Ford Motor Company\", \"sector\": \"Automotive\", \"city\": \"Dearborn, MI\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS03",
+        "severity": 1,
+        "category": "stock_commentary",
+        "reason": "Article is a generic stock analysis headline about Ford's share price with no substantive operational or financial distress details, consistent with minor negative market commentary."
+      }
+    }
+  ],
+  "turns": 2
+}

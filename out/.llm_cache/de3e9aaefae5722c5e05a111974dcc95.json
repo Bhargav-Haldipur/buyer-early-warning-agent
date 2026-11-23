@@ -1,0 +1,45 @@
+{
+  "result": {
+    "trend": "deteriorating",
+    "summary": "Vodafone Idea currently has one open overdue invoice (INR 9.0M, due 2026-11-05, now 18 days past due) against policy TCI-SCF-2026-0001, which carries a INR 120M limit (total exposure ~40M, so utilization remains moderate). However, the pattern across the last three notifications shows lengthening resolution times (5 days late \u2192 9 days late \u2192 currently 18 days and still open), all from the same single policy, with notification frequency also ticking up (2 in the last 6 months vs 1 in the prior window).",
+    "concerns": [
+      "Days-to-resolve overdue invoices has been steadily increasing (5 \u2192 9 \u2192 18+ days), signalling slowing payment behaviour",
+      "All overdue notifications originate from a single policy (TCI-SCF-2026-0001), limiting visibility into broader payment conduct",
+      "Slight uptick in notification frequency within the 180-day window (1 \u2192 2) could indicate early-stage accumulation if it continues",
+      "Current open overdue is unresolved and already exceeds the days-late of both prior resolved cases"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"event_id\": \"N-261106-00006\", \"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"reason\": \"OVERDUE_INVOICE\", \"notification_date\": \"2026-11-06\", \"original_due_date\": \"2026-11-05\", \"amount_at_risk\": 9000000.0, \"currency\": \"INR\", \"days_past_due\": 18, \"outstanding_by_ageing\": {\"NOT_YET_DUE\": 31000000.0, \"OVERDUE_1_30_DAYS\": 9000000.0}}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260329-00005\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-03-28\", \"resolved_date\": \"2026-04-02\", \"amount_at_risk\": 6000000.0, \"days_late\": 5}, {\"event_id\": \"N-260727-00004\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-07-26\", \"resolved_date\": \"2026-08-04\", \"amount_at_risk\": 7500000.0, \"days_late\": 9}], \""
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"credit_limit\": 120000000.0, \"currency\": \"INR\", \"payment_terms_days\": 90, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-07-04\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 18,
+        "worst_event_id": "N-261106-00006",
+        "trend": "deteriorating",
+        "summary": "Vodafone Idea currently has one open overdue invoice (INR 9.0M, due 2026-11-05, now 18 days past due) against policy TCI-SCF-2026-0001, which carries a INR 120M limit (total exposure ~40M, so utilization remains moderate). However, the pattern across the last three notifications shows lengthening resolution times (5 days late \u2192 9 days late \u2192 currently 18 days and still open), all from the same single policy, with notification frequency also ticking up (2 in the last 6 months vs 1 in the prior window).",
+        "concerns": [
+          "Days-to-resolve overdue invoices has been steadily increasing (5 \u2192 9 \u2192 18+ days), signalling slowing payment behaviour",
+          "All overdue notifications originate from a single policy (TCI-SCF-2026-0001), limiting visibility into broader payment conduct",
+          "Slight uptick in notification frequency within the 180-day window (1 \u2192 2) could indicate early-stage accumulation if it continues",
+          "Current open overdue is unresolved and already exceeds the days-late of both prior resolved cases"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

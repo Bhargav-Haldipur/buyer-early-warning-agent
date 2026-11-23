@@ -1,0 +1,78 @@
+{
+  "result": {
+    "narrative": "Vodafone Idea sits at 25.4, in the Watch band, with a PD of 0.1544 against a 0.25 appetite target. The operating picture from the news file is mixed-to-constructive: eight of the eleven matched articles are severity 0 or 1, including a Reuters report that the company narrowed its quarterly loss on higher per-user revenue and a Bloomberg report of an SBI-led group providing $3.5 billion of debt. The harder signal is in the payment file, where one overdue notification is open under policy TCI-SCF-2026-0001 at 18 days past due and the trend is recorded as deteriorating.\n\nThe band is driven by two roughly equal components: 0.65 x 18.0 on payment (weighted 11.7) and 0.35 x 39.2 on news (weighted 13.7). The adjudicator agreed with the Watch landing point but with caveats, and the reasoning matters here. The entire news contribution comes from a single severity-2 article (GN-1caacc272320, decayed 39.25); every other item is severity 0 or 1, the highest decaying to 19.85. That article's retrievable body is only its headline, so the profit_warning call rests on the phrase \"wider-than-expected loss\" alone, and Reuters scored severity 0 on the same Q2 results one day earlier. If that severity were corrected, the score would fall below the 20.0 cutoff into Healthy. Offsetting this, the payment component is understated: the formula reads only the 18 DPD snapshot and ignores resolution times lengthening from 5 to 9 to 18 days with the current item still open. The adjudicator also flagged an unreconciled amount discrepancy, with the notification recording INR 40,000,000 owed while the payment review describes the open overdue invoice as INR 9.0M.\n\nThe recommendation is to MAINTAIN the Meridia Bank supply chain finance limit at INR 120,000,000, no change, on the basis that PD of 0.1544 is within the 0.25 target and maximum liability does not bind. Expected loss is unchanged at INR 13,340,160. Given the adjudicator's caveats, the sensible reading is that 25.4 is not a stable number in either direction: the underwriter should re-adjudicate the Q2 severity call and track DPD on the open item rather than treat the score as settled. There is 24.6 points of headroom to High Risk at 50.0, equivalent to DPD reaching 43, so the maintain decision has room in it.\n\nA move down to Healthy needs only 5.4 points, below 20.0. The cleanest routes are resolution of the open overdue invoice, bringing DPD below 18 and reversing the 5 to 9 to 18 day pattern, or a corrected severity assessment on GN-1caacc272320 that reconciles it with the Reuters account of the same results. The news component also decays on a 365-day half-life, and news alone does not hold the band, so the payment file is what will decide this one.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the Meridia Bank limit at INR 120,000,000 with no change: PD of 0.1544 is inside the 0.25 appetite target and max liability does not bind. The adjudicator agreed with caveats \u2014 the Watch band rests entirely on one severity-2 article whose scoring is contradicted by Reuters on the same results, while the genuinely deteriorating payment trend is not captured by the formula.",
+      "payment_note": "One overdue notification is open under policy TCI-SCF-2026-0001 at 18 days past due, and the review marks the trend deteriorating: resolution times have lengthened from 5 to 9 to 18 days with the current item still unresolved and notification frequency up from 1 to 2 in the 180-day window.",
+      "news_note": "The news score comes wholly from one severity-2 Business Standard item on a wider-than-expected Q2 loss (decayed 39.25) whose body is headline-only and whose reading is contradicted by a severity-0 Reuters piece on the same results; the rest of the file is severity 0 or 1, including a $3.5 billion SBI-led debt facility.",
+      "lifts_it": [
+        "5.4 points takes it to Healthy, below 20.0",
+        "Resolution of the open overdue item, reversing the 5 to 9 to 18 day pattern",
+        "Re-adjudication of GN-1caacc272320 to reconcile with the severity-0 Reuters account"
+      ],
+      "worsens_it": [
+        "24.6 points reaches High Risk at 50.0",
+        "DPD reaching 43 on the open item",
+        "Further overdue notifications beyond the 2 recorded in the 180-day window"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN03\", \"score\": 25.4, \"band\": \"Watch\", \"pd\": 0.1544, \"payment\": {\"dpd\": 18, \"raw\": 18.0, \"weighted\": 11.7, \"worst_line\": \"TCI-SCF-2026-0001\"}, \"news\": {\"severity\": 2, \"category\": \"profit_warning\", \"article_id\": \"GN-1caacc272320\", \"age_days\": 10, \"headline\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\", \"via_parent\": false, \"parent_name\": null, \"raw\": 39.2, \"w"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN03-1\", \"buyer_id\": \"IN03\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-SCF-2026-0001\", \"insured_name\": \"Meridia Bank\", \"product_type\": \"SUPPLY_CHAIN_FINANCE\", \"currency\": \"INR\", \"current_limit\": 120000000, \"owed\": 40000000, \"revised_limit\": 120000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\""
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 24.6, \"dpd_for_next_band\": 43, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 5.4, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261106-00006\", \"kind\": \"payment\", \"date\": \"2026-11-05\", \"detail\": \"1 open overdue notification(s) under policy TCI-SCF-2026-0001; the oldest is 18 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"dpd\": 18, \"owed\": 40000000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261106-00006\", \"kind\": \"payment_review\", \"date\": \"2026-11-05\", \"detail\": \"Vodafone I"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-1caacc272320"
+      },
+      "result": "{\"article_id\": \"GN-1caacc272320\", \"published_date\": \"2026-11-13\", \"publication\": \"Business Standard\", \"headline\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\", \"body\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-f61f7063777f"
+      },
+      "result": "{\"article_id\": \"GN-f61f7063777f\", \"published_date\": \"2026-11-12\", \"publication\": \"Reuters\", \"headline\": \"India's Vodafone Idea narrows quarterly loss on bigger per-user revenue\", \"body\": \"India's Vodafone Idea narrows quarterly loss on bigger per-user revenue\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Vodafone Idea sits at 25.4, in the Watch band, with a PD of 0.1544 against a 0.25 appetite target. The operating picture from the news file is mixed-to-constructive: eight of the eleven matched articles are severity 0 or 1, including a Reuters report that the company narrowed its quarterly loss on higher per-user revenue and a Bloomberg report of an SBI-led group providing $3.5 billion of debt. The harder signal is in the payment file, where one overdue notification is open under policy TCI-SCF-2026-0001 at 18 days past due and the trend is recorded as deteriorating.\n\nThe band is driven by two roughly equal components: 0.65 x 18.0 on payment (weighted 11.7) and 0.35 x 39.2 on news (weighted 13.7). The adjudicator agreed with the Watch landing point but with caveats, and the reasoning matters here. The entire news contribution comes from a single severity-2 article (GN-1caacc272320, decayed 39.25); every other item is severity 0 or 1, the highest decaying to 19.85. That article's retrievable body is only its headline, so the profit_warning call rests on the phrase \"wider-than-expected loss\" alone, and Reuters scored severity 0 on the same Q2 results one day earlier. If that severity were corrected, the score would fall below the 20.0 cutoff into Healthy. Offsetting this, the payment component is understated: the formula reads only the 18 DPD snapshot and ignores resolution times lengthening from 5 to 9 to 18 days with the current item still open. The adjudicator also flagged an unreconciled amount discrepancy, with the notification recording INR 40,000,000 owed while the payment review describes the open overdue invoice as INR 9.0M.\n\nThe recommendation is to MAINTAIN the Meridia Bank supply chain finance limit at INR 120,000,000, no change, on the basis that PD of 0.1544 is within the 0.25 target and maximum liability does not bind. Expected loss is unchanged at INR 13,340,160. Given the adjudicator's caveats, the sensible reading is that 25.4 is not a stable number in either direction: the underwriter should re-adjudicate the Q2 severity call and track DPD on the open item rather than treat the score as settled. There is 24.6 points of headroom to High Risk at 50.0, equivalent to DPD reaching 43, so the maintain decision has room in it.\n\nA move down to Healthy needs only 5.4 points, below 20.0. The cleanest routes are resolution of the open overdue invoice, bringing DPD below 18 and reversing the 5 to 9 to 18 day pattern, or a corrected severity assessment on GN-1caacc272320 that reconciles it with the Reuters account of the same results. The news component also decays on a 365-day half-life, and news alone does not hold the band, so the payment file is what will decide this one.",
+        "bottom_line": "Maintain the Meridia Bank limit at INR 120,000,000 with no change: PD of 0.1544 is inside the 0.25 appetite target and max liability does not bind. The adjudicator agreed with caveats \u2014 the Watch band rests entirely on one severity-2 article whose scoring is contradicted by Reuters on the same results, while the genuinely deteriorating payment trend is not captured by the formula.",
+        "payment_note": "One overdue notification is open under policy TCI-SCF-2026-0001 at 18 days past due, and the review marks the trend deteriorating: resolution times have lengthened from 5 to 9 to 18 days with the current item still unresolved and notification frequency up from 1 to 2 in the 180-day window.",
+        "news_note": "The news score comes wholly from one severity-2 Business Standard item on a wider-than-expected Q2 loss (decayed 39.25) whose body is headline-only and whose reading is contradicted by a severity-0 Reuters piece on the same results; the rest of the file is severity 0 or 1, including a $3.5 billion SBI-led debt facility.",
+        "lifts_it": [
+          "5.4 points takes it to Healthy, below 20.0",
+          "Resolution of the open overdue item, reversing the 5 to 9 to 18 day pattern",
+          "Re-adjudication of GN-1caacc272320 to reconcile with the severity-0 Reuters account"
+        ],
+        "worsens_it": [
+          "24.6 points reaches High Risk at 50.0",
+          "DPD reaching 43 on the open item",
+          "Further overdue notifications beyond the 2 recorded in the 180-day window"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN02",
+    "name": "Larsen & Toubro Limited",
+    "severity": 3,
+    "category": "regulatory_action",
+    "reason": "A Karnataka minister has asked officials to blacklist L&T for delaying government works, indicating a potential contract/regulatory action against the company."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsen & Toubro"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN02\", \"name\": \"Larsen & Toubro Limited\", \"sector\": \"Engineering & Construction\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN02",
+        "severity": 3,
+        "category": "regulatory_action",
+        "reason": "A Karnataka minister has asked officials to blacklist L&T for delaying government works, indicating a potential contract/regulatory action against the company."
+      }
+    }
+  ],
+  "turns": 2
+}

@@ -1,0 +1,78 @@
+{
+  "result": {
+    "narrative": "Vodafone Idea sits at a score of 25.4 (Watch) with a PD of 0.1544, against a PD target of 0.25. There is one open overdue notification under policy TCI-SCF-2026-0001, 18 days past due, on an invoice of INR 9.0M; total exposure is around INR 40M against a INR 120M limit, so utilisation remains moderate. The payment review is flagged deteriorating: resolution times have lengthened across the last three notifications from 5 days late to 9 days to the current 18 days still open, and notification frequency has ticked up to 2 in the last six months against 1 in the prior window. The wider news picture is mostly neutral to positive, including an SBI-led group providing $3.5 billion of debt in September and a Reuters report that the Q2 loss narrowed on higher per-user revenue.\n\nThe band is produced by 0.65 x 18.0 (payment, 18 DPD) + 0.35 x 39.2 (news) = 25.4. The adjudicator agreed with Watch but with caveats, and the underwriter should read them. The entire news leg (weighted 13.7) rests on a single severity 2 item, GN-1caacc272320, which is headline-only with no body text, is scored off a 3.5% share price decline rather than a credit event, and is filed as a profit warning although no company-issued guidance warning appears in the evidence. A Reuters article the day before reports the same Q2 results as a narrowed loss and was scored severity 0; that conflict is unresolved on the record. Payment alone is weighted 11.7, below the Watch threshold of 20, and the outlook confirms news alone does not hold the band. The adjudicator's view is that the load-bearing evidence is the payment trajectory, which the formula sees only as a point-in-time 18 DPD and therefore understates, not the news item.\n\nThe recommendation is to MAINTAIN the Meridia Bank supply chain finance limit at INR 120,000,000, no change, on the basis that PD of 0.1544 is within the 0.25 appetite and maximum liability does not bind. Expected loss is unchanged at INR 13,340,160 before and after. Given the deteriorating payment trend and the single-policy visibility, holding the limit while monitoring the open item is the proportionate step; there is no case in this evidence for a cut, but equally no case for an increase.\n\nWhat would lift it: the score is 5.4 points above the Healthy line at 20.0. Clearing the open INR 9.0M invoice and bringing days-to-resolve back toward the earlier 5 to 9 day pattern would remove the deteriorating read. Resolving the news conflict in favour of the Reuters account, or a downgrade of GN-1caacc272320 from severity 2, would remove the leg currently carrying the band. Note also that news decays on a 365-day half-life, so the 10-day-old item will fade only slowly on its own.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the Meridia Bank limit at INR 120,000,000 (no change): PD of 0.1544 is within the 0.25 appetite, but the adjudicator agreed with the Watch band only with caveats, warning that the band rests entirely on one unverifiable headline-only article while the real signal is a deteriorating payment trend the formula under-weights.",
+      "payment_note": "One open overdue of INR 9.0M under policy TCI-SCF-2026-0001 at 18 days past due, with a clearly deteriorating trend \u2014 resolution times lengthening from 5 to 9 to the current 18 days still open, and notifications rising to 2 in the last six months from 1 in the prior window.",
+      "news_note": "The only negative item is a single severity 2 Business Standard headline on a 3.5% share decline after a wider-than-expected Q2 loss, which has no body text and is directly contradicted by a Reuters piece the previous day reporting a narrowed quarterly loss; the rest of the coverage, including a $3.5 billion SBI-led debt facility, is neutral to positive.",
+      "lifts_it": [
+        "Score is 5.4 points above the Healthy line at 20.0",
+        "Clearing the open INR 9.0M invoice and returning days-to-resolve toward the prior 5-9 day pattern",
+        "Downgrading GN-1caacc272320 from severity 2, or resolving the conflict in favour of the Reuters narrowed-loss account"
+      ],
+      "worsens_it": [
+        "43 DPD would reach High Risk; the score is 24.6 points below the 50.0 line",
+        "Further lengthening of resolution times or the open item ageing past 18 days unresolved",
+        "Overdues appearing outside TCI-SCF-2026-0001, which would end the single-policy blind spot in the worst way"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN03\", \"score\": 25.4, \"band\": \"Watch\", \"pd\": 0.1544, \"payment\": {\"dpd\": 18, \"raw\": 18.0, \"weighted\": 11.7, \"worst_line\": \"TCI-SCF-2026-0001\"}, \"news\": {\"severity\": 2, \"category\": \"profit_warning\", \"article_id\": \"GN-1caacc272320\", \"age_days\": 10, \"headline\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\", \"via_parent\": false, \"parent_name\": null, \"raw\": 39.2, \"w"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN03-1\", \"buyer_id\": \"IN03\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-SCF-2026-0001\", \"insured_name\": \"Meridia Bank\", \"product_type\": \"SUPPLY_CHAIN_FINANCE\", \"currency\": \"INR\", \"current_limit\": 120000000, \"owed\": 40000000, \"revised_limit\": 120000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\""
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 24.6, \"dpd_for_next_band\": 43, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 5.4, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261106-00006\", \"kind\": \"payment\", \"date\": \"2026-11-05\", \"detail\": \"1 open overdue notification(s) under policy TCI-SCF-2026-0001; the oldest is 18 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"dpd\": 18, \"owed\": 40000000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261106-00006\", \"kind\": \"payment_review\", \"date\": \"2026-11-05\", \"detail\": \"Vodafone I"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-1caacc272320"
+      },
+      "result": "{\"article_id\": \"GN-1caacc272320\", \"published_date\": \"2026-11-13\", \"publication\": \"Business Standard\", \"headline\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\", \"body\": \"Vodafone Idea shares decline 3.5% on wider-than-expected loss in Q2\"}"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "GN-f61f7063777f"
+      },
+      "result": "{\"article_id\": \"GN-f61f7063777f\", \"published_date\": \"2026-11-12\", \"publication\": \"Reuters\", \"headline\": \"India's Vodafone Idea narrows quarterly loss on bigger per-user revenue\", \"body\": \"India's Vodafone Idea narrows quarterly loss on bigger per-user revenue\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Vodafone Idea sits at a score of 25.4 (Watch) with a PD of 0.1544, against a PD target of 0.25. There is one open overdue notification under policy TCI-SCF-2026-0001, 18 days past due, on an invoice of INR 9.0M; total exposure is around INR 40M against a INR 120M limit, so utilisation remains moderate. The payment review is flagged deteriorating: resolution times have lengthened across the last three notifications from 5 days late to 9 days to the current 18 days still open, and notification frequency has ticked up to 2 in the last six months against 1 in the prior window. The wider news picture is mostly neutral to positive, including an SBI-led group providing $3.5 billion of debt in September and a Reuters report that the Q2 loss narrowed on higher per-user revenue.\n\nThe band is produced by 0.65 x 18.0 (payment, 18 DPD) + 0.35 x 39.2 (news) = 25.4. The adjudicator agreed with Watch but with caveats, and the underwriter should read them. The entire news leg (weighted 13.7) rests on a single severity 2 item, GN-1caacc272320, which is headline-only with no body text, is scored off a 3.5% share price decline rather than a credit event, and is filed as a profit warning although no company-issued guidance warning appears in the evidence. A Reuters article the day before reports the same Q2 results as a narrowed loss and was scored severity 0; that conflict is unresolved on the record. Payment alone is weighted 11.7, below the Watch threshold of 20, and the outlook confirms news alone does not hold the band. The adjudicator's view is that the load-bearing evidence is the payment trajectory, which the formula sees only as a point-in-time 18 DPD and therefore understates, not the news item.\n\nThe recommendation is to MAINTAIN the Meridia Bank supply chain finance limit at INR 120,000,000, no change, on the basis that PD of 0.1544 is within the 0.25 appetite and maximum liability does not bind. Expected loss is unchanged at INR 13,340,160 before and after. Given the deteriorating payment trend and the single-policy visibility, holding the limit while monitoring the open item is the proportionate step; there is no case in this evidence for a cut, but equally no case for an increase.\n\nWhat would lift it: the score is 5.4 points above the Healthy line at 20.0. Clearing the open INR 9.0M invoice and bringing days-to-resolve back toward the earlier 5 to 9 day pattern would remove the deteriorating read. Resolving the news conflict in favour of the Reuters account, or a downgrade of GN-1caacc272320 from severity 2, would remove the leg currently carrying the band. Note also that news decays on a 365-day half-life, so the 10-day-old item will fade only slowly on its own.",
+        "bottom_line": "Maintain the Meridia Bank limit at INR 120,000,000 (no change): PD of 0.1544 is within the 0.25 appetite, but the adjudicator agreed with the Watch band only with caveats, warning that the band rests entirely on one unverifiable headline-only article while the real signal is a deteriorating payment trend the formula under-weights.",
+        "payment_note": "One open overdue of INR 9.0M under policy TCI-SCF-2026-0001 at 18 days past due, with a clearly deteriorating trend \u2014 resolution times lengthening from 5 to 9 to the current 18 days still open, and notifications rising to 2 in the last six months from 1 in the prior window.",
+        "news_note": "The only negative item is a single severity 2 Business Standard headline on a 3.5% share decline after a wider-than-expected Q2 loss, which has no body text and is directly contradicted by a Reuters piece the previous day reporting a narrowed quarterly loss; the rest of the coverage, including a $3.5 billion SBI-led debt facility, is neutral to positive.",
+        "lifts_it": [
+          "Score is 5.4 points above the Healthy line at 20.0",
+          "Clearing the open INR 9.0M invoice and returning days-to-resolve toward the prior 5-9 day pattern",
+          "Downgrading GN-1caacc272320 from severity 2, or resolving the conflict in favour of the Reuters narrowed-loss account"
+        ],
+        "worsens_it": [
+          "43 DPD would reach High Risk; the score is 24.6 points below the 50.0 line",
+          "Further lengthening of resolution times or the open item ageing past 18 days unresolved",
+          "Overdues appearing outside TCI-SCF-2026-0001, which would end the single-policy blind spot in the worst way"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}
