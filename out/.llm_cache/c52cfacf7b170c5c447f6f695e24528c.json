@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN01",
+    "name": "Tata Motors Limited",
+    "severity": 0,
+    "category": "expansion",
+    "reason": "Acquisition of Iveco and new chairperson appointment are neutral-to-positive corporate developments, not a credit risk signal."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Tata Motors"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN01\", \"name\": \"Tata Motors Limited\", \"sector\": \"Automotive\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN01",
+        "severity": 0,
+        "category": "expansion",
+        "reason": "Acquisition of Iveco and new chairperson appointment are neutral-to-positive corporate developments, not a credit risk signal."
+      }
+    }
+  ],
+  "turns": 2
+}

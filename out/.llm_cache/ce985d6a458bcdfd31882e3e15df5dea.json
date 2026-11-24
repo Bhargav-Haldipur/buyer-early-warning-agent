@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS02",
+    "name": "The Boeing Company",
+    "severity": 2,
+    "category": "production_delay",
+    "reason": "Boeing is delaying the planned ramp-up of 737 Max production until late 2027, indicating slower revenue growth and persistent supply/production constraints, a notable but non-critical negative signal."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Boeing"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS02\", \"name\": \"The Boeing Company\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS02",
+        "severity": 2,
+        "category": "production_delay",
+        "reason": "Boeing is delaying the planned ramp-up of 737 Max production until late 2027, indicating slower revenue growth and persistent supply/production constraints, a notable but non-critical negative signal."
+      }
+    }
+  ],
+  "turns": 2
+}

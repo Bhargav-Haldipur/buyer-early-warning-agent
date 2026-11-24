@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "Headline is a generic \"stocks to watch\" list with no actual news content about Tata Motors; nothing substantive to assess."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Tata Motors"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN01\", \"name\": \"Tata Motors Limited\", \"sector\": \"Automotive\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "Headline is a generic \"stocks to watch\" list with no actual news content about Tata Motors; nothing substantive to assess."
+      }
+    }
+  ],
+  "turns": 2
+}

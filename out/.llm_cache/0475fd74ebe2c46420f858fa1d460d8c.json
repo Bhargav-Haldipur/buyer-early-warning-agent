@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Boeing's payment behaviour remains clean: there are no open overdue notifications, and the only historical item on file is a single $650k invoice paid just 3 days late in June 2026, with no pattern of accumulation. Credit risk signals are instead coming entirely from the news side, where a severity-4 Reuters headline on possible further layoffs amid stalled production is the single largest contributor to the score, reinforced by an earlier CNBC report of an actual 5% commercial-workforce cut and by separate stories on 737 MAX production delays and a DOT watchdog audit of FAA oversight.\n\nThe Watch band placement is driven almost entirely by that one severity-4 news item (0.35 x 79.5 = 27.8 of the score), while the payment component contributes zero. The adjudicator agreed with the band but flagged caveats: the lead headline is uncorroborated by other outlets, the payment history is too thin (one resolved item, single-insurer TCI concentration) to firmly support a \"zero risk\" payment score, and several strongly positive same-window stories (a $20B Navy contract, a $12B aircraft deal, a possible 250-plane China order, backlog growing to $745B) are not netted against the negative headline by the scoring formula, meaning the 27.8 score may overstate near-term risk.\n\nThe recommended limit action is to maintain the existing $9,000,000 limit with Trade Credit Insurer, as Boeing's probability of default (0.1784) sits within the insurer's target appetite (0.25) and expected loss is unchanged before and after review.\n\nA move to the Healthy band would require the score to fall below 20.0 (7.8 points of headroom), which would follow if the news does not recur and the current severity-4 item decays (its effect has a roughly one-year half-life) without fresh negative coverage; a move toward High Risk would require the score to rise to 50.0 (22.2 points away), which could come from additional negative news or from payment delinquency reaching 33 days past due.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the $9,000,000 TCI limit \u2014 Boeing's PD (0.1784) is within appetite and payment history is clean, though the adjudicator agreed with caveats that the Watch-band score is driven almost entirely by one uncorroborated layoff headline and doesn't net against strongly positive concurrent news.",
+      "payment_note": "No open overdues and only one historical notification (a $650k item paid 3 days late in June 2026), with insufficient history to establish a trend.",
+      "news_note": "The score is driven by a severity-4 Reuters headline on possible further layoffs amid stalled production, reinforced by an earlier CNBC report of a 5% workforce cut, even as several concurrent stories report large new contracts and a record order backlog.",
+      "lifts_it": [
+        "Score falling below 20.0 (Healthy band), 7.8 points below current level",
+        "Decay of the severity-4 layoffs headline without fresh negative coverage (roughly one-year half-life)",
+        "Establishment of a longer clean payment history to support the zero-risk payment score"
+      ],
+      "worsens_it": [
+        "Score rising to 50.0 (High Risk band), 22.2 points above current level",
+        "Further negative news corroborating or extending the layoffs/production-delay narrative",
+        "Payment delinquency reaching 33 days past due"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS02\", \"score\": 27.8, \"band\": \"Watch\", \"pd\": 0.1784, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 4, \"category\": \"layoffs\", \"article_id\": \"GN-8b97eceb4530\", \"age_days\": 3, \"headline\": \"Boeing leaves open possibility of more layoffs amid stalled production plans\", \"via_parent\": false, \"parent_name\": null, \"raw\": 79.5, \"weighted\": 27.8}, "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS02-1\", \"buyer_id\": \"OS02\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 9000000, \"owed\": 0, \"revised_limit\": 9000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1784, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 22.2, \"dpd_for_next_band\": 33, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 7.8, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-260607-00024\", \"kind\": \"payment_review\", \"date\": \"2026-06-06\", \"detail\": \"No open overdue notifications for Boeing. History shows only a single resolved overdue (TCI, $650k, paid 3 days late in June 2026), with no accumulation pattern (1 notification in last 6 months vs 0 prior window, from one policy). Single insurer TCI holds a $9M accepted credit limit on 60-day terms. Insufficient d"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Boeing's payment behaviour remains clean: there are no open overdue notifications, and the only historical item on file is a single $650k invoice paid just 3 days late in June 2026, with no pattern of accumulation. Credit risk signals are instead coming entirely from the news side, where a severity-4 Reuters headline on possible further layoffs amid stalled production is the single largest contributor to the score, reinforced by an earlier CNBC report of an actual 5% commercial-workforce cut and by separate stories on 737 MAX production delays and a DOT watchdog audit of FAA oversight.\n\nThe Watch band placement is driven almost entirely by that one severity-4 news item (0.35 x 79.5 = 27.8 of the score), while the payment component contributes zero. The adjudicator agreed with the band but flagged caveats: the lead headline is uncorroborated by other outlets, the payment history is too thin (one resolved item, single-insurer TCI concentration) to firmly support a \"zero risk\" payment score, and several strongly positive same-window stories (a $20B Navy contract, a $12B aircraft deal, a possible 250-plane China order, backlog growing to $745B) are not netted against the negative headline by the scoring formula, meaning the 27.8 score may overstate near-term risk.\n\nThe recommended limit action is to maintain the existing $9,000,000 limit with Trade Credit Insurer, as Boeing's probability of default (0.1784) sits within the insurer's target appetite (0.25) and expected loss is unchanged before and after review.\n\nA move to the Healthy band would require the score to fall below 20.0 (7.8 points of headroom), which would follow if the news does not recur and the current severity-4 item decays (its effect has a roughly one-year half-life) without fresh negative coverage; a move toward High Risk would require the score to rise to 50.0 (22.2 points away), which could come from additional negative news or from payment delinquency reaching 33 days past due.",
+        "bottom_line": "Maintain the $9,000,000 TCI limit \u2014 Boeing's PD (0.1784) is within appetite and payment history is clean, though the adjudicator agreed with caveats that the Watch-band score is driven almost entirely by one uncorroborated layoff headline and doesn't net against strongly positive concurrent news.",
+        "payment_note": "No open overdues and only one historical notification (a $650k item paid 3 days late in June 2026), with insufficient history to establish a trend.",
+        "news_note": "The score is driven by a severity-4 Reuters headline on possible further layoffs amid stalled production, reinforced by an earlier CNBC report of a 5% workforce cut, even as several concurrent stories report large new contracts and a record order backlog.",
+        "lifts_it": [
+          "Score falling below 20.0 (Healthy band), 7.8 points below current level",
+          "Decay of the severity-4 layoffs headline without fresh negative coverage (roughly one-year half-life)",
+          "Establishment of a longer clean payment history to support the zero-risk payment score"
+        ],
+        "worsens_it": [
+          "Score rising to 50.0 (High Risk band), 22.2 points above current level",
+          "Further negative news corroborating or extending the layoffs/production-delay narrative",
+          "Payment delinquency reaching 33 days past due"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

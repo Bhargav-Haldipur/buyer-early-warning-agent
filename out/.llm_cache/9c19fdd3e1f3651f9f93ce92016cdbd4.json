@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS03",
+    "name": "Ford Motor Company",
+    "severity": 1,
+    "category": "analyst_commentary",
+    "reason": "Headline questions stock risk level, a minor negative sentiment piece with no concrete financial distress details, matching Ford Motor Company."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Ford"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS03\", \"name\": \"Ford Motor Company\", \"sector\": \"Automotive\", \"city\": \"Dearborn, MI\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS03",
+        "severity": 1,
+        "category": "analyst_commentary",
+        "reason": "Headline questions stock risk level, a minor negative sentiment piece with no concrete financial distress details, matching Ford Motor Company."
+      }
+    }
+  ],
+  "turns": 2
+}

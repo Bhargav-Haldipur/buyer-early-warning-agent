@@ -1,0 +1,43 @@
+{
+  "result": {
+    "trend": "insufficient_history",
+    "summary": "Jyotsna Electricals has one open overdue of INR 600,000 (22 days past due) against a single policy (TCI-WT-2026-0001, INR 4M limit), representing 15% of the granted limit. There is no resolution history to gauge payment speed, and only one notification has arrived in the last 6 months from one policy, so no pile-up is evident yet. Recommend monitoring for resolution timing and any additional notifications before adjusting the limit.",
+    "concerns": [
+      "No prior resolved notifications exist to benchmark typical days-late, limiting confidence in trend assessment",
+      "Single policy exposure concentrates risk reporting on one insurer's view",
+      "Outstanding overdue is within 1-30 day bucket but should be watched for further aging"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"event_id\": \"N-261102-00023\", \"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"reason\": \"OVERDUE_INVOICE\", \"notification_date\": \"2026-11-02\", \"original_due_date\": \"2026-11-01\", \"amount_at_risk\": 600000.0, \"currency\": \"INR\", \"days_past_due\": 22, \"outstanding_by_ageing\": {\"NOT_YET_DUE\": 900000.0, \"OVERDUE_1_30_DAYS\": 600000.0}}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"note\": \"no resolved notifications\"}], \"accumulation\": {\"window_days\": 180, \"last_window\": 1, \"window_before\": 0, \"policies_reporting_last_window\": 1}}"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"credit_limit\": 4000000.0, \"currency\": \"INR\", \"payment_terms_days\": 30, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-04-29\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 22,
+        "worst_event_id": "N-261102-00023",
+        "trend": "insufficient_history",
+        "summary": "Jyotsna Electricals has one open overdue of INR 600,000 (22 days past due) against a single policy (TCI-WT-2026-0001, INR 4M limit), representing 15% of the granted limit. There is no resolution history to gauge payment speed, and only one notification has arrived in the last 6 months from one policy, so no pile-up is evident yet. Recommend monitoring for resolution timing and any additional notifications before adjusting the limit.",
+        "concerns": [
+          "No prior resolved notifications exist to benchmark typical days-late, limiting confidence in trend assessment",
+          "Single policy exposure concentrates risk reporting on one insurer's view",
+          "Outstanding overdue is within 1-30 day bucket but should be watched for further aging"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

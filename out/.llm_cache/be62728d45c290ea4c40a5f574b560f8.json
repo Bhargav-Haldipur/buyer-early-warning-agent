@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 0,
+    "category": "routine_filing",
+    "reason": "Standard 8-K furnishing quarterly results press release; no negative financial details are disclosed in the filing itself."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 0,
+        "category": "routine_filing",
+        "reason": "Standard 8-K furnishing quarterly results press release; no negative financial details are disclosed in the filing itself."
+      }
+    }
+  ],
+  "turns": 2
+}

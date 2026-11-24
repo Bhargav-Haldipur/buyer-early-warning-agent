@@ -1,0 +1,35 @@
+{
+  "result": {
+    "trend": "improving",
+    "summary": "No open overdue notifications on Qasr Meridian Trading LLC. The two most recent overdue events (Apr 2026, Aug 2026) resolved quickly, and the gap to resolution shrank from 11 to 6 days. Notification volume is low and not accumulating (1 per 6-month window, single policy via TCI), consistent with the single $1.8M accepted credit line.",
+    "concerns": []
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"note\": \"no open overdue notifications\"}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260408-00028\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-04-07\", \"resolved_date\": \"2026-04-18\", \"amount_at_risk\": 210000.0, \"days_late\": 11}, {\"event_id\": \"N-260806-00029\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-08-05\", \"resolved_date\": \"2026-08-11\", \"amount_at_risk\": 190000.0, \"days_late\": 6}], \"a"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"credit_limit\": 1800000.0, \"currency\": \"USD\", \"payment_terms_days\": 90, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-03-05\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 0,
+        "worst_event_id": "",
+        "trend": "improving",
+        "summary": "No open overdue notifications on Qasr Meridian Trading LLC. The two most recent overdue events (Apr 2026, Aug 2026) resolved quickly, and the gap to resolution shrank from 11 to 6 days. Notification volume is low and not accumulating (1 per 6-month window, single policy via TCI), consistent with the single $1.8M accepted credit line.",
+        "concerns": []
+      }
+    }
+  ],
+  "turns": 2
+}

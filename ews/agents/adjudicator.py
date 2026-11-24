@@ -70,6 +70,12 @@ def _rules_review(verdict: dict, items: list[dict]) -> dict:
             "concerns": concerns}
 
 
+def _has_text(a: dict) -> bool:
+    """False for a story that is its headline only, as Google News gives it."""
+    body = (a.get("body") or "").strip()
+    return bool(body) and body != (a.get("headline") or "").strip()
+
+
 def review(buyer: dict, verdict: dict, items: list[dict], articles: dict[str, dict],
            llm) -> dict | None:
     """Run the review agent for one buyer. None when there is nothing to review."""
@@ -80,12 +86,31 @@ def review(buyer: dict, verdict: dict, items: list[dict], articles: dict[str, di
     spec = definition.load("adjudicator")
     guard = spec.guardrails
 
+    looked_up: set[str] = set()      # other articles read in this run: their figures count
+
     def get_article(article_id: str) -> dict:
         a = articles.get(article_id)
-        if a is None or article_id not in sources:
-            raise ValueError(f"{article_id!r} is not evidence for this buyer")
+        if a is None or (article_id not in sources and article_id not in looked_up):
+            raise ValueError(f"{article_id!r} is not evidence for this buyer; "
+                             f"find_articles lists the others you may read")
         return {k: a[k] for k in ("article_id", "published_date", "publication",
                                   "headline", "body")}
+
+    def find_articles(query: str) -> list[dict]:
+        """Every trusted story in the book mentioning the query - to corroborate a
+        severity that rests on one story, often a headline with no article text."""
+        q = query.lower().strip()
+        if not q:
+            raise ValueError("give a word or name to search for")
+        hits = [a for a in articles.values()
+                if q in f"{a['headline']} {a['body']} {a['mentioned_entity_as_written']}".lower()]
+        hits.sort(key=lambda a: a["published_date"], reverse=True)
+        looked_up.update(a["article_id"] for a in hits[:10])
+        return [{"article_id": a["article_id"], "date": a["published_date"],
+                 "publication": a["publication"], "headline": a["headline"],
+                 "evidence_for_this_buyer": a["article_id"] in sources,
+                 "has_article_text": _has_text(a)}
+                for a in hits[:10]] or [{"note": f"no article mentions {query!r}"}]
 
     def submit(assessment: str, rationale: str, concerns: list[dict]) -> dict:
         if assessment not in ASSESSMENTS:
@@ -98,7 +123,7 @@ def review(buyer: dict, verdict: dict, items: list[dict], articles: dict[str, di
             raise ValueError(f"not evidence for this buyer: {unknown}; cite ids from get_evidence")
         if guard["verify_figures"]:
             facts = {"verdict": verdict, "evidence": view,
-                     "articles": [articles[s] for s in sources if s in articles]}
+                     "articles": [articles[s] for s in sources | looked_up if s in articles]}
             bad = verify(" ".join([rationale] + [c["issue"] for c in concerns]), facts)
             if bad:
                 raise ValueError(f"these figures are not in the data: {bad}")
@@ -117,6 +142,7 @@ def review(buyer: dict, verdict: dict, items: list[dict], articles: dict[str, di
                            "enum": ["all", "payment", "payment_review", "news", "parent"]}},
                  lambda kind: evidence_view(items, kind) or [{"note": f"no {kind} evidence"}]),
             Tool("get_article", {"article_id": {"type": "string"}}, get_article),
+            Tool("find_articles", {"query": {"type": "string"}}, find_articles),
             Tool("submit_review", {
                 "assessment": {"type": "string", "enum": ASSESSMENTS},
                 "rationale": {"type": "string", "description": "two to four sentences"},

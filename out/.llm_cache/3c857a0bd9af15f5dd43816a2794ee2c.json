@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "No covered entity matches L&T, and the news (a large order win) is positive in any case."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "L&T"
+      },
+      "result": "[{\"note\": \"no covered entity shares a word with 'L&T'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "No covered entity matches L&T, and the news (a large order win) is positive in any case."
+      }
+    }
+  ],
+  "turns": 2
+}

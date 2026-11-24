@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 0,
+    "category": "new_customer",
+    "reason": "The article reports Intel securing its first external customer for advanced 18A chips, which is positive news for the company's foundry business and has no negative credit implications."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 0,
+        "category": "new_customer",
+        "reason": "The article reports Intel securing its first external customer for advanced 18A chips, which is positive news for the company's foundry business and has no negative credit implications."
+      }
+    }
+  ],
+  "turns": 2
+}

@@ -9,7 +9,7 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
-from . import casefile
+from . import casefile, settings
 from .agents import adjudicator, definition, news as news_agent, payment as payment_agent
 from .config import AS_OF
 from .evidence import EvidenceStore
@@ -47,8 +47,19 @@ def run(llm=None, cache: bool = True,
     llm = llm or get_llm(cache=cache)
     store = EvidenceStore()
 
-    payments = payment_agent.assess(loader, store, llm)
-    newsvals = news_agent.assess(loader, llm, store)
+    buyers = loader.buyers_by_id()
+    # REAL_BUYERS_ONLY: Claude for the real companies, rules for the invented ones
+    real_only = settings.REAL_BUYERS_ONLY and any(b["is_real"] for b in buyers.values())
+    invented_stories = {a["article_id"] for a in loader.table("illustrative_articles")}
+
+    def buyer_llm(b: dict):
+        return _RULES if real_only and not b["is_real"] else llm
+
+    def article_llm(a: dict):
+        return _RULES if real_only and a["article_id"] in invented_stories else llm
+
+    payments = payment_agent.assess(loader, store, llm, llm_for=buyer_llm)
+    newsvals = news_agent.assess(loader, llm, store, llm_for=article_llm)
 
     live_ids = {a["article_id"] for a in (extra_articles or [])}
     quick = set(score_only or ())
@@ -64,13 +75,14 @@ def run(llm=None, cache: bool = True,
 
     def prose_llm(bid: str):
         """Which model writes this buyer's commentary; None skips it."""
+        if real_only and not buyers[bid]["is_real"]:
+            return _RULES if commentary else None
         if commentary == "changed":
             if bid in changed:
                 return llm
             return quick_replay if bid in skipped else replay
         return llm if commentary else None
 
-    buyers = loader.buyers_by_id()
     notes = loader.notifications()
     articles = {a["article_id"]: a for a in loader.news()}
     verdicts = {}

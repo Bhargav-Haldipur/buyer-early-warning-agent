@@ -1,0 +1,43 @@
+{
+  "result": {
+    "trend": "deteriorating",
+    "summary": "Vardhit Auto Components has one open overdue invoice (INR 7.0m, 36 days past due, due 2026-10-18) against its sole TCI policy (TCI-WT-2026-0002, INR 60m limit), still unresolved. Prior four notifications over the last ~10 months all resolved quickly (3-6 days late), so this 36-day overdue marks a sharp escalation in severity even though notification frequency (2 in last 6 months vs 3 prior) hasn't increased. Total exposure (7m overdue + 19m not-yet-due = 26m) remains within the 60m limit, but the payment delay trend warrants closer monitoring.",
+    "concerns": [
+      "Current overdue (36 DPD) is far longer than any prior resolved notification (max 6 days late), indicating a material change in payment behaviour",
+      "Single insurer/policy concentration (all notifications from TCI) limits visibility into broader buyer behaviour",
+      "Invoice remains unresolved as of the latest data, with no resolution date yet confirmed"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"event_id\": \"N-261019-00017\", \"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0002\", \"reason\": \"OVERDUE_INVOICE\", \"notification_date\": \"2026-10-19\", \"original_due_date\": \"2026-10-18\", \"amount_at_risk\": 7000000.0, \"currency\": \"INR\", \"days_past_due\": 36, \"outstanding_by_ageing\": {\"NOT_YET_DUE\": 19000000.0, \"OVERDUE_31_60_DAYS\": 7000000.0}}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-251229-00013\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2025-12-28\", \"resolved_date\": \"2025-12-31\", \"amount_at_risk\": 4000000.0, \"days_late\": 3}, {\"event_id\": \"N-260309-00014\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-03-08\", \"resolved_date\": \"2026-03-13\", \"amount_at_risk\": 4500000.0, \"days_late\": 5}, {\""
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0002\", \"credit_limit\": 60000000.0, \"currency\": \"INR\", \"payment_terms_days\": 60, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-06-12\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 36,
+        "worst_event_id": "N-261019-00017",
+        "trend": "deteriorating",
+        "summary": "Vardhit Auto Components has one open overdue invoice (INR 7.0m, 36 days past due, due 2026-10-18) against its sole TCI policy (TCI-WT-2026-0002, INR 60m limit), still unresolved. Prior four notifications over the last ~10 months all resolved quickly (3-6 days late), so this 36-day overdue marks a sharp escalation in severity even though notification frequency (2 in last 6 months vs 3 prior) hasn't increased. Total exposure (7m overdue + 19m not-yet-due = 26m) remains within the 60m limit, but the payment delay trend warrants closer monitoring.",
+        "concerns": [
+          "Current overdue (36 DPD) is far longer than any prior resolved notification (max 6 days late), indicating a material change in payment behaviour",
+          "Single insurer/policy concentration (all notifications from TCI) limits visibility into broader buyer behaviour",
+          "Invoice remains unresolved as of the latest data, with no resolution date yet confirmed"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

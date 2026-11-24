@@ -247,7 +247,7 @@ class DataModel(unittest.TestCase):
                                          resolved="2026-10-15")]).notifications()
         self.assertEqual((n["status"], n["dpd"]), ("OPEN", 24))
 
-    def test_without_ageing_the_owed_amount_is_the_amount_at_risk(self):
+    def test_without_ageing_the_owed_amount_is_the_exposure(self):
         from ews.limits import owed_by_line
         with patch("ews.loader.AS_OF", self.AS_OF):
             notes = self._loader([self._ev("N1", "2026-09-02", "2026-09-01", amount="1200"),

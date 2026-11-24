@@ -1,0 +1,41 @@
+{
+  "result": {
+    "trend": "improving",
+    "summary": "No open overdue notifications currently exist for Aranya Pharma Packaging. The two historical overdue events resolved quickly (7 days late, then 3 days late), showing faster resolution over time, and notification volume remains low (one per 6-month window from a single policy/insurer). The single INR 50M credit line from TCI is accepted and recently reviewed, with no signs of stress.",
+    "concerns": [
+      "Only one insurer (TCI) is currently reporting, limiting visibility into the buyer's full payment behaviour across other credit lines.",
+      "History is short (only two resolved events), so confidence in the improving trend is moderate."
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"note\": \"no open overdue notifications\"}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260217-00018\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-02-16\", \"resolved_date\": \"2026-02-23\", \"amount_at_risk\": 3000000.0, \"days_late\": 7}, {\"event_id\": \"N-260707-00019\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-07-06\", \"resolved_date\": \"2026-07-09\", \"amount_at_risk\": 2600000.0, \"days_late\": 3}], \""
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"credit_limit\": 50000000.0, \"currency\": \"INR\", \"payment_terms_days\": 45, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-06-01\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 0,
+        "worst_event_id": "",
+        "trend": "improving",
+        "summary": "No open overdue notifications currently exist for Aranya Pharma Packaging. The two historical overdue events resolved quickly (7 days late, then 3 days late), showing faster resolution over time, and notification volume remains low (one per 6-month window from a single policy/insurer). The single INR 50M credit line from TCI is accepted and recently reviewed, with no signs of stress.",
+        "concerns": [
+          "Only one insurer (TCI) is currently reporting, limiting visibility into the buyer's full payment behaviour across other credit lines.",
+          "History is short (only two resolved events), so confidence in the improving trend is moderate."
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

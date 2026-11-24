@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Boeing sits in the Watch band with a score of 27.8 (PD 17.84%), driven almost entirely by negative news sentiment rather than any payment deterioration. The company has no open overdue notifications and a clean recent payment record, while the business itself shows strong underlying momentum, including a $20B uncontested Navy contract, a $745B order backlog with bullish Wall Street coverage, a $12B Asia aircraft sale, and potential for a further 250-plane China order.\n\nThe Watch band is produced by the 0.35 news weight alone: a severity-4 layoffs headline from 20 Nov 2026 contributes the full 27.8 points (payment contributes zero), reinforced by a second severity-4 layoffs article from 9 Nov and lower-severity regulatory and production-delay items. The adjudicator agreed with the band but flagged caveats: the key article is only a repeated headline with no supporting body text, the clean payment score rests on a single historical data point, and the week's strongly positive news (backlog, Navy win, Asia deal) scores zero and does not offset the negative weighting, so the news component may overstate deterioration.\n\nThe recommendation is to maintain the current $9,000,000 export limit with Trade Credit Insurer, as the PD of 0.1784 remains within the 0.25 target appetite and expected loss is unchanged before and after.\n\nA move to the lower Healthy band requires the score to fall by 7.8 points below the current level, which would follow if the negative news decays (half-life 365 days) without fresh layoffs or production-delay coverage. Conversely, reaching the High Risk band would need a 22.2-point increase (to 50.0), equivalent to payment deterioration out to 33 days past due, or a fresh run of severe negative headlines on top of the existing layoffs coverage.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the $9,000,000 export limit with Trade Credit Insurer; PD of 17.84% is within the 25% appetite target, though the adjudicator agreed with caveats, noting the Watch score is driven almost entirely by a single thinly-sourced layoffs headline rather than any payment weakness.",
+      "payment_note": "Boeing has no open overdue notifications and a clean 0 DPD record, with only one minor historical 3-day-late incident, though the single data point limits confidence in trend.",
+      "news_note": "Recent coverage is a mix of severity-4 layoffs headlines (Nov 9 and Nov 20) and regulatory/production-delay items that drive the score, alongside multiple strongly positive but zero-weighted stories (Navy contract, record backlog, Asia aircraft sale, potential China order).",
+      "lifts_it": [
+        "Score falls 7.8 points as the layoffs-driven news decays without fresh negative headlines",
+        "No recurrence of layoffs, regulatory scrutiny, or production-delay coverage",
+        "Continued clean payment performance (0 DPD) over a longer track record"
+      ],
+      "worsens_it": [
+        "Score rises 22.2 points to 50.0, moving into High Risk",
+        "Payment slipping to 33 days past due",
+        "Additional severity-4 layoffs or operational distress headlines compounding the existing coverage"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS02\", \"score\": 27.8, \"band\": \"Watch\", \"pd\": 0.1784, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 4, \"category\": \"layoffs\", \"article_id\": \"GN-8b97eceb4530\", \"age_days\": 3, \"headline\": \"Boeing leaves open possibility of more layoffs amid stalled production plans\", \"via_parent\": false, \"parent_name\": null, \"raw\": 79.5, \"weighted\": 27.8}, "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS02-1\", \"buyer_id\": \"OS02\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 9000000, \"owed\": 0, \"revised_limit\": 9000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1784, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 22.2, \"dpd_for_next_band\": 33, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 7.8, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-260607-00024\", \"kind\": \"payment_review\", \"date\": \"2026-06-06\", \"detail\": \"Boeing currently has no open overdue notifications. Recent history shows only one resolved overdue (3 days late, $650k) in the last six months from a single policy, a minor and quickly-cured delay, with a $9M accepted credit line from TCI. With just one historical data point, there isn't enough evidence to establi"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Boeing sits in the Watch band with a score of 27.8 (PD 17.84%), driven almost entirely by negative news sentiment rather than any payment deterioration. The company has no open overdue notifications and a clean recent payment record, while the business itself shows strong underlying momentum, including a $20B uncontested Navy contract, a $745B order backlog with bullish Wall Street coverage, a $12B Asia aircraft sale, and potential for a further 250-plane China order.\n\nThe Watch band is produced by the 0.35 news weight alone: a severity-4 layoffs headline from 20 Nov 2026 contributes the full 27.8 points (payment contributes zero), reinforced by a second severity-4 layoffs article from 9 Nov and lower-severity regulatory and production-delay items. The adjudicator agreed with the band but flagged caveats: the key article is only a repeated headline with no supporting body text, the clean payment score rests on a single historical data point, and the week's strongly positive news (backlog, Navy win, Asia deal) scores zero and does not offset the negative weighting, so the news component may overstate deterioration.\n\nThe recommendation is to maintain the current $9,000,000 export limit with Trade Credit Insurer, as the PD of 0.1784 remains within the 0.25 target appetite and expected loss is unchanged before and after.\n\nA move to the lower Healthy band requires the score to fall by 7.8 points below the current level, which would follow if the negative news decays (half-life 365 days) without fresh layoffs or production-delay coverage. Conversely, reaching the High Risk band would need a 22.2-point increase (to 50.0), equivalent to payment deterioration out to 33 days past due, or a fresh run of severe negative headlines on top of the existing layoffs coverage.",
+        "bottom_line": "Maintain the $9,000,000 export limit with Trade Credit Insurer; PD of 17.84% is within the 25% appetite target, though the adjudicator agreed with caveats, noting the Watch score is driven almost entirely by a single thinly-sourced layoffs headline rather than any payment weakness.",
+        "payment_note": "Boeing has no open overdue notifications and a clean 0 DPD record, with only one minor historical 3-day-late incident, though the single data point limits confidence in trend.",
+        "news_note": "Recent coverage is a mix of severity-4 layoffs headlines (Nov 9 and Nov 20) and regulatory/production-delay items that drive the score, alongside multiple strongly positive but zero-weighted stories (Navy contract, record backlog, Asia aircraft sale, potential China order).",
+        "lifts_it": [
+          "Score falls 7.8 points as the layoffs-driven news decays without fresh negative headlines",
+          "No recurrence of layoffs, regulatory scrutiny, or production-delay coverage",
+          "Continued clean payment performance (0 DPD) over a longer track record"
+        ],
+        "worsens_it": [
+          "Score rises 22.2 points to 50.0, moving into High Risk",
+          "Payment slipping to 33 days past due",
+          "Additional severity-4 layoffs or operational distress headlines compounding the existing coverage"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

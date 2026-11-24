@@ -1,25 +1,39 @@
-type,name,enabled,country,notes
-feed,sec_edgar,Y,,Form 8-K current reports from the SEC's own API - what the company itself reported
-feed,google_news,Y,,"Press coverage via Google News RSS - kept only from the publishers below. Other spellings of a publisher's name follow it, split by |"
-publisher,Reuters,Y,,
-publisher,Associated Press|AP News,Y,,
-publisher,Bloomberg|Bloomberg.com,Y,,
-publisher,The Wall Street Journal|WSJ,Y,,
-publisher,Financial Times,Y,,
-publisher,CNBC,Y,,
-publisher,Barron's,Y,,
-publisher,MarketWatch,Y,,
-publisher,The New York Times,Y,,
-publisher,Fortune,Y,,
-publisher,Yahoo Finance,Y,,
-publisher,Business Standard,Y,IND,
-publisher,The Economic Times|ET Auto|ET Telecom|ET Infra,Y,IND,ET Auto / Telecom / Infra are its sector sites
-publisher,Mint|Livemint,Y,IND,
-publisher,Moneycontrol|Moneycontrol.com,Y,IND,
-publisher,The Hindu BusinessLine|BusinessLine,Y,IND,
-publisher,The Hindu,Y,IND,
-publisher,NDTV Profit,Y,IND,
-publisher,CNBC TV18,Y,IND,
-publisher,The Financial Express|Financial Express,Y,IND,
-publisher,Fortune India,Y,IND,
-publisher,The Times of India,Y,IND,
+type,name,enabled,country,notes,url
+feed,sec_edgar,Y,,Form 8-K current reports from the SEC's own API - what the company itself reported,
+feed,google_news,Y,,"Press coverage via Google News RSS - kept only from the publishers below. Other spellings of a publisher's name follow it, split by |",
+publisher,Reuters,Y,,,
+publisher,Associated Press|AP News,Y,,,
+publisher,Bloomberg|Bloomberg.com,Y,,,
+publisher,The Wall Street Journal|WSJ,Y,,,
+publisher,Financial Times,Y,,,
+publisher,CNBC,Y,,,
+publisher,Barron's,Y,,,
+publisher,MarketWatch,Y,,,
+publisher,The New York Times,Y,,,
+publisher,Fortune,Y,,,
+publisher,Yahoo Finance,Y,,,
+publisher,Business Standard,Y,IND,,
+publisher,The Economic Times|ET Auto|ET Telecom|ET Infra,Y,IND,ET Auto / Telecom / Infra are its sector sites,
+publisher,Mint|Livemint,Y,IND,,
+publisher,Moneycontrol|Moneycontrol.com,Y,IND,,
+publisher,The Hindu BusinessLine|BusinessLine,Y,IND,,
+publisher,The Hindu,Y,IND,,
+publisher,NDTV Profit,Y,IND,,
+publisher,CNBC TV18,Y,IND,,
+publisher,The Financial Express|Financial Express,Y,IND,,
+publisher,Fortune India,Y,IND,,
+publisher,The Times of India,Y,IND,,
+rss,The Economic Times,Y,IND,Publisher's own feed: recent stories with its summary as the text - companies,https://economictimes.indiatimes.com/news/company/rssfeeds/2143429.cms
+rss,The Economic Times,Y,IND,Publisher's own feed: recent stories with its summary as the text - markets,https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms
+rss,ET Telecom,Y,IND,Publisher's own feed: recent stories with its summary as the text,https://telecom.economictimes.indiatimes.com/rss/topstories
+rss,ET Infra,Y,IND,Publisher's own feed: recent stories with its summary as the text,https://infra.economictimes.indiatimes.com/rss/topstories
+rss,Business Standard,Y,IND,Publisher's own feed: recent stories with its summary as the text - companies,https://www.business-standard.com/rss/companies-101.rss
+rss,Business Standard,Y,IND,Publisher's own feed: recent stories with its summary as the text - markets,https://www.business-standard.com/rss/markets-106.rss
+rss,Mint,Y,IND,Publisher's own feed: recent stories with its summary as the text - companies,https://www.livemint.com/rss/companies
+rss,Mint,Y,IND,Publisher's own feed: recent stories with its summary as the text - markets,https://www.livemint.com/rss/markets
+rss,The Hindu BusinessLine,Y,IND,Publisher's own feed: recent stories with its summary as the text - companies,https://www.thehindubusinessline.com/companies/feeder/default.rss
+rss,The Hindu BusinessLine,Y,IND,Publisher's own feed: recent stories with its summary as the text - markets,https://www.thehindubusinessline.com/markets/feeder/default.rss
+rss,CNBC TV18,Y,IND,Publisher's own feed: recent stories with its summary as the text - business,https://www.cnbctv18.com/commonfeeds/v1/cne/rss/business.xml
+rss,CNBC TV18,Y,IND,Publisher's own feed: recent stories with its summary as the text - market,https://www.cnbctv18.com/commonfeeds/v1/cne/rss/market.xml
+rss,NDTV Profit,Y,IND,Publisher's own feed: recent stories with its summary as the text - latest,https://feeds.feedburner.com/ndtvprofit-latest
+rss,The Times of India,Y,IND,Publisher's own feed: recent stories with its summary as the text - business,https://timesofindia.indiatimes.com/rssfeeds/1898055.cms

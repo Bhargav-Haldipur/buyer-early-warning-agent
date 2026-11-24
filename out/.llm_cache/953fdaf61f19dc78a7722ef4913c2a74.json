@@ -1,0 +1,41 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "Article is about fantasy football and does not mention any covered entity."
+  },
+  "trace": [
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "Article is about fantasy football and does not mention any covered entity."
+      },
+      "error": "call search_entities before submitting"
+    },
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "football"
+      },
+      "result": "[{\"note\": \"no covered entity shares a word with 'football'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "Article is about fantasy football and does not mention any covered entity."
+      }
+    }
+  ],
+  "turns": 3
+}

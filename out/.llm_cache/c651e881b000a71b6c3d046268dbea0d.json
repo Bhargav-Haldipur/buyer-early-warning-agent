@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 0,
+    "category": "equity_offering",
+    "reason": "Routine 8-K disclosing a public equity offering (stock sale), which raises capital and is neutral to positive for credit standing, not a negative event."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 0,
+        "category": "equity_offering",
+        "reason": "Routine 8-K disclosing a public equity offering (stock sale), which raises capital and is neutral to positive for credit standing, not a negative event."
+      }
+    }
+  ],
+  "turns": 2
+}

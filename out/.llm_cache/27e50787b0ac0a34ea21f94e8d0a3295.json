@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN01",
+    "name": "Tata Motors Limited",
+    "severity": 0,
+    "category": "acquisition",
+    "reason": "Tata Motors raising its takeover offer for Iveco is a strategic expansion move, not a negative credit signal."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Tata Motors"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN01\", \"name\": \"Tata Motors Limited\", \"sector\": \"Automotive\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN01",
+        "severity": 0,
+        "category": "acquisition",
+        "reason": "Tata Motors raising its takeover offer for Iveco is a strategic expansion move, not a negative credit signal."
+      }
+    }
+  ],
+  "turns": 2
+}

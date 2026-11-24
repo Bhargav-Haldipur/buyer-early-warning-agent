@@ -1,0 +1,55 @@
+{
+  "result": {
+    "trend": "insufficient_history",
+    "summary": "Tata Motors Limited currently has no open overdue notifications. Historical data shows only one resolved overdue (4 days late, INR 22m) from a single policyholder in the last 6 months, which is too little to establish a trend. One insurer (TCI) holds an accepted INR 450m credit line on 60-day terms, reviewed as recently as July 2026.",
+    "concerns": [
+      "Only one historical data point exists, limiting ability to assess a genuine trend",
+      "Single policyholder reporting limits visibility into broader payment behaviour across other suppliers"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"note\": \"no open overdue notifications\"}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260627-00001\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-06-26\", \"resolved_date\": \"2026-06-30\", \"amount_at_risk\": 22000000.0, \"days_late\": 4}], \"accumulation\": {\"window_days\": 180, \"last_window\": 1, \"window_before\": 0, \"policies_reporting_last_window\": 1}}"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"credit_limit\": 450000000.0, \"currency\": \"INR\", \"payment_terms_days\": 60, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-07-26\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 4,
+        "worst_event_id": "N-260627-00001",
+        "trend": "insufficient_history",
+        "summary": "Tata Motors Limited currently has no open overdue notifications. Historical data shows only a single resolved overdue (4 days late, INR 22m) from one policyholder in the last 6 months, with no prior pattern to compare against. One insurer (TCI) holds an accepted INR 450m credit line on 60-day terms, reviewed as recently as July 2026.",
+        "concerns": [
+          "Only one historical data point exists, limiting ability to assess a genuine trend",
+          "Single policyholder reporting limits visibility into broader payment behaviour across other suppliers"
+        ]
+      },
+      "error": "the oldest open overdue is 0 days past due, not 4; check get_open_notifications"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 0,
+        "worst_event_id": "",
+        "trend": "insufficient_history",
+        "summary": "Tata Motors Limited currently has no open overdue notifications. Historical data shows only one resolved overdue (4 days late, INR 22m) from a single policyholder in the last 6 months, which is too little to establish a trend. One insurer (TCI) holds an accepted INR 450m credit line on 60-day terms, reviewed as recently as July 2026.",
+        "concerns": [
+          "Only one historical data point exists, limiting ability to assess a genuine trend",
+          "Single policyholder reporting limits visibility into broader payment behaviour across other suppliers"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

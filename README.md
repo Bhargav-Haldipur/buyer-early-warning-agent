@@ -37,7 +37,7 @@ library. Run them from the repository root.
 
 The dashboard blocks the terminal, so give it its own window. The live input sandbox
 is at http://localhost:8000/live: file an overdue invoice the way a policyholder
-notifies one on the platform (buyer and policy, original due date, amount at risk), fetch the
+notifies one on the platform (buyer and policy, original due date, exposure), fetch the
 latest real news on the live-news book, or type a story nobody prepared - and the engine
 re-runs on it, with the adjudicator and the Case File agent re-reviewing the buyers it
 touched. With Claude connected that review takes a minute or two; each form's **Score

@@ -22,7 +22,7 @@ AGENTS = {
     "payment": {
         "enabled": True,              # False: always use the rule-based review
         "model": "claude-sonnet-5",
-        "effort": "high",
+        "effort": "medium",
         "max_turns": 12,              # model calls before the run gives up and falls back
         "max_tokens": 16000,          # per model call
         "guardrails": {
@@ -36,7 +36,7 @@ AGENTS = {
     "news": {
         "enabled": True,
         "model": "claude-sonnet-5",
-        "effort": "high",
+        "effort": "medium",
         "max_turns": 12,
         "max_tokens": 16000,
         "guardrails": {
@@ -50,7 +50,7 @@ AGENTS = {
     },
     "adjudicator": {
         "enabled": True,
-        "model": "claude-opus-5",
+        "model": "claude-sonnet-5",
         "effort": "high",
         "max_turns": 12,
         "max_tokens": 16000,
@@ -65,7 +65,7 @@ AGENTS = {
     },
     "casefile": {
         "enabled": True,
-        "model": "claude-opus-5",
+        "model": "claude-sonnet-5",
         "effort": "high",
         "max_turns": 12,
         "max_tokens": 16000,
@@ -112,6 +112,12 @@ DEFAULT_PRICE = (10.0, 50.0)
 MAX_MODEL_TOKENS = 4_000_000
 
 REFUSAL_FALLBACK = True
+
+# In a book with real companies (the live-news book), Claude runs only for them: an
+# invented buyer, and the illustrative stories written about it, get the rule-based
+# answers. A book with no real company at all (the synthetic one) runs Claude for every
+# buyer. A story typed into the live page always goes to the News agent.
+REAL_BUYERS_ONLY = True
 
 # Characters of each tool result kept in the trace shown on the dashboard.
 TRACE_PREVIEW_CHARS = 400

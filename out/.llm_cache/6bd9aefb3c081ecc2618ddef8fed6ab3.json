@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS02",
+    "name": "The Boeing Company",
+    "severity": 4,
+    "category": "layoffs",
+    "reason": "Article reports Boeing may pursue further layoffs amid stalled production plans, indicating ongoing operational and workforce distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Boeing"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS02\", \"name\": \"The Boeing Company\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "OS02"
+      },
+      "result": "{\"id\": \"OS02\", \"kind\": \"buyer\", \"name\": \"The Boeing Company\", \"short_name\": \"Boeing\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\", \"size_band\": \"large\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS02",
+        "severity": 4,
+        "category": "layoffs",
+        "reason": "Article reports Boeing may pursue further layoffs amid stalled production plans, indicating ongoing operational and workforce distress."
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN01",
+    "name": "Tata Motors Limited",
+    "severity": 2,
+    "category": "profit_warning",
+    "reason": "Tata Motors Passenger Vehicles, a subsidiary of Tata Motors Limited, reported a large Q2 net loss of \u20b95,531 crore, indicating a notable financial deterioration for the group."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Tata Motors"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN01\", \"name\": \"Tata Motors Limited\", \"sector\": \"Automotive\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "IN01"
+      },
+      "result": "{\"id\": \"IN01\", \"kind\": \"buyer\", \"name\": \"Tata Motors Limited\", \"short_name\": \"Tata Motors\", \"sector\": \"Automotive\", \"city\": \"Mumbai\", \"size_band\": \"large\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN01",
+        "severity": 2,
+        "category": "profit_warning",
+        "reason": "Tata Motors Passenger Vehicles, a subsidiary of Tata Motors Limited, reported a large Q2 net loss of \u20b95,531 crore, indicating a notable financial deterioration for the group."
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -238,6 +238,7 @@ class Settings(unittest.TestCase):
             Tool("get_score_breakdown", {}, lambda: {}),
             Tool("get_evidence", {"kind": {"type": "string"}}, lambda kind: []),
             Tool("get_article", {"article_id": {"type": "string"}}, lambda article_id: {}),
+            Tool("find_articles", {"query": {"type": "string"}}, lambda query: []),
             Tool("submit_review", {"assessment": {}, "rationale": {}, "concerns": {}},
                  lambda **a: a)])
         req = llm.requests[0]

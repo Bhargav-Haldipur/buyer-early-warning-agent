@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN01",
+    "name": "Tata Motors Limited",
+    "severity": 2,
+    "category": "guidance_cut",
+    "reason": "Article reports a Q2 loss and downward JLR guidance revision alongside analyst price target cuts, reflecting a notable earnings/outlook deterioration for Tata Motors."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Tata Motors"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN01\", \"name\": \"Tata Motors Limited\", \"sector\": \"Automotive\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "IN01"
+      },
+      "result": "{\"id\": \"IN01\", \"kind\": \"buyer\", \"name\": \"Tata Motors Limited\", \"short_name\": \"Tata Motors\", \"sector\": \"Automotive\", \"city\": \"Mumbai\", \"size_band\": \"large\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN01",
+        "severity": 2,
+        "category": "guidance_cut",
+        "reason": "Article reports a Q2 loss and downward JLR guidance revision alongside analyst price target cuts, reflecting a notable earnings/outlook deterioration for Tata Motors."
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -225,8 +225,36 @@ class FetchFunnel(unittest.TestCase):
         buyers = len(rep["buyers"])                       # every real buyer gets the same feed
         self.assertEqual(rep["funnel"], {
             "found": 3 * buyers, "untrusted_dropped": buyers, "outside_window_or_cap": 0,
-            "duplicates": 2 * buyers - 2, "kept": 2})
+            "duplicates": 2 * buyers - 2, "kept": 2, "carried": 0})
         self.assertEqual(rep["new"], ["GN-" + hashlib.sha1(b"https://x/new").hexdigest()[:12]])
+
+    def test_a_story_the_feed_stops_returning_is_kept_until_it_ages_out(self):
+        import shutil
+        import tempfile
+        from datetime import date
+        from pathlib import Path
+        from unittest.mock import patch
+        from ews import fetch_news
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp) / "book"
+            shutil.copytree(SBI, d)
+            with (d / "news_articles.csv").open("w", newline="") as fh:
+                w = csv.DictWriter(fh, fieldnames=FIELDS)
+                w.writeheader()
+                for aid, day in (("GN-yesterday", "2026-11-10"), ("GN-ancient", "2026-01-01")):
+                    w.writerow({"article_id": aid, "published_date": day,
+                                "publication": "Reuters", "headline": aid, "body": "",
+                                "mentioned_entity_as_written": "", "url": f"https://x/{aid}"})
+            with patch.object(fetch_news, "_get", lambda url, **kw: self.RSS), \
+                    patch.object(fetch_news, "AS_OF", date(2026, 11, 19)), \
+                    patch.object(fetch_news, "DATASET", "sbi"):
+                rep = fetch_news.fetch(days=180, per_buyer=12, data_dir=d, quiet=True)
+                ids = {a["article_id"] for a in fetch_news.read_articles(d)}
+        self.assertIn("GN-yesterday", ids)           # not returned today, still in the window
+        self.assertNotIn("GN-ancient", ids)          # older than 180 days: gone
+        self.assertEqual(rep["funnel"]["carried"], 1)
+        self.assertEqual(rep["articles"], rep["funnel"]["kept"] + 1)
+        self.assertNotIn("GN-yesterday", rep["new"])
 
 
 class AutoRefresh(unittest.TestCase):
@@ -239,10 +267,10 @@ class AutoRefresh(unittest.TestCase):
         from ews import user_settings
         self.S, self.us = S, user_settings
         self._saved = (dict(S.AUTO), dict(S.FETCH), S.fetch_news.fetch, S.snapshot,
-                       user_settings.PATH)
+                       user_settings.PATH, S.rescore)
         self.tmp = tempfile.TemporaryDirectory()
         user_settings.PATH = Path(self.tmp.name) / "settings.json"   # never the real file
-        S.snapshot = lambda: {}
+        S.snapshot = S.rescore = lambda: {}
         self.calls = []
 
         def fake_fetch(**kw):
@@ -251,7 +279,8 @@ class AutoRefresh(unittest.TestCase):
         S.fetch_news.fetch = fake_fetch
 
     def tearDown(self):
-        auto, fetch, real_fetch, snap, path = self._saved
+        auto, fetch, real_fetch, snap, path, rescore = self._saved
+        self.S.rescore = rescore
         self.S.AUTO.clear(); self.S.AUTO.update(auto)
         self.S.FETCH.clear(); self.S.FETCH.update(fetch)
         self.S.fetch_news.fetch, self.S.snapshot = real_fetch, snap
@@ -320,6 +349,31 @@ class AutoRefresh(unittest.TestCase):
         self.assertEqual(self.calls, [])
         self.assertIn("already running", self.S.FETCH["last"])
 
+    def test_the_button_answers_at_once_and_the_page_follows_the_fetch(self):
+        """A fetch that brings new stories re-scores for minutes - longer than a browser
+        waits. The button starts it in the background; the page says it is running and
+        reloads itself until it is done."""
+        import threading
+        release = threading.Event()
+
+        def slow_rescore():
+            release.wait(5)
+            return {}
+        self.S.rescore = slow_rescore
+        self.S.start_fetch()
+        self.assertTrue(self.S.AUTO["running"])
+        self.assertIn("fetching and re-scoring now", self.S.auto_switch())
+        self.assertIn("location.reload(), 5000", self.S.auto_switch())
+        self.S.start_fetch()                                   # a second click
+        self.assertIn("already running", self.S.FETCH["last"])
+        release.set()
+        for t in threading.enumerate():
+            if t.name == "manual-fetch":
+                t.join(5)
+        self.assertFalse(self.S.AUTO["running"])
+        self.assertEqual(len(self.calls), 1)
+        self.assertIn("Scores are re-run", self.S.FETCH["last"])
+
     def test_a_failed_fetch_keeps_the_old_news(self):
         def broken(**kw):
             raise OSError("network down")
@@ -375,7 +429,8 @@ class FetchResultPanel(unittest.TestCase):
         try:
             with patch.object(S.fetch_news, "fetch", lambda **kw: rep), \
                     patch.object(S.fetch_news, "read_articles", lambda d: [story]), \
-                    patch.object(S, "snapshot", lambda: next(snaps)):
+                    patch.object(S, "snapshot", lambda: next(snaps)), \
+                    patch.object(S, "rescore", lambda: next(snaps)):
                 S.refresh_news("Manual")
             html = S.fetch_result_panel()
         finally:
@@ -435,3 +490,148 @@ class ResetRestoresTheNews(unittest.TestCase):
             self.assertIsNone(S.LIVE["last"])
         finally:
             S.LIVE.clear(); S.LIVE.update(keep)
+
+
+class ClaudeForRealBuyersOnly(unittest.TestCase):
+    """settings.REAL_BUYERS_ONLY: the agents run for the six real companies; the invented
+    buyers and their illustrative stories get the rule-based answers."""
+
+    def test_only_the_real_companies_reach_the_model(self):
+        from unittest.mock import patch
+        from ews import run as engine
+        from ews.agents.runtime import AgentError
+        from ews.llm import _Cache
+
+        class ModelOffline:
+            """Agentic, no cache, and fails any call that reaches the model."""
+            name, agentic, disabled, degraded = "claude", True, False, 0
+            api_errors = ()
+
+            def __init__(self):
+                self.cache = _Cache(False)
+
+            def create(self, **_):
+                raise AgentError("model called")
+
+        from ews import config
+        # the book's own rates; config picks them by EWS_DATASET when it loads
+        with patch.object(engine, "Loader", lambda **kw: Loader(SBI, **kw)), \
+                patch.dict(config.FX_TO_REPORTING, {"INR": 1.0, "USD": 93.3461}):
+            out = engine.run(llm=ModelOffline())
+        illustrative = {a["article_id"] for a in Loader(SBI).table("illustrative_articles")}
+        reached = set()
+        for r in out["buyers"]:
+            runs = [e["data"]["agent"] for e in r["evidence"]
+                    if e["kind"] == "payment_review"
+                    or (e["kind"] == "news" and e["source"] in illustrative)]
+            if r["verdict"]["review"]:
+                runs.append(r["verdict"]["review"]["agent"])
+            if r["verdict"]["band"] != "Healthy":
+                runs.append(r["case_file"]["agent"])
+            if any(run.get("error") == "model called" for run in runs):
+                reached.add(r["buyer_id"])
+            if not r["is_real"]:
+                self.assertTrue(all(run["mode"] == "rules" for run in runs),
+                                (r["short_name"], runs))
+        real = {r["buyer_id"] for r in out["buyers"] if r["is_real"]}
+        self.assertEqual(reached, real)
+
+
+class ArticleText(unittest.TestCase):
+    """Google News gives headlines only. A publisher's own feed gives its summary, and an
+    8-K gives the company's own words; the agents read whichever text exists."""
+
+    GN = (b"<rss><channel>"
+          b"<item><title>Tata Motors cuts output at Pune plant - Business Standard</title>"
+          b"<source>Business Standard</source><link>https://news.google.com/x/1</link>"
+          b"<pubDate>Mon, 16 Nov 2026 10:00:00 GMT</pubDate></item>"
+          b"</channel></rss>")
+    FEED = (b"<rss><channel>"
+            b"<item><title>Tata Motors cuts output at Pune plant</title>"
+            b"<link>https://bs.example/1</link><pubDate>Mon, 16 Nov 2026 09:00:00 GMT</pubDate>"
+            b"<description>Tata Motors will cut output by 20% for six weeks as dealer stocks "
+            b"pile up, the company said.</description></item>"
+            b"<item><title>Vodafone Idea misses a spectrum payment</title>"
+            b"<link>https://bs.example/2</link><pubDate>Tue, 17 Nov 2026 09:00:00 GMT</pubDate>"
+            b"<description>Vodafone Idea did not pay the instalment due on Monday.</description></item>"
+            b"<item><title>Monsoon lifts tractor sales</title>"
+            b"<link>https://bs.example/3</link><pubDate>Tue, 17 Nov 2026 09:00:00 GMT</pubDate>"
+            b"<description>Rural demand recovered across the industry.</description></item>"
+            b"</channel></rss>")
+
+    def _fetch(self, stored=()):
+        import shutil
+        import tempfile
+        from datetime import date
+        from pathlib import Path
+        from unittest.mock import patch
+        from ews import fetch_news
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp) / "book"
+            shutil.copytree(SBI, d)
+            with (d / "trusted_sources.csv").open(newline="") as fh:
+                rows = list(csv.DictReader(fh))
+            rows = [r for r in rows if r["type"] != "rss"] + [{
+                "type": "rss", "name": "Business Standard", "enabled": "Y", "country": "IND",
+                "notes": "", "url": "https://bs.example/rss"}]
+            for r in rows:
+                if r["name"] == "sec_edgar":
+                    r["enabled"] = "N"
+            with (d / "trusted_sources.csv").open("w", newline="") as fh:
+                w = csv.DictWriter(fh, fieldnames=list(rows[0]))
+                w.writeheader()
+                w.writerows(rows)
+            with (d / "news_articles.csv").open("w", newline="") as fh:
+                w = csv.DictWriter(fh, fieldnames=FIELDS)
+                w.writeheader()
+                w.writerows(stored)
+            get = lambda url, **kw: self.FEED if "bs.example" in url else self.GN
+            with patch.object(fetch_news, "_get", get), \
+                    patch.object(fetch_news, "AS_OF", date(2026, 11, 19)), \
+                    patch.object(fetch_news, "DATASET", "sbi"):
+                rep = fetch_news.fetch(days=180, per_buyer=12, data_dir=d, quiet=True)
+                return rep, {a["article_id"]: a for a in fetch_news.read_articles(d)}
+
+    def test_a_headline_from_google_gets_the_publisher_s_summary(self):
+        rep, arts = self._fetch()
+        tata = [a for a in arts.values() if a["headline"].startswith("Tata Motors cuts")]
+        self.assertEqual(len(tata), 1, "one story, not one per source")
+        self.assertTrue(tata[0]["article_id"].startswith("GN-"))
+        self.assertIn("20% for six weeks", tata[0]["body"])
+
+    def test_a_feed_story_is_added_only_when_it_names_a_watched_company(self):
+        rep, arts = self._fetch()
+        heads = {a["headline"] for a in arts.values()}
+        self.assertIn("Vodafone Idea misses a spectrum payment", heads)
+        self.assertNotIn("Monsoon lifts tractor sales", heads)
+
+    def test_a_stored_headline_keeps_its_id_when_text_arrives(self):
+        stored = [{"article_id": "GN-stored", "published_date": "2026-11-16",
+                   "publication": "Business Standard",
+                   "headline": "Tata Motors cuts output at Pune plant",
+                   "body": "Tata Motors cuts output at Pune plant",
+                   "mentioned_entity_as_written": "Tata Motors", "url": "https://x/old"}]
+        rep, arts = self._fetch(stored)
+        self.assertIn("20% for six weeks", arts["GN-stored"]["body"])
+        self.assertNotIn("GN-stored", rep["new"], "more text is not a new story")
+
+    def test_an_8k_gives_the_company_s_own_words(self):
+        from unittest.mock import patch
+        from ews import fetch_news
+        doc = (b"<html><body><p>Check the appropriate box ... emerging growth company</p>"
+               b"<p>Item 5.02. Departure of Directors</p><p>On November 17, 2026, the Vice "
+               b"Chair elected to retire.</p><p>Item 9.01 Financial Statements and Exhibits"
+               b"</p><p>SIGNATURES</p></body></html>")
+        with patch.object(fetch_news, "_get", lambda url, **kw: doc):
+            text = fetch_news.filing_text("https://sec.example/doc.htm")
+        self.assertTrue(text.startswith("Item 5.02"))
+        self.assertIn("elected to retire", text)
+        self.assertNotIn("9.01", text)
+
+    def test_a_headline_that_recurs_is_a_different_story_on_a_different_day(self):
+        from ews.fetch_news import same_story
+        q = "The Boeing Company files Form 8-K: Results of Operations and Financial Condition"
+        self.assertFalse(same_story({"headline": q, "published_date": "2026-07-28"},
+                                    {"headline": q, "published_date": "2026-10-27"}))
+        self.assertTrue(same_story({"headline": "Tata Motors cuts output", "published_date": "2026-11-16"},
+                                   {"headline": "Tata Motors cuts output", "published_date": "2026-11-17"}))

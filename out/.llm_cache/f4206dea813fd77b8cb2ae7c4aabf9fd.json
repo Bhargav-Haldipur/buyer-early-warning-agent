@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Boeing sits in the Watch band with a score of 27.8 (PD 0.1784), entirely on the back of news sentiment \u2014 payment behaviour contributes nothing negative to the score. The payment side is clean: zero days past due, no open overdue notifications, and a $9M accepted credit line from TCI, though the only historical data point is a single minor delay (3 days, $650k) that was quickly cured, so the record is too thin to call a firm trend. The news component is driven almost entirely by one severity-4 \"layoffs\" article from three days ago, reiterating an earlier severity-4 layoff story from eleven days prior, plus a lower-severity regulatory-scrutiny item on an FAA oversight audit and an older production-delay story. Several materially positive items in the same window \u2014 a record $745B order backlog, an uncontested $20B Navy F/A-XX contract, and a $12B aircraft sale \u2014 are scored as zero and do not offset the negative news driving the band.\n\nThe Watch classification rests on genuine negative signals (repeated layoffs, stalled production ramp-up, regulatory audit) but the adjudicator flagged that the triggering article has almost no substantive body text and largely restates the prior layoff story, raising a risk that one underlying workforce-reduction event is being counted twice at maximum severity. The adjudicator agreed with the band but added caveats on the thin evidentiary basis of the news driver and the limited payment history available to confirm a trend.\n\nThe recommended action is to maintain the current limit of $9,000,000 on the TCI export policy, as the probability of default (0.1784) remains within the insurer's appetite target of 0.25, with expected loss unchanged before and after the review.\n\nTo move into the Healthy band the score would need to fall by 7.8 points below the current level, which would likely follow as the layoff coverage ages and decays (half-life 365 days) absent fresh negative stories, or if subsequent news coverage incorporates the offsetting positive developments. Conversely, the buyer would move into High Risk if the score rose by 22.2 points to 50.0 \u2014 for example through a further severe news event \u2014 or if payment performance deteriorated to around 33 days past due.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the $9,000,000 limit on the TCI export policy; the Watch band is driven solely by news sentiment with a clean payment record, and the adjudicator agreed with the band but flagged caveats about possible double-counting of one layoff story and the thin payment history.",
+      "payment_note": "Payment record is clean (0 DPD, no open overdues) with only one resolved historical delay (3 days, $650k), too little history to confirm a stable trend.",
+      "news_note": "The band is driven by a severity-4 layoff article (possible further layoffs amid stalled production) that largely echoes an earlier severity-4 layoff story from eleven days prior, while concurrent positive news (record $745B backlog, $20B Navy contract, $12B aircraft sale) was scored as zero and not weighed against it.",
+      "lifts_it": [
+        "Score falling 7.8 points to below 20.0 as the layoff news decays without fresh negative coverage",
+        "News coverage reflecting the offsetting positive developments (backlog, contract wins)",
+        "Continued clean payment performance building a longer trend record"
+      ],
+      "worsens_it": [
+        "Score rising 22.2 points to 50.0 via further severe news (e.g., additional layoffs or production setbacks)",
+        "Payment delinquency reaching around 33 days past due",
+        "Escalation of the regulatory/FAA audit into a more severe finding"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS02\", \"score\": 27.8, \"band\": \"Watch\", \"pd\": 0.1784, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 4, \"category\": \"layoffs\", \"article_id\": \"GN-8b97eceb4530\", \"age_days\": 3, \"headline\": \"Boeing leaves open possibility of more layoffs amid stalled production plans\", \"via_parent\": false, \"parent_name\": null, \"raw\": 79.5, \"weighted\": 27.8}, "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS02-1\", \"buyer_id\": \"OS02\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 9000000, \"owed\": 0, \"revised_limit\": 9000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1784, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 22.2, \"dpd_for_next_band\": 33, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 7.8, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-260607-00024\", \"kind\": \"payment_review\", \"date\": \"2026-06-06\", \"detail\": \"Boeing currently has no open overdue notifications. Recent history shows only one resolved overdue (3 days late, $650k) in the last six months from a single policy, a minor and quickly-cured delay, with a $9M accepted credit line from TCI. With just one historical data point, there isn't enough evidence to establi"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Boeing sits in the Watch band with a score of 27.8 (PD 0.1784), entirely on the back of news sentiment \u2014 payment behaviour contributes nothing negative to the score. The payment side is clean: zero days past due, no open overdue notifications, and a $9M accepted credit line from TCI, though the only historical data point is a single minor delay (3 days, $650k) that was quickly cured, so the record is too thin to call a firm trend. The news component is driven almost entirely by one severity-4 \"layoffs\" article from three days ago, reiterating an earlier severity-4 layoff story from eleven days prior, plus a lower-severity regulatory-scrutiny item on an FAA oversight audit and an older production-delay story. Several materially positive items in the same window \u2014 a record $745B order backlog, an uncontested $20B Navy F/A-XX contract, and a $12B aircraft sale \u2014 are scored as zero and do not offset the negative news driving the band.\n\nThe Watch classification rests on genuine negative signals (repeated layoffs, stalled production ramp-up, regulatory audit) but the adjudicator flagged that the triggering article has almost no substantive body text and largely restates the prior layoff story, raising a risk that one underlying workforce-reduction event is being counted twice at maximum severity. The adjudicator agreed with the band but added caveats on the thin evidentiary basis of the news driver and the limited payment history available to confirm a trend.\n\nThe recommended action is to maintain the current limit of $9,000,000 on the TCI export policy, as the probability of default (0.1784) remains within the insurer's appetite target of 0.25, with expected loss unchanged before and after the review.\n\nTo move into the Healthy band the score would need to fall by 7.8 points below the current level, which would likely follow as the layoff coverage ages and decays (half-life 365 days) absent fresh negative stories, or if subsequent news coverage incorporates the offsetting positive developments. Conversely, the buyer would move into High Risk if the score rose by 22.2 points to 50.0 \u2014 for example through a further severe news event \u2014 or if payment performance deteriorated to around 33 days past due.",
+        "bottom_line": "Maintain the $9,000,000 limit on the TCI export policy; the Watch band is driven solely by news sentiment with a clean payment record, and the adjudicator agreed with the band but flagged caveats about possible double-counting of one layoff story and the thin payment history.",
+        "payment_note": "Payment record is clean (0 DPD, no open overdues) with only one resolved historical delay (3 days, $650k), too little history to confirm a stable trend.",
+        "news_note": "The band is driven by a severity-4 layoff article (possible further layoffs amid stalled production) that largely echoes an earlier severity-4 layoff story from eleven days prior, while concurrent positive news (record $745B backlog, $20B Navy contract, $12B aircraft sale) was scored as zero and not weighed against it.",
+        "lifts_it": [
+          "Score falling 7.8 points to below 20.0 as the layoff news decays without fresh negative coverage",
+          "News coverage reflecting the offsetting positive developments (backlog, contract wins)",
+          "Continued clean payment performance building a longer trend record"
+        ],
+        "worsens_it": [
+          "Score rising 22.2 points to 50.0 via further severe news (e.g., additional layoffs or production setbacks)",
+          "Payment delinquency reaching around 33 days past due",
+          "Escalation of the regulatory/FAA audit into a more severe finding"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

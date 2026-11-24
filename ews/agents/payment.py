@@ -3,7 +3,7 @@ Defined in agents/payment.md; this module holds the ledger, its tools and the ch
 
 What an insurer knows about how a buyer pays is what its policyholders notify: there
 is no invoice ledger, only notifiable events - an overdue invoice, its
-original due date, the amount at risk and the outstanding by ageing.
+original due date, the exposure and the outstanding by ageing.
 
 The ledger pass is code: the oldest open overdue decides the buyer's payment input,
 and per-insurer findings are kept as first-class evidence so a buyer-level number
@@ -77,7 +77,7 @@ class Ledger:
             ({"event_id": n["event_id"], "client_id": n["client_id"], "policy_id": n["policy_id"],
               "reason": n["reason"], "notification_date": n["notification_date"],
               "original_due_date": n["original_due_date"],
-              "amount_at_risk": n["amount_at_risk"], "currency": n["currency"],
+              "exposure": n["exposure"], "currency": n["currency"],
               "days_past_due": n["dpd"] or 0,
               "outstanding_by_ageing": {a["bucket"]: a["amount"] for a in n["ageing"]}}
              for n in mine if n["status"] == "OPEN"),
@@ -85,7 +85,7 @@ class Ledger:
         self.history = sorted(
             ({"event_id": n["event_id"], "client_id": n["client_id"], "reason": n["reason"],
               "original_due_date": n["original_due_date"], "resolved_date": n["resolved_date"],
-              "amount_at_risk": n["amount_at_risk"], "days_late": _days_late(n)}
+              "exposure": n["exposure"], "days_late": _days_late(n)}
              for n in mine if n["status"] == "RESOLVED" and n["original_due_date"]),
             key=lambda n: n["original_due_date"])
         self.accumulation = accumulation(mine)
@@ -135,7 +135,8 @@ class Ledger:
         return {"trend": trend, "summary": summary, "concerns": []}
 
 
-def assess(loader: Loader, store, llm=None) -> dict[str, dict]:
+def assess(loader: Loader, store, llm=None, llm_for=None) -> dict[str, dict]:
+    """llm_for(buyer), when given, picks the model for each buyer; else llm for all."""
     notes = loader.notifications()
     limits = loader.credit_limits()
     owed = owed_by_line(notes)
@@ -182,7 +183,7 @@ def assess(loader: Loader, store, llm=None) -> dict[str, dict]:
         if not (ledger.open or ledger.history):
             continue
         run = attempt(
-            llm, ledger.rules_review, spec=spec,
+            llm_for(b) if llm_for else llm, ledger.rules_review, spec=spec,
             task=f"Review payment behaviour for {b['buyer_name']} ({bid}), "
                  f"{b['sector']}, {b['city']}.",
             tools=[

@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 0,
+    "category": "routine_filing",
+    "reason": "This is a routine SEC Form 8-K reporting results of operations with no negative financial details disclosed."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 0,
+        "category": "routine_filing",
+        "reason": "This is a routine SEC Form 8-K reporting results of operations with no negative financial details disclosed."
+      }
+    }
+  ],
+  "turns": 2
+}

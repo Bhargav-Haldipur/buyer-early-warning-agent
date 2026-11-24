@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS03",
+    "name": "Ford Motor Company",
+    "severity": 0,
+    "category": "routine_filing",
+    "reason": "Routine 8-K announcing Q2 2026 earnings call details; no negative financial information disclosed."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Ford"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS03\", \"name\": \"Ford Motor Company\", \"sector\": \"Automotive\", \"city\": \"Dearborn, MI\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS03",
+        "severity": 0,
+        "category": "routine_filing",
+        "reason": "Routine 8-K announcing Q2 2026 earnings call details; no negative financial information disclosed."
+      }
+    }
+  ],
+  "turns": 2
+}

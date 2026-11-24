@@ -283,7 +283,7 @@ class Loader:
                 "buyer_id": ev["CORE_LIMIT_REQUEST_DEBTOR"], "reason": ev["NEV_REASON"],
                 "notification_date": ev["notification_date"],
                 "original_due_date": ev["NEV_ORIGINAL_DUE_DATE"],
-                "amount_at_risk": float(ev["NEV_AMOUNT_AT_RISK"] or 0),
+                "exposure": float(ev["NEV_AMOUNT_AT_RISK"] or 0),
                 "currency": ev["NEV_CURRENCY"],
                 "status": "OPEN" if is_open else ev["ews_status"],
                 "resolved_date": ev["ews_resolved_date"] if not is_open else "",

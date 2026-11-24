@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Intel Corporation sits in the Watch band with a score of 20.7, driven entirely by news rather than any payment deterioration. The payment record is pristine at 0 days past due, contributing nothing to the score, while the full 20.7 points come from a single severity-3 news item on a shareholder lawsuit filed after a 29% stock plunge. All other recent coverage in the evidence set is neutral-to-positive, including new 18A/18A-P foundry customers and stock gains, with no overdue payment or payment_review evidence recorded at all. The adjudicator agreed with the score but flagged caveats: the lawsuit article is a bare headline with no body detail on scope or credit relevance, and shareholder suits following a stock drop are a routine, often opportunistic occurrence rather than a direct liquidity signal, so the Watch classification rests on a thin single source rather than corroborated financial distress. The recommended action is to maintain the current limit of 7,000,000 USD unchanged, as the probability of default (0.1072) remains within appetite and expected loss is unaffected before and after. The buyer sits only 0.7 points above the Healthy band threshold, so even modest easing of the news-driven score would lift it back to Healthy, while a move to High Risk would need the score to climb a further 29.3 points, equivalent to payment delinquency reaching 38 days past due.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the current 7,000,000 USD limit; the Watch band is technically correct per the formula but the adjudicator cautions it rests entirely on one thin, headline-only shareholder-lawsuit article against an otherwise clean and improving news and payment backdrop.",
+      "payment_note": "Payment record is clean with 0 days past due and no overdue or payment_review evidence on file.",
+      "news_note": "The score is driven solely by a severity-3 Reuters headline on a shareholder lawsuit following a 29% stock plunge, while all other recent news (new foundry customers, stock gains, chip breakthroughs) is neutral or positive.",
+      "lifts_it": [
+        "Score would only need to fall 0.7 points to reach the Healthy band",
+        "Decay or resolution of the shareholder-lawsuit news item's weighting over time",
+        "Continued run of positive news (new customers, stock gains) with no fresh negative items"
+      ],
+      "worsens_it": [
+        "Score rising a further 29.3 points would trigger High Risk",
+        "Payment delinquency reaching 38 days past due would alone reach the High Risk threshold",
+        "Any new, more substantive negative news (e.g. litigation developments, financial disclosures) adding to the news-driven score"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS01\", \"score\": 20.7, \"band\": \"Watch\", \"pd\": 0.1072, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 3, \"category\": \"shareholder_lawsuit\", \"article_id\": \"GN-92904b4dcaa6\", \"age_days\": 7, \"headline\": \"Intel sued by shareholders following 29% stock plunge\", \"via_parent\": false, \"parent_name\": null, \"raw\": 59.2, \"weighted\": 20.7}, \"trace\": \"0"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS01-1\", \"buyer_id\": \"OS01\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 7000000, \"owed\": 0, \"revised_limit\": 7000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1072, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 29.3, \"dpd_for_next_band\": 38, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 0.7, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"GN-b97c444dd8fd\", \"kind\": \"news\", \"date\": \"2026-11-22\", \"detail\": \"severity 0 (neutral_news): Intel Says It Just Signed Its First Customer for Its Most Advanced Chipmaking Process. The Stock Is Still More Than 60% Below Its June Record.\", \"data\": {\"severity\": 0, \"category\": \"neutral_news\", \"age_days\": 1, \"base\": 0.0, \"decayed\": 0.0, \"entity\": \"Intel Corporation\", \"via_parent\": false, \"pub"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Intel Corporation sits in the Watch band with a score of 20.7, driven entirely by news rather than any payment deterioration. The payment record is pristine at 0 days past due, contributing nothing to the score, while the full 20.7 points come from a single severity-3 news item on a shareholder lawsuit filed after a 29% stock plunge. All other recent coverage in the evidence set is neutral-to-positive, including new 18A/18A-P foundry customers and stock gains, with no overdue payment or payment_review evidence recorded at all. The adjudicator agreed with the score but flagged caveats: the lawsuit article is a bare headline with no body detail on scope or credit relevance, and shareholder suits following a stock drop are a routine, often opportunistic occurrence rather than a direct liquidity signal, so the Watch classification rests on a thin single source rather than corroborated financial distress. The recommended action is to maintain the current limit of 7,000,000 USD unchanged, as the probability of default (0.1072) remains within appetite and expected loss is unaffected before and after. The buyer sits only 0.7 points above the Healthy band threshold, so even modest easing of the news-driven score would lift it back to Healthy, while a move to High Risk would need the score to climb a further 29.3 points, equivalent to payment delinquency reaching 38 days past due.",
+        "bottom_line": "Maintain the current 7,000,000 USD limit; the Watch band is technically correct per the formula but the adjudicator cautions it rests entirely on one thin, headline-only shareholder-lawsuit article against an otherwise clean and improving news and payment backdrop.",
+        "payment_note": "Payment record is clean with 0 days past due and no overdue or payment_review evidence on file.",
+        "news_note": "The score is driven solely by a severity-3 Reuters headline on a shareholder lawsuit following a 29% stock plunge, while all other recent news (new foundry customers, stock gains, chip breakthroughs) is neutral or positive.",
+        "lifts_it": [
+          "Score would only need to fall 0.7 points to reach the Healthy band",
+          "Decay or resolution of the shareholder-lawsuit news item's weighting over time",
+          "Continued run of positive news (new customers, stock gains) with no fresh negative items"
+        ],
+        "worsens_it": [
+          "Score rising a further 29.3 points would trigger High Risk",
+          "Payment delinquency reaching 38 days past due would alone reach the High Risk threshold",
+          "Any new, more substantive negative news (e.g. litigation developments, financial disclosures) adding to the news-driven score"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

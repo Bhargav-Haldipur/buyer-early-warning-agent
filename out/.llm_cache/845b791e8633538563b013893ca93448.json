@@ -1,0 +1,43 @@
+{
+  "result": {
+    "trend": "insufficient_history",
+    "summary": "Ford Motor Company has one open overdue notification (N-261115-00025, $450,000, 9 days past due) from its single reporting policyholder (TCI, policy TCI-EX-2026-0001), against a $6M accepted credit limit with 60-day terms. There is no resolved notification history to benchmark against, and only one policy has reported in the last six months with no prior-period notifications, so a trend cannot yet be established. Exposure remains modest relative to the credit line, but this is the first signal from this buyer and warrants monitoring for repeat or lengthening overdues.",
+    "concerns": [
+      "No resolution history exists to confirm this buyer typically pays overdue invoices promptly",
+      "Only one policyholder is currently reporting, limiting visibility into broader payment behavior",
+      "Should track whether this 9-day overdue resolves quickly or extends/recurs in coming months"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"event_id\": \"N-261115-00025\", \"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"reason\": \"OVERDUE_INVOICE\", \"notification_date\": \"2026-11-15\", \"original_due_date\": \"2026-11-14\", \"amount_at_risk\": 450000.0, \"currency\": \"USD\", \"days_past_due\": 9, \"outstanding_by_ageing\": {\"NOT_YET_DUE\": 1200000.0, \"OVERDUE_1_30_DAYS\": 450000.0}}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"note\": \"no resolved notifications\"}], \"accumulation\": {\"window_days\": 180, \"last_window\": 1, \"window_before\": 0, \"policies_reporting_last_window\": 1}}"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"credit_limit\": 6000000.0, \"currency\": \"USD\", \"payment_terms_days\": 60, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-03-27\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 9,
+        "worst_event_id": "N-261115-00025",
+        "trend": "insufficient_history",
+        "summary": "Ford Motor Company has one open overdue notification (N-261115-00025, $450,000, 9 days past due) from its single reporting policyholder (TCI, policy TCI-EX-2026-0001), against a $6M accepted credit limit with 60-day terms. There is no resolved notification history to benchmark against, and only one policy has reported in the last six months with no prior-period notifications, so a trend cannot yet be established. Exposure remains modest relative to the credit line, but this is the first signal from this buyer and warrants monitoring for repeat or lengthening overdues.",
+        "concerns": [
+          "No resolution history exists to confirm this buyer typically pays overdue invoices promptly",
+          "Only one policyholder is currently reporting, limiting visibility into broader payment behavior",
+          "Should track whether this 9-day overdue resolves quickly or extends/recurs in coming months"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Vodafone Idea Limited scores 25.5 and sits in the Watch band, driven mainly by a single open overdue of 18 days on policy TCI-SCF-2026-0001 and a cluster of negative news around subscriber losses and a wider-than-expected Q2 loss. Exposure of INR 40M is well within the INR 120M accepted limit, and the probability of default (0.1552) remains inside the insurer's 0.25 target, so there is no immediate limit concern, but the trajectory on both payment and news fronts is worsening rather than stabilising. Resolved overdues on the same policy have lengthened from 5 days (Mar-26) to 9 days (Jul-26), and the current unresolved overdue has already exceeded both at 18 days, with notification frequency also rising. News flow is mixed overall - several positive items on financing, analyst targets and stock rallies sit alongside two severity-2 stories (subscriber decline and earnings miss) published within the last two weeks that are driving the news component of the score; both of these are headline-only entries with no corroborating outlet, a sourcing gap the adjudicator flagged without disputing the band. The recommended action is to maintain the current INR 120M limit across the one reporting policy, as PD remains within appetite and the max liability does not bind; no reduction is proposed at this time. A move to Healthy would need the score to fall about 5.5 points, consistent with the overdue resolving and news severity fading, whereas a move to High Risk (at a score of 50.0) would need either days-past-due to reach roughly 43 or a comparable escalation in negative news severity.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the INR 120M limit on policy TCI-SCF-2026-0001 - PD (0.1552) remains within the 0.25 appetite target and exposure is well covered - but the underwriter should note the adjudicator's caveat that the driving negative news (subscriber decline, earnings miss) rests on single-outlet headlines with no corroborating text.",
+      "payment_note": "The buyer has one open overdue of 18 days (INR 9.0M of INR 40M notified exposure) on policy TCI-SCF-2026-0001, continuing a deteriorating trend where resolved overdues lengthened from 5 days in Mar-26 to 9 days in Jul-26 and notification frequency has risen.",
+      "news_note": "The most recent matched news is negative - a severity-2 report on a quarter-on-quarter subscriber base decline (Livemint) alongside a severity-2 wider-than-expected Q2 loss story (Business Standard), both headline-only with no independent corroboration found, amid an otherwise mixed backdrop of positive financing and analyst coverage.",
+      "lifts_it": [
+        "Score falling about 5.5 points to move into Healthy band",
+        "The 18-day overdue resolving promptly rather than lengthening further",
+        "Negative news severity fading as the subscriber-decline and earnings-miss stories age out without follow-on corroboration"
+      ],
+      "worsens_it": [
+        "Days past due reaching roughly 43, which alone would push the score to the High Risk threshold of 50.0",
+        "Further lengthening of resolution times or additional overdue notifications on policy TCI-SCF-2026-0001",
+        "Additional corroborated severity-2+ news (e.g. confirmed subscriber losses or earnings deterioration) reinforcing the current single-source reports"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN03\", \"score\": 25.5, \"band\": \"Watch\", \"pd\": 0.1552, \"payment\": {\"dpd\": 18, \"raw\": 18.0, \"weighted\": 11.7, \"worst_line\": \"TCI-SCF-2026-0001\"}, \"news\": {\"severity\": 2, \"category\": \"subscriber_decline\", \"article_id\": \"GN-75cb48dc2523\", \"age_days\": 7, \"headline\": \"Why Vodafone Idea\\u2019s q-o-q drop in mobile subscriber base is a worrying sign\", \"via_parent\": false, \"parent_name\": null,"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN03-1\", \"buyer_id\": \"IN03\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-SCF-2026-0001\", \"insured_name\": \"Meridia Bank\", \"product_type\": \"SUPPLY_CHAIN_FINANCE\", \"currency\": \"INR\", \"current_limit\": 120000000, \"owed\": 40000000, \"revised_limit\": 120000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\""
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 24.5, \"dpd_for_next_band\": 43, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 5.5, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261106-00006\", \"kind\": \"payment\", \"date\": \"2026-11-05\", \"detail\": \"1 open overdue notification(s) under policy TCI-SCF-2026-0001; the oldest is 18 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"dpd\": 18, \"owed\": 40000000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261106-00006\", \"kind\": \"payment_review\", \"date\": \"2026-11-05\", \"detail\": \"Vodafone I"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Vodafone Idea Limited scores 25.5 and sits in the Watch band, driven mainly by a single open overdue of 18 days on policy TCI-SCF-2026-0001 and a cluster of negative news around subscriber losses and a wider-than-expected Q2 loss. Exposure of INR 40M is well within the INR 120M accepted limit, and the probability of default (0.1552) remains inside the insurer's 0.25 target, so there is no immediate limit concern, but the trajectory on both payment and news fronts is worsening rather than stabilising. Resolved overdues on the same policy have lengthened from 5 days (Mar-26) to 9 days (Jul-26), and the current unresolved overdue has already exceeded both at 18 days, with notification frequency also rising. News flow is mixed overall - several positive items on financing, analyst targets and stock rallies sit alongside two severity-2 stories (subscriber decline and earnings miss) published within the last two weeks that are driving the news component of the score; both of these are headline-only entries with no corroborating outlet, a sourcing gap the adjudicator flagged without disputing the band. The recommended action is to maintain the current INR 120M limit across the one reporting policy, as PD remains within appetite and the max liability does not bind; no reduction is proposed at this time. A move to Healthy would need the score to fall about 5.5 points, consistent with the overdue resolving and news severity fading, whereas a move to High Risk (at a score of 50.0) would need either days-past-due to reach roughly 43 or a comparable escalation in negative news severity.",
+        "bottom_line": "Maintain the INR 120M limit on policy TCI-SCF-2026-0001 - PD (0.1552) remains within the 0.25 appetite target and exposure is well covered - but the underwriter should note the adjudicator's caveat that the driving negative news (subscriber decline, earnings miss) rests on single-outlet headlines with no corroborating text.",
+        "payment_note": "The buyer has one open overdue of 18 days (INR 9.0M of INR 40M notified exposure) on policy TCI-SCF-2026-0001, continuing a deteriorating trend where resolved overdues lengthened from 5 days in Mar-26 to 9 days in Jul-26 and notification frequency has risen.",
+        "news_note": "The most recent matched news is negative - a severity-2 report on a quarter-on-quarter subscriber base decline (Livemint) alongside a severity-2 wider-than-expected Q2 loss story (Business Standard), both headline-only with no independent corroboration found, amid an otherwise mixed backdrop of positive financing and analyst coverage.",
+        "lifts_it": [
+          "Score falling about 5.5 points to move into Healthy band",
+          "The 18-day overdue resolving promptly rather than lengthening further",
+          "Negative news severity fading as the subscriber-decline and earnings-miss stories age out without follow-on corroboration"
+        ],
+        "worsens_it": [
+          "Days past due reaching roughly 43, which alone would push the score to the High Risk threshold of 50.0",
+          "Further lengthening of resolution times or additional overdue notifications on policy TCI-SCF-2026-0001",
+          "Additional corroborated severity-2+ news (e.g. confirmed subscriber losses or earnings deterioration) reinforcing the current single-source reports"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

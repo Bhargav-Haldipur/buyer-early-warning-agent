@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS03",
+    "name": "Ford Motor Company",
+    "severity": 1,
+    "category": "stock_movement",
+    "reason": "Article only notes a day's stock price dip relative to the broader market, a minor negative with no fundamental credit implications."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Ford Motor"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS03\", \"name\": \"Ford Motor Company\", \"sector\": \"Automotive\", \"city\": \"Dearborn, MI\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS03",
+        "severity": 1,
+        "category": "stock_movement",
+        "reason": "Article only notes a day's stock price dip relative to the broader market, a minor negative with no fundamental credit implications."
+      }
+    }
+  ],
+  "turns": 2
+}

@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Intel Corporation is paying cleanly, with no days-past-due recorded and a weighted payment score of 0.0 \u2014 the payment ledger shows no deterioration at all. The buyer's entire risk score of 20.7 (Watch band) is driven exclusively by news, specifically a single severity-3 Reuters headline reporting a shareholder lawsuit following a 29% stock plunge. The rest of the recent news flow is mixed-to-positive: Intel has landed its first external 18A/18A-P chip customers, seen several positive stock-rally headlines, and even a severity-0 article noting the first customer win, alongside older severity-1 commentary on the broader stock decline.\n\nThe Watch band placement rests almost entirely on that one lawsuit article. The adjudicator agreed with the score but flagged a caveat: the article's body is identical to its headline, with no detail on plaintiffs, claims, or court, and no other outlet corroborates the lawsuit itself (though the underlying stock collapse is independently confirmed across multiple sources). This means the Watch classification is support by a thin, single-source legal signal rather than any confirmed payment or liquidity deterioration.\n\nThe recommended limit action is to maintain the current USD 7,000,000 limit for Tamrin Exports, as the probability of default (10.72%) remains within appetite and well below the 25% target threshold; expected loss is unchanged before and after this review.\n\nThe score sits just 0.7 points above the lower Healthy band threshold, so continued clean payment behavior and the lawsuit headline's natural decay (365-day half-life) would likely lift the buyer back to Healthy without further news. Conversely, a move toward High Risk would need either a further 29.3-point deterioration in the news score or payment delinquency reaching 38 days past due.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the current USD 7,000,000 limit \u2014 PD (10.72%) is well within appetite and payment behavior is clean; the Watch band is driven entirely by a single, thinly-sourced shareholder-lawsuit headline, which the adjudicator flagged as a caveat rather than a confirmed credit event.",
+      "payment_note": "Payment record is clean with 0 days past due and a weighted payment score of 0.0, showing no settlement deterioration.",
+      "news_note": "The Watch score is driven entirely by a single severity-3 Reuters headline on a shareholder lawsuit tied to Intel's stock plunge, which the adjudicator notes lacks corroboration or detail beyond the headline itself, even as surrounding news flow (new chip customers, stock rallies) is neutral-to-positive.",
+      "lifts_it": [
+        "Score is only 0.7 points above the Healthy threshold, so natural decay of the lawsuit headline (365-day half-life) could lift it back to Healthy",
+        "Continued clean payment performance (0 DPD) with no new negative news",
+        "Independent corroboration that the lawsuit claim is resolved or immaterial"
+      ],
+      "worsens_it": [
+        "A further 29.3-point deterioration in the news-driven score (e.g., confirmation or escalation of the lawsuit, or a new severe credit event)",
+        "Payment delinquency reaching 38 days past due",
+        "Additional corroborating negative coverage of the shareholder lawsuit from other outlets"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS01\", \"score\": 20.7, \"band\": \"Watch\", \"pd\": 0.1072, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 3, \"category\": \"shareholder_lawsuit\", \"article_id\": \"GN-92904b4dcaa6\", \"age_days\": 7, \"headline\": \"Intel sued by shareholders following 29% stock plunge\", \"via_parent\": false, \"parent_name\": null, \"raw\": 59.2, \"weighted\": 20.7}, \"trace\": \"0"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS01-1\", \"buyer_id\": \"OS01\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 7000000, \"owed\": 0, \"revised_limit\": 7000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1072, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 29.3, \"dpd_for_next_band\": 38, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 0.7, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"GN-a7d59ce9df3e\", \"kind\": \"news\", \"date\": \"2026-11-23\", \"detail\": \"severity 0 (positive_news): NVIDIA Jumps 28% as Jensen Huang Reportedly Reinstated as CEO; Intel Rallies 13%, AMD Gains 7%\", \"data\": {\"severity\": 0, \"category\": \"positive_news\", \"age_days\": 0, \"base\": 0.0, \"decayed\": 0.0, \"entity\": \"Intel Corporation\", \"via_parent\": false, \"publication\": \"Yahoo Finance\", \"headline\": \"NVIDI"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Intel Corporation is paying cleanly, with no days-past-due recorded and a weighted payment score of 0.0 \u2014 the payment ledger shows no deterioration at all. The buyer's entire risk score of 20.7 (Watch band) is driven exclusively by news, specifically a single severity-3 Reuters headline reporting a shareholder lawsuit following a 29% stock plunge. The rest of the recent news flow is mixed-to-positive: Intel has landed its first external 18A/18A-P chip customers, seen several positive stock-rally headlines, and even a severity-0 article noting the first customer win, alongside older severity-1 commentary on the broader stock decline.\n\nThe Watch band placement rests almost entirely on that one lawsuit article. The adjudicator agreed with the score but flagged a caveat: the article's body is identical to its headline, with no detail on plaintiffs, claims, or court, and no other outlet corroborates the lawsuit itself (though the underlying stock collapse is independently confirmed across multiple sources). This means the Watch classification is support by a thin, single-source legal signal rather than any confirmed payment or liquidity deterioration.\n\nThe recommended limit action is to maintain the current USD 7,000,000 limit for Tamrin Exports, as the probability of default (10.72%) remains within appetite and well below the 25% target threshold; expected loss is unchanged before and after this review.\n\nThe score sits just 0.7 points above the lower Healthy band threshold, so continued clean payment behavior and the lawsuit headline's natural decay (365-day half-life) would likely lift the buyer back to Healthy without further news. Conversely, a move toward High Risk would need either a further 29.3-point deterioration in the news score or payment delinquency reaching 38 days past due.",
+        "bottom_line": "Maintain the current USD 7,000,000 limit \u2014 PD (10.72%) is well within appetite and payment behavior is clean; the Watch band is driven entirely by a single, thinly-sourced shareholder-lawsuit headline, which the adjudicator flagged as a caveat rather than a confirmed credit event.",
+        "payment_note": "Payment record is clean with 0 days past due and a weighted payment score of 0.0, showing no settlement deterioration.",
+        "news_note": "The Watch score is driven entirely by a single severity-3 Reuters headline on a shareholder lawsuit tied to Intel's stock plunge, which the adjudicator notes lacks corroboration or detail beyond the headline itself, even as surrounding news flow (new chip customers, stock rallies) is neutral-to-positive.",
+        "lifts_it": [
+          "Score is only 0.7 points above the Healthy threshold, so natural decay of the lawsuit headline (365-day half-life) could lift it back to Healthy",
+          "Continued clean payment performance (0 DPD) with no new negative news",
+          "Independent corroboration that the lawsuit claim is resolved or immaterial"
+        ],
+        "worsens_it": [
+          "A further 29.3-point deterioration in the news-driven score (e.g., confirmation or escalation of the lawsuit, or a new severe credit event)",
+          "Payment delinquency reaching 38 days past due",
+          "Additional corroborating negative coverage of the shareholder lawsuit from other outlets"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

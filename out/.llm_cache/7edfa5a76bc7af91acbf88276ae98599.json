@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "The article is a speculative headline with no substantive content or factual negative event reported about Intel."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "The article is a speculative headline with no substantive content or factual negative event reported about Intel."
+      }
+    }
+  ],
+  "turns": 2
+}

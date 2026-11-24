@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Vodafone Idea sits in the Watch band with a score of 25.5, driven by a modest but deteriorating payment pattern and negative operational news. A single open overdue (18 days past due, INR 9.0M against a 90-day term and INR 120M limit on policy TCI-SCF-2026-0001) is the active trigger, and it follows a worsening sequence of prior late resolutions. Two severity-2 news items - a quarter-on-quarter subscriber decline and a wider-than-expected Q2 loss - add to the risk picture, while a long run of positive items (financing, analyst targets, stock rallies) scored severity 0 and so did not offset the negative weighting.\n\nThe band reflects the formula's blend of payment behaviour (weighted 11.7) and news (weighted 13.8), summing to 25.5, comfortably inside Watch (20-50) and 5.5 points above the Healthy cutoff but 24.5 points below the High Risk threshold. The adjudicator agreed with the score but flagged caveats: the payment trend has lengthened each cycle (5 -> 9 -> 18 days, still open) with notification frequency rising from 1 to 2 in six months, and a second severity-2 earnings-miss article reinforces rather than contradicts the negative read, even though exposure remains concentrated on a single policy/insurer.\n\nRecommended action is to maintain the current limit: the sole policy (TCI-SCF-2026-0001, Meridia Bank insured, TCI client) stays at INR 120,000,000 with no change, as PD (0.1552) remains within the target appetite (0.25) and expected loss is unchanged before and after (INR 13,409,280). No reduction is indicated at this score level, but the deteriorating payment trend warrants closer monitoring rather than passive maintenance.\n\nA move to the lower, Healthy band would need the score to fall by 5.5 points, consistent with resolution of the current overdue and a return to the faster prior settlement pattern; continued escalation - particularly if DPD reaches 43 days - would push the buyer into High Risk, as would further severity-2 or higher negative news reinforcing the subscriber and earnings pressure already on record.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the current INR 120,000,000 limit on policy TCI-SCF-2026-0001 as PD remains within appetite, but the adjudicator agreed with caveats given a clearly deteriorating payment trend that warrants closer monitoring rather than passive hold.",
+      "payment_note": "One overdue is open at 18 days past due (INR 9.0M, policy TCI-SCF-2026-0001), and settlement times have been lengthening across cycles (5 days late, then 9, now 18 and still unresolved), with notification frequency rising from 1 to 2 in six months.",
+      "news_note": "Recent matched news is mixed-leaning-negative, with severity-2 articles on a quarter-on-quarter subscriber decline and a wider-than-expected Q2 loss, alongside several severity-0 positive items (financing, analyst targets, stock rallies) that do not offset the score.",
+      "lifts_it": [
+        "Resolution of the current overdue and a return to faster (sub-9-day) settlement times",
+        "Score falling 5.5 points to drop into the Healthy band",
+        "Positive credit-relevant news (e.g. financing, tariff hikes) carrying higher severity weight"
+      ],
+      "worsens_it": [
+        "DPD extending to 43 days, which would push the score into High Risk",
+        "Further notification frequency increases or a third consecutive lengthening of late-resolution cycles",
+        "Additional severity-2+ negative news reinforcing subscriber decline or earnings weakness"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN03\", \"score\": 25.5, \"band\": \"Watch\", \"pd\": 0.1552, \"payment\": {\"dpd\": 18, \"raw\": 18.0, \"weighted\": 11.7, \"worst_line\": \"TCI-SCF-2026-0001\"}, \"news\": {\"severity\": 2, \"category\": \"subscriber_decline\", \"article_id\": \"GN-75cb48dc2523\", \"age_days\": 7, \"headline\": \"Why Vodafone Idea\\u2019s q-o-q drop in mobile subscriber base is a worrying sign\", \"via_parent\": false, \"parent_name\": null,"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN03-1\", \"buyer_id\": \"IN03\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-SCF-2026-0001\", \"insured_name\": \"Meridia Bank\", \"product_type\": \"SUPPLY_CHAIN_FINANCE\", \"currency\": \"INR\", \"current_limit\": 120000000, \"owed\": 40000000, \"revised_limit\": 120000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\""
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 24.5, \"dpd_for_next_band\": 43, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 5.5, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261106-00006\", \"kind\": \"payment\", \"date\": \"2026-11-05\", \"detail\": \"1 open overdue notification(s) under policy TCI-SCF-2026-0001; the oldest is 18 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"dpd\": 18, \"owed\": 40000000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261106-00006\", \"kind\": \"payment_review\", \"date\": \"2026-11-05\", \"detail\": \"Vodafone I"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Vodafone Idea sits in the Watch band with a score of 25.5, driven by a modest but deteriorating payment pattern and negative operational news. A single open overdue (18 days past due, INR 9.0M against a 90-day term and INR 120M limit on policy TCI-SCF-2026-0001) is the active trigger, and it follows a worsening sequence of prior late resolutions. Two severity-2 news items - a quarter-on-quarter subscriber decline and a wider-than-expected Q2 loss - add to the risk picture, while a long run of positive items (financing, analyst targets, stock rallies) scored severity 0 and so did not offset the negative weighting.\n\nThe band reflects the formula's blend of payment behaviour (weighted 11.7) and news (weighted 13.8), summing to 25.5, comfortably inside Watch (20-50) and 5.5 points above the Healthy cutoff but 24.5 points below the High Risk threshold. The adjudicator agreed with the score but flagged caveats: the payment trend has lengthened each cycle (5 -> 9 -> 18 days, still open) with notification frequency rising from 1 to 2 in six months, and a second severity-2 earnings-miss article reinforces rather than contradicts the negative read, even though exposure remains concentrated on a single policy/insurer.\n\nRecommended action is to maintain the current limit: the sole policy (TCI-SCF-2026-0001, Meridia Bank insured, TCI client) stays at INR 120,000,000 with no change, as PD (0.1552) remains within the target appetite (0.25) and expected loss is unchanged before and after (INR 13,409,280). No reduction is indicated at this score level, but the deteriorating payment trend warrants closer monitoring rather than passive maintenance.\n\nA move to the lower, Healthy band would need the score to fall by 5.5 points, consistent with resolution of the current overdue and a return to the faster prior settlement pattern; continued escalation - particularly if DPD reaches 43 days - would push the buyer into High Risk, as would further severity-2 or higher negative news reinforcing the subscriber and earnings pressure already on record.",
+        "bottom_line": "Maintain the current INR 120,000,000 limit on policy TCI-SCF-2026-0001 as PD remains within appetite, but the adjudicator agreed with caveats given a clearly deteriorating payment trend that warrants closer monitoring rather than passive hold.",
+        "payment_note": "One overdue is open at 18 days past due (INR 9.0M, policy TCI-SCF-2026-0001), and settlement times have been lengthening across cycles (5 days late, then 9, now 18 and still unresolved), with notification frequency rising from 1 to 2 in six months.",
+        "news_note": "Recent matched news is mixed-leaning-negative, with severity-2 articles on a quarter-on-quarter subscriber decline and a wider-than-expected Q2 loss, alongside several severity-0 positive items (financing, analyst targets, stock rallies) that do not offset the score.",
+        "lifts_it": [
+          "Resolution of the current overdue and a return to faster (sub-9-day) settlement times",
+          "Score falling 5.5 points to drop into the Healthy band",
+          "Positive credit-relevant news (e.g. financing, tariff hikes) carrying higher severity weight"
+        ],
+        "worsens_it": [
+          "DPD extending to 43 days, which would push the score into High Risk",
+          "Further notification frequency increases or a third consecutive lengthening of late-resolution cycles",
+          "Additional severity-2+ negative news reinforcing subscriber decline or earnings weakness"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

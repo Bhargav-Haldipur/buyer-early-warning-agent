@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN03",
+    "name": "Vodafone Idea Limited",
+    "severity": 0,
+    "category": "stock_movement",
+    "reason": "Article reports a positive stock price move (4% rise, 25-month high) on heavy volumes, which is neutral-to-positive news with no credit implications."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Vodafone Idea"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN03\", \"name\": \"Vodafone Idea Limited\", \"sector\": \"Telecommunications\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN03",
+        "severity": 0,
+        "category": "stock_movement",
+        "reason": "Article reports a positive stock price move (4% rise, 25-month high) on heavy volumes, which is neutral-to-positive news with no credit implications."
+      }
+    }
+  ],
+  "turns": 2
+}

@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 1,
+    "category": "stock_commentary",
+    "reason": "Article is generic investor commentary about Intel's stock decline this year, not operational or credit news; mild negative signal reflecting stock underperformance."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 1,
+        "category": "stock_commentary",
+        "reason": "Article is generic investor commentary about Intel's stock decline this year, not operational or credit news; mild negative signal reflecting stock underperformance."
+      }
+    }
+  ],
+  "turns": 2
+}

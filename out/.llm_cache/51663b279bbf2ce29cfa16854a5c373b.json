@@ -1,0 +1,41 @@
+{
+  "result": {
+    "trend": "insufficient_history",
+    "summary": "No open overdue notifications for Boeing. History shows only a single resolved overdue (TCI, $650k, paid 3 days late in June 2026), with no accumulation pattern (1 notification in last 6 months vs 0 prior window, from one policy). Single insurer TCI holds a $9M accepted credit limit on 60-day terms. Insufficient data to establish a clear trend.",
+    "concerns": [
+      "Only one historical notification exists, limiting confidence in trend assessment",
+      "Single-insurer concentration of credit exposure (TCI only)"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"note\": \"no open overdue notifications\"}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260607-00024\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-06-06\", \"resolved_date\": \"2026-06-09\", \"exposure\": 650000.0, \"days_late\": 3}], \"accumulation\": {\"window_days\": 180, \"last_window\": 1, \"window_before\": 0, \"policies_reporting_last_window\": 1}}"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"credit_limit\": 9000000.0, \"currency\": \"USD\", \"payment_terms_days\": 60, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-04-07\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 0,
+        "worst_event_id": "",
+        "trend": "insufficient_history",
+        "summary": "No open overdue notifications for Boeing. History shows only a single resolved overdue (TCI, $650k, paid 3 days late in June 2026), with no accumulation pattern (1 notification in last 6 months vs 0 prior window, from one policy). Single insurer TCI holds a $9M accepted credit limit on 60-day terms. Insufficient data to establish a clear trend.",
+        "concerns": [
+          "Only one historical notification exists, limiting confidence in trend assessment",
+          "Single-insurer concentration of credit exposure (TCI only)"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

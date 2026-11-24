@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Boeing's payment behaviour remains clean: no open overdue notifications and only one minor, quickly-cured delay (3 days, $650k) in the last six months against a $9M accepted credit line from TCI. The Watch-band score of 27.8 is driven entirely by negative news flow, chiefly a severity-4 layoffs headline from 3 days ago that leaves open the possibility of further job cuts amid stalled production, corroborated by a second severity-4 layoffs article 14 days prior (5% of commercial airplane workforce) and secondary severity-2 items on 737 Max production delays and DOT/FAA regulatory scrutiny. Positive news (bullish analyst sentiment, $745B backlog, Asia deals, delivery upticks) is present but scored zero and does not offset the layoffs narrative under the model. The recommendation is to maintain the current $9,000,000 limit, as PD (0.1784) sits within the 0.25 appetite target and expected loss is unchanged before and after; the adjudicator agreed with this outcome but flagged caveats, including thin evidentiary detail behind the lead article, low confidence in the payment trend given only one historical data point, and the need to confirm the two layoffs articles are not duplicate reports of the same event. A move to Healthy would require the score to fall 7.8 points, consistent with the current clean payment record aging further and no fresh negative news; conversely, a slide to High Risk would need a 22.2-point rise (score to 50), which could come from new negative news compounding the existing layoffs/production narrative or payment deterioration reaching 33 days past due.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the $9,000,000 limit for Boeing (PD 0.1784, within the 0.25 appetite target); the adjudicator agreed with the Watch-band verdict but flagged caveats around the thin sourcing of the lead layoffs article and the low-confidence payment trend.",
+      "payment_note": "Payment record is clean with no open overdue notifications and only one minor 3-day, $650k delay in six months, though only one historical data point exists so the trend is of low confidence.",
+      "news_note": "News is dominated by a severity-4 layoffs headline from 3 days ago (further job cuts possible amid stalled production), reinforced by a second severity-4 layoffs article from 14 days ago and secondary production-delay/regulatory-scrutiny items, while concurrent positive news on backlog and deliveries is excluded from the score.",
+      "lifts_it": [
+        "Score falling 7.8 points toward Healthy as negative news decays with no fresh incidents",
+        "Continued clean payment performance building a longer track record",
+        "No further layoffs or production-delay headlines"
+      ],
+      "worsens_it": [
+        "Score rising 22.2 points to 50 (High Risk threshold) on fresh negative news",
+        "Payment deterioration reaching 33 days past due",
+        "Additional layoffs, production delays, or escalation of FAA/DOT regulatory scrutiny"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS02\", \"score\": 27.8, \"band\": \"Watch\", \"pd\": 0.1784, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 4, \"category\": \"layoffs\", \"article_id\": \"GN-8b97eceb4530\", \"age_days\": 3, \"headline\": \"Boeing leaves open possibility of more layoffs amid stalled production plans\", \"via_parent\": false, \"parent_name\": null, \"raw\": 79.5, \"weighted\": 27.8}, "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS02-1\", \"buyer_id\": \"OS02\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 9000000, \"owed\": 0, \"revised_limit\": 9000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1784, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 22.2, \"dpd_for_next_band\": 33, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 7.8, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-260607-00024\", \"kind\": \"payment_review\", \"date\": \"2026-06-06\", \"detail\": \"Boeing currently has no open overdue notifications. Recent history shows only one resolved overdue (3 days late, $650k) in the last six months from a single policy, a minor and quickly-cured delay, with a $9M accepted credit line from TCI. With just one historical data point, there isn't enough evidence to establi"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Boeing's payment behaviour remains clean: no open overdue notifications and only one minor, quickly-cured delay (3 days, $650k) in the last six months against a $9M accepted credit line from TCI. The Watch-band score of 27.8 is driven entirely by negative news flow, chiefly a severity-4 layoffs headline from 3 days ago that leaves open the possibility of further job cuts amid stalled production, corroborated by a second severity-4 layoffs article 14 days prior (5% of commercial airplane workforce) and secondary severity-2 items on 737 Max production delays and DOT/FAA regulatory scrutiny. Positive news (bullish analyst sentiment, $745B backlog, Asia deals, delivery upticks) is present but scored zero and does not offset the layoffs narrative under the model. The recommendation is to maintain the current $9,000,000 limit, as PD (0.1784) sits within the 0.25 appetite target and expected loss is unchanged before and after; the adjudicator agreed with this outcome but flagged caveats, including thin evidentiary detail behind the lead article, low confidence in the payment trend given only one historical data point, and the need to confirm the two layoffs articles are not duplicate reports of the same event. A move to Healthy would require the score to fall 7.8 points, consistent with the current clean payment record aging further and no fresh negative news; conversely, a slide to High Risk would need a 22.2-point rise (score to 50), which could come from new negative news compounding the existing layoffs/production narrative or payment deterioration reaching 33 days past due.",
+        "bottom_line": "Maintain the $9,000,000 limit for Boeing (PD 0.1784, within the 0.25 appetite target); the adjudicator agreed with the Watch-band verdict but flagged caveats around the thin sourcing of the lead layoffs article and the low-confidence payment trend.",
+        "payment_note": "Payment record is clean with no open overdue notifications and only one minor 3-day, $650k delay in six months, though only one historical data point exists so the trend is of low confidence.",
+        "news_note": "News is dominated by a severity-4 layoffs headline from 3 days ago (further job cuts possible amid stalled production), reinforced by a second severity-4 layoffs article from 14 days ago and secondary production-delay/regulatory-scrutiny items, while concurrent positive news on backlog and deliveries is excluded from the score.",
+        "lifts_it": [
+          "Score falling 7.8 points toward Healthy as negative news decays with no fresh incidents",
+          "Continued clean payment performance building a longer track record",
+          "No further layoffs or production-delay headlines"
+        ],
+        "worsens_it": [
+          "Score rising 22.2 points to 50 (High Risk threshold) on fresh negative news",
+          "Payment deterioration reaching 33 days past due",
+          "Additional layoffs, production delays, or escalation of FAA/DOT regulatory scrutiny"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

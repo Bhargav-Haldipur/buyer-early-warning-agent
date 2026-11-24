@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN02",
+    "name": "Larsen & Toubro Limited",
+    "severity": 3,
+    "category": "regulatory_action",
+    "reason": "A state minister has asked officials to blacklist L&T over delays in government works, which could lead to contract loss/exclusion from future tenders - a mild-to-moderate negative for credit, though not yet an actual blacklisting or financial distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsen & Toubro"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN02\", \"name\": \"Larsen & Toubro Limited\", \"sector\": \"Engineering & Construction\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN02",
+        "severity": 3,
+        "category": "regulatory_action",
+        "reason": "A state minister has asked officials to blacklist L&T over delays in government works, which could lead to contract loss/exclusion from future tenders - a mild-to-moderate negative for credit, though not yet an actual blacklisting or financial distress."
+      }
+    }
+  ],
+  "turns": 2
+}

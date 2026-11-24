@@ -9,8 +9,14 @@ so a run is reproducible from the file, the agent cache still works, and the
 dashboard never waits on a feed in front of a room.
 
 Sources are listed in data/sbi/trusted_sources.csv:
-  feed       sec_edgar    - Form 8-K current reports, from the SEC's own API
-  feed       google_news  - press coverage, kept only from the publishers below
+  feed       sec_edgar    - Form 8-K current reports, from the SEC's own API, with the
+                            text of each reported item from the filing itself
+  feed       google_news  - press coverage, kept only from the publishers below. Google
+                            gives the headline only, never the article text
+  rss        <name>       - a trusted publisher's own RSS feed (`url` column): recent
+                            stories with the publisher's summary. A story it shares with
+                            Google News keeps the summary as its text; one only it has
+                            is added when it names a watched company of its `country`
   publisher  <name>       - a publisher whose stories are kept from google_news;
                             its `country` column limits it to buyers of that country
                             (blank: every buyer). Other spellings Google News uses
@@ -168,8 +174,59 @@ def mention_in(text: str, aliases: list[str]) -> str:
     return ""
 
 
+def has_text(a: dict) -> bool:
+    """False for a story that is its headline only, as Google News gives it."""
+    body = (a.get("body") or "").strip()
+    return bool(body) and body != (a.get("headline") or "").strip()
+
+
+def story_key(headline: str) -> str:
+    """One story under two ids (Google News and the publisher's own feed) has one key."""
+    return re.sub(r"[^a-z0-9]+", " ", html.unescape(headline).lower()).strip()
+
+
+def same_story(a: dict, b: dict) -> bool:
+    """The same headline within a day. A headline that recurs - every quarter's 8-K
+    results filing, a daily "stock rises" - is a different story on a different day."""
+    if story_key(a["headline"]) != story_key(b["headline"]):
+        return False
+    days = abs((date.fromisoformat(a["published_date"])
+                - date.fromisoformat(b["published_date"])).days)
+    return days <= 1
+
+
 # ---------------------------------------------------------------- SEC EDGAR
-def sec_filings(buyer: dict, watch: dict, since: date) -> list[dict]:
+SEC_TEXT = "Filing text: "
+SEC_TEXT_CHARS = 1500
+
+
+def _html_text(raw: bytes) -> str:
+    s = raw.decode("utf-8", "replace")
+    s = re.sub(r"(?is)<(script|style|head)[^>]*>.*?</\1>", " ", s)
+    s = re.sub(r"(?i)<br\s*/?>|</p>|</div>|</tr>", "\n", s)
+    return re.sub(r"[ \t\xa0]+", " ", html.unescape(re.sub(r"<[^>]+>", " ", s)))
+
+
+def filing_text(url: str) -> str:
+    """What the company wrote under each item of an 8-K: from the first item heading
+    after the cover page to the exhibits list or the signatures."""
+    t = _html_text(_get(url, sec=True))
+    cover = t.lower().find("emerging growth company")
+    m = re.search(r"Item\s*\d\.\d\d", t[max(cover, 0):])
+    if not m:
+        return ""
+    seg = t[max(cover, 0) + m.start():]
+    end = re.search(r"Item\s*9\.01|SIGNATURES?\b", seg)
+    seg = re.sub(r"\s+", " ", seg[:end.start() if end else SEC_TEXT_CHARS * 2]).strip()
+    if len(seg) <= SEC_TEXT_CHARS:
+        return seg
+    return seg[:SEC_TEXT_CHARS].rsplit(" ", 1)[0] + " ..."
+
+
+def sec_filings(buyer: dict, watch: dict, since: date,
+                known: dict[str, dict] | None = None) -> list[dict]:
+    """`known`: articles stored by an earlier fetch, so a filing's text is read once."""
+    known = known or {}
     cik = int(watch["cik"])
     data = json.loads(_get(SEC_URL.format(cik=cik), sec=True))
     recent = data["filings"]["recent"]
@@ -185,17 +242,31 @@ def sec_filings(buyer: dict, watch: dict, since: date) -> list[dict]:
         titles = [ITEMS_8K.get(x, f"Item {x}") for x in said]
         acc = recent["accessionNumber"][i]
         doc = recent["primaryDocument"][i]
+        url = SEC_DOC.format(cik=cik, acc=acc.replace("-", ""), doc=doc)
+        body = (f"{buyer['buyer_name']} filed a current report on Form {form} with the "
+                f"US Securities and Exchange Commission on {filed.isoformat()}, "
+                f"reporting: " + "; ".join(f"Item {x} - {ITEMS_8K.get(x, 'other')}"
+                                           for x in said) + ".")
+        prior = known.get(f"SEC-{acc}", {}).get("body", "")
+        if SEC_TEXT in prior:
+            text = prior.split(SEC_TEXT, 1)[1]
+        else:
+            text = ""                 # without it the item titles still say what was reported
+            for pause in (0.15, 1.0):  # the SEC asks for no more than ten requests a second,
+                time.sleep(pause)      # and turns a burst away; the next fetch tries again
+                try:
+                    text = filing_text(url)
+                    break
+                except Exception:                                      # noqa: BLE001
+                    continue
         out.append({
             "article_id": f"SEC-{acc}",
             "published_date": filed.isoformat(),
             "publication": f"SEC EDGAR (Form {form})",
             "headline": f"{buyer['buyer_name']} files Form {form}: {'; '.join(titles)}",
-            "body": (f"{buyer['buyer_name']} filed a current report on Form {form} with the "
-                     f"US Securities and Exchange Commission on {filed.isoformat()}, "
-                     f"reporting: " + "; ".join(f"Item {x} - {ITEMS_8K.get(x, 'other')}"
-                                                for x in said) + "."),
+            "body": body + (f" {SEC_TEXT}{text}" if text else ""),
             "mentioned_entity_as_written": buyer["buyer_name"],
-            "url": SEC_DOC.format(cik=cik, acc=acc.replace("-", ""), doc=doc),
+            "url": url,
         })
     return out
 
@@ -254,6 +325,60 @@ def google_news(buyer: dict, watch: dict, since: date, publishers: list[str],
     return kept[:per_buyer], dropped
 
 
+# ---------------------------------------------------------------- publisher RSS
+def rss_feeds(data_dir: Path) -> list[dict]:
+    """Enabled publisher feeds: name shown, country it is trusted for, url."""
+    return [{"publication": _spellings(r)[0], "country": r.get("country", "").strip(),
+             "url": (r.get("url") or "").strip()}
+            for r in _sources(data_dir) if r["type"] == "rss" and (r.get("url") or "").strip()]
+
+
+def _when(raw: str) -> date | None:
+    try:
+        return parsedate_to_datetime(raw).astimezone(timezone.utc).date()
+    except (TypeError, ValueError):
+        try:
+            return datetime.fromisoformat(raw.strip()).astimezone(timezone.utc).date()
+        except ValueError:
+            return None
+
+
+def read_rss(feed: dict) -> list[dict]:
+    """One publisher feed's stories that carry a summary."""
+    root = ET.fromstring(_get(feed["url"]))
+    out = []
+    for item in root.iter("item"):
+        title = _strip(item.findtext("title") or "")
+        summary = _strip(item.findtext("description") or "")
+        published = _when(item.findtext("pubDate") or "")
+        link = (item.findtext("link") or "").strip()
+        if title and published and link and summary and summary != title:
+            out.append({"publication": feed["publication"], "country": feed["country"],
+                        "headline": title, "body": summary, "url": link,
+                        "published_date": published})
+    return out
+
+
+def rss_for(watch: dict, items: list[dict], since: date) -> list[dict]:
+    """The feed stories that name this company, inside the window."""
+    aliases = [a.strip() for a in watch["aliases"].split("|") if a.strip()]
+    out = []
+    for it in items:
+        if it["country"] not in ("", watch["country"]):
+            continue
+        if not since <= it["published_date"] <= AS_OF:
+            continue
+        named = (mention_in(it["headline"], aliases)
+                 or mention_in(it["body"], aliases))
+        if named:
+            out.append({
+                "article_id": "RSS-" + hashlib.sha1(it["url"].encode()).hexdigest()[:12],
+                "published_date": it["published_date"].isoformat(),
+                "publication": it["publication"], "headline": it["headline"],
+                "body": it["body"], "mentioned_entity_as_written": named, "url": it["url"]})
+    return out
+
+
 # ---------------------------------------------------------------- run
 def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
           quiet: bool = False) -> dict:
@@ -263,17 +388,54 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
     from .loader import Loader
     feeds, publishers = load_sources(data_dir)
     out = data_dir / "news_articles.csv"
-    # what the engine had before this fetch, so the page can say what is new
-    had_ids = {r["article_id"] for r in _read(out)} if out.exists() else set()
+    # what the engine had before this fetch: the page says what is new, and a story
+    # a feed stops returning is kept rather than forgotten
+    stored = _read(out) if out.exists() else []
+    had_ids = {r["article_id"] for r in stored}
+    stored_by_id = {r["article_id"]: r for r in stored}
+    stored_by_story: dict[str, list[dict]] = {}
+    for r in stored:
+        stored_by_story.setdefault(story_key(r["headline"]), []).append(r)
     previous = last_fetch(data_dir)
     buyers = Loader(data_dir).buyers_by_id()
     watchlist = _read(data_dir / "news_watchlist.csv")
     since = AS_OF - timedelta(days=days)
 
     articles: dict[str, dict] = {}
+    story_ids: dict[str, list[str]] = {}
+
+    def put(a: dict) -> None:
+        """Add a story once, however many feeds return it, keeping its text and the
+        company it names from whichever copy has them. A story an earlier fetch stored
+        under another id keeps that id, so it is not new again."""
+        key = story_key(a["headline"])
+        old = stored_by_id.get(a["article_id"]) or next(
+            (r for r in stored_by_story.get(key, []) if same_story(r, a)), None)
+        aid = next((i for i in story_ids.get(key, []) if same_story(articles[i], a)),
+                   old["article_id"] if old else a["article_id"])
+        a = {**a, "article_id": aid}
+        if old and has_text(old) and not has_text(a):
+            a["body"] = old["body"]
+        had = articles.get(aid)
+        if had is None:
+            articles[aid] = a
+            story_ids.setdefault(key, []).append(aid)
+            return
+        if has_text(a) and not has_text(had):
+            had["body"] = a["body"]
+        if not had["mentioned_entity_as_written"] and a["mentioned_entity_as_written"]:
+            had["mentioned_entity_as_written"] = a["mentioned_entity_as_written"]
+
+    rss_items: list[dict] = []
+    rss_errors: list[str] = []
+    for feed in rss_feeds(data_dir):
+        try:
+            rss_items += read_rss(feed)
+        except Exception as exc:                                       # noqa: BLE001
+            rss_errors.append(f"{feed['publication']} rss: {exc}")
     report = {"fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
               "as_of": AS_OF.isoformat(), "days": days, "feeds": sorted(feeds),
-              "publishers": publishers, "buyers": {}, "errors": []}
+              "publishers": publishers, "buyers": {}, "errors": rss_errors}
     for w in watchlist:
         b = buyers.get(w["buyer_id"])
         if b is None:
@@ -281,11 +443,11 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
         country = w.get("country", "") or b.get("country", "")
         w = {**w, "country": country}
         got = {"country": country, "edition": edition(country)[0], "sec_edgar": 0,
-               "google_news": 0, "untrusted_dropped": 0, "returned": 0}
+               "google_news": 0, "publisher_rss": 0, "untrusted_dropped": 0, "returned": 0}
         if "sec_edgar" in feeds and str(w.get("cik", "")).strip().isdigit():
             try:
-                for a in sec_filings(b, w, since):
-                    articles[a["article_id"]] = a
+                for a in sec_filings(b, w, since, stored_by_id):
+                    put(a)
                     got["sec_edgar"] += 1
             except Exception as exc:                                   # noqa: BLE001
                 report["errors"].append(f"{b['short_name']} sec_edgar: {exc}")
@@ -297,30 +459,37 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
                                             per_buyer, stats)
                 got["returned"] = stats.get("returned", 0)
                 for a in kept:
-                    # one story can come back for two companies' searches: keep the copy
-                    # that names a company, so the fallback still has something to resolve
-                    had = articles.get(a["article_id"])
-                    if had is None or (not had["mentioned_entity_as_written"]
-                                       and a["mentioned_entity_as_written"]):
-                        articles[a["article_id"]] = a
+                    put(a)
                 got.update(google_news=len(kept), untrusted_dropped=dropped)
             except Exception as exc:                                   # noqa: BLE001
                 report["errors"].append(f"{b['short_name']} google_news: {exc}")
-        got["coverage"] = got["sec_edgar"] + got["google_news"]
+        for a in rss_for(w, rss_items, since):
+            put(a)
+            got["publisher_rss"] += 1
+        got["coverage"] = got["sec_edgar"] + got["google_news"] + got["publisher_rss"]
         report["buyers"][b["short_name"]] = got
         say(f"  {b['short_name']:14} {got['edition']:5}  8-K {got['sec_edgar']:3}   press "
-            f"{got['google_news']:3}   (untrusted dropped {got['untrusted_dropped']})"
+            f"{got['google_news']:3}   publisher rss {got['publisher_rss']:3}   (untrusted dropped {got['untrusted_dropped']})"
             + ("   - no coverage found" if not got["coverage"] else ""))
 
     if not articles and report["errors"]:
         # never replace a good file with an empty one because the network is down
         raise SystemExit("nothing fetched - news_articles.csv left as it was:\n  "
                          + "\n  ".join(report["errors"]))
+    fetched = len(articles)
+    # Feeds do not return the same stories every day: a search ranks differently, the
+    # per-company cap lets newer stories push older ones out, one feed can fail. A story
+    # an earlier fetch found stays until it is older than the window; this fetch's copy
+    # wins when both have it.
+    carried = [r for r in stored if r["article_id"] not in articles
+               and since.isoformat() <= r["published_date"] <= AS_OF.isoformat()]
+    for r in carried:
+        articles[r["article_id"]] = {f: r.get(f, "") for f in FIELDS}
     rows = sorted(articles.values(), key=lambda a: (a["published_date"], a["article_id"]),
                   reverse=True)
     per = report["buyers"].values()
     kept_per_search = sum(g["coverage"] for g in per)
-    found = sum(g["returned"] + g["sec_edgar"] for g in per)
+    found = sum(g["returned"] + g["sec_edgar"] + g["publisher_rss"] for g in per)
     untrusted = sum(g["untrusted_dropped"] for g in per)
     report["funnel"] = {
         "found": found,
@@ -328,8 +497,10 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
         # trusted, but older than the window or past the per-company cap
         "outside_window_or_cap": max(0, found - untrusted - kept_per_search),
         # the same story returned by two companies' searches
-        "duplicates": max(0, kept_per_search - len(rows)),
-        "kept": len(rows),
+        "duplicates": max(0, kept_per_search - fetched),
+        "kept": fetched,
+        # found by an earlier fetch, not returned by this one, still inside the window
+        "carried": len(carried),
     }
     report["new"] = [a["article_id"] for a in rows if a["article_id"] not in had_ids]
     report["previous_fetch"] = previous["fetched_at"] if previous else None
@@ -341,7 +512,8 @@ def fetch(days: int = 180, per_buyer: int = 12, data_dir: Path = DATA_DIR,
     tmp.replace(out)
     report["articles"] = len(rows)
     (data_dir / LOG).write_text(json.dumps(report, indent=2))
-    say(f"  {len(rows)} articles -> {out} ({len(report['new'])} new since the last fetch)")
+    say(f"  {len(rows)} articles -> {out} ({len(report['new'])} new since the last fetch, "
+        f"{len(carried)} kept from earlier fetches)")
     for err in report["errors"]:
         say(f"  ! {err}")
     return report

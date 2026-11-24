@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Intel Corporation sits in the Watch band at a score of 20.7, driven entirely by news rather than any payment deterioration. The payment record is clean, with 0 days past due and no weighted contribution from that side. The score is the product of a single severity-3 article reporting a shareholder lawsuit tied to a 29% stock plunge, which contributes 20.7 of the 20.7 total via the 0.35 news weighting (raw 59.2).\n\nThe buyer sits in Watch because the news formula keys off the single worst-severity article in the window, which is now seven days old, rather than netting the broader flow of subsequent coverage. The adjudicator agreed with the score but flagged caveats: the triggering article (GN-92904b4dcaa6) is a bare headline with no detail on the lawsuit's substance or financial impact, and more recent articles (0-4 days old) report Intel shares rallying 13% and 7% and signing new 18A foundry customers, none of which offset the Watch-driving score since they are scored severity 0.\n\nThe recommended limit action is to maintain the current limit of 7,000,000 USD for Tamrin Exports under policy TCI-EX-2026-0001, with the probability of default (0.1072) within appetite against a target of 0.25; expected loss is unchanged before and after at 540,288. No exposure is currently owed.\n\nA move to Healthy (next band at 20.0 points below current, i.e. 0.7 points of headroom) would follow if the news score decays or is superseded by a cleaner read, while a move to High Risk would require the score to rise a further 29.3 points to the 50.0 threshold, equivalent to payment delinquency reaching 38 days past due given the news currently holds the band on its own.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the 7,000,000 USD limit \u2014 PD of 0.1072 is comfortably within the 0.25 target and payment history is clean; the Watch band is driven solely by a single shareholder-lawsuit headline, and the adjudicator agreed with caveats that this article lacks substantive detail and omits more recent positive coverage.",
+      "payment_note": "Payment record is clean with 0 days past due and zero weighted contribution to the score.",
+      "news_note": "A severity-3 Reuters headline on a shareholder lawsuit following a 29% stock plunge drives the entire score, while more recent coverage (0-4 days old) of stock rallies and new 18A foundry customers is scored neutral and does not offset it.",
+      "lifts_it": [
+        "Decay or replacement of the severity-3 lawsuit article with more substantive, less negative coverage",
+        "Score falling 0.7 points to cross into the Healthy band",
+        "Continued run of positive operational news (new customers, stock recovery) aging into the scoring window"
+      ],
+      "worsens_it": [
+        "Score rising 29.3 points to the 50.0 High Risk threshold",
+        "Payment delinquency reaching 38 days past due, which alone would reach the next band",
+        "Further escalation of the shareholder lawsuit with concrete financial/legal detail or additional severity-3+ news events"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS01\", \"score\": 20.7, \"band\": \"Watch\", \"pd\": 0.1072, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 3, \"category\": \"shareholder_lawsuit\", \"article_id\": \"GN-92904b4dcaa6\", \"age_days\": 7, \"headline\": \"Intel sued by shareholders following 29% stock plunge\", \"via_parent\": false, \"parent_name\": null, \"raw\": 59.2, \"weighted\": 20.7}, \"trace\": \"0"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS01-1\", \"buyer_id\": \"OS01\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 7000000, \"owed\": 0, \"revised_limit\": 7000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1072, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 29.3, \"dpd_for_next_band\": 38, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 0.7, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"GN-a7d59ce9df3e\", \"kind\": \"news\", \"date\": \"2026-11-23\", \"detail\": \"severity 0 (positive_news): NVIDIA Jumps 28% as Jensen Huang Reportedly Reinstated as CEO; Intel Rallies 13%, AMD Gains 7%\", \"data\": {\"severity\": 0, \"category\": \"positive_news\", \"age_days\": 0, \"base\": 0.0, \"decayed\": 0.0, \"entity\": \"Intel Corporation\", \"via_parent\": false, \"publication\": \"Yahoo Finance\", \"headline\": \"NVIDI"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Intel Corporation sits in the Watch band at a score of 20.7, driven entirely by news rather than any payment deterioration. The payment record is clean, with 0 days past due and no weighted contribution from that side. The score is the product of a single severity-3 article reporting a shareholder lawsuit tied to a 29% stock plunge, which contributes 20.7 of the 20.7 total via the 0.35 news weighting (raw 59.2).\n\nThe buyer sits in Watch because the news formula keys off the single worst-severity article in the window, which is now seven days old, rather than netting the broader flow of subsequent coverage. The adjudicator agreed with the score but flagged caveats: the triggering article (GN-92904b4dcaa6) is a bare headline with no detail on the lawsuit's substance or financial impact, and more recent articles (0-4 days old) report Intel shares rallying 13% and 7% and signing new 18A foundry customers, none of which offset the Watch-driving score since they are scored severity 0.\n\nThe recommended limit action is to maintain the current limit of 7,000,000 USD for Tamrin Exports under policy TCI-EX-2026-0001, with the probability of default (0.1072) within appetite against a target of 0.25; expected loss is unchanged before and after at 540,288. No exposure is currently owed.\n\nA move to Healthy (next band at 20.0 points below current, i.e. 0.7 points of headroom) would follow if the news score decays or is superseded by a cleaner read, while a move to High Risk would require the score to rise a further 29.3 points to the 50.0 threshold, equivalent to payment delinquency reaching 38 days past due given the news currently holds the band on its own.",
+        "bottom_line": "Maintain the 7,000,000 USD limit \u2014 PD of 0.1072 is comfortably within the 0.25 target and payment history is clean; the Watch band is driven solely by a single shareholder-lawsuit headline, and the adjudicator agreed with caveats that this article lacks substantive detail and omits more recent positive coverage.",
+        "payment_note": "Payment record is clean with 0 days past due and zero weighted contribution to the score.",
+        "news_note": "A severity-3 Reuters headline on a shareholder lawsuit following a 29% stock plunge drives the entire score, while more recent coverage (0-4 days old) of stock rallies and new 18A foundry customers is scored neutral and does not offset it.",
+        "lifts_it": [
+          "Decay or replacement of the severity-3 lawsuit article with more substantive, less negative coverage",
+          "Score falling 0.7 points to cross into the Healthy band",
+          "Continued run of positive operational news (new customers, stock recovery) aging into the scoring window"
+        ],
+        "worsens_it": [
+          "Score rising 29.3 points to the 50.0 High Risk threshold",
+          "Payment delinquency reaching 38 days past due, which alone would reach the next band",
+          "Further escalation of the shareholder lawsuit with concrete financial/legal detail or additional severity-3+ news events"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

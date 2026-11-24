@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS03",
+    "name": "Ford Motor Company",
+    "severity": 1,
+    "category": "legal_setback",
+    "reason": "Headline references a legal setback for Ford alongside new investment backing for its Oakville facility, but no details are given; this is a minor negative signal at most."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Ford Motor"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS03\", \"name\": \"Ford Motor Company\", \"sector\": \"Automotive\", \"city\": \"Dearborn, MI\"}]"
+    },
+    {
+      "tool": "find_articles",
+      "input": {
+        "query": "Oakville"
+      },
+      "result": "[{\"note\": \"no other article mentions 'Oakville'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS03",
+        "severity": 1,
+        "category": "legal_setback",
+        "reason": "Headline references a legal setback for Ford alongside new investment backing for its Oakville facility, but no details are given; this is a minor negative signal at most."
+      }
+    }
+  ],
+  "turns": 3
+}

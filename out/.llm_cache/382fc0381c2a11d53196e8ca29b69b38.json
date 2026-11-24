@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 0,
+    "category": "positive_news",
+    "reason": "Article reports a positive chip breakthrough and stock jump for Intel Corporation, which is neutral-to-positive news with no credit risk implications."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 0,
+        "category": "positive_news",
+        "reason": "Article reports a positive chip breakthrough and stock jump for Intel Corporation, which is neutral-to-positive news with no credit risk implications."
+      }
+    }
+  ],
+  "turns": 2
+}

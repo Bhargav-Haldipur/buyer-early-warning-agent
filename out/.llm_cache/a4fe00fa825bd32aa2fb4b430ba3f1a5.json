@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "none",
+    "id": "",
+    "name": "",
+    "severity": 0,
+    "category": null,
+    "reason": "L&T Technology Services is not present in the covered entity registry, so no match can be made."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "L&T Technology Services"
+      },
+      "result": "[{\"note\": \"no covered entity shares a word with 'L&T Technology Services'\"}]"
+    },
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "L&T"
+      },
+      "result": "[{\"note\": \"no covered entity shares a word with 'L&T'\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "L&T Technology Services is not present in the covered entity registry, so no match can be made."
+      }
+    }
+  ],
+  "turns": 3
+}

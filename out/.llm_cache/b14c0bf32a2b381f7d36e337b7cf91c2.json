@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Boeing sits in the Watch band at a score of 27.8, driven almost entirely by negative news rather than payment behavior. The underlying trade payment record is clean: no open overdues, only one minor 3-day/$650k delay in the past six months, and a $9M accepted credit line, though the single historical data point means confidence in a payment trend is low. The score is instead carried by a severity-4 layoffs headline from three days ago, \"Boeing leaves open possibility of more layoffs amid stalled production plans,\" which alone contributes nearly all of the weighted news score.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the $9M limit for Tamrin Exports (TCI) as recommended; the adjudicator agreed with caveats, flagging that the score rests on a thinly-sourced headline and should be read with some caution rather than taken at face value.",
+      "payment_note": "Payment history is clean with 0 DPD and only one minor 3-day/$650k delay in six months, though the single data point gives low confidence in any trend.",
+      "news_note": "News is dominated by a severity-4 layoffs headline from 3 days ago, corroborated by a second severity-4 layoffs article from 14 days prior and severity-2 production-delay/regulatory-scrutiny stories, while concurrent positive news (bullish outlook, $745B backlog) was scored zero and excluded.",
+      "lifts_it": [
+        "Score would need to fall 7.8 points to reach the Healthy band",
+        "Absence of further negative layoffs/production news allowing the current headline to decay (365-day half-life)",
+        "Continued clean payment performance building a longer trend record"
+      ],
+      "worsens_it": [
+        "Score rising 22.2 points to 50.0 would trigger High Risk",
+        "A payment delay reaching 33 days past due would be enough to push into the next band",
+        "Additional corroborating layoffs, production-delay, or regulatory-scrutiny headlines reinforcing the operational-strain narrative"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS02\", \"score\": 27.8, \"band\": \"Watch\", \"pd\": 0.1784, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 4, \"category\": \"layoffs\", \"article_id\": \"GN-8b97eceb4530\", \"age_days\": 3, \"headline\": \"Boeing leaves open possibility of more layoffs amid stalled production plans\", \"via_parent\": false, \"parent_name\": null, \"raw\": 79.5, \"weighted\": 27.8}, "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS02-1\", \"buyer_id\": \"OS02\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 9000000, \"owed\": 0, \"revised_limit\": 9000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1784, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 22.2, \"dpd_for_next_band\": 33, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 7.8, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-260607-00024\", \"kind\": \"payment_review\", \"date\": \"2026-06-06\", \"detail\": \"Boeing currently has no open overdue notifications. Recent history shows only one resolved overdue (3 days late, $650k) in the last six months from a single policy, a minor and quickly-cured delay, with a $9M accepted credit line from TCI. With just one historical data point, there isn't enough evidence to establi"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Boeing sits in the Watch band at a score of 27.8, driven almost entirely by negative news rather than payment behavior. The underlying trade payment record is clean: no open overdues, only one minor 3-day/$650k delay in the past six months, and a $9M accepted credit line, though the single historical data point means confidence in a payment trend is low. The score is instead carried by a severity-4 layoffs headline from three days ago, \"Boeing leaves open possibility of more layoffs amid stalled production plans,\" which alone contributes nearly all of the weighted news score.",
+        "bottom_line": "Maintain the $9M limit for Tamrin Exports (TCI) as recommended; the adjudicator agreed with caveats, flagging that the score rests on a thinly-sourced headline and should be read with some caution rather than taken at face value.",
+        "payment_note": "Payment history is clean with 0 DPD and only one minor 3-day/$650k delay in six months, though the single data point gives low confidence in any trend.",
+        "news_note": "News is dominated by a severity-4 layoffs headline from 3 days ago, corroborated by a second severity-4 layoffs article from 14 days prior and severity-2 production-delay/regulatory-scrutiny stories, while concurrent positive news (bullish outlook, $745B backlog) was scored zero and excluded.",
+        "lifts_it": [
+          "Score would need to fall 7.8 points to reach the Healthy band",
+          "Absence of further negative layoffs/production news allowing the current headline to decay (365-day half-life)",
+          "Continued clean payment performance building a longer trend record"
+        ],
+        "worsens_it": [
+          "Score rising 22.2 points to 50.0 would trigger High Risk",
+          "A payment delay reaching 33 days past due would be enough to push into the next band",
+          "Additional corroborating layoffs, production-delay, or regulatory-scrutiny headlines reinforcing the operational-strain narrative"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

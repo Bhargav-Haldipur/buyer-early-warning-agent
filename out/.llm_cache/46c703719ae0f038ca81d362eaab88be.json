@@ -1,0 +1,35 @@
+{
+  "result": {
+    "trend": "insufficient_history",
+    "summary": "No open overdue notifications for Tata Motors Limited. History shows only one prior overdue (resolved 4 days late, June 2026), reported by a single policyholder with no repeat accumulation in the last 6 months. A single credit line of INR 450m is accepted and current, consistent with a clean, low-risk payment profile, though the thin history limits confidence in trend assessment.</summary>\n<parameter name=\"concerns\">[\"Only one historical notification exists, making it hard to establish a reliable payment pattern\", \"Monitor for any new notifications given the single active credit line exposure of INR 450m\"]",
+    "concerns": []
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"note\": \"no open overdue notifications\"}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260627-00001\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-06-26\", \"resolved_date\": \"2026-06-30\", \"exposure\": 22000000.0, \"days_late\": 4}], \"accumulation\": {\"window_days\": 180, \"last_window\": 1, \"window_before\": 0, \"policies_reporting_last_window\": 1}}"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"credit_limit\": 450000000.0, \"currency\": \"INR\", \"payment_terms_days\": 60, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-07-26\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 0,
+        "worst_event_id": "",
+        "trend": "insufficient_history",
+        "summary": "No open overdue notifications for Tata Motors Limited. History shows only one prior overdue (resolved 4 days late, June 2026), reported by a single policyholder with no repeat accumulation in the last 6 months. A single credit line of INR 450m is accepted and current, consistent with a clean, low-risk payment profile, though the thin history limits confidence in trend assessment.</summary>\n<parameter name=\"concerns\">[\"Only one historical notification exists, making it hard to establish a reliable payment pattern\", \"Monitor for any new notifications given the single active credit line exposure of INR 450m\"]",
+        "concerns": []
+      }
+    }
+  ],
+  "turns": 2
+}

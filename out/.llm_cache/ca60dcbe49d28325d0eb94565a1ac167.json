@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS03",
+    "name": "Ford Motor Company",
+    "severity": 1,
+    "category": "supply_disruption",
+    "reason": "Short-term supplier issue affected F-150 production, but Ford states the impact is containable within its full-year 2026 adjusted EBIT guidance, indicating minor and contained financial effect."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Ford"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS03\", \"name\": \"Ford Motor Company\", \"sector\": \"Automotive\", \"city\": \"Dearborn, MI\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS03",
+        "severity": 1,
+        "category": "supply_disruption",
+        "reason": "Short-term supplier issue affected F-150 production, but Ford states the impact is containable within its full-year 2026 adjusted EBIT guidance, indicating minor and contained financial effect."
+      }
+    }
+  ],
+  "turns": 2
+}

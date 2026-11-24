@@ -157,7 +157,8 @@ def _summary(run: dict) -> dict:
     return {k: run[k] for k in ("mode", "turns", "cached", "trace", "error")}
 
 
-def assess(loader: Loader, llm, store) -> dict[str, dict]:
+def assess(loader: Loader, llm, store, llm_for=None) -> dict[str, dict]:
+    """llm_for(article), when given, picks the model for each article; else llm for all."""
     desk = NewsDesk(loader)
     buyers = desk.buyers
     best: dict[str, dict] = {}
@@ -170,7 +171,7 @@ def assess(loader: Loader, llm, store) -> dict[str, dict]:
             best[buyer_id] = {"value": value, "points": pts, **rec}
 
     for art in desk.articles:
-        d = desk.decide(art, llm)
+        d = desk.decide(art, llm_for(art) if llm_for else llm)
         age = (AS_OF - parse_date(art["published_date"],
                                   what=f"article {art['article_id']} published_date")).days
 

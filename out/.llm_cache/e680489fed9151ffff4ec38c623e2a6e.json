@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN02",
+    "name": "Larsen & Toubro Limited",
+    "severity": 0,
+    "category": "market_commentary",
+    "reason": "Article is neutral market commentary about stock gains tied to geopolitical conditions, with no adverse financial information about the company."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsen & Toubro"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN02\", \"name\": \"Larsen & Toubro Limited\", \"sector\": \"Engineering & Construction\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN02",
+        "severity": 0,
+        "category": "market_commentary",
+        "reason": "Article is neutral market commentary about stock gains tied to geopolitical conditions, with no adverse financial information about the company."
+      }
+    }
+  ],
+  "turns": 2
+}

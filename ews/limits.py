@@ -25,9 +25,9 @@ def owed_by_line(notifications: list[dict]) -> dict[tuple[str, str], float]:
     a domestic whole-turnover policy and a bank's TReDS cover - and each is its own line.
 
     The latest open notification that reports an outstanding by ageing gives the line's
-    total; any open notification filed after it adds its amount at risk, since that
+    total; any open notification filed after it adds its exposure, since that
     ageing could not include it. The ageing is optional: a line where no open
-    notification has one owes the sum of the amounts at risk. A line with no open
+    notification has one owes the sum of the exposures. A line with no open
     notification has nothing reported as owed.
     """
     by_line: dict[tuple[str, str], list[dict]] = {}
@@ -41,9 +41,9 @@ def owed_by_line(notifications: list[dict]) -> dict[tuple[str, str], float]:
         if aged:
             last = aged[-1]
             out[key] = (sum(a["amount"] for a in notes[last]["ageing"])
-                        + sum(n["amount_at_risk"] for n in notes[last + 1:]))
+                        + sum(n["exposure"] for n in notes[last + 1:]))
         else:
-            out[key] = sum(n["amount_at_risk"] for n in notes)
+            out[key] = sum(n["exposure"] for n in notes)
     return out
 
 

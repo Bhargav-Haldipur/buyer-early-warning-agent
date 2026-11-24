@@ -176,21 +176,45 @@ def snapshot() -> dict:
     commentary. Scores are identical either way; they come from the formula, not from
     an agent.
     """
-    live = live_active()
-    key = (json.dumps(LIVE["articles"], sort_keys=True), json.dumps(LIVE["events"], sort_keys=True))
+    key = _live_key()
     with _LOCK:  # one engine run at a time now that requests are threaded
         if key not in _CACHE:
-            # "Score only" inputs: their evidence agent runs and the score moves, but the
-            # buyers they touch skip the two Opus runs (adjudicator review, case file)
-            quick = {x.get("article_id") or x.get("event_id")
-                     for x in LIVE["articles"] + LIVE["events"] if x.get("score_only")}
-            _CACHE[key] = engine.run(
-                extra_articles=[{k: v for k, v in a.items() if k != "score_only"}
-                                for a in LIVE["articles"]] or None,
-                extra_events=[_engine_event(ev) for ev in LIVE["events"]] or None,
-                commentary="changed" if live else True,
-                score_only=quick or None)
+            _CACHE[key] = _engine_run()
         return _CACHE[key]
+
+
+def rescore() -> dict:
+    """Re-run the engine after a fetch without holding the pages up.
+
+    The agents can take minutes on a fetch that brings new stories. Until this run is
+    ready every page keeps rendering the previous one, then switches to it.
+    """
+    key = _live_key()
+    run = _engine_run()
+    with _LOCK:
+        _CACHE.clear()
+        _CACHE[key] = run
+    return run
+
+
+def _live_key() -> tuple[str, str]:
+    return (json.dumps(LIVE["articles"], sort_keys=True),
+            json.dumps(LIVE["events"], sort_keys=True))
+
+
+def _engine_run() -> dict:
+    """One engine run: the shipped data plus whatever the live sandbox added."""
+    live = live_active()
+    # "Score only" inputs: their evidence agent runs and the score moves, but the
+    # buyers they touch skip the two Opus runs (adjudicator review, case file)
+    quick = {x.get("article_id") or x.get("event_id")
+             for x in LIVE["articles"] + LIVE["events"] if x.get("score_only")}
+    return engine.run(
+        extra_articles=[{k: v for k, v in a.items() if k != "score_only"}
+                        for a in LIVE["articles"]] or None,
+        extra_events=[_engine_event(ev) for ev in LIVE["events"]] or None,
+        commentary="changed" if live else True,
+        score_only=quick or None)
 
 
 # ---------------------------------------------------------------- helpers
@@ -427,6 +451,10 @@ def sources_panel(back: str = "/live") -> str:
     publishers = fetch_news.publisher_names(DATA_DIR)
     names = {"sec_edgar": "SEC EDGAR 8-K filings", "google_news": "Google News"}
     feed_txt = " and ".join(names.get(f, f) for f in sorted(feeds))
+    rss = sorted({f["publication"] for f in fetch_news.rss_feeds(DATA_DIR)})
+    if rss:
+        feed_txt += (f"</b>, with article summaries from the publishers&rsquo; own feeds "
+                     f"(<b>{e(', '.join(rss))}</b>) and the text of each 8-K filing<b>")
     when = (f'Last fetched {e(log["fetched_at"].replace("T", " ").replace("+00:00", " UTC"))} '
             f'&middot; {log["articles"]} articles from the last {log["days"]} days'
             if log else "Not fetched yet")
@@ -448,7 +476,7 @@ def auto_switch() -> str:
     """The on/off switch, and while on, when the next fetch is due."""
     on = AUTO["on"]
     if AUTO["running"]:
-        status = "fetching now&hellip;"
+        status = "fetching and re-scoring now&hellip; this page updates by itself"
     elif on and AUTO["next"]:
         mins = max(0, round((AUTO["next"] - time.time()) / 60))
         status = f"next fetch in about {mins} min" if mins else "next fetch due now"
@@ -465,7 +493,10 @@ def auto_switch() -> str:
             f'aria-pressed="{str(on).lower()}">{label}</button></form>'
             f'<span class="overline">{status}</span>'
             # while on, the open live page follows the timer without anyone touching it
-            + ('<script>setTimeout(() => location.reload(), 60000)</script>' if on else ""))
+            # while a fetch runs, follow it closely; while on, follow the timer
+            + ('<script>setTimeout(() => location.reload(), 5000)</script>' if AUTO["running"]
+               else '<script>setTimeout(() => location.reload(), 60000)</script>' if on
+               else ""))
 
 
 def client_page(cid: str) -> bytes:
@@ -849,12 +880,12 @@ def buyer_page(bid: str, tab: str) -> bytes:
             f'<td>{e(n["reason"].replace("_", " ").lower())}</td>'
             f'<td>{e(shown_date(n["event_id"], n["notification_date"]))}</td>'
             f'<td>{e(shown_date(n["event_id"], n["original_due_date"]) if n["original_due_date"] else "—")}</td>'
-            f'<td>{state(n)}</td><td class="num">{money(n["amount_at_risk"], n["currency"])}</td>'
+            f'<td>{state(n)}</td><td class="num">{money(n["exposure"], n["currency"])}</td>'
             f'<td class="num">{ageing(n)}</td></tr>' for n in r.get("notifications", []))
         inner = (summary + (
             f'<h3>Notifications from policyholders</h3><table><thead><tr><th>Notification</th>'
             f'<th>Reason</th><th>Notified</th><th>Original due</th><th>Status</th>'
-            f'<th class="num">Amount at risk</th><th class="num">Outstanding by ageing</th>'
+            f'<th class="num">Exposure</th><th class="num">Outstanding by ageing</th>'
             f'</tr></thead><tbody>{rows}</tbody></table>'
             f'<p class="overline">As the platform records them (notifiable events). There is no '
             f'invoice ledger; resolution status is this prototype&rsquo;s own until the '
@@ -961,6 +992,8 @@ def fetch_result_panel() -> str:
     if f["duplicates"]:
         steps.append(f'{f["duplicates"]} duplicates')
     steps.append(f'{f["kept"]} kept')
+    if f.get("carried"):
+        steps.append(f'{f["carried"]} more kept from earlier fetches')
     since = f' since the fetch at {e(res["previous"])}' if res["previous"] else ""
     steps.append(f'<b>{len(res["new"])} new</b>{since}')
     funnel = " &rarr; ".join(steps)
@@ -1043,7 +1076,7 @@ def live_inputs_block() -> str:
         f'<td class="num">{money(float(ev["NEV_AMOUNT_AT_RISK"]), ev["NEV_CURRENCY"])}</td></tr>'
         for ev in LIVE["events"])
     evs = (f'<table><thead><tr><th>Notification</th><th>Buyer &middot; policy</th>'
-           f'<th>Reason</th><th>Original due</th><th class="num">Amount at risk</th>'
+           f'<th>Reason</th><th>Original due</th><th class="num">Exposure</th>'
            f'</tr></thead><tbody>{evs}</tbody></table>' if evs else "")
     return arts + evs
 
@@ -1119,7 +1152,7 @@ moves the score in seconds.</p>
   <label>Original due date
     <input type="date" name="due" value="{e(default_due)}" min="{e(oldest_due)}"
            max="{e(date.today().isoformat())}" required></label>
-  <label>Amount at risk <span class="overline">in the policy&rsquo;s currency</span>
+  <label>Exposure <span class="overline">in the policy&rsquo;s currency</span>
     <input type="number" name="amount" min="1" step="any" required placeholder="e.g. 4500000"></label>
   <button class="btn" type="submit">File overdue invoice &amp; re-run</button>
   <button class="btn ghost" type="submit" name="mode" value="score">Score only</button>
@@ -1231,9 +1264,9 @@ def file_notification(form: dict) -> None:
         try:
             amount = float(amount_raw)
         except ValueError as exc:
-            raise ValueError(f"the amount at risk must be a number, got {amount_raw!r}") from exc
+            raise ValueError(f"the exposure must be a number, got {amount_raw!r}") from exc
         if not 0 < amount < 1e13:
-            raise ValueError("the amount at risk must be above zero")
+            raise ValueError("the exposure must be above zero")
         today = date.today()
         if not due_raw:
             raise ValueError("an overdue invoice needs its original due date - the platform "
@@ -1279,6 +1312,16 @@ def reset_live() -> None:
                 last=None)
 
 
+def start_fetch() -> None:
+    """The button: fetch in the background and answer at once. A fetch that brings new
+    stories re-scores for minutes, longer than a browser waits for a reply."""
+    if AUTO["running"]:
+        FETCH["last"] = "A fetch is already running - its result will show here."
+        return
+    AUTO["running"] = True           # set here, so the page that follows shows it running
+    threading.Thread(target=refresh_news, name="manual-fetch", daemon=True).start()
+
+
 def refresh_news(source: str = "Manual") -> None:
     """Fetch from the trusted sources, then re-score. A failed fetch keeps the old file."""
     if not _FETCH_LOCK.acquire(blocking=False):
@@ -1293,13 +1336,15 @@ def refresh_news(source: str = "Manual") -> None:
         except (SystemExit, OSError, ValueError) as exc:
             FETCH["last"] = f"{source} fetch failed - the previous news is still in use: {exc}"
             return
-        with _LOCK:
-            _CACHE.clear()
         stamp = datetime.now(timezone.utc).strftime("%H:%M UTC")
-        FETCH["last"] = (f"{source} fetch at {stamp}: {rep['articles']} articles"
-                         + (f"; {len(rep['errors'])} source error(s)" if rep["errors"] else "")
-                         + ". Scores are re-run on them.")
-        after = snapshot()          # re-score now, so the next page view does not wait
+        done = (f"{source} fetch at {stamp}: {rep['articles']} articles"
+                + (f"; {len(rep['errors'])} source error(s)" if rep["errors"] else ""))
+        new_count = len(rep.get("new", []))
+        FETCH["last"] = (f"{done}. Re-scoring {new_count} new stor"
+                         f"{'y' if new_count == 1 else 'ies'} with the agents - the scores "
+                         f"below are the previous ones until it finishes.")
+        after = rescore()           # pages keep the previous run until this one is ready
+        FETCH["last"] = f"{done}. Scores are re-run on them."
         if rep.get("funnel"):
             new = set(rep.get("new", []))
             fresh = [a for a in fetch_news.read_articles(DATA_DIR) if a["article_id"] in new]
@@ -1377,7 +1422,7 @@ class Handler(BaseHTTPRequestHandler):
             elif path == "/live/notification":
                 file_notification(form)
             elif path == "/news/fetch" and LIVE_BOOK:
-                refresh_news()
+                start_fetch()
                 back = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("back", ["/"])[0]
                 return self._redirect(back if back in ("/", "/live") else "/live")
             elif path == "/news/auto" and LIVE_BOOK:

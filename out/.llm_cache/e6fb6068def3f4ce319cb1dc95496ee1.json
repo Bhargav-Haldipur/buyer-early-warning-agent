@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN02",
+    "name": "Larsen & Toubro Limited",
+    "severity": 0,
+    "category": "new_order",
+    "reason": "Article reports a large new AI data centre order win worth up to $1.57 billion, which is positive news for the company."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Larsen"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN02\", \"name\": \"Larsen & Toubro Limited\", \"sector\": \"Engineering & Construction\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN02",
+        "severity": 0,
+        "category": "new_order",
+        "reason": "Article reports a large new AI data centre order win worth up to $1.57 billion, which is positive news for the company."
+      }
+    }
+  ],
+  "turns": 2
+}
