@@ -196,6 +196,35 @@ once. On this book a story typed on the Live input page is
 labelled **HYPOTHETICAL** everywhere it appears. The harness grades the synthetic
 dataset only - there are no labels for real companies.
 
+#### Running the live-news book: pin the date, or warm it for today
+
+`EWS_AS_OF` pins the date the engine runs as of. Leave it out and it runs as of today.
+It matters because the agent cache is keyed by it: a buyer's days past due change every
+day, so the Payment, Adjudicator and Case File answers cached for one date miss on the
+next and are run again (the News agent's answers do not depend on the date and carry
+over). The shipped cache is warm for **2026-11-23**.
+
+```bash
+# Replay only, no key needed - every agent answer comes from the shipped cache, free:
+EWS_DATASET=sbi EWS_AS_OF=2026-11-23 EWS_LLM=claude ANTHROPIC_API_KEY=invalid \
+  .venv/bin/python -m dashboard.server 8011
+
+# With the key in .env, pinned - starts in seconds from the cache; only what you
+# type on the Live input page, or a fetch that brings new stories, calls Claude:
+EWS_DATASET=sbi EWS_AS_OF=2026-11-23 .venv/bin/python -m dashboard.server 8011
+
+# With the key, as of today - for a demo on the day. The first start warms the cache
+# for today's date (about 10 minutes and a few dollars on Sonnet); later starts that
+# day are instant. Needed for live news: a pinned date drops every story published
+# after it, so a fetch on a pinned server finds nothing newer than the pin.
+EWS_DATASET=sbi .venv/bin/python -m dashboard.server 8011
+```
+
+Then open http://localhost:8011 (the live input page is `/live`). Typed stories and
+overdues live only in the server's memory: a restart clears them, which is also how to
+clear rehearsed inputs before a demo. Leave auto refresh off for a demo, so a fetch
+does not start mid-presentation.
+
 ---
 
 ## What was built
