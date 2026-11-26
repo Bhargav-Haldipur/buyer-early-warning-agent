@@ -1,0 +1,43 @@
+{
+  "result": {
+    "trend": "deteriorating",
+    "summary": "Kestrel Marine Parts Ltd has one open overdue invoice of $70k, now 38 days past due (original due 2026-10-16), against a single TCI policy with a $500k limit. The prior notification from the same policy (resolved 12 days late in July 2026) shows the overdue period has roughly tripled, and notification frequency has risen from 0 to 2 in the last six months. While exposure remains well within the credit line and only one policy is reporting, the lengthening delay warrants closer monitoring before further limit extension.",
+    "concerns": [
+      "Days past due increased from 12 (resolved) to 38 (still open) on consecutive notifications",
+      "Notification frequency rising (0 to 2 in last 180 days) from the same policy",
+      "Current overdue ($70k) plus not-yet-due exposure ($95k) together represent meaningful utilization of the $500k limit"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"event_id\": \"N-261017-00034\", \"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"reason\": \"OVERDUE_INVOICE\", \"notification_date\": \"2026-10-17\", \"original_due_date\": \"2026-10-16\", \"exposure\": 70000.0, \"currency\": \"USD\", \"days_past_due\": 38, \"outstanding_by_ageing\": {\"NOT_YET_DUE\": 95000.0, \"OVERDUE_31_60_DAYS\": 70000.0}}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260707-00033\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-07-06\", \"resolved_date\": \"2026-07-18\", \"exposure\": 60000.0, \"days_late\": 12}], \"accumulation\": {\"window_days\": 180, \"last_window\": 2, \"window_before\": 0, \"policies_reporting_last_window\": 1}}"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"credit_limit\": 500000.0, \"currency\": \"USD\", \"payment_terms_days\": 60, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-01-31\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 38,
+        "worst_event_id": "N-261017-00034",
+        "trend": "deteriorating",
+        "summary": "Kestrel Marine Parts Ltd has one open overdue invoice of $70k, now 38 days past due (original due 2026-10-16), against a single TCI policy with a $500k limit. The prior notification from the same policy (resolved 12 days late in July 2026) shows the overdue period has roughly tripled, and notification frequency has risen from 0 to 2 in the last six months. While exposure remains well within the credit line and only one policy is reporting, the lengthening delay warrants closer monitoring before further limit extension.",
+        "concerns": [
+          "Days past due increased from 12 (resolved) to 38 (still open) on consecutive notifications",
+          "Notification frequency rising (0 to 2 in last 180 days) from the same policy",
+          "Current overdue ($70k) plus not-yet-due exposure ($95k) together represent meaningful utilization of the $500k limit"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

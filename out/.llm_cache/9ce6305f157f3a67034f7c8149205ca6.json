@@ -1,0 +1,55 @@
+{
+  "result": {
+    "assessment": "agree_with_caveats",
+    "rationale": "The score is driven entirely by payment (22 DPD, weighted 14.3) with zero news contribution, and find_articles confirms no press coverage exists for Jyotsna Electricals, so the Healthy band is well supported on current data. However, this is the buyer's first overdue notification in six months, from a single policyholder (TCI) against a INR 4,000,000 limit, with no resolution history to benchmark payment speed or pattern - the payment agent itself flags this as insufficient history. Underwriters should treat the Healthy band as provisional and watch whether this overdue resolves promptly or whether further notifications emerge, since the file currently has no track record to confirm stable payment behavior.",
+    "concerns": [
+      {
+        "source_id": "N-261102-00023",
+        "issue": "Only one overdue notification exists and there is no prior resolution history, so payment trend is unverified (payment_review marks this 'insufficient_history')."
+      },
+      {
+        "source_id": "N-261102-00023",
+        "issue": "Exposure visibility is limited to a single policyholder (TCI, INR 600,000 overdue of a INR 4,000,000 limit), giving a narrow view of overall payment conduct."
+      }
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_score_breakdown",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN09\", \"score\": 14.3, \"band\": \"Healthy\", \"pd\": 0.0743, \"payment\": {\"dpd\": 22, \"raw\": 22.0, \"weighted\": 14.3, \"worst_line\": \"TCI-WT-2026-0001\"}, \"news\": {\"severity\": 0, \"category\": null, \"article_id\": null, \"age_days\": null, \"headline\": null, \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x 22.0 (payment, 22 DPD) + 0.35 x 0.0 (news) = 14.3\"}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {
+        "kind": "all"
+      },
+      "result": "[{\"id\": \"N-261102-00023\", \"kind\": \"payment\", \"date\": \"2026-11-01\", \"detail\": \"1 open overdue notification(s) under policy TCI-WT-2026-0001; the oldest is 22 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"dpd\": 22, \"owed\": 1500000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261102-00023\", \"kind\": \"payment_review\", \"date\": \"2026-11-01\", \"detail\": \"Jyotsna Elect"
+    },
+    {
+      "tool": "find_articles",
+      "input": {
+        "query": "Jyotsna Electricals"
+      },
+      "result": "[{\"note\": \"no article mentions 'Jyotsna Electricals'\"}]"
+    },
+    {
+      "tool": "submit_review",
+      "input": {
+        "assessment": "agree_with_caveats",
+        "rationale": "The score is driven entirely by payment (22 DPD, weighted 14.3) with zero news contribution, and find_articles confirms no press coverage exists for Jyotsna Electricals, so the Healthy band is well supported on current data. However, this is the buyer's first overdue notification in six months, from a single policyholder (TCI) against a INR 4,000,000 limit, with no resolution history to benchmark payment speed or pattern - the payment agent itself flags this as insufficient history. Underwriters should treat the Healthy band as provisional and watch whether this overdue resolves promptly or whether further notifications emerge, since the file currently has no track record to confirm stable payment behavior.",
+        "concerns": [
+          {
+            "source_id": "N-261102-00023",
+            "issue": "Only one overdue notification exists and there is no prior resolution history, so payment trend is unverified (payment_review marks this 'insufficient_history')."
+          },
+          {
+            "source_id": "N-261102-00023",
+            "issue": "Exposure visibility is limited to a single policyholder (TCI, INR 600,000 overdue of a INR 4,000,000 limit), giving a narrow view of overall payment conduct."
+          }
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

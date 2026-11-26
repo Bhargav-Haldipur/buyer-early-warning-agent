@@ -1,0 +1,84 @@
+{
+  "result": {
+    "narrative": "Ford's underlying fundamentals look benign: payment behaviour shows a single open overdue notice of $450,000 (9 days past due) against a $6,000,000 credit line, and the reviewer notes there is no resolved-notification history yet to benchmark a pattern. The large body of genuine news coverage over the review window is routine stock commentary, analyst sentiment, an earnings beat, a contained supplier disruption, and a scheduled executive departure - none of it rated above minor severity and none indicating financial distress.\n\nThe Watch score of 40.9 is driven almost entirely by one item: a severity-100 \"unpaid wages/employee protest\" headline (LIVE01) that is explicitly tagged \"[HYPOTHETICAL]\" and sourced to \"HYPOTHETICAL - typed in the room\" rather than a real outlet, contributing 35.0 of the 40.9 total. The adjudicator challenged the verdict on this basis, finding no independent corroboration from any other source and noting that payment evidence alone (0.65 x 9.0) would sit well inside the Healthy band. The payment signal itself is thin - a first notification with no accumulation pattern yet established.\n\nThe limit system recommends reducing the TCI-EX-2026-0001 export limit from $6,000,000 to $4,862,237, sized to bring expected loss back to the 25% appetite threshold (from $1,332,720 to $1,080,000) given the current PD of 0.3085. Because that PD is itself inflated by the disputed hypothetical headline, the underwriter should treat this REDUCE recommendation with caution and decide whether to apply it in full, apply a smaller cut, or hold the limit pending verification of the wage-protest story.\n\nA lift back toward Healthy (score below 20.0) would follow from the hypothetical news item being withdrawn, discredited, or decaying with no corroboration (it alone is currently holding the band), combined with the 9-day-past-due invoice resolving without further ageing. Conversely, real deterioration - the overdue item ageing out to 24 days past due - would push the score toward the High Risk band at 50.0, as would any genuinely sourced negative reporting corroborating distress at Ford.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "The adjudicator challenged this Watch rating: the score is driven almost entirely by a single news item explicitly labeled \"[HYPOTHETICAL]\" with no corroboration, so the recommended REDUCE on TCI-EX-2026-0001 (to $4,862,237 from $6,000,000) should be reviewed with that caveat rather than applied automatically.",
+      "payment_note": "Ford has one open overdue notice of $450,000 (9 days past due) against its $6,000,000 line, with no prior resolved notifications to establish a trend, so no pattern of worsening is yet evident.",
+      "news_note": "All genuinely sourced news is routine (stock moves, analyst sentiment, an earnings beat, minor contained supply disruption) while the one severe \"unpaid wages\" headline driving most of the score is explicitly tagged hypothetical and uncorroborated by any other outlet.",
+      "lifts_it": [
+        "The hypothetical/uncorroborated wage-protest headline decaying or being discredited with no real-news corroboration",
+        "The current 9-day overdue invoice resolving promptly without further ageing",
+        "A clean run of resolved payment notifications establishing a non-worsening trend"
+      ],
+      "worsens_it": [
+        "The overdue invoice ageing to 24 days past due (triggers next band at score 50.0)",
+        "A second overdue notice appearing, building an accumulation pattern",
+        "Independent, corroborated reporting confirming financial distress (e.g. actual unpaid wages) at Ford"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS03\", \"score\": 40.9, \"band\": \"Watch\", \"pd\": 0.3085, \"payment\": {\"dpd\": 9, \"raw\": 9.0, \"weighted\": 5.9, \"worst_line\": \"TCI-EX-2026-0001\"}, \"news\": {\"severity\": 5, \"category\": \"unpaid_wages\", \"article_id\": \"LIVE01\", \"age_days\": 0, \"headline\": \"[HYPOTHETICAL] Ford Motor Company employes are at protest\", \"via_parent\": false, \"parent_name\": null, \"raw\": 100.0, \"weighted\": 35.0}, \"trace\":"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS03-1\", \"buyer_id\": \"OS03\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 6000000, \"owed\": 1650000, \"revised_limit\": 4862237, \"change\": -1137763, \"action\": \"REDUCE\", \"reason\": \"cut to the limit where expected loss meets 25% appetite\", \"pd"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 9.1, \"dpd_for_next_band\": 24, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 20.9, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261115-00025\", \"kind\": \"payment\", \"date\": \"2026-11-14\", \"detail\": \"1 open overdue notification(s) under policy TCI-EX-2026-0001; the oldest is 9 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"dpd\": 9, \"owed\": 1650000.0, \"currency\": \"USD\", \"open_count\": 1}}, {\"id\": \"N-261115-00025\", \"kind\": \"payment_review\", \"date\": \"2026-11-14\", \"detail\": \"Ford has one op"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Ford's underlying fundamentals look benign: payment behaviour shows a single open overdue notice of $450,000 (9 days past due) against a $6,000,000 credit line, with $1,200,000 not yet due, and the reviewer notes there is no resolved-notification history yet to benchmark a pattern. The large body of genuine news coverage over the review window is routine stock commentary, analyst sentiment, an earnings beat, a contained supplier disruption, and a scheduled executive departure - none of it rated above minor severity and none indicating financial distress.\n\nThe Watch score of 40.9 is driven almost entirely by one item: a severity-100 \"unpaid wages/employee protest\" headline (LIVE01) that is explicitly tagged \"[HYPOTHETICAL]\" and sourced to \"HYPOTHETICAL - typed in the room\" rather than a real outlet, contributing 35 of the 40.9 total. The adjudicator challenged the verdict on this basis, finding no independent corroboration from any other source and noting that payment evidence alone (0.65 x 9.0) would sit well inside the Healthy band. The payment signal itself is thin - a first notification with no accumulation pattern yet established.\n\nThe limit system recommends reducing the TCI-EX-2026-0001 export limit from $6,000,000 to $4,862,237 (a cut of $1,137,763), sized to bring expected loss back to the 25% appetite threshold (from $1,332,720 to $1,080,000) given the current PD of 0.3085. Because that PD is itself inflated by the disputed hypothetical headline, the underwriter should treat this REDUCE recommendation with caution and decide whether to apply it in full, apply a smaller cut, or hold the limit pending verification of the wage-protest story.\n\nA lift back toward Healthy would follow from the hypothetical news item being withdrawn, discredited, or simply decaying with no corroboration (it alone is currently holding the band), combined with the 9-day-past-due invoice resolving without further ageing. Conversely, real deterioration - the overdue item ageing out to 24 days past due, or a second overdue notice appearing - would push the score toward the High Risk band at 50.0, as would any genuinely sourced negative reporting corroborating distress at Ford.",
+        "bottom_line": "The adjudicator challenged this Watch rating: the score is driven almost entirely by a single news item explicitly labeled \"[HYPOTHETICAL]\" with no corroboration, so the recommended REDUCE on TCI-EX-2026-0001 (to $4,862,237 from $6,000,000) should be reviewed with that caveat rather than applied automatically.",
+        "payment_note": "Ford has one open overdue notice of $450,000 (9 days past due) against its $6,000,000 line, with no prior resolved notifications to establish a trend, so no pattern of worsening is yet evident.",
+        "news_note": "All genuinely sourced news is routine (stock moves, analyst sentiment, an earnings beat, minor contained supply disruption) while the one severe \"unpaid wages\" headline driving most of the score is explicitly tagged hypothetical and uncorroborated by any other outlet.",
+        "lifts_it": [
+          "The hypothetical/uncorroborated wage-protest headline decaying or being discredited with no real-news corroboration",
+          "The current 9-day overdue invoice resolving promptly without further ageing",
+          "A clean run of resolved payment notifications establishing a non-worsening trend"
+        ],
+        "worsens_it": [
+          "The overdue invoice ageing to 24 days past due (triggers next band at score 50.0)",
+          "A second overdue notice appearing, building an accumulation pattern",
+          "Independent, corroborated reporting confirming financial distress (e.g. actual unpaid wages) at Ford"
+        ]
+      },
+      "error": "these figures are not in the data: ['1,200,000', '1,137,763']. Use only the numbers the tools returned, then resubmit"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Ford's underlying fundamentals look benign: payment behaviour shows a single open overdue notice of $450,000 (9 days past due) against a $6,000,000 credit line, and the reviewer notes there is no resolved-notification history yet to benchmark a pattern. The large body of genuine news coverage over the review window is routine stock commentary, analyst sentiment, an earnings beat, a contained supplier disruption, and a scheduled executive departure - none of it rated above minor severity and none indicating financial distress.\n\nThe Watch score of 40.9 is driven almost entirely by one item: a severity-100 \"unpaid wages/employee protest\" headline (LIVE01) that is explicitly tagged \"[HYPOTHETICAL]\" and sourced to \"HYPOTHETICAL - typed in the room\" rather than a real outlet, contributing 35.0 of the 40.9 total. The adjudicator challenged the verdict on this basis, finding no independent corroboration from any other source and noting that payment evidence alone (0.65 x 9.0) would sit well inside the Healthy band. The payment signal itself is thin - a first notification with no accumulation pattern yet established.\n\nThe limit system recommends reducing the TCI-EX-2026-0001 export limit from $6,000,000 to $4,862,237, sized to bring expected loss back to the 25% appetite threshold (from $1,332,720 to $1,080,000) given the current PD of 0.3085. Because that PD is itself inflated by the disputed hypothetical headline, the underwriter should treat this REDUCE recommendation with caution and decide whether to apply it in full, apply a smaller cut, or hold the limit pending verification of the wage-protest story.\n\nA lift back toward Healthy (score below 20.0) would follow from the hypothetical news item being withdrawn, discredited, or decaying with no corroboration (it alone is currently holding the band), combined with the 9-day-past-due invoice resolving without further ageing. Conversely, real deterioration - the overdue item ageing out to 24 days past due - would push the score toward the High Risk band at 50.0, as would any genuinely sourced negative reporting corroborating distress at Ford.",
+        "bottom_line": "The adjudicator challenged this Watch rating: the score is driven almost entirely by a single news item explicitly labeled \"[HYPOTHETICAL]\" with no corroboration, so the recommended REDUCE on TCI-EX-2026-0001 (to $4,862,237 from $6,000,000) should be reviewed with that caveat rather than applied automatically.",
+        "payment_note": "Ford has one open overdue notice of $450,000 (9 days past due) against its $6,000,000 line, with no prior resolved notifications to establish a trend, so no pattern of worsening is yet evident.",
+        "news_note": "All genuinely sourced news is routine (stock moves, analyst sentiment, an earnings beat, minor contained supply disruption) while the one severe \"unpaid wages\" headline driving most of the score is explicitly tagged hypothetical and uncorroborated by any other outlet.",
+        "lifts_it": [
+          "The hypothetical/uncorroborated wage-protest headline decaying or being discredited with no real-news corroboration",
+          "The current 9-day overdue invoice resolving promptly without further ageing",
+          "A clean run of resolved payment notifications establishing a non-worsening trend"
+        ],
+        "worsens_it": [
+          "The overdue invoice ageing to 24 days past due (triggers next band at score 50.0)",
+          "A second overdue notice appearing, building an accumulation pattern",
+          "Independent, corroborated reporting confirming financial distress (e.g. actual unpaid wages) at Ford"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

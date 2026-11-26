@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Vodafone Idea sits in the Watch band with a score of 25.5, driven primarily by a payment leg of 18 days past due (weighted 11.7) and a news leg weighted 13.8. The payment record shows a single open overdue of INR 9.0M on policy TCI-SCF-2026-0001, and the broader review flags a deteriorating trend rather than a one-off: resolved overdues have lengthened from 5 days in March to 9 days in July, and the current unresolved item has already stretched to 18 days, with notification frequency also ticking up. All of this activity concentrates on one policy and one insurer, which limits diversification but also keeps exposure well inside the INR 120M accepted limit against INR 40M owed. The adjudicator agreed with the Watch band but attached caveats: the specific news story driving the score (a Livemint subscriber-decline headline) is a bare Google News item with no corroborating coverage, so that particular severity rests on a single uncorroborated source. However, the same period is independently and repeatedly corroborated by ET Telecom, Business Standard and BusinessLine reporting a widened Q2 net loss of \u20b95,975 crore, which is a genuine, multi-sourced negative signal even though it wasn't the headline selected for scoring. Taken together, the band reflects real financial stress plus a genuine payment-trend deterioration, not an artifact of one weak headline. The recommended action is to maintain the current limit of INR 120,000,000 on the TCI-SCF-2026-0001 policy, as the probability of default (0.1552) remains within the insurer's appetite (target 0.25) and the expected loss is unchanged before and after. No limit reduction is proposed at this time, but the underwriter should treat this as an active monitoring case given the concentration on a single policy and the lengthening overdue pattern. The buyer would move to the lower, Healthy band if the score fell by 5.5 points, which would require the payment pattern to stop deteriorating and the open overdue to resolve promptly rather than lengthen further; conversely, it would move into High Risk if the score rose by 24.5 points, which the outlook indicates would require days-past-due to reach 43 days or a comparable escalation in negative, corroborated news.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the current INR 120,000,000 limit on policy TCI-SCF-2026-0001; the adjudicator agreed with the Watch band but flagged that the driving news headline is single-sourced, while independently noting that corroborated Q2 loss-widening news supports genuine underlying stress alongside a real payment-trend deterioration.",
+      "payment_note": "The buyer has one open overdue of 18 days past due (INR 9.0M of INR 40M notified exposure) on policy TCI-SCF-2026-0001, continuing a deteriorating settlement trend where resolved overdues lengthened from 5 days to 9 days and notification frequency has also increased.",
+      "news_note": "The news driving the score is a single uncorroborated Livemint headline on subscriber decline, but the same period is independently corroborated by ET Telecom, Business Standard and BusinessLine reporting Vodafone Idea's Q2 net loss widening to \u20b95,975 crore.",
+      "lifts_it": [
+        "Score falling by 5.5 points would move the buyer to the Healthy band",
+        "Resolution of the current 18-day overdue without further lengthening",
+        "Notification frequency on the TCI policy returning to prior lower levels"
+      ],
+      "worsens_it": [
+        "Score rising by 24.5 points would move the buyer to High Risk",
+        "Days past due reaching 43 days",
+        "Further corroborated negative financial news (e.g. continued loss widening or subscriber decline) compounding the payment deterioration"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN03\", \"score\": 25.5, \"band\": \"Watch\", \"pd\": 0.1552, \"payment\": {\"dpd\": 18, \"raw\": 18.0, \"weighted\": 11.7, \"worst_line\": \"TCI-SCF-2026-0001\"}, \"news\": {\"severity\": 2, \"category\": \"subscriber_decline\", \"article_id\": \"GN-75cb48dc2523\", \"age_days\": 7, \"headline\": \"Why Vodafone Idea\\u2019s q-o-q drop in mobile subscriber base is a worrying sign\", \"via_parent\": false, \"parent_name\": null,"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN03-1\", \"buyer_id\": \"IN03\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-SCF-2026-0001\", \"insured_name\": \"Meridia Bank\", \"product_type\": \"SUPPLY_CHAIN_FINANCE\", \"currency\": \"INR\", \"current_limit\": 120000000, \"owed\": 40000000, \"revised_limit\": 120000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\""
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 24.5, \"dpd_for_next_band\": 43, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 5.5, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261106-00006\", \"kind\": \"payment\", \"date\": \"2026-11-05\", \"detail\": \"1 open overdue notification(s) under policy TCI-SCF-2026-0001; the oldest is 18 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"dpd\": 18, \"owed\": 40000000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261106-00006\", \"kind\": \"payment_review\", \"date\": \"2026-11-05\", \"detail\": \"Vodafone I"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Vodafone Idea sits in the Watch band with a score of 25.5, driven primarily by a payment leg of 18 days past due (weighted 11.7) and a news leg weighted 13.8. The payment record shows a single open overdue of INR 9.0M on policy TCI-SCF-2026-0001, and the broader review flags a deteriorating trend rather than a one-off: resolved overdues have lengthened from 5 days in March to 9 days in July, and the current unresolved item has already stretched to 18 days, with notification frequency also ticking up. All of this activity concentrates on one policy and one insurer, which limits diversification but also keeps exposure well inside the INR 120M accepted limit against INR 40M owed. The adjudicator agreed with the Watch band but attached caveats: the specific news story driving the score (a Livemint subscriber-decline headline) is a bare Google News item with no corroborating coverage, so that particular severity rests on a single uncorroborated source. However, the same period is independently and repeatedly corroborated by ET Telecom, Business Standard and BusinessLine reporting a widened Q2 net loss of \u20b95,975 crore, which is a genuine, multi-sourced negative signal even though it wasn't the headline selected for scoring. Taken together, the band reflects real financial stress plus a genuine payment-trend deterioration, not an artifact of one weak headline. The recommended action is to maintain the current limit of INR 120,000,000 on the TCI-SCF-2026-0001 policy, as the probability of default (0.1552) remains within the insurer's appetite (target 0.25) and the expected loss is unchanged before and after. No limit reduction is proposed at this time, but the underwriter should treat this as an active monitoring case given the concentration on a single policy and the lengthening overdue pattern. The buyer would move to the lower, Healthy band if the score fell by 5.5 points, which would require the payment pattern to stop deteriorating and the open overdue to resolve promptly rather than lengthen further; conversely, it would move into High Risk if the score rose by 24.5 points, which the outlook indicates would require days-past-due to reach 43 days or a comparable escalation in negative, corroborated news.",
+        "bottom_line": "Maintain the current INR 120,000,000 limit on policy TCI-SCF-2026-0001; the adjudicator agreed with the Watch band but flagged that the driving news headline is single-sourced, while independently noting that corroborated Q2 loss-widening news supports genuine underlying stress alongside a real payment-trend deterioration.",
+        "payment_note": "The buyer has one open overdue of 18 days past due (INR 9.0M of INR 40M notified exposure) on policy TCI-SCF-2026-0001, continuing a deteriorating settlement trend where resolved overdues lengthened from 5 days to 9 days and notification frequency has also increased.",
+        "news_note": "The news driving the score is a single uncorroborated Livemint headline on subscriber decline, but the same period is independently corroborated by ET Telecom, Business Standard and BusinessLine reporting Vodafone Idea's Q2 net loss widening to \u20b95,975 crore.",
+        "lifts_it": [
+          "Score falling by 5.5 points would move the buyer to the Healthy band",
+          "Resolution of the current 18-day overdue without further lengthening",
+          "Notification frequency on the TCI policy returning to prior lower levels"
+        ],
+        "worsens_it": [
+          "Score rising by 24.5 points would move the buyer to High Risk",
+          "Days past due reaching 43 days",
+          "Further corroborated negative financial news (e.g. continued loss widening or subscriber decline) compounding the payment deterioration"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

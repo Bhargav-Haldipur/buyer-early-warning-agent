@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN01",
+    "name": "Tata Motors Limited",
+    "severity": 0,
+    "category": "partnership",
+    "reason": "The article reports a positive business development - a new partnership deal between Tata Motors and Stellantis to develop vehicles for global markets, which is neutral-to-positive news."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Tata Motors"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN01\", \"name\": \"Tata Motors Limited\", \"sector\": \"Automotive\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN01",
+        "severity": 0,
+        "category": "partnership",
+        "reason": "The article reports a positive business development - a new partnership deal between Tata Motors and Stellantis to develop vehicles for global markets, which is neutral-to-positive news."
+      }
+    }
+  ],
+  "turns": 2
+}

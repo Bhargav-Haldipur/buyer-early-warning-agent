@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN03",
+    "name": "Vodafone Idea Limited",
+    "severity": 0,
+    "category": "partnership",
+    "reason": "Announcement of a business partnership with PwC India for AI transformation is neutral-to-positive news, with no indication of financial distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Vodafone Idea"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN03\", \"name\": \"Vodafone Idea Limited\", \"sector\": \"Telecommunications\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN03",
+        "severity": 0,
+        "category": "partnership",
+        "reason": "Announcement of a business partnership with PwC India for AI transformation is neutral-to-positive news, with no indication of financial distress."
+      }
+    }
+  ],
+  "turns": 2
+}

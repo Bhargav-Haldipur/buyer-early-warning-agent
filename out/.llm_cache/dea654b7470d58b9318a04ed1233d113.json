@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS01",
+    "name": "Intel Corporation",
+    "severity": 3,
+    "category": "cash_burn_supply_constraints",
+    "reason": "Intel Corporation shares tumbled after hours due to chip supply constraints and significant cash burn, signaling financial strain, though not yet default-level distress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Intel"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS01\", \"name\": \"Intel Corporation\", \"sector\": \"Semiconductors\", \"city\": \"Santa Clara, CA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS01",
+        "severity": 3,
+        "category": "cash_burn_supply_constraints",
+        "reason": "Intel Corporation shares tumbled after hours due to chip supply constraints and significant cash burn, signaling financial strain, though not yet default-level distress."
+      }
+    }
+  ],
+  "turns": 2
+}

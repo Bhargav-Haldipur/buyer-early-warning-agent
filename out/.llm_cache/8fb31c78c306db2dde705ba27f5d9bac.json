@@ -1,0 +1,41 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN01",
+    "name": "Tata Motors Limited",
+    "severity": 0,
+    "category": "product_launch",
+    "reason": "Article is a neutral/positive commentary from a Tata Motors PV executive about a new product (Aeris), with no negative credit implications."
+  },
+  "trace": [
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "none",
+        "entity_id": "",
+        "severity": 0,
+        "category": "none",
+        "reason": "Article is a neutral/positive product launch commentary about Tata Motors PV, not indicative of credit risk."
+      },
+      "error": "call search_entities before submitting"
+    },
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Tata Motors"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN01\", \"name\": \"Tata Motors Limited\", \"sector\": \"Automotive\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN01",
+        "severity": 0,
+        "category": "product_launch",
+        "reason": "Article is a neutral/positive commentary from a Tata Motors PV executive about a new product (Aeris), with no negative credit implications."
+      }
+    }
+  ],
+  "turns": 3
+}

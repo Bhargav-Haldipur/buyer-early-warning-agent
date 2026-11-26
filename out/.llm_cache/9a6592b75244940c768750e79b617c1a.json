@@ -1,0 +1,43 @@
+{
+  "result": {
+    "trend": "deteriorating",
+    "summary": "Hessler Maschinenbau currently has one open overdue invoice of USD 640k, 52 days past due (original due 2026-10-02), on a single policy with TCI. Prior resolved overdues show lateness increasing from 9 to 19 days, and the current overdue is already far beyond that, with notification frequency rising (2 in the last 6 months vs 1 before) from the same policy. Total exposure (2.6M not-yet-due + 640k overdue) is now at ~3.24M against a 3.0M accepted credit limit, suggesting the line is effectively breached and warrants tightening or review.",
+    "concerns": [
+      "Payment delays are lengthening across successive notifications (9d \u2192 19d \u2192 52d+ and still open)",
+      "Total exposure (3.24M) exceeds the accepted credit limit (3.0M) on policy TCI-EX-2026-0001",
+      "Notification frequency is accelerating within the 180-day window, indicating a single concentrated exposure risk with TCI"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"event_id\": \"N-261003-00032\", \"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"reason\": \"OVERDUE_INVOICE\", \"notification_date\": \"2026-10-03\", \"original_due_date\": \"2026-10-02\", \"exposure\": 640000.0, \"currency\": \"USD\", \"days_past_due\": 52, \"outstanding_by_ageing\": {\"NOT_YET_DUE\": 2600000.0, \"OVERDUE_31_60_DAYS\": 640000.0}}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260309-00030\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-03-08\", \"resolved_date\": \"2026-03-17\", \"exposure\": 400000.0, \"days_late\": 9}, {\"event_id\": \"N-260627-00031\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-06-26\", \"resolved_date\": \"2026-07-15\", \"exposure\": 450000.0, \"days_late\": 19}], \"accumulation\""
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"credit_limit\": 3000000.0, \"currency\": \"USD\", \"payment_terms_days\": 60, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-02-22\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 52,
+        "worst_event_id": "N-261003-00032",
+        "trend": "deteriorating",
+        "summary": "Hessler Maschinenbau currently has one open overdue invoice of USD 640k, 52 days past due (original due 2026-10-02), on a single policy with TCI. Prior resolved overdues show lateness increasing from 9 to 19 days, and the current overdue is already far beyond that, with notification frequency rising (2 in the last 6 months vs 1 before) from the same policy. Total exposure (2.6M not-yet-due + 640k overdue) is now at ~3.24M against a 3.0M accepted credit limit, suggesting the line is effectively breached and warrants tightening or review.",
+        "concerns": [
+          "Payment delays are lengthening across successive notifications (9d \u2192 19d \u2192 52d+ and still open)",
+          "Total exposure (3.24M) exceeds the accepted credit limit (3.0M) on policy TCI-EX-2026-0001",
+          "Notification frequency is accelerating within the 180-day window, indicating a single concentrated exposure risk with TCI"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

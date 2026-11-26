@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN08",
+    "name": "Ravisha Engineering Works",
+    "severity": 5,
+    "category": "unpaid_wages",
+    "reason": "Workers staged a protest over delayed wages, indicating a severe cash-flow/payment problem at the company."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Ravisha"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN08\", \"name\": \"Ravisha Engineering Works\", \"sector\": \"Engineering\", \"city\": \"Ludhiana\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN08",
+        "severity": 5,
+        "category": "unpaid_wages",
+        "reason": "Workers staged a protest over delayed wages, indicating a severe cash-flow/payment problem at the company."
+      }
+    }
+  ],
+  "turns": 2
+}

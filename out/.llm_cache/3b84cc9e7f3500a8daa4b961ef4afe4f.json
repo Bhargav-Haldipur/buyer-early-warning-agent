@@ -1,0 +1,71 @@
+{
+  "result": {
+    "narrative": "Ravisha Engineering Works currently sits in the Watch band with a score of 35.0 and an implied PD of 0.25. Payment performance is clean, with 0 days past due and a weighted payment score of 0.0, so nothing in the ledger is pulling the score down. The entire Watch classification is instead driven by a single severity-5 \"unpaid_wages\" news item alleging a worker protest over delayed wages.\n\nThe band is being held up almost entirely by that one news item (0.35 x 100 = 35.0 of the 35.0 total score), which the adjudicator has flagged as a challenge: the source is explicitly labeled \"HYPOTHETICAL - typed in the room,\" not a genuine publication, and no independent outlet corroborates the claim despite searches on both the company name and \"protest.\" With clean payment history and a maximum severity rating built on an uncorroborated, non-journalistic single source, the adjudicator considers the Watch band unsupported pending verification.\n\nGiven the PD of 0.25 is within appetite, the recommended limit action is to maintain the current limit of 6,000,000 INR for Orvana Steel under the whole-turnover policy, with no change to exposure and expected loss unchanged. This reflects that, net of the questioned news item, there is no payment deterioration to justify tightening.\n\nVerification of the wage-protest claim through a credible outlet is the key swing factor: if unconfirmed or retracted, the score would fall toward the Healthy band (15.0 points below the current score would cross that line). Conversely, if real payment delays begin to emerge (around 24 days past due would be enough combined with the existing news weight) or further negative news corroborates the claim, the buyer would move into High Risk (15.0 points above current score, threshold 50.0).",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Recommend maintaining the current limit of 6,000,000 INR, but the adjudicator has challenged the Watch band itself, since it rests entirely on one uncorroborated \"hypothetical\" news item against an otherwise clean payment record.",
+      "payment_note": "Payment behavior is clean, with 0 days past due and a weighted payment score of 0.0, showing no settlement deterioration.",
+      "news_note": "The only matched news is a severity-5 unpaid-wages protest story, but it is marked \"HYPOTHETICAL - typed in the room\" and has no corroboration from any other outlet.",
+      "lifts_it": [
+        "Score falling 15.0 points to below 20.0 would move the buyer into the Healthy band",
+        "Independent verification that the wage-protest claim is false or resolved, allowing the news weighting to decay",
+        "Continued 0 DPD payment performance sustained over time"
+      ],
+      "worsens_it": [
+        "Score rising 15.0 points to 50.0 would move the buyer into High Risk",
+        "Payment delays reaching roughly 24 days past due would be enough, combined with the current news weighting, to push into the next band",
+        "Independent news corroboration of the wage/protest issue from a credible outlet"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN08\", \"score\": 35.0, \"band\": \"Watch\", \"pd\": 0.25, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 5, \"category\": \"unpaid_wages\", \"article_id\": \"LIVE02\", \"age_days\": 0, \"headline\": \"[HYPOTHETICAL] Ravisha Engineering workers stage protest\", \"via_parent\": false, \"parent_name\": null, \"raw\": 100.0, \"weighted\": 35.0}, \"trace\": \"0.65 x 0.0 (pay"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN08-1\", \"buyer_id\": \"IN08\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-WT-2026-0002\", \"insured_name\": \"Orvana Steel\", \"product_type\": \"WHOLE_TURNOVER\", \"currency\": \"INR\", \"current_limit\": 6000000, \"owed\": 0, \"revised_limit\": 6000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.25, \"pd_target"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 15.0, \"dpd_for_next_band\": 24, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 15.0, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"LIVE02\", \"kind\": \"news\", \"date\": \"2026-11-23\", \"detail\": \"severity 5 (unpaid_wages): [HYPOTHETICAL] Ravisha Engineering workers stage protest\", \"data\": {\"severity\": 5, \"category\": \"unpaid_wages\", \"age_days\": 0, \"base\": 100.0, \"decayed\": 100.0, \"entity\": \"Ravisha Engineering Works\", \"via_parent\": false, \"publication\": \"HYPOTHETICAL - typed in the room\", \"headline\": \"[HYPOTHETICAL] Ravisha "
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "LIVE02"
+      },
+      "result": "{\"article_id\": \"LIVE02\", \"published_date\": \"2026-11-23\", \"publication\": \"HYPOTHETICAL - typed in the room\", \"headline\": \"[HYPOTHETICAL] Ravisha Engineering workers stage protest\", \"body\": \"Ravisha Engineering workers stage protest over delayed wages\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Ravisha Engineering Works currently sits in the Watch band with a score of 35.0 and an implied PD of 0.25. Payment performance is clean, with 0 days past due and a weighted payment score of 0.0, so nothing in the ledger is pulling the score down. The entire Watch classification is instead driven by a single severity-5 \"unpaid_wages\" news item alleging a worker protest over delayed wages.\n\nThe band is being held up almost entirely by that one news item (0.35 x 100 = 35.0 of the 35.0 total score), which the adjudicator has flagged as a challenge: the source is explicitly labeled \"HYPOTHETICAL - typed in the room,\" not a genuine publication, and no independent outlet corroborates the claim despite searches on both the company name and \"protest.\" With clean payment history and a maximum severity rating built on an uncorroborated, non-journalistic single source, the adjudicator considers the Watch band unsupported pending verification.\n\nGiven the PD of 0.25 is within appetite, the recommended limit action is to maintain the current limit of 6,000,000 INR for Orvana Steel under the whole-turnover policy, with no change to exposure and expected loss unchanged. This reflects that, net of the questioned news item, there is no payment deterioration to justify tightening.\n\nVerification of the wage-protest claim through a credible outlet is the key swing factor: if unconfirmed or retracted, the score would fall toward the Healthy band (15.0 points below the current score would cross that line). Conversely, if real payment delays begin to emerge (around 24 days past due would be enough combined with the existing news weight) or further negative news corroborates the claim, the buyer would move into High Risk (15.0 points above current score, threshold 50.0).",
+        "bottom_line": "Recommend maintaining the current limit of 6,000,000 INR, but the adjudicator has challenged the Watch band itself, since it rests entirely on one uncorroborated \"hypothetical\" news item against an otherwise clean payment record.",
+        "payment_note": "Payment behavior is clean, with 0 days past due and a weighted payment score of 0.0, showing no settlement deterioration.",
+        "news_note": "The only matched news is a severity-5 unpaid-wages protest story, but it is marked \"HYPOTHETICAL - typed in the room\" and has no corroboration from any other outlet.",
+        "lifts_it": [
+          "Score falling 15.0 points to below 20.0 would move the buyer into the Healthy band",
+          "Independent verification that the wage-protest claim is false or resolved, allowing the news weighting to decay",
+          "Continued 0 DPD payment performance sustained over time"
+        ],
+        "worsens_it": [
+          "Score rising 15.0 points to 50.0 would move the buyer into High Risk",
+          "Payment delays reaching roughly 24 days past due would be enough, combined with the current news weighting, to push into the next band",
+          "Independent news corroboration of the wage/protest issue from a credible outlet"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

@@ -274,6 +274,22 @@ def _fields(facts: dict, judgement: dict, items: list[dict]) -> dict:
     }
 
 
+def verdict_view(verdict: dict) -> dict:
+    """The verdict as the Case File agent and its cache key see it: without the
+    adjudicator's run metadata (mode, turns, cached, trace, error).
+
+    That block says how the review was produced, not what it concluded, and its
+    "cached" flag differs between a fresh review and a replay of the same one. Left in
+    the cache key, a case file written after a fresh review missed on every replay and
+    ran the model again. evidence_view() strips the same block from evidence for the same
+    reason.
+    """
+    rv = verdict.get("review")
+    if not rv or "agent" not in rv:
+        return verdict
+    return {**verdict, "review": {k: v for k, v in rv.items() if k != "agent"}}
+
+
 def write(llm, buyer: dict, verdict: dict, lines: list[dict], items: list[dict] | None = None,
           articles: dict[str, dict] | None = None) -> dict:
     """The Case File agent (agents/casefile.md), with the D10 guard as its submit check.
@@ -333,7 +349,7 @@ def write(llm, buyer: dict, verdict: dict, lines: list[dict], items: list[dict] 
         spec=spec,
         task=f"Write the case file for {buyer['buyer_name']} ({buyer['buyer_id']}).",
         tools=[
-            Tool("get_verdict", {}, lambda: verdict),
+            Tool("get_verdict", {}, lambda: verdict_view(verdict)),
             Tool("get_limits", {}, lambda: lines or [{"note": "no limit lines"}]),
             Tool("get_outlook", {}, lambda: facts["outlook"]),
             Tool("get_evidence", {}, lambda: view or [{"note": "no evidence"}]),
@@ -346,7 +362,8 @@ def write(llm, buyer: dict, verdict: dict, lines: list[dict], items: list[dict] 
                 "lifts_it": string_list,
                 "worsens_it": string_list}, submit),
         ],
-        cache_payload={"facts": facts, "evidence": view},
+        cache_payload={"facts": {**facts, "verdict": verdict_view(facts["verdict"])},
+                       "evidence": view},
     )
     res = run["result"]
     return {"narrative": res["narrative"],

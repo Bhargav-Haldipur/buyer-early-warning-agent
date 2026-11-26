@@ -1,0 +1,45 @@
+{
+  "result": {
+    "trend": "deteriorating",
+    "summary": "Vodafone Idea currently has one open overdue invoice of INR 9M, 19 days past due (vs. INR 120M credit line, so exposure coverage is not a concern). However, resolution lag has been lengthening across the last three notifications (5 days late \u2192 9 days late \u2192 currently 19 days and still open), all from the same policy (TCI-SCF-2026-0001), indicating a worsening payment pattern rather than a one-off delay.",
+    "concerns": [
+      "Days-to-resolve trend is increasing (5 \u2192 9 \u2192 19+ days), suggesting slowing payment discipline",
+      "Current overdue is still open at 19 DPD with no resolution date yet",
+      "All notifications originate from a single policy/insurer, limiting visibility into broader payment behavior",
+      "Slight uptick in notification frequency in the last 6-month window (2 vs 1 prior window) worth monitoring for further accumulation"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"event_id\": \"N-261106-00006\", \"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"reason\": \"OVERDUE_INVOICE\", \"notification_date\": \"2026-11-06\", \"original_due_date\": \"2026-11-05\", \"exposure\": 9000000.0, \"currency\": \"INR\", \"days_past_due\": 19, \"outstanding_by_ageing\": {\"NOT_YET_DUE\": 31000000.0, \"OVERDUE_1_30_DAYS\": 9000000.0}}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260329-00005\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-03-28\", \"resolved_date\": \"2026-04-02\", \"exposure\": 6000000.0, \"days_late\": 5}, {\"event_id\": \"N-260727-00004\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-07-26\", \"resolved_date\": \"2026-08-04\", \"exposure\": 7500000.0, \"days_late\": 9}], \"accumulation"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"credit_limit\": 120000000.0, \"currency\": \"INR\", \"payment_terms_days\": 90, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-07-04\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 19,
+        "worst_event_id": "N-261106-00006",
+        "trend": "deteriorating",
+        "summary": "Vodafone Idea currently has one open overdue invoice of INR 9M, 19 days past due (vs. INR 120M credit line, so exposure coverage is not a concern). However, resolution lag has been lengthening across the last three notifications (5 days late \u2192 9 days late \u2192 currently 19 days and still open), all from the same policy (TCI-SCF-2026-0001), indicating a worsening payment pattern rather than a one-off delay.",
+        "concerns": [
+          "Days-to-resolve trend is increasing (5 \u2192 9 \u2192 19+ days), suggesting slowing payment discipline",
+          "Current overdue is still open at 19 DPD with no resolution date yet",
+          "All notifications originate from a single policy/insurer, limiting visibility into broader payment behavior",
+          "Slight uptick in notification frequency in the last 6-month window (2 vs 1 prior window) worth monitoring for further accumulation"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

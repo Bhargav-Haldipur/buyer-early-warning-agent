@@ -1,0 +1,41 @@
+{
+  "result": {
+    "trend": "improving",
+    "summary": "No open overdue notifications on Qasr Meridian Trading LLC. History shows two resolved overdues from the sole reporting insurer (TCI), with days-late improving from 11 to 6 days, and no accumulation (only 1 notification per 6-month window). Single credit line of USD 1.8M from TCI remains ACCEPTED with no current signs of stress.",
+    "concerns": [
+      "Only one policyholder (TCI) is reporting, limiting visibility into broader payment behaviour",
+      "Short history (only two resolved events) limits confidence in the trend assessment"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"note\": \"no open overdue notifications\"}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260408-00028\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-04-07\", \"resolved_date\": \"2026-04-18\", \"exposure\": 210000.0, \"days_late\": 11}, {\"event_id\": \"N-260806-00029\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-08-05\", \"resolved_date\": \"2026-08-11\", \"exposure\": 190000.0, \"days_late\": 6}], \"accumulation\""
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"credit_limit\": 1800000.0, \"currency\": \"USD\", \"payment_terms_days\": 90, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-03-05\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 0,
+        "worst_event_id": "",
+        "trend": "improving",
+        "summary": "No open overdue notifications on Qasr Meridian Trading LLC. History shows two resolved overdues from the sole reporting insurer (TCI), with days-late improving from 11 to 6 days, and no accumulation (only 1 notification per 6-month window). Single credit line of USD 1.8M from TCI remains ACCEPTED with no current signs of stress.",
+        "concerns": [
+          "Only one policyholder (TCI) is reporting, limiting visibility into broader payment behaviour",
+          "Short history (only two resolved events) limits confidence in the trend assessment"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

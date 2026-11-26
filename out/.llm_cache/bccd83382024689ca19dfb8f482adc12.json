@@ -1,0 +1,71 @@
+{
+  "result": {
+    "narrative": "Jyotsna Electricals currently sits in the Watch band with a score of 21.3 and a PD of 0.113, just 1.3 points above the Healthy cutoff. The payment side shows one first-time overdue notification (22 DPD, INR 600,000 against a INR 4,000,000 limit) with no history to judge resolution speed, and the news side shows a single uncorroborated headline of a 30% stock crash.\n\nThe Watch classification is driven almost entirely by that news item: the payment leg alone (weighted 14.3) falls short of the 20-point Watch threshold, and the adjudicator has formally challenged the verdict, noting the headline comes from a source literally tagged \"HYPOTHETICAL - typed in the room\" with no corroborating outlet found, and that the payment evidence is a single, unbenchmarked notice labeled \"insufficient_history\" by the payment review. The adjudicator's view is that absent this uncorroborated news, the buyer would score in the Healthy band.\n\nThe recommended limit action is MAINTAIN at INR 4,000,000 under policy TCI-WT-2026-0001 (Velaris Polymers insured), as the PD of 0.113 remains within appetite (target 0.25) and expected loss is unchanged before and after at INR 325,440. Given the adjudicator's challenge to the underlying news evidence, the underwriter should treat this as a borderline Watch call rather than a firm deterioration signal.\n\nA move to Healthy would follow if the news item is confirmed as fabricated/unverifiable and removed, or simply ages out, combined with the overdue notice resolving promptly. Conversely, continued or escalating days-past-due, or any independent corroboration of real financial distress, would reinforce or worsen the band.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Recommend MAINTAIN the INR 4,000,000 limit, but flag that the adjudicator has challenged the Watch verdict: the payment data alone would not reach Watch, and the entire news-driven portion of the score rests on a single uncorroborated, apparently hypothetical/test headline.",
+      "payment_note": "There is one first-ever overdue notification (22 days past due, INR 600,000 of a INR 4,000,000 limit) with no prior history, so no settlement trend can yet be established (\"insufficient_history\").",
+      "news_note": "The only matched news is a single severity-1 \"stock crashes 30 percent\" headline from a source tagged \"HYPOTHETICAL - typed in the room,\" with no corroboration found elsewhere.",
+      "lifts_it": [
+        "Score needs to drop only 1.3 points to reach Healthy",
+        "Removal or non-corroboration of the LIVE01 stock-crash story",
+        "Prompt resolution of the 22-DPD overdue notice with no further pile-up"
+      ],
+      "worsens_it": [
+        "DPD extending toward 49 days, which would push into High Risk",
+        "Additional overdue notifications building a pile-up pattern",
+        "Independent corroboration of the stock decline or other financial distress"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN09\", \"score\": 21.3, \"band\": \"Watch\", \"pd\": 0.113, \"payment\": {\"dpd\": 22, \"raw\": 22.0, \"weighted\": 14.3, \"worst_line\": \"TCI-WT-2026-0001\"}, \"news\": {\"severity\": 1, \"category\": \"stock_decline\", \"article_id\": \"LIVE01\", \"age_days\": 0, \"headline\": \"[HYPOTHETICAL] Jyotsna Electricals stock crashes 30 percent\", \"via_parent\": false, \"parent_name\": null, \"raw\": 20.0, \"weighted\": 7.0}, \"trac"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN09-1\", \"buyer_id\": \"IN09\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-WT-2026-0001\", \"insured_name\": \"Velaris Polymers\", \"product_type\": \"WHOLE_TURNOVER\", \"currency\": \"INR\", \"current_limit\": 4000000, \"owed\": 1500000, \"revised_limit\": 4000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.113,"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 28.7, \"dpd_for_next_band\": 49, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 1.3, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261102-00023\", \"kind\": \"payment\", \"date\": \"2026-11-01\", \"detail\": \"1 open overdue notification(s) under policy TCI-WT-2026-0001; the oldest is 22 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"dpd\": 22, \"owed\": 1500000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261102-00023\", \"kind\": \"payment_review\", \"date\": \"2026-11-01\", \"detail\": \"Jyotsna Elect"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "LIVE01"
+      },
+      "result": "{\"article_id\": \"LIVE01\", \"published_date\": \"2026-11-23\", \"publication\": \"HYPOTHETICAL - typed in the room\", \"headline\": \"[HYPOTHETICAL] Jyotsna Electricals stock crashes 30 percent\", \"body\": \"Jyotsna Electricals stock crash\"}"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Jyotsna Electricals currently sits in the Watch band with a score of 21.3 and a PD of 0.113, just 1.3 points above the Healthy cutoff. The payment side shows one first-time overdue notification (22 DPD, INR 600,000 against a INR 4,000,000 limit) with no history to judge resolution speed, and the news side shows a single uncorroborated headline of a 30% stock crash.\n\nThe Watch classification is driven almost entirely by that news item: the payment leg alone (weighted 14.3) falls short of the 20-point Watch threshold, and the adjudicator has formally challenged the verdict, noting the headline comes from a source literally tagged \"HYPOTHETICAL - typed in the room\" with no corroborating outlet found, and that the payment evidence is a single, unbenchmarked notice labeled \"insufficient_history\" by the payment review. The adjudicator's view is that absent this uncorroborated news, the buyer would score in the Healthy band.\n\nThe recommended limit action is MAINTAIN at INR 4,000,000 under policy TCI-WT-2026-0001 (Velaris Polymers insured), as the PD of 0.113 remains within appetite (target 0.25) and expected loss is unchanged before and after at INR 325,440. Given the adjudicator's challenge to the underlying news evidence, the underwriter should treat this as a borderline Watch call rather than a firm deterioration signal.\n\nA move to Healthy would follow if the news item is confirmed as fabricated/unverifiable and removed, or simply ages out, combined with the overdue notice resolving promptly. Conversely, continued or escalating days-past-due, or any independent corroboration of real financial distress, would reinforce or worsen the band.",
+        "bottom_line": "Recommend MAINTAIN the INR 4,000,000 limit, but flag that the adjudicator has challenged the Watch verdict: the payment data alone would not reach Watch, and the entire news-driven portion of the score rests on a single uncorroborated, apparently hypothetical/test headline.",
+        "payment_note": "There is one first-ever overdue notification (22 days past due, INR 600,000 of a INR 4,000,000 limit) with no prior history, so no settlement trend can yet be established (\"insufficient_history\").",
+        "news_note": "The only matched news is a single severity-1 \"stock crashes 30 percent\" headline from a source tagged \"HYPOTHETICAL - typed in the room,\" with no corroboration found elsewhere.",
+        "lifts_it": [
+          "Score needs to drop only 1.3 points to reach Healthy",
+          "Removal or non-corroboration of the LIVE01 stock-crash story",
+          "Prompt resolution of the 22-DPD overdue notice with no further pile-up"
+        ],
+        "worsens_it": [
+          "DPD extending toward 49 days, which would push into High Risk",
+          "Additional overdue notifications building a pile-up pattern",
+          "Independent corroboration of the stock decline or other financial distress"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

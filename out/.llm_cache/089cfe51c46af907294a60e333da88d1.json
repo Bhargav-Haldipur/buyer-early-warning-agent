@@ -1,0 +1,45 @@
+{
+  "result": {
+    "trend": "deteriorating",
+    "summary": "Shrivana Textile Mills currently has three open overdue notifications totaling INR 21M across two policies (TCI-WT-2026-0001 and TCI-SCF-2026-0001), the oldest being 50 days past due since 2026-10-04. Resolution lag on past overdues has been worsening (10\u219214\u219222 days late over the last three cycles), and notification volume has doubled in the latest 6-month window (4 vs 2) spanning two policies simultaneously, indicating building payment stress. Exposure under the WT line (17M open, plus 25M not-yet-due) is approaching its 80M limit's practical utilization pace, warranting closer monitoring of the SCF line draw as well.",
+    "concerns": [
+      "Oldest overdue (50 DPD) remains unresolved on the working capital policy",
+      "Days-late on resolved invoices trending upward (10\u219214\u219222 days)",
+      "Notification frequency doubled in the last 6 months and now spans two policies concurrently, suggesting liquidity stress spreading across funding channels",
+      "Combined open + not-yet-due exposure on WT policy (approx. 42M) is more than half of the 80M limit, reducing headroom"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"event_id\": \"N-261005-00010\", \"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"reason\": \"OVERDUE_INVOICE\", \"notification_date\": \"2026-10-05\", \"original_due_date\": \"2026-10-04\", \"exposure\": 11000000.0, \"currency\": \"INR\", \"days_past_due\": 50, \"outstanding_by_ageing\": {}}, {\"event_id\": \"N-261021-00011\", \"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"reason\": \"OVERDUE_INVOICE\", \"notific"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260128-00007\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-01-27\", \"resolved_date\": \"2026-02-06\", \"exposure\": 7000000.0, \"days_late\": 10}, {\"event_id\": \"N-260329-00008\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-03-28\", \"resolved_date\": \"2026-04-11\", \"exposure\": 8500000.0, \"days_late\": 14}, {\"event_id\":"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"credit_limit\": 80000000.0, \"currency\": \"INR\", \"payment_terms_days\": 60, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-06-23\"}, {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"credit_limit\": 20000000.0, \"currency\": \"INR\", \"payment_terms_days\": 60, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-06-23\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 50,
+        "worst_event_id": "N-261005-00010",
+        "trend": "deteriorating",
+        "summary": "Shrivana Textile Mills currently has three open overdue notifications totaling INR 21M across two policies (TCI-WT-2026-0001 and TCI-SCF-2026-0001), the oldest being 50 days past due since 2026-10-04. Resolution lag on past overdues has been worsening (10\u219214\u219222 days late over the last three cycles), and notification volume has doubled in the latest 6-month window (4 vs 2) spanning two policies simultaneously, indicating building payment stress. Exposure under the WT line (17M open, plus 25M not-yet-due) is approaching its 80M limit's practical utilization pace, warranting closer monitoring of the SCF line draw as well.",
+        "concerns": [
+          "Oldest overdue (50 DPD) remains unresolved on the working capital policy",
+          "Days-late on resolved invoices trending upward (10\u219214\u219222 days)",
+          "Notification frequency doubled in the last 6 months and now spans two policies concurrently, suggesting liquidity stress spreading across funding channels",
+          "Combined open + not-yet-due exposure on WT policy (approx. 42M) is more than half of the 80M limit, reducing headroom"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

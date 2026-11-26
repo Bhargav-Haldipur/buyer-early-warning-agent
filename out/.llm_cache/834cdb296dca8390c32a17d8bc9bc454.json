@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Brightwell Home Retail Inc. sits in the Watch band with a score of 23.1, driven mainly by a single current overdue and a negative store-closure headline. Payment behavior shows one open overdue of $180,000 (15 days past due) against $520,000 not yet due, with $700,000 total exposure under the TCI policy; this is only the second notification on record, so the pattern is suggestive rather than confirmed. The news hit (ILL-002) reports Brightwell closing 14 Midwest stores after a third straight quarter of declining same-store sales, a substantive severity-2 story, though it has not been corroborated by any other outlet. The adjudicator agreed with the Watch score but added caveats: the payment trend rests on just two data points and exposure is well within the $2.5M limit, and the news severity relies on a single source. The recommended action is to maintain the current $2,500,000 limit on the TCI-EX-2026-0001 policy, as the probability of default (0.131) remains within appetite and expected loss is unchanged before and after review. The score sits close to the Healthy boundary (3.1 points below the 20.0 line) and well below the High Risk threshold (26.9 points short, which would require DPD reaching 44 days), so a modest improvement or even stable performance over the next review could lift the band, while a lengthening overdue or further negative coverage would move it the other way.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the $2,500,000 limit on TCI-EX-2026-0001; the Watch score is adjudicator-supported but with caveats around thin payment history and single-source news corroboration, and PD (0.131) remains within appetite.",
+      "payment_note": "The buyer has one open overdue of $180,000 now 15 days past due (versus $520,000 not yet due), already longer than the 8-day-late resolution of the only prior notification, though with just two notifications on record this is not yet a confirmed trend.",
+      "news_note": "A single, substantively-detailed article (ILL-002) reports Brightwell closing 14 Midwest stores amid a third straight quarter of declining same-store sales, but no independent outlet has corroborated the story.",
+      "lifts_it": [
+        "Score moving 3.1 points lower would reach the Healthy band",
+        "Continued low, resolved overdues building a cleaner payment trend",
+        "News severity fading over time (365-day half-life) without fresh negative coverage"
+      ],
+      "worsens_it": [
+        "Overdue extending to 44 days past due, which would push into High Risk territory",
+        "A second deteriorating notification confirming a worsening payment trend",
+        "Additional negative or corroborating news coverage of the store closures/sales decline"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS04\", \"score\": 23.1, \"band\": \"Watch\", \"pd\": 0.131, \"payment\": {\"dpd\": 15, \"raw\": 15.0, \"weighted\": 9.8, \"worst_line\": \"TCI-EX-2026-0001\"}, \"news\": {\"severity\": 2, \"category\": \"store_closures\", \"article_id\": \"ILL-002\", \"age_days\": 25, \"headline\": \"Brightwell Home Retail scales back, closing 14 stores across the Midwest\", \"via_parent\": false, \"parent_name\": null, \"raw\": 38.1, \"weighte"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS04-1\", \"buyer_id\": \"OS04\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 2500000, \"owed\": 700000, \"revised_limit\": 2500000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.131, \"pd_target"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 26.9, \"dpd_for_next_band\": 44, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 3.1, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261109-00027\", \"kind\": \"payment\", \"date\": \"2026-11-08\", \"detail\": \"1 open overdue notification(s) under policy TCI-EX-2026-0001; the oldest is 15 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"dpd\": 15, \"owed\": 700000.0, \"currency\": \"USD\", \"open_count\": 1}}, {\"id\": \"N-261109-00027\", \"kind\": \"payment_review\", \"date\": \"2026-11-08\", \"detail\": \"Brightwell Hom"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Brightwell Home Retail Inc. sits in the Watch band with a score of 23.1, driven mainly by a single current overdue and a negative store-closure headline. Payment behavior shows one open overdue of $180,000 (15 days past due) against $520,000 not yet due, with $700,000 total exposure under the TCI policy; this is only the second notification on record, so the pattern is suggestive rather than confirmed. The news hit (ILL-002) reports Brightwell closing 14 Midwest stores after a third straight quarter of declining same-store sales, a substantive severity-2 story, though it has not been corroborated by any other outlet. The adjudicator agreed with the Watch score but added caveats: the payment trend rests on just two data points and exposure is well within the $2.5M limit, and the news severity relies on a single source. The recommended action is to maintain the current $2,500,000 limit on the TCI-EX-2026-0001 policy, as the probability of default (0.131) remains within appetite and expected loss is unchanged before and after review. The score sits close to the Healthy boundary (3.1 points below the 20.0 line) and well below the High Risk threshold (26.9 points short, which would require DPD reaching 44 days), so a modest improvement or even stable performance over the next review could lift the band, while a lengthening overdue or further negative coverage would move it the other way.",
+        "bottom_line": "Maintain the $2,500,000 limit on TCI-EX-2026-0001; the Watch score is adjudicator-supported but with caveats around thin payment history and single-source news corroboration, and PD (0.131) remains within appetite.",
+        "payment_note": "The buyer has one open overdue of $180,000 now 15 days past due (versus $520,000 not yet due), already longer than the 8-day-late resolution of the only prior notification, though with just two notifications on record this is not yet a confirmed trend.",
+        "news_note": "A single, substantively-detailed article (ILL-002) reports Brightwell closing 14 Midwest stores amid a third straight quarter of declining same-store sales, but no independent outlet has corroborated the story.",
+        "lifts_it": [
+          "Score moving 3.1 points lower would reach the Healthy band",
+          "Continued low, resolved overdues building a cleaner payment trend",
+          "News severity fading over time (365-day half-life) without fresh negative coverage"
+        ],
+        "worsens_it": [
+          "Overdue extending to 44 days past due, which would push into High Risk territory",
+          "A second deteriorating notification confirming a worsening payment trend",
+          "Additional negative or corroborating news coverage of the store closures/sales decline"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

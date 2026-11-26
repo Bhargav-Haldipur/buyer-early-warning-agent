@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS02",
+    "name": "The Boeing Company",
+    "severity": 2,
+    "category": "delivery_decline",
+    "reason": "A 14% drop in monthly jet deliveries signals production/output weakness for Boeing, a notable but not severe negative for near-term cash flow."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Boeing"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS02\", \"name\": \"The Boeing Company\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS02",
+        "severity": 2,
+        "category": "delivery_decline",
+        "reason": "A 14% drop in monthly jet deliveries signals production/output weakness for Boeing, a notable but not severe negative for near-term cash flow."
+      }
+    }
+  ],
+  "turns": 2
+}

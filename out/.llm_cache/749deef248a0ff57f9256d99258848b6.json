@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Kestrel Marine Parts Ltd sits in the Watch band with a score of 29.9 (PD 0.199), driven entirely by its payment record under the single reporting policy TCI-EX-2026-0001; no news evidence contributes to the score. The buyer has one open overdue invoice totalling $165k exposure ($70k overdue, $95k not yet due) against a $500k limit, so utilisation of the line remains modest even though the payment behaviour itself has worsened over the last two notifications.\n\nThe Watch banding reflects a genuine deterioration pattern rather than a one-off blip: the oldest open item is now 38 days past due, versus a prior notification on the same policy that was resolved 12 days late, and notification frequency from this policy has risen from 0 to 2 within the last six months. The adjudicator agreed with the computed band, confirming the zero news contribution is correct (no trusted articles mention this buyer) and that the payment evidence supports a Watch-level rather than High Risk score, while flagging the deteriorating trend as a concern to monitor before any further limit extension.\n\nThe recommendation is to maintain the current $500,000 limit with Trade Credit Insurer: the PD of 0.199 is within the 0.25 target and expected loss is unchanged before and after review at $71,640, so no reduction is warranted, but the limit should not be extended further given the open concern.\n\nA move to the lower Healthy band would require the score to fall below 20 (9.9 points lower), which would follow from the current overdue invoice being settled and the DPD trend reversing. Conversely, if the oldest invoice reaches 54 days past due the score would cross into High Risk (50 points, 20.1 away from the current level), at which point the limit should be revisited.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the $500,000 limit with Trade Credit Insurer \u2014 PD (0.199) is within appetite and exposure is well covered \u2014 but the adjudicator flagged the deteriorating payment trend as a reason not to extend further at this time.",
+      "payment_note": "One open invoice is now 38 days past due (up from a prior notification resolved 12 days late), with notification frequency on this policy rising from 0 to 2 in the last six months, against $165k total exposure on a $500k limit.",
+      "news_note": "No trusted news articles mention Kestrel Marine Parts, so the news component of the score is zero.",
+      "lifts_it": [
+        "Score falling below 20 (9.9 points lower) would move the buyer to Healthy",
+        "Settlement of the current overdue invoice",
+        "Reversal of the rising DPD/notification-frequency trend"
+      ],
+      "worsens_it": [
+        "Oldest invoice reaching 54 days past due would push the score to 50 and into High Risk",
+        "Further rise in notification frequency on policy TCI-EX-2026-0001",
+        "Any increase in overdue or not-yet-due exposure against the $500k limit"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS08\", \"score\": 29.9, \"band\": \"Watch\", \"pd\": 0.199, \"payment\": {\"dpd\": 38, \"raw\": 46.0, \"weighted\": 29.9, \"worst_line\": \"TCI-EX-2026-0001\"}, \"news\": {\"severity\": 0, \"category\": null, \"article_id\": null, \"age_days\": null, \"headline\": null, \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x 46.0 (payment, 38 DPD) + 0.35 x 0.0 (news) = 29.9\", \"revie"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS08-1\", \"buyer_id\": \"OS08\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 500000, \"owed\": 165000, \"revised_limit\": 500000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.199, \"pd_target\":"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 20.1, \"dpd_for_next_band\": 54, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 9.9, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261017-00034\", \"kind\": \"payment\", \"date\": \"2026-10-16\", \"detail\": \"1 open overdue notification(s) under policy TCI-EX-2026-0001; the oldest is 38 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"dpd\": 38, \"owed\": 165000.0, \"currency\": \"USD\", \"open_count\": 1}}, {\"id\": \"N-261017-00034\", \"kind\": \"payment_review\", \"date\": \"2026-10-16\", \"detail\": \"Kestrel Marine"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Kestrel Marine Parts Ltd sits in the Watch band with a score of 29.9 (PD 0.199), driven entirely by its payment record under the single reporting policy TCI-EX-2026-0001; no news evidence contributes to the score. The buyer has one open overdue invoice totalling $165k exposure ($70k overdue, $95k not yet due) against a $500k limit, so utilisation of the line remains modest even though the payment behaviour itself has worsened over the last two notifications.\n\nThe Watch banding reflects a genuine deterioration pattern rather than a one-off blip: the oldest open item is now 38 days past due, versus a prior notification on the same policy that was resolved 12 days late, and notification frequency from this policy has risen from 0 to 2 within the last six months. The adjudicator agreed with the computed band, confirming the zero news contribution is correct (no trusted articles mention this buyer) and that the payment evidence supports a Watch-level rather than High Risk score, while flagging the deteriorating trend as a concern to monitor before any further limit extension.\n\nThe recommendation is to maintain the current $500,000 limit with Trade Credit Insurer: the PD of 0.199 is within the 0.25 target and expected loss is unchanged before and after review at $71,640, so no reduction is warranted, but the limit should not be extended further given the open concern.\n\nA move to the lower Healthy band would require the score to fall below 20 (9.9 points lower), which would follow from the current overdue invoice being settled and the DPD trend reversing. Conversely, if the oldest invoice reaches 54 days past due the score would cross into High Risk (50 points, 20.1 away from the current level), at which point the limit should be revisited.",
+        "bottom_line": "Maintain the $500,000 limit with Trade Credit Insurer \u2014 PD (0.199) is within appetite and exposure is well covered \u2014 but the adjudicator flagged the deteriorating payment trend as a reason not to extend further at this time.",
+        "payment_note": "One open invoice is now 38 days past due (up from a prior notification resolved 12 days late), with notification frequency on this policy rising from 0 to 2 in the last six months, against $165k total exposure on a $500k limit.",
+        "news_note": "No trusted news articles mention Kestrel Marine Parts, so the news component of the score is zero.",
+        "lifts_it": [
+          "Score falling below 20 (9.9 points lower) would move the buyer to Healthy",
+          "Settlement of the current overdue invoice",
+          "Reversal of the rising DPD/notification-frequency trend"
+        ],
+        "worsens_it": [
+          "Oldest invoice reaching 54 days past due would push the score to 50 and into High Risk",
+          "Further rise in notification frequency on policy TCI-EX-2026-0001",
+          "Any increase in overdue or not-yet-due exposure against the $500k limit"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

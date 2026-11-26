@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN09",
+    "name": "Jyotsna Electricals",
+    "severity": 2,
+    "category": "stock_crash",
+    "reason": "Jyotsna Electricals' stock reportedly crashed 30%, a notable negative signal for investor confidence though no direct detail on operations or payment ability is given."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Jyotsna"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN09\", \"name\": \"Jyotsna Electricals\", \"sector\": \"Electrical Equipment\", \"city\": \"Coimbatore\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN09",
+        "severity": 2,
+        "category": "stock_crash",
+        "reason": "Jyotsna Electricals' stock reportedly crashed 30%, a notable negative signal for investor confidence though no direct detail on operations or payment ability is given."
+      }
+    }
+  ],
+  "turns": 2
+}

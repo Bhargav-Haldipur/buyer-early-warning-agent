@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS06",
+    "name": "Hessler Maschinenbau GmbH",
+    "severity": 4,
+    "category": "unpaid_vendors",
+    "reason": "The company has fallen behind on payments to multiple suppliers after a customer delayed acceptance of production lines, indicating cash flow strain and unpaid vendor obligations."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Hessler"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS06\", \"name\": \"Hessler Maschinenbau GmbH\", \"sector\": \"Industrial Machinery\", \"city\": \"Stuttgart\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS06",
+        "severity": 4,
+        "category": "unpaid_vendors",
+        "reason": "The company has fallen behind on payments to multiple suppliers after a customer delayed acceptance of production lines, indicating cash flow strain and unpaid vendor obligations."
+      }
+    }
+  ],
+  "turns": 2
+}

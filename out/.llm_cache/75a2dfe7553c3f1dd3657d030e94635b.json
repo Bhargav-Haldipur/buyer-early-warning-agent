@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Vodafone Idea sits in the Watch band with a score of 25.5, driven mainly by a deteriorating payment pattern and a negative news tone. The one open overdue on policy TCI-SCF-2026-0001 (INR 9.0M, 18 days past due) is modest against the INR 120M accepted limit, but it continues a trend of lengthening delays and slightly more frequent notifications from this single policy.\n\nThe band reflects a blend of that payment deterioration (weighted 11.7) and news severity (weighted 13.8, score 39.5 raw) from a subscriber-decline headline. The adjudicator agreed with the Watch call but flagged that the specific subscriber-decline article driving the news score is a single, headline-only Livemint piece with no corroboration found elsewhere. However, the adjudicator also found that the broader negative narrative is independently substantiated: Vodafone Idea's widening Q2 net loss to \u20b95,975 crore is reported consistently by ET Telecom, Business Standard (twice) and BusinessLine, which supports real financial deterioration even if the subscriber-decline framing itself is thinly sourced.\n\nThe recommended action is to maintain the current limit of INR 120,000,000 with Meridia Bank under policy TCI-SCF-2026-0001, as the probability of default (0.1552) remains within the insurer's appetite (target 0.25) and max liability does not bind. No change to exposure is proposed, but the lengthening payment delays warrant closer monitoring given the single-policy concentration.\n\nA move to the lower Healthy band would need the score to fall by 5.5 points, which would likely require resolution of the current overdue and a return to shorter settlement times. Conversely, a slide toward High Risk (50.0, a further 24.5 points away, corresponding to days-past-due reaching 43) would be triggered by continued lengthening of the payment cycle and/or further corroborated negative financial news.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the INR 120,000,000 limit with Meridia Bank as PD (0.1552) remains within appetite, though the underwriter should note the adjudicator's caveat that the subscriber-decline headline driving part of the news score is single-sourced, even as the wider earnings deterioration is independently corroborated.",
+      "payment_note": "The single open overdue (INR 9.0M, 18 days past due on a 40M notified exposure) continues a deteriorating trend, with days-late lengthening from 5 to 9 to the current unresolved 18, and notification frequency ticking up.",
+      "news_note": "The news feed is dominated by a subscriber-decline headline that is itself single-sourced, but it sits alongside multiple independently reported articles on Vodafone Idea's widened Q2 net loss to \u20b95,975 crore, indicating genuine financial pressure alongside some positive financing and analyst coverage.",
+      "lifts_it": [
+        "Resolution of the current 18-day overdue and reversion to shorter settlement times",
+        "Score falling by 5.5 points to drop below the Healthy threshold",
+        "Absence of further corroborated negative earnings or subscriber news"
+      ],
+      "worsens_it": [
+        "Days past due extending to 43, which would push the score to the High Risk threshold (50.0)",
+        "Further lengthening of payment delays or increased notification frequency on the same policy",
+        "Additional corroborated negative news (e.g., further earnings misses or subscriber losses) compounding the current severity-2 items"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN03\", \"score\": 25.5, \"band\": \"Watch\", \"pd\": 0.1552, \"payment\": {\"dpd\": 18, \"raw\": 18.0, \"weighted\": 11.7, \"worst_line\": \"TCI-SCF-2026-0001\"}, \"news\": {\"severity\": 2, \"category\": \"subscriber_decline\", \"article_id\": \"GN-75cb48dc2523\", \"age_days\": 7, \"headline\": \"Why Vodafone Idea\\u2019s q-o-q drop in mobile subscriber base is a worrying sign\", \"via_parent\": false, \"parent_name\": null,"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN03-1\", \"buyer_id\": \"IN03\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-SCF-2026-0001\", \"insured_name\": \"Meridia Bank\", \"product_type\": \"SUPPLY_CHAIN_FINANCE\", \"currency\": \"INR\", \"current_limit\": 120000000, \"owed\": 40000000, \"revised_limit\": 120000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\""
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 24.5, \"dpd_for_next_band\": 43, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 5.5, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261106-00006\", \"kind\": \"payment\", \"date\": \"2026-11-05\", \"detail\": \"1 open overdue notification(s) under policy TCI-SCF-2026-0001; the oldest is 18 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"dpd\": 18, \"owed\": 40000000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261106-00006\", \"kind\": \"payment_review\", \"date\": \"2026-11-05\", \"detail\": \"Vodafone I"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Vodafone Idea sits in the Watch band with a score of 25.5, driven mainly by a deteriorating payment pattern and a negative news tone. The one open overdue on policy TCI-SCF-2026-0001 (INR 9.0M, 18 days past due) is modest against the INR 120M accepted limit, but it continues a trend of lengthening delays and slightly more frequent notifications from this single policy.\n\nThe band reflects a blend of that payment deterioration (weighted 11.7) and news severity (weighted 13.8, score 39.5 raw) from a subscriber-decline headline. The adjudicator agreed with the Watch call but flagged that the specific subscriber-decline article driving the news score is a single, headline-only Livemint piece with no corroboration found elsewhere. However, the adjudicator also found that the broader negative narrative is independently substantiated: Vodafone Idea's widening Q2 net loss to \u20b95,975 crore is reported consistently by ET Telecom, Business Standard (twice) and BusinessLine, which supports real financial deterioration even if the subscriber-decline framing itself is thinly sourced.\n\nThe recommended action is to maintain the current limit of INR 120,000,000 with Meridia Bank under policy TCI-SCF-2026-0001, as the probability of default (0.1552) remains within the insurer's appetite (target 0.25) and max liability does not bind. No change to exposure is proposed, but the lengthening payment delays warrant closer monitoring given the single-policy concentration.\n\nA move to the lower Healthy band would need the score to fall by 5.5 points, which would likely require resolution of the current overdue and a return to shorter settlement times. Conversely, a slide toward High Risk (50.0, a further 24.5 points away, corresponding to days-past-due reaching 43) would be triggered by continued lengthening of the payment cycle and/or further corroborated negative financial news.",
+        "bottom_line": "Maintain the INR 120,000,000 limit with Meridia Bank as PD (0.1552) remains within appetite, though the underwriter should note the adjudicator's caveat that the subscriber-decline headline driving part of the news score is single-sourced, even as the wider earnings deterioration is independently corroborated.",
+        "payment_note": "The single open overdue (INR 9.0M, 18 days past due on a 40M notified exposure) continues a deteriorating trend, with days-late lengthening from 5 to 9 to the current unresolved 18, and notification frequency ticking up.",
+        "news_note": "The news feed is dominated by a subscriber-decline headline that is itself single-sourced, but it sits alongside multiple independently reported articles on Vodafone Idea's widened Q2 net loss to \u20b95,975 crore, indicating genuine financial pressure alongside some positive financing and analyst coverage.",
+        "lifts_it": [
+          "Resolution of the current 18-day overdue and reversion to shorter settlement times",
+          "Score falling by 5.5 points to drop below the Healthy threshold",
+          "Absence of further corroborated negative earnings or subscriber news"
+        ],
+        "worsens_it": [
+          "Days past due extending to 43, which would push the score to the High Risk threshold (50.0)",
+          "Further lengthening of payment delays or increased notification frequency on the same policy",
+          "Additional corroborated negative news (e.g., further earnings misses or subscriber losses) compounding the current severity-2 items"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Intel's payment record with this insured is clean - zero days past due and no adverse payment evidence on file - so the entire 20.7 score driving the Watch band comes from the news leg. The trigger is a severity-3 \"shareholder lawsuit\" story (Intel sued by investors after a 29% stock plunge), corroborated independently by WSJ and Reuters and set against a backdrop of other severity-2/3 stories over the prior month covering the stock's worst day since 1974, foundry concerns, and cash burn. More recent newsflow, however, has turned positive: Intel has signed its first external 18A/18A-P customers and the stock has rallied on sector sentiment, suggesting the backward-looking score may be lagging an improving trend.\n\nThe buyer sits in Watch because the lawsuit/stock-plunge story carries enough weight on its own to hold the band even with perfect payment behaviour - the adjudicator confirms the news-driven 20.7 score is reasonable but flags that the underlying lawsuit articles are headline-only, with no detail on the claims or likely financial exposure, so the severity rating rests on the fact of the suit rather than any disclosed liquidity impact. The buyer is also very close to the lower, Healthy threshold, underscoring that this is a borderline case resting on a single news cluster rather than deteriorating fundamentals.\n\nGiven the PD of 0.1072 sits comfortably within the insurer's appetite (target 0.25), the recommended action is to maintain the current limit of $7,000,000 with no change, consistent across the expected-loss figures before and after. The underwriter should note the adjudicator's caveats before approving: the lawsuit severity score is based on corroborated but substance-light headlines, and the file's recent trend is mixed-to-improving rather than worsening.\n\nA move to the lower Healthy band would follow from continued clean payments and the shareholder-lawsuit news aging out or being resolved without new negative disclosures. Conversely, the band would only worsen to High Risk if payment performance deteriorated materially (around 38 days past due) alongside the existing news weight, or if fresh negative stories (e.g., disclosed financial/liquidity detail behind the lawsuit, further cash-burn confirmation) pushed the news score higher.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the $7,000,000 limit - PD (0.1072) is well within appetite and payments are clean, but the underwriter should note the adjudicator agreed only with caveats, since the Watch-band score rests entirely on a headline-only shareholder-lawsuit story.",
+      "payment_note": "Payment behaviour is clean at 0 days past due with no adverse payment evidence on file, so none of the score is payment-driven.",
+      "news_note": "The score is driven entirely by a severity-3 shareholder-lawsuit story tied to a 29% stock plunge (corroborated by WSJ and Reuters), though more recent headlines have turned positive with new 18A customer wins and a stock rally.",
+      "lifts_it": [
+        "Score is only 0.7 points above the Healthy band threshold - continued clean payments would help",
+        "Shareholder-lawsuit news aging out (365-day half-life) without new negative developments",
+        "Resolution or dismissal of the lawsuit with no disclosed financial impact"
+      ],
+      "worsens_it": [
+        "Payment deterioration toward roughly 38 days past due, which combined with current news would reach the High Risk band (50.0, 29.3 points away)",
+        "Substantive disclosure of financial/liquidity exposure from the lawsuit",
+        "Further negative news confirming cash-burn or foundry execution problems"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS01\", \"score\": 20.7, \"band\": \"Watch\", \"pd\": 0.1072, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 3, \"category\": \"shareholder_lawsuit\", \"article_id\": \"GN-b53da81e0c9d\", \"age_days\": 7, \"headline\": \"Intel Sued by Investors After 29% Stock Plunge\", \"via_parent\": false, \"parent_name\": null, \"raw\": 59.2, \"weighted\": 20.7}, \"trace\": \"0.65 x 0"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS01-1\", \"buyer_id\": \"OS01\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 7000000, \"owed\": 0, \"revised_limit\": 7000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1072, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 29.3, \"dpd_for_next_band\": 38, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 0.7, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"GN-a7d59ce9df3e\", \"kind\": \"news\", \"date\": \"2026-11-23\", \"detail\": \"severity 0 (positive_news): NVIDIA Jumps 28% as Jensen Huang Reportedly Reinstated as CEO; Intel Rallies 13%, AMD Gains 7%\", \"data\": {\"severity\": 0, \"category\": \"positive_news\", \"age_days\": 0, \"base\": 0.0, \"decayed\": 0.0, \"entity\": \"Intel Corporation\", \"via_parent\": false, \"publication\": \"Yahoo Finance\", \"headline\": \"NVIDI"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Intel's payment record with this insured is clean - zero days past due and no adverse payment evidence on file - so the entire 20.7 score driving the Watch band comes from the news leg. The trigger is a severity-3 \"shareholder lawsuit\" story (Intel sued by investors after a 29% stock plunge), corroborated independently by WSJ and Reuters and set against a backdrop of other severity-2/3 stories over the prior month covering the stock's worst day since 1974, foundry concerns, and cash burn. More recent newsflow, however, has turned positive: Intel has signed its first external 18A/18A-P customers and the stock has rallied on sector sentiment, suggesting the backward-looking score may be lagging an improving trend.\n\nThe buyer sits in Watch because the lawsuit/stock-plunge story carries enough weight on its own to hold the band even with perfect payment behaviour - the adjudicator confirms the news-driven 20.7 score is reasonable but flags that the underlying lawsuit articles are headline-only, with no detail on the claims or likely financial exposure, so the severity rating rests on the fact of the suit rather than any disclosed liquidity impact. The buyer is also very close to the lower, Healthy threshold, underscoring that this is a borderline case resting on a single news cluster rather than deteriorating fundamentals.\n\nGiven the PD of 0.1072 sits comfortably within the insurer's appetite (target 0.25), the recommended action is to maintain the current limit of $7,000,000 with no change, consistent across the expected-loss figures before and after. The underwriter should note the adjudicator's caveats before approving: the lawsuit severity score is based on corroborated but substance-light headlines, and the file's recent trend is mixed-to-improving rather than worsening.\n\nA move to the lower Healthy band would follow from continued clean payments and the shareholder-lawsuit news aging out or being resolved without new negative disclosures. Conversely, the band would only worsen to High Risk if payment performance deteriorated materially (around 38 days past due) alongside the existing news weight, or if fresh negative stories (e.g., disclosed financial/liquidity detail behind the lawsuit, further cash-burn confirmation) pushed the news score higher.",
+        "bottom_line": "Maintain the $7,000,000 limit - PD (0.1072) is well within appetite and payments are clean, but the underwriter should note the adjudicator agreed only with caveats, since the Watch-band score rests entirely on a headline-only shareholder-lawsuit story.",
+        "payment_note": "Payment behaviour is clean at 0 days past due with no adverse payment evidence on file, so none of the score is payment-driven.",
+        "news_note": "The score is driven entirely by a severity-3 shareholder-lawsuit story tied to a 29% stock plunge (corroborated by WSJ and Reuters), though more recent headlines have turned positive with new 18A customer wins and a stock rally.",
+        "lifts_it": [
+          "Score is only 0.7 points above the Healthy band threshold - continued clean payments would help",
+          "Shareholder-lawsuit news aging out (365-day half-life) without new negative developments",
+          "Resolution or dismissal of the lawsuit with no disclosed financial impact"
+        ],
+        "worsens_it": [
+          "Payment deterioration toward roughly 38 days past due, which combined with current news would reach the High Risk band (50.0, 29.3 points away)",
+          "Substantive disclosure of financial/liquidity exposure from the lawsuit",
+          "Further negative news confirming cash-burn or foundry execution problems"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

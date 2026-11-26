@@ -114,6 +114,14 @@ LIVE: dict = {"articles": [], "events": [], "last": None}
 # appended to the result title of an input sent with the "Score only" button
 SCORE_ONLY_NOTE = " (score only: the adjudicator review and case file were not re-run)"
 
+# Fetch times are stored in UTC (news_fetch_log.json) and shown in India time.
+IST = timezone(timedelta(hours=5, minutes=30), "IST")
+
+
+def ist(stamp: str) -> str:
+    """A stored UTC timestamp as the pages show it: '2026-11-24 16:47 IST'."""
+    return datetime.fromisoformat(stamp).astimezone(IST).strftime("%Y-%m-%d %H:%M IST")
+
 
 def engine_date(shown: date) -> date:
     """Live stories are typed on today's calendar and scored on the snapshot's.
@@ -378,8 +386,11 @@ def crumbs(*parts) -> str:
 
 def live_banner() -> str:
     """Shown on every page while sandbox input is in play, so no screen can imply the
-    numbers on it are the shipped dataset's."""
-    if not live_active():
+    numbers on it are the shipped dataset's.
+
+    Not on the live-news book: there a typed story carries HYPOTHETICAL in its headline
+    and publication wherever it appears, so the banner only repeated it on every page."""
+    if LIVE_BOOK or not live_active():
         return ""
     bits = []
     if LIVE["articles"]:
@@ -388,9 +399,7 @@ def live_banner() -> str:
     if LIVE["events"]:
         bits.append(f'{len(LIVE["events"])} filed overdue '
                     f'{"notification" if len(LIVE["events"]) == 1 else "notifications"}')
-    what = ("<b>Hypothetical scenario in play</b> &mdash; the typed stories are not real news. "
-            if LIVE_BOOK else "<b>Live input in play</b> &mdash; ")
-    return (f'<div class="panel result">{what}'
+    return (f'<div class="panel result"><b>Live input in play</b> &mdash; '
             f'{" and ".join(bits)} on top of the shipped dataset. Every page reflects it. '
             'The adjudicator and the Case File agent re-review the buyers it touched; '
             'every other buyer keeps its cached review. <a href="/live">Live input &rsaquo;</a></div>')
@@ -455,7 +464,7 @@ def sources_panel(back: str = "/live") -> str:
     if rss:
         feed_txt += (f"</b>, with article summaries from the publishers&rsquo; own feeds "
                      f"(<b>{e(', '.join(rss))}</b>) and the text of each 8-K filing<b>")
-    when = (f'Last fetched {e(log["fetched_at"].replace("T", " ").replace("+00:00", " UTC"))} '
+    when = (f'Last fetched {e(ist(log["fetched_at"]))} '
             f'&middot; {log["articles"]} articles from the last {log["days"]} days'
             if log else "Not fetched yet")
     errs = "".join(f'<br><span class="overline">{e(x)}</span>' for x in (log or {}).get("errors", []))
@@ -1013,8 +1022,11 @@ def fetch_result_panel() -> str:
         stories = ('<p class="body2">Nothing new since the last fetch: every story was '
                    'already graded, so nothing reached the agent and nothing was spent.</p>')
     moves = moves_html(res["moves"]) or (
-        '<p class="body2">No score moved. On a quiet day that is the right answer: the new '
-        'stories were read, and none of them changes a buyer&rsquo;s risk.</p>')
+        '<p class="body2">No score moved. A buyer&rsquo;s news score comes from its single '
+        'strongest story, and none of the new ones outranks the story already setting it: '
+        'they are kept as evidence, and the agents&rsquo; reviews take them into account.</p>'
+        if res["new"] else
+        '<p class="body2">No score moved: nothing new came in.</p>')
     return (f'<div class="panel result"><h3>{e(res["title"])}</h3>'
             f'<p class="body2">{funnel}</p>{stories}<h3>Scores</h3>{moves}</div>')
 
@@ -1336,7 +1348,7 @@ def refresh_news(source: str = "Manual") -> None:
         except (SystemExit, OSError, ValueError) as exc:
             FETCH["last"] = f"{source} fetch failed - the previous news is still in use: {exc}"
             return
-        stamp = datetime.now(timezone.utc).strftime("%H:%M UTC")
+        stamp = datetime.now(IST).strftime("%H:%M IST")
         done = (f"{source} fetch at {stamp}: {rep['articles']} articles"
                 + (f"; {len(rep['errors'])} source error(s)" if rep["errors"] else ""))
         new_count = len(rep.get("new", []))
@@ -1353,7 +1365,7 @@ def refresh_news(source: str = "Manual") -> None:
                 "title": f"{source} fetch at {stamp}",
                 "funnel": rep["funnel"], "days": rep.get("days", AUTO["days"]),
                 "per_company": AUTO["per_company"],
-                "previous": prev.replace("T", " ")[:16] + " UTC" if prev else None,
+                "previous": ist(prev) if prev else None,
                 "new": [(a, _fetch_outcome(after, a["article_id"])) for a in fresh],
                 "moves": (moves_between(before, after)
                           if before.get("buyers") and after.get("buyers") else []),

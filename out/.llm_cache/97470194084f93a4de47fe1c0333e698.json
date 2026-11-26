@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "The Boeing Company sits in the Watch band with a score of 27.8, driven almost entirely by news rather than payment behaviour. On the payment side the record is clean: zero DPD, a weighted payment score of 0.0, and only one historical notification (a single $650k item paid 3 days late via TCI) with insufficient history to establish any trend. The score is instead pushed up by a severity-4 \"layoffs\" headline from Reuters, 3 days old, reporting Boeing has left open the possibility of further layoffs amid stalled production.\n\nThe Watch band is driven almost entirely by this single news item, which contributes 27.8 of the 27.8 total score (0.35 x 79.5), while the payment component contributes zero. The adjudicator agreed with the band but flagged caveats: the triggering headline is a standalone Reuters piece with no corroborating outlet found, and it sits amid a broader news window containing several strongly positive stories (a $20B Navy contract, a $12B Asia aircraft deal, a potential 250-plane China order, and backlog growth to $745B) that the scoring formula does not net against the negative item. The adjudicator also notes the payment record's \"insufficient_history\" rating and single-insurer (TCI) concentration limit confidence in the clean payment score, though it does not point toward higher risk.\n\nThe recommended limit action is to maintain the current $9,000,000 export limit with TCI, unchanged, as the probability of default (0.1784) remains within the target appetite (0.25) and the expected loss is unaffected (before and after: $1,156,032).\n\nA move to the lower Healthy band would require the score to fall below the Watch threshold, which given news-only exposure would mean the layoff story aging out or being offset, since news alone currently holds the band (7.8 points below current score). Conversely, the buyer would move to High Risk if the score rose by 22.2 points to 50.0, which would require either a materially more severe news development or payment deterioration equivalent to 33 days past due.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the $9,000,000 limit with TCI; PD (0.1784) is comfortably within appetite (0.25), though the adjudicator agreed with caveats, noting the Watch band is driven almost entirely by a single, uncorroborated layoffs headline rather than any payment deterioration.",
+      "payment_note": "Payment history is clean with 0 DPD and a weighted payment score of 0.0, but it is based on only one resolved notification (a $650k item paid 3 days late), so no real trend can be established.",
+      "news_note": "The score is driven by a severity-4 Reuters headline on possible further layoffs amid stalled production, a story not corroborated by other outlets and offset elsewhere in the same window by positive contract and backlog news that the score does not net against.",
+      "lifts_it": [
+        "Score falling 7.8 points to below the Healthy threshold",
+        "The layoff headline aging out or being offset by further reporting",
+        "Continued clean payment performance building a longer trend record"
+      ],
+      "worsens_it": [
+        "Score rising 22.2 points to 50.0 (High Risk threshold)",
+        "Payment deterioration reaching 33 days past due",
+        "Further corroborated layoff or production-delay news adding to severity"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS02\", \"score\": 27.8, \"band\": \"Watch\", \"pd\": 0.1784, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 4, \"category\": \"layoffs\", \"article_id\": \"GN-8b97eceb4530\", \"age_days\": 3, \"headline\": \"Boeing leaves open possibility of more layoffs amid stalled production plans\", \"via_parent\": false, \"parent_name\": null, \"raw\": 79.5, \"weighted\": 27.8}, "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS02-1\", \"buyer_id\": \"OS02\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 9000000, \"owed\": 0, \"revised_limit\": 9000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1784, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 22.2, \"dpd_for_next_band\": 33, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 7.8, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-260607-00024\", \"kind\": \"payment_review\", \"date\": \"2026-06-06\", \"detail\": \"No open overdue notifications for Boeing. History shows only a single resolved overdue (TCI, $650k, paid 3 days late in June 2026), with no accumulation pattern (1 notification in last 6 months vs 0 prior window, from one policy). Single insurer TCI holds a $9M accepted credit limit on 60-day terms. Insufficient d"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "The Boeing Company sits in the Watch band with a score of 27.8, driven almost entirely by news rather than payment behaviour. On the payment side the record is clean: zero DPD, a weighted payment score of 0.0, and only one historical notification (a single $650k item paid 3 days late via TCI) with insufficient history to establish any trend. The score is instead pushed up by a severity-4 \"layoffs\" headline from Reuters, 3 days old, reporting Boeing has left open the possibility of further layoffs amid stalled production.\n\nThe Watch band is driven almost entirely by this single news item, which contributes 27.8 of the 27.8 total score (0.35 x 79.5), while the payment component contributes zero. The adjudicator agreed with the band but flagged caveats: the triggering headline is a standalone Reuters piece with no corroborating outlet found, and it sits amid a broader news window containing several strongly positive stories (a $20B Navy contract, a $12B Asia aircraft deal, a potential 250-plane China order, and backlog growth to $745B) that the scoring formula does not net against the negative item. The adjudicator also notes the payment record's \"insufficient_history\" rating and single-insurer (TCI) concentration limit confidence in the clean payment score, though it does not point toward higher risk.\n\nThe recommended limit action is to maintain the current $9,000,000 export limit with TCI, unchanged, as the probability of default (0.1784) remains within the target appetite (0.25) and the expected loss is unaffected (before and after: $1,156,032).\n\nA move to the lower Healthy band would require the score to fall below the Watch threshold, which given news-only exposure would mean the layoff story aging out or being offset, since news alone currently holds the band (7.8 points below current score). Conversely, the buyer would move to High Risk if the score rose by 22.2 points to 50.0, which would require either a materially more severe news development or payment deterioration equivalent to 33 days past due.",
+        "bottom_line": "Maintain the $9,000,000 limit with TCI; PD (0.1784) is comfortably within appetite (0.25), though the adjudicator agreed with caveats, noting the Watch band is driven almost entirely by a single, uncorroborated layoffs headline rather than any payment deterioration.",
+        "payment_note": "Payment history is clean with 0 DPD and a weighted payment score of 0.0, but it is based on only one resolved notification (a $650k item paid 3 days late), so no real trend can be established.",
+        "news_note": "The score is driven by a severity-4 Reuters headline on possible further layoffs amid stalled production, a story not corroborated by other outlets and offset elsewhere in the same window by positive contract and backlog news that the score does not net against.",
+        "lifts_it": [
+          "Score falling 7.8 points to below the Healthy threshold",
+          "The layoff headline aging out or being offset by further reporting",
+          "Continued clean payment performance building a longer trend record"
+        ],
+        "worsens_it": [
+          "Score rising 22.2 points to 50.0 (High Risk threshold)",
+          "Payment deterioration reaching 33 days past due",
+          "Further corroborated layoff or production-delay news adding to severity"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

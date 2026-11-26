@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Vardhit Auto Components Limited has moved into the Watch band after a single open overdue notification under policy TCI-WT-2026-0002 reached 36 days past due, a sharp departure from its historical pattern of clearing invoices within 3-6 days of due date. Notification frequency has actually eased slightly (2 vs 3 in the prior six-month window), and there is no adverse news on the company, so the deterioration is confined to this one payment event rather than a broader pattern.\n\nThe Watch score of 27.3 is driven entirely by the payment component (0.65 x 42.0 raw), with zero contribution from news (severity 0, no trusted articles found). The adjudicator agrees with the band placement but flags caveats: the owed amount is reported inconsistently across sources (INR 26.0M in the raw notification vs INR 7.0M described in the payment review narrative for the same case), and all exposure sits under a single insurer/policy, so there is no independent corroboration of the buyer's broader conduct, and the overdue remains unresolved.\n\nThe recommended limit action is to maintain the current INR 60,000,000 limit with Trade Credit Insurer (Orvana Steel), as the probability of default (0.173) remains within the 0.25 target appetite and expected loss is unchanged before and after. No reduction is proposed given the single-event nature of the overdue, but the position should be revisited once the overdue is resolved or ages further.\n\nA return to the Healthy band requires the score to fall more than 7.3 points below the current level; conversely, a further 22.7-point rise (broadly consistent with DPD reaching 54 days) would push the buyer into High Risk. The open overdue should be watched closely for resolution, and the owed-amount discrepancy should be reconciled before relying on either figure.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the INR 60,000,000 limit with Trade Credit Insurer, as PD (0.173) remains within appetite, though the underwriter should note the adjudicator's caveats about the inconsistent owed-amount figures and the single-insurer concentration before relying on the score.",
+      "payment_note": "A single overdue notification is now 36 days past due, a sharp deterioration from the buyer's historical pattern of clearing within 3-6 days, and it remains unresolved.",
+      "news_note": "No trusted news articles were found on the buyer, so the score is driven entirely by payment behavior.",
+      "lifts_it": [
+        "Score falling more than 7.3 points to drop into Healthy",
+        "Resolution of the open overdue notification with prompt payment going forward",
+        "Return to the historical 3-6 day clearing pattern"
+      ],
+      "worsens_it": [
+        "Score rising 22.7 points further (roughly DPD reaching 54 days) into High Risk",
+        "The open overdue aging further without resolution",
+        "Reconciliation revealing the larger INR 26.0M owed figure is accurate rather than INR 7.0M"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN05\", \"score\": 27.3, \"band\": \"Watch\", \"pd\": 0.173, \"payment\": {\"dpd\": 36, \"raw\": 42.0, \"weighted\": 27.3, \"worst_line\": \"TCI-WT-2026-0002\"}, \"news\": {\"severity\": 0, \"category\": null, \"article_id\": null, \"age_days\": null, \"headline\": null, \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x 42.0 (payment, 36 DPD) + 0.35 x 0.0 (news) = 27.3\", \"revie"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN05-1\", \"buyer_id\": \"IN05\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-WT-2026-0002\", \"insured_name\": \"Orvana Steel\", \"product_type\": \"WHOLE_TURNOVER\", \"currency\": \"INR\", \"current_limit\": 60000000, \"owed\": 26000000, \"revised_limit\": 60000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.173, "
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 22.7, \"dpd_for_next_band\": 54, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 7.3, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261019-00017\", \"kind\": \"payment\", \"date\": \"2026-10-18\", \"detail\": \"1 open overdue notification(s) under policy TCI-WT-2026-0002; the oldest is 36 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0002\", \"dpd\": 36, \"owed\": 26000000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261019-00017\", \"kind\": \"payment_review\", \"date\": \"2026-10-18\", \"detail\": \"Vardhit Auto"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Vardhit Auto Components Limited has moved into the Watch band after a single open overdue notification under policy TCI-WT-2026-0002 reached 36 days past due, a sharp departure from its historical pattern of clearing invoices within 3-6 days of due date. Notification frequency has actually eased slightly (2 vs 3 in the prior six-month window), and there is no adverse news on the company, so the deterioration is confined to this one payment event rather than a broader pattern.\n\nThe Watch score of 27.3 is driven entirely by the payment component (0.65 x 42.0 raw), with zero contribution from news (severity 0, no trusted articles found). The adjudicator agrees with the band placement but flags caveats: the owed amount is reported inconsistently across sources (INR 26.0M in the raw notification vs INR 7.0M described in the payment review narrative for the same case), and all exposure sits under a single insurer/policy, so there is no independent corroboration of the buyer's broader conduct, and the overdue remains unresolved.\n\nThe recommended limit action is to maintain the current INR 60,000,000 limit with Trade Credit Insurer (Orvana Steel), as the probability of default (0.173) remains within the 0.25 target appetite and expected loss is unchanged before and after. No reduction is proposed given the single-event nature of the overdue, but the position should be revisited once the overdue is resolved or ages further.\n\nA return to the Healthy band requires the score to fall more than 7.3 points below the current level; conversely, a further 22.7-point rise (broadly consistent with DPD reaching 54 days) would push the buyer into High Risk. The open overdue should be watched closely for resolution, and the owed-amount discrepancy should be reconciled before relying on either figure.",
+        "bottom_line": "Maintain the INR 60,000,000 limit with Trade Credit Insurer, as PD (0.173) remains within appetite, though the underwriter should note the adjudicator's caveats about the inconsistent owed-amount figures and the single-insurer concentration before relying on the score.",
+        "payment_note": "A single overdue notification is now 36 days past due, a sharp deterioration from the buyer's historical pattern of clearing within 3-6 days, and it remains unresolved.",
+        "news_note": "No trusted news articles were found on the buyer, so the score is driven entirely by payment behavior.",
+        "lifts_it": [
+          "Score falling more than 7.3 points to drop into Healthy",
+          "Resolution of the open overdue notification with prompt payment going forward",
+          "Return to the historical 3-6 day clearing pattern"
+        ],
+        "worsens_it": [
+          "Score rising 22.7 points further (roughly DPD reaching 54 days) into High Risk",
+          "The open overdue aging further without resolution",
+          "Reconciliation revealing the larger INR 26.0M owed figure is accurate rather than INR 7.0M"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

@@ -113,11 +113,13 @@ MAX_MODEL_TOKENS = 4_000_000
 
 REFUSAL_FALLBACK = True
 
-# In a book with real companies (the live-news book), Claude runs only for them: an
-# invented buyer, and the illustrative stories written about it, get the rule-based
-# answers. A book with no real company at all (the synthetic one) runs Claude for every
-# buyer. A story typed into the live page always goes to the News agent.
-REAL_BUYERS_ONLY = True
+# True: in a book with real companies (the live-news book), Claude runs only for them -
+# an invented buyer, and the illustrative stories written about it, get the rule-based
+# answers. False: Claude runs for every buyer, invented ones included (their answers are
+# in the shipped cache). A book with no real company at all (the synthetic one) runs
+# Claude for every buyer either way. A story typed into the live page always goes to the
+# News agent.
+REAL_BUYERS_ONLY = False
 
 # Characters of each tool result kept in the trace shown on the dashboard.
 TRACE_PREVIEW_CHARS = 400

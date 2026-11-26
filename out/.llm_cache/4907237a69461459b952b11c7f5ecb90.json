@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN09",
+    "name": "Jyotsna Electricals",
+    "severity": 1,
+    "category": "stock_decline",
+    "reason": "A sharp 30% stock price crash signals negative market sentiment, which is a minor negative indicator but no direct evidence of operational or payment distress is given."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Jyotsna"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN09\", \"name\": \"Jyotsna Electricals\", \"sector\": \"Electrical Equipment\", \"city\": \"Coimbatore\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN09",
+        "severity": 1,
+        "category": "stock_decline",
+        "reason": "A sharp 30% stock price crash signals negative market sentiment, which is a minor negative indicator but no direct evidence of operational or payment distress is given."
+      }
+    }
+  ],
+  "turns": 2
+}

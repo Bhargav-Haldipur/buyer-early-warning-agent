@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Hessler Maschinenbau is showing clear financial strain: a single overdue invoice of USD 640k is now 52 days past due, lateness has been lengthening across successive notifications (9d \u2192 19d \u2192 52d+), and notification frequency on the TCI policy is accelerating. Total exposure of roughly 3.24M (2.6M not-yet-due plus 640k overdue) now exceeds the 3.0M accepted credit limit on policy TCI-EX-2026-0001. This deterioration is corroborated, directionally, by a severity-4 news item describing Hessler falling behind on payments to several component suppliers after a customer postponed acceptance of two production lines. The combined score of 75.3 (0.65 x 74.0 payment + 0.35 x 77.8 news) places the buyer firmly in the High Risk band, 25.3 points above the Watch threshold, with no higher band above it. The adjudicator agreed with the score but flagged two caveats: the news sub-score rests on a single, uncorroborated publication (Illustrative), and the exposure already sits above the accepted limit, which is a limit issue independent of the score itself. Given exposure already at/above the accepted limit and a deteriorating payment trend, the recommended action is to freeze the limit at the current 3.0M on policy TCI-EX-2026-0001 - there is no room to cut further and expected loss is unchanged before/after (1,674,000). The band would only improve with a sustained reduction of the overdue position and faster clearance of outstanding invoices; absent that, continued lengthening of days-past-due or further unpaid-vendor reports would entrench the High Risk rating.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Freeze the limit at 3.0M on policy TCI-EX-2026-0001 (no room to cut, exposure already above limit); the adjudicator agreed with the High Risk call but flagged that the news score is single-sourced and that exposure already breaches the accepted limit.",
+      "payment_note": "A single overdue invoice (USD 640k) is 52 days past due, with a deteriorating trend in lateness (9d \u2192 19d \u2192 52d+) and rising notification frequency, pushing total exposure (~3.24M) above the 3.0M accepted limit.",
+      "news_note": "A severity-4 article (Illustrative, uncorroborated by other outlets) reports Hessler has fallen behind on payments to several suppliers after a customer delayed acceptance of production lines.",
+      "lifts_it": [
+        "Clearing the 52-day overdue invoice and returning to on-time payment",
+        "Exposure falling back below the 3.0M accepted limit",
+        "Score improving by 25.3 points to drop below the Watch threshold (50.0)"
+      ],
+      "worsens_it": [
+        "Days past due lengthening further beyond 52 days",
+        "Additional overdue notifications or rising notification frequency on the TCI policy",
+        "Further news coverage of unpaid vendors or cash flow strain, especially from additional outlets"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS06\", \"score\": 75.3, \"band\": \"High Risk\", \"pd\": 0.775, \"payment\": {\"dpd\": 52, \"raw\": 74.0, \"weighted\": 48.1, \"worst_line\": \"TCI-EX-2026-0001\"}, \"news\": {\"severity\": 4, \"category\": \"unpaid_vendors\", \"article_id\": \"ILL-003\", \"age_days\": 15, \"headline\": \"Hessler Maschinenbau has fallen behind on payments to suppliers\", \"via_parent\": false, \"parent_name\": null, \"raw\": 77.8, \"weighted\": "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS06-1\", \"buyer_id\": \"OS06\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 3000000, \"owed\": 3240000, \"revised_limit\": 3000000, \"change\": 0, \"action\": \"FREEZE\", \"reason\": \"outstanding exposure already at or above the limit - nothing left to"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": null, \"next_band_at\": null, \"points_to_next_band\": null, \"dpd_for_next_band\": null, \"lower_band\": \"Watch\", \"lower_band_below\": 50.0, \"points_to_lower_band\": 25.3, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261003-00032\", \"kind\": \"payment\", \"date\": \"2026-10-02\", \"detail\": \"1 open overdue notification(s) under policy TCI-EX-2026-0001; the oldest is 52 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"dpd\": 52, \"owed\": 3240000.0, \"currency\": \"USD\", \"open_count\": 1}}, {\"id\": \"N-261003-00032\", \"kind\": \"payment_review\", \"date\": \"2026-10-02\", \"detail\": \"Hessler Masch"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Hessler Maschinenbau is showing clear financial strain: a single overdue invoice of USD 640k is now 52 days past due, lateness has been lengthening across successive notifications (9d \u2192 19d \u2192 52d+), and notification frequency on the TCI policy is accelerating. Total exposure of roughly 3.24M (2.6M not-yet-due plus 640k overdue) now exceeds the 3.0M accepted credit limit on policy TCI-EX-2026-0001. This deterioration is corroborated, directionally, by a severity-4 news item describing Hessler falling behind on payments to several component suppliers after a customer postponed acceptance of two production lines. The combined score of 75.3 (0.65 x 74.0 payment + 0.35 x 77.8 news) places the buyer firmly in the High Risk band, 25.3 points above the Watch threshold, with no higher band above it. The adjudicator agreed with the score but flagged two caveats: the news sub-score rests on a single, uncorroborated publication (Illustrative), and the exposure already sits above the accepted limit, which is a limit issue independent of the score itself. Given exposure already at/above the accepted limit and a deteriorating payment trend, the recommended action is to freeze the limit at the current 3.0M on policy TCI-EX-2026-0001 - there is no room to cut further and expected loss is unchanged before/after (1,674,000). The band would only improve with a sustained reduction of the overdue position and faster clearance of outstanding invoices; absent that, continued lengthening of days-past-due or further unpaid-vendor reports would entrench the High Risk rating.",
+        "bottom_line": "Freeze the limit at 3.0M on policy TCI-EX-2026-0001 (no room to cut, exposure already above limit); the adjudicator agreed with the High Risk call but flagged that the news score is single-sourced and that exposure already breaches the accepted limit.",
+        "payment_note": "A single overdue invoice (USD 640k) is 52 days past due, with a deteriorating trend in lateness (9d \u2192 19d \u2192 52d+) and rising notification frequency, pushing total exposure (~3.24M) above the 3.0M accepted limit.",
+        "news_note": "A severity-4 article (Illustrative, uncorroborated by other outlets) reports Hessler has fallen behind on payments to several suppliers after a customer delayed acceptance of production lines.",
+        "lifts_it": [
+          "Clearing the 52-day overdue invoice and returning to on-time payment",
+          "Exposure falling back below the 3.0M accepted limit",
+          "Score improving by 25.3 points to drop below the Watch threshold (50.0)"
+        ],
+        "worsens_it": [
+          "Days past due lengthening further beyond 52 days",
+          "Additional overdue notifications or rising notification frequency on the TCI policy",
+          "Further news coverage of unpaid vendors or cash flow strain, especially from additional outlets"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

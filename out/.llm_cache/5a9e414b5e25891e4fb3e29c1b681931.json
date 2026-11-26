@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS02",
+    "name": "The Boeing Company",
+    "severity": 1,
+    "category": "earnings_forecast",
+    "reason": "Analysts forecast a small quarterly loss despite recent wins, a minor negative earnings signal rather than a serious credit concern."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Boeing"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS02\", \"name\": \"The Boeing Company\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS02",
+        "severity": 1,
+        "category": "earnings_forecast",
+        "reason": "Analysts forecast a small quarterly loss despite recent wins, a minor negative earnings signal rather than a serious credit concern."
+      }
+    }
+  ],
+  "turns": 2
+}

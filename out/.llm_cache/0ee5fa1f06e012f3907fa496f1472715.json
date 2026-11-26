@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS02",
+    "name": "The Boeing Company",
+    "severity": 4,
+    "category": "mass_layoffs",
+    "reason": "Boeing announced mass layoffs (5% of commercial jet workforce) amid production struggles, indicating operational and financial stress."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Boeing"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS02\", \"name\": \"The Boeing Company\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "OS02"
+      },
+      "result": "{\"id\": \"OS02\", \"kind\": \"buyer\", \"name\": \"The Boeing Company\", \"short_name\": \"Boeing\", \"sector\": \"Aerospace\", \"city\": \"Arlington, VA\", \"size_band\": \"large\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS02",
+        "severity": 4,
+        "category": "mass_layoffs",
+        "reason": "Boeing announced mass layoffs (5% of commercial jet workforce) amid production struggles, indicating operational and financial stress."
+      }
+    }
+  ],
+  "turns": 3
+}

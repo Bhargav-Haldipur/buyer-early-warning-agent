@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Vodafone Idea sits in the Watch band at a score of 25.5, driven by a payment file that is quietly deteriorating and a news flow carrying two severity-2 negative stories. Payment resolution times on its single reporting policy have lengthened from 5 days late (Mar-26) to 9 days late (Jul-26), and the current open overdue has already surpassed both at 18 days past due, with notification frequency also ticking up. News flow is mixed overall - most headlines are positive stock moves, analyst targets, and a $3.5bn SBI-led financing package - but the two scored negatives (a quarter-on-quarter subscriber decline and a wider-than-expected Q2 loss) both point to continued operating and revenue pressure.\n\nThe Watch band reflects a blend of 65% payment behaviour and 35% news severity. The payment component alone (18 DPD) is a moderate driver, but it is the deteriorating trend - not just the absolute figure - that matters, combined with concentration on a single policy (TCI-SCF-2026-0001). The news component is elevated because two independent severity-2 stories (subscriber decline and earnings miss) corroborate each other directionally, even though the adjudicator flagged that both are headline-only with no fuller article text found to independently verify the underlying figures. The adjudicator agreed with the Watch band but attached this sourcing caveat plus a note on single-policy concentration.\n\nThe recommended action is to maintain the limit at INR 120,000,000 with Meridia Bank (TCI-SCF-2026-0001), as PD (0.1552) remains within the 0.25 target appetite and current exposure (INR 40,000,000) sits well within the limit; expected loss is unchanged before and after. No limit reduction is being proposed at this time, but the lengthening payment delays warrant closer monitoring.\n\nMovement to a lower (Healthy) band would need the score to fall by 5.5 points, which would likely require the open overdue to resolve promptly and the lengthening-delay trend to reverse. Conversely, the score is 24.5 points below the High Risk threshold; a slide to 43 days past due, or further corroborated negative news, would be enough to tip the buyer into High Risk and should prompt a limit review.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the INR 120,000,000 limit with Meridia Bank as PD remains within appetite, but note the adjudicator's agreement carries caveats around unverified single-outlet news sourcing and payment concentration on one policy.",
+      "payment_note": "Payment behaviour on the single reporting policy is deteriorating, with resolved overdues lengthening from 5 days (Mar-26) to 9 days (Jul-26) and a current open overdue already at 18 days past due with notification frequency rising.",
+      "news_note": "News flow is mostly positive (financing, analyst targets, stock rallies) but includes two severity-2 stories - a quarter-on-quarter subscriber decline and a wider-than-expected Q2 loss - both headline-only with no independently corroborating article text found.",
+      "lifts_it": [
+        "Score would need to fall 5.5 points to reach Healthy",
+        "Open overdue resolving promptly and the lengthening-delay trend reversing",
+        "Independent corroboration that the negative news stories are not overstated"
+      ],
+      "worsens_it": [
+        "Days past due reaching 43 would push the score to the High Risk threshold",
+        "Further lengthening of overdue resolution times or rising notification frequency on TCI-SCF-2026-0001",
+        "Additional corroborated negative news (e.g. further earnings misses or subscriber losses)"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN03\", \"score\": 25.5, \"band\": \"Watch\", \"pd\": 0.1552, \"payment\": {\"dpd\": 18, \"raw\": 18.0, \"weighted\": 11.7, \"worst_line\": \"TCI-SCF-2026-0001\"}, \"news\": {\"severity\": 2, \"category\": \"subscriber_decline\", \"article_id\": \"GN-75cb48dc2523\", \"age_days\": 7, \"headline\": \"Why Vodafone Idea\\u2019s q-o-q drop in mobile subscriber base is a worrying sign\", \"via_parent\": false, \"parent_name\": null,"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN03-1\", \"buyer_id\": \"IN03\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-SCF-2026-0001\", \"insured_name\": \"Meridia Bank\", \"product_type\": \"SUPPLY_CHAIN_FINANCE\", \"currency\": \"INR\", \"current_limit\": 120000000, \"owed\": 40000000, \"revised_limit\": 120000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\""
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 24.5, \"dpd_for_next_band\": 43, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 5.5, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261106-00006\", \"kind\": \"payment\", \"date\": \"2026-11-05\", \"detail\": \"1 open overdue notification(s) under policy TCI-SCF-2026-0001; the oldest is 18 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"dpd\": 18, \"owed\": 40000000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261106-00006\", \"kind\": \"payment_review\", \"date\": \"2026-11-05\", \"detail\": \"Vodafone I"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Vodafone Idea sits in the Watch band at a score of 25.5, driven by a payment file that is quietly deteriorating and a news flow carrying two severity-2 negative stories. Payment resolution times on its single reporting policy have lengthened from 5 days late (Mar-26) to 9 days late (Jul-26), and the current open overdue has already surpassed both at 18 days past due, with notification frequency also ticking up. News flow is mixed overall - most headlines are positive stock moves, analyst targets, and a $3.5bn SBI-led financing package - but the two scored negatives (a quarter-on-quarter subscriber decline and a wider-than-expected Q2 loss) both point to continued operating and revenue pressure.\n\nThe Watch band reflects a blend of 65% payment behaviour and 35% news severity. The payment component alone (18 DPD) is a moderate driver, but it is the deteriorating trend - not just the absolute figure - that matters, combined with concentration on a single policy (TCI-SCF-2026-0001). The news component is elevated because two independent severity-2 stories (subscriber decline and earnings miss) corroborate each other directionally, even though the adjudicator flagged that both are headline-only with no fuller article text found to independently verify the underlying figures. The adjudicator agreed with the Watch band but attached this sourcing caveat plus a note on single-policy concentration.\n\nThe recommended action is to maintain the limit at INR 120,000,000 with Meridia Bank (TCI-SCF-2026-0001), as PD (0.1552) remains within the 0.25 target appetite and current exposure (INR 40,000,000) sits well within the limit; expected loss is unchanged before and after. No limit reduction is being proposed at this time, but the lengthening payment delays warrant closer monitoring.\n\nMovement to a lower (Healthy) band would need the score to fall by 5.5 points, which would likely require the open overdue to resolve promptly and the lengthening-delay trend to reverse. Conversely, the score is 24.5 points below the High Risk threshold; a slide to 43 days past due, or further corroborated negative news, would be enough to tip the buyer into High Risk and should prompt a limit review.",
+        "bottom_line": "Maintain the INR 120,000,000 limit with Meridia Bank as PD remains within appetite, but note the adjudicator's agreement carries caveats around unverified single-outlet news sourcing and payment concentration on one policy.",
+        "payment_note": "Payment behaviour on the single reporting policy is deteriorating, with resolved overdues lengthening from 5 days (Mar-26) to 9 days (Jul-26) and a current open overdue already at 18 days past due with notification frequency rising.",
+        "news_note": "News flow is mostly positive (financing, analyst targets, stock rallies) but includes two severity-2 stories - a quarter-on-quarter subscriber decline and a wider-than-expected Q2 loss - both headline-only with no independently corroborating article text found.",
+        "lifts_it": [
+          "Score would need to fall 5.5 points to reach Healthy",
+          "Open overdue resolving promptly and the lengthening-delay trend reversing",
+          "Independent corroboration that the negative news stories are not overstated"
+        ],
+        "worsens_it": [
+          "Days past due reaching 43 would push the score to the High Risk threshold",
+          "Further lengthening of overdue resolution times or rising notification frequency on TCI-SCF-2026-0001",
+          "Additional corroborated negative news (e.g. further earnings misses or subscriber losses)"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

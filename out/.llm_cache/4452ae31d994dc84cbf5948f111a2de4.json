@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Intel's underlying payment behavior with this insured is clean: 0 days past due and no payment-review flags, so none of the 20.7 Watch score comes from the ledger. The entire score is news-driven, built almost wholly on a single severity-3 event - a shareholder lawsuit filed after Intel's stock plunged 29% - which is corroborated by both WSJ and Reuters reporting the same suit on the same date, giving it real weight as a multi-sourced event rather than single-outlet noise.\n\nThe buyer sits in the Watch band because that corroborated lawsuit story (decayed value 59.2) is run through the 35% news weight against a 0% payment component, landing at 20.7. The adjudicator agreed with the Watch classification but flagged caveats: both lawsuit articles are headline-only with no body text on the claims, scope, or cash impact, and a separate severity-3 Reuters story from October on chip supply constraints and \"big cash burn\" has already decayed out of the binding score but points to genuine operational strain that could resurface.\n\nGiven the clean payment record and a PD of 0.1072 that remains comfortably within the 0.25 target, the recommended action is to maintain the current $7,000,000 limit with no change in exposure; expected loss is unchanged before and after the review.\n\nA return to the Healthy band would follow from continued clean payments and the lawsuit story's natural decay (news half-life 365 days), since no new negative coverage is needed for improvement. Conversely, the position would move to High Risk at a score of 50.0 if the cash-burn/supply-constraint narrative resurfaces alongside fresh negative coverage, or if payment delinquency reaches 38 days past due.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Maintain the $7,000,000 limit - the Watch score is entirely news-driven off a corroborated but headline-only shareholder-lawsuit story, while payment behavior remains clean and PD is well within appetite; the adjudicator agreed with the Watch band but flagged that this rests on thin detail and should be watched for recurrence of cash-burn/supply-constraint reporting.",
+      "payment_note": "Payment history is clean with 0 days past due and no payment-review flags, contributing nothing to the score.",
+      "news_note": "The score is driven almost entirely by a severity-3 shareholder lawsuit over Intel's 29% stock plunge, independently reported by both WSJ and Reuters, with a prior severity-3 cash-burn/supply-constraint story having already decayed out of the current score.",
+      "lifts_it": [
+        "Continued clean payment record (0 DPD) with no new payment-review flags",
+        "Natural decay of the shareholder-lawsuit news score over time (365-day half-life) without fresh negative coverage",
+        "Resolution or favorable developments in the lawsuit that are picked up in reporting"
+      ],
+      "worsens_it": [
+        "Score rising to 50.0 (High Risk threshold), 29.3 points above current level",
+        "Payment delinquency reaching 38 days past due, which alone would trigger the next band",
+        "Recurrence or escalation of the cash-burn/chip-supply-constraint narrative in fresh reporting"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"OS01\", \"score\": 20.7, \"band\": \"Watch\", \"pd\": 0.1072, \"payment\": {\"dpd\": 0, \"raw\": 0.0, \"weighted\": 0.0, \"worst_line\": null}, \"news\": {\"severity\": 3, \"category\": \"shareholder_lawsuit\", \"article_id\": \"GN-b53da81e0c9d\", \"age_days\": 7, \"headline\": \"Intel Sued by Investors After 29% Stock Plunge\", \"via_parent\": false, \"parent_name\": null, \"raw\": 59.2, \"weighted\": 20.7}, \"trace\": \"0.65 x 0"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-OS01-1\", \"buyer_id\": \"OS01\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-EX-2026-0001\", \"insured_name\": \"Tamrin Exports\", \"product_type\": \"EXPORT\", \"currency\": \"USD\", \"current_limit\": 7000000, \"owed\": 0, \"revised_limit\": 7000000, \"change\": 0, \"action\": \"MAINTAIN\", \"reason\": \"probability of default is within appetite\", \"pd\": 0.1072, \"pd_target\": 0"
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": \"High Risk\", \"next_band_at\": 50.0, \"points_to_next_band\": 29.3, \"dpd_for_next_band\": 38, \"lower_band\": \"Healthy\", \"lower_band_below\": 20.0, \"points_to_lower_band\": 0.7, \"news_alone_holds_band\": true, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"GN-a7d59ce9df3e\", \"kind\": \"news\", \"date\": \"2026-11-23\", \"detail\": \"severity 0 (positive_news): NVIDIA Jumps 28% as Jensen Huang Reportedly Reinstated as CEO; Intel Rallies 13%, AMD Gains 7%\", \"data\": {\"severity\": 0, \"category\": \"positive_news\", \"age_days\": 0, \"base\": 0.0, \"decayed\": 0.0, \"entity\": \"Intel Corporation\", \"via_parent\": false, \"publication\": \"Yahoo Finance\", \"headline\": \"NVIDI"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Intel's underlying payment behavior with this insured is clean: 0 days past due and no payment-review flags, so none of the 20.7 Watch score comes from the ledger. The entire score is news-driven, built almost wholly on a single severity-3 event - a shareholder lawsuit filed after Intel's stock plunged 29% - which is corroborated by both WSJ and Reuters reporting the same suit on the same date, giving it real weight as a multi-sourced event rather than single-outlet noise.\n\nThe buyer sits in the Watch band because that corroborated lawsuit story (decayed value 59.2) is run through the 35% news weight against a 0% payment component, landing at 20.7. The adjudicator agreed with the Watch classification but flagged caveats: both lawsuit articles are headline-only with no body text on the claims, scope, or cash impact, and a separate severity-3 Reuters story from October on chip supply constraints and \"big cash burn\" has already decayed out of the binding score but points to genuine operational strain that could resurface.\n\nGiven the clean payment record and a PD of 0.1072 that remains comfortably within the 0.25 target, the recommended action is to maintain the current $7,000,000 limit with no change in exposure; expected loss is unchanged before and after the review.\n\nA return to the Healthy band would follow from continued clean payments and the lawsuit story's natural decay (news half-life 365 days), since no new negative coverage is needed for improvement. Conversely, the position would move to High Risk at a score of 50.0 if the cash-burn/supply-constraint narrative resurfaces alongside fresh negative coverage, or if payment delinquency reaches 38 days past due.",
+        "bottom_line": "Maintain the $7,000,000 limit - the Watch score is entirely news-driven off a corroborated but headline-only shareholder-lawsuit story, while payment behavior remains clean and PD is well within appetite; the adjudicator agreed with the Watch band but flagged that this rests on thin detail and should be watched for recurrence of cash-burn/supply-constraint reporting.",
+        "payment_note": "Payment history is clean with 0 days past due and no payment-review flags, contributing nothing to the score.",
+        "news_note": "The score is driven almost entirely by a severity-3 shareholder lawsuit over Intel's 29% stock plunge, independently reported by both WSJ and Reuters, with a prior severity-3 cash-burn/supply-constraint story having already decayed out of the current score.",
+        "lifts_it": [
+          "Continued clean payment record (0 DPD) with no new payment-review flags",
+          "Natural decay of the shareholder-lawsuit news score over time (365-day half-life) without fresh negative coverage",
+          "Resolution or favorable developments in the lawsuit that are picked up in reporting"
+        ],
+        "worsens_it": [
+          "Score rising to 50.0 (High Risk threshold), 29.3 points above current level",
+          "Payment delinquency reaching 38 days past due, which alone would trigger the next band",
+          "Recurrence or escalation of the cash-burn/chip-supply-constraint narrative in fresh reporting"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

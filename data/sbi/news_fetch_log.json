@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-11-23T18:23:47+00:00",
+  "fetched_at": "2026-11-25T04:22:21+00:00",
   "as_of": "2026-11-23",
   "days": 180,
   "feeds": [
@@ -47,29 +47,29 @@
       "sec_edgar": 0,
       "google_news": 12,
       "publisher_rss": 0,
-      "untrusted_dropped": 55,
-      "returned": 74,
+      "untrusted_dropped": 65,
+      "returned": 100,
       "coverage": 12
     },
     "L&T": {
       "country": "IND",
       "edition": "en-IN",
       "sec_edgar": 0,
-      "google_news": 12,
-      "publisher_rss": 3,
+      "google_news": 11,
+      "publisher_rss": 2,
       "untrusted_dropped": 31,
-      "returned": 45,
-      "coverage": 15
+      "returned": 44,
+      "coverage": 13
     },
     "Vodafone Idea": {
       "country": "IND",
       "edition": "en-IN",
       "sec_edgar": 0,
       "google_news": 12,
-      "publisher_rss": 1,
-      "untrusted_dropped": 41,
-      "returned": 56,
-      "coverage": 13
+      "publisher_rss": 0,
+      "untrusted_dropped": 37,
+      "returned": 49,
+      "coverage": 12
     },
     "Intel": {
       "country": "USA",
@@ -77,7 +77,7 @@
       "sec_edgar": 3,
       "google_news": 12,
       "publisher_rss": 0,
-      "untrusted_dropped": 67,
+      "untrusted_dropped": 44,
       "returned": 100,
       "coverage": 15
     },
@@ -87,7 +87,7 @@
       "sec_edgar": 4,
       "google_news": 12,
       "publisher_rss": 0,
-      "untrusted_dropped": 85,
+      "untrusted_dropped": 41,
       "returned": 100,
       "coverage": 16
     },
@@ -97,21 +97,39 @@
       "sec_edgar": 5,
       "google_news": 12,
       "publisher_rss": 0,
-      "untrusted_dropped": 44,
-      "returned": 81,
+      "untrusted_dropped": 65,
+      "returned": 100,
       "coverage": 17
     }
   },
   "errors": [],
   "funnel": {
-    "found": 472,
-    "untrusted_dropped": 323,
-    "outside_window_or_cap": 61,
-    "duplicates": 2,
-    "kept": 86,
-    "carried": 29
+    "found": 507,
+    "untrusted_dropped": 283,
+    "outside_window_or_cap": 139,
+    "duplicates": 0,
+    "kept": 85,
+    "carried": 75
   },
-  "new": [],
-  "previous_fetch": "2026-11-23T18:23:05+00:00",
-  "articles": 115
+  "new": [
+    "GN-e68baa9befa6",
+    "GN-a622ff1e3454",
+    "GN-8cfece2c0445",
+    "GN-ac5a0ee97e81",
+    "GN-62814020851f",
+    "GN-74b25eacef63",
+    "GN-689eb1f27674",
+    "GN-500a51e31a80",
+    "GN-091f51ae3ed5",
+    "GN-eec4bf66ed5d",
+    "GN-b51c760b340f",
+    "GN-3e4a82ad6337",
+    "GN-ae6c7d540c93",
+    "GN-4aa515ff2a23",
+    "GN-737d7ff63c4d",
+    "GN-758e0edaccab",
+    "GN-ea4b5c6b993b"
+  ],
+  "previous_fetch": "2026-11-24T11:17:44+00:00",
+  "articles": 160
 }

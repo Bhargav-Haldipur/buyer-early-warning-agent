@@ -1,0 +1,64 @@
+{
+  "result": {
+    "narrative": "Mehtab Agro Foods is showing a clear deterioration in payment behaviour across both of its policies. The oldest overdue invoice under the supply-chain-finance policy (TCI-SCF-2026-0001) is now 64 days past due, and a second overdue has appeared on the whole-turnover policy (TCI-WT-2026-0002) at 41 days past due. This follows a prior invoice that was already 18 days late, and the frequency of overdue notifications has doubled in the last six months, pointing to a recurring liquidity issue rather than a one-off delay.\n\nThe buyer sits in the High Risk band with a score of 63.7, driven almost entirely by the payment component: the 64-day-past-due line produced a near-maximum raw payment score of 98, weighted to 63.7 once combined with a news component that contributed nothing (no matching coverage was found). The adjudicator agreed with the band but flagged with caveats that the owed amounts recorded in the overdue notifications (INR 7.7M and INR 3.0M) do not match the exposure figures cited in the payment review narrative (INR 4.2M and INR 1.8M) for the same two policies, and recommended this be reconciled before acting on the combined exposure.\n\nThe recommended action is to reduce both limits to the point where expected loss meets the 25% appetite threshold: the SCF policy limit falls from INR 15,000,000 to INR 7,700,000, and the whole-turnover policy limit falls from INR 8,000,000 to INR 3,394,433. Both reductions reflect the elevated probability of default (0.5892) now attached to this buyer.\n\nA move back to the lower Watch band would require the score to fall by 13.7 points, which in practice means clearing the current overdues and reversing the deteriorating payment trend. Conversely, further aging of the existing overdue invoices, additional policies falling overdue, or the significant not-yet-due exposure behind the current overdues converting into new overdue notifications would reinforce the current High Risk classification.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Reduce both limits as recommended - to INR 7,700,000 on TCI-SCF-2026-0001 and INR 3,394,433 on TCI-WT-2026-0002 - given the 64-day overdue driving a High Risk score of 63.7; the adjudicator agreed with caveats, flagging an unresolved mismatch between owed amounts in the overdue notifications and the exposure figures in the payment review that should be reconciled first.",
+      "payment_note": "Payment behaviour is deteriorating: the oldest overdue is now 64 days past due on TCI-SCF-2026-0001 with a second overdue of 41 days on TCI-WT-2026-0002, following a prior 18-day-late invoice and a doubling of notification frequency over the last six months.",
+      "news_note": "No matching news coverage was found for this buyer, so the news component contributes nothing to the score.",
+      "lifts_it": [
+        "Clearing the 64-day and 41-day overdue invoices",
+        "Reversing the doubled notification frequency trend",
+        "A sustained run of on-time payments to reduce the score by 13.7 points into the Watch band"
+      ],
+      "worsens_it": [
+        "Further aging of the existing overdue invoices",
+        "A new policy or additional invoice going overdue",
+        "The INR 4.7M of not-yet-due exposure behind the current overdues converting into new overdue notifications"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN07\", \"score\": 63.7, \"band\": \"High Risk\", \"pd\": 0.5892, \"payment\": {\"dpd\": 64, \"raw\": 98.0, \"weighted\": 63.7, \"worst_line\": \"TCI-SCF-2026-0001\"}, \"news\": {\"severity\": 0, \"category\": null, \"article_id\": null, \"age_days\": null, \"headline\": null, \"via_parent\": false, \"parent_name\": null, \"raw\": 0.0, \"weighted\": 0.0}, \"trace\": \"0.65 x 98.0 (payment, 64 DPD) + 0.35 x 0.0 (news) = 63.7\", "
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN07-1\", \"buyer_id\": \"IN07\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-SCF-2026-0001\", \"insured_name\": \"Meridia Bank\", \"product_type\": \"SUPPLY_CHAIN_FINANCE\", \"currency\": \"INR\", \"current_limit\": 15000000, \"owed\": 7700000, \"revised_limit\": 7700000, \"change\": -7300000, \"action\": \"REDUCE\", \"reason\": \"cut to the limit where expected loss meets 25% "
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": null, \"next_band_at\": null, \"points_to_next_band\": null, \"dpd_for_next_band\": null, \"lower_band\": \"Watch\", \"lower_band_below\": 50.0, \"points_to_lower_band\": 13.7, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-260921-00021\", \"kind\": \"payment\", \"date\": \"2026-09-20\", \"detail\": \"1 open overdue notification(s) under policy TCI-SCF-2026-0001; the oldest is 64 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-SCF-2026-0001\", \"dpd\": 64, \"owed\": 7700000.0, \"currency\": \"INR\", \"open_count\": 1}}, {\"id\": \"N-261014-00022\", \"kind\": \"payment\", \"date\": \"2026-10-13\", \"detail\": \"1 open overdue not"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Mehtab Agro Foods is showing a clear deterioration in payment behaviour across both of its policies. The oldest overdue invoice under the supply-chain-finance policy (TCI-SCF-2026-0001) is now 64 days past due, and a second overdue has appeared on the whole-turnover policy (TCI-WT-2026-0002) at 41 days past due. This follows a prior invoice that was already 18 days late, and the frequency of overdue notifications has doubled in the last six months, pointing to a recurring liquidity issue rather than a one-off delay.\n\nThe buyer sits in the High Risk band with a score of 63.7, driven almost entirely by the payment component: the 64-day-past-due line produced a near-maximum raw payment score of 98, weighted to 63.7 once combined with a news component that contributed nothing (no matching coverage was found). The adjudicator agreed with the band but flagged with caveats that the owed amounts recorded in the overdue notifications (INR 7.7M and INR 3.0M) do not match the exposure figures cited in the payment review narrative (INR 4.2M and INR 1.8M) for the same two policies, and recommended this be reconciled before acting on the combined exposure.\n\nThe recommended action is to reduce both limits to the point where expected loss meets the 25% appetite threshold: the SCF policy limit falls from INR 15,000,000 to INR 7,700,000, and the whole-turnover policy limit falls from INR 8,000,000 to INR 3,394,433. Both reductions reflect the elevated probability of default (0.5892) now attached to this buyer.\n\nA move back to the lower Watch band would require the score to fall by 13.7 points, which in practice means clearing the current overdues and reversing the deteriorating payment trend. Conversely, further aging of the existing overdue invoices, additional policies falling overdue, or the significant not-yet-due exposure behind the current overdues converting into new overdue notifications would reinforce the current High Risk classification.",
+        "bottom_line": "Reduce both limits as recommended - to INR 7,700,000 on TCI-SCF-2026-0001 and INR 3,394,433 on TCI-WT-2026-0002 - given the 64-day overdue driving a High Risk score of 63.7; the adjudicator agreed with caveats, flagging an unresolved mismatch between owed amounts in the overdue notifications and the exposure figures in the payment review that should be reconciled first.",
+        "payment_note": "Payment behaviour is deteriorating: the oldest overdue is now 64 days past due on TCI-SCF-2026-0001 with a second overdue of 41 days on TCI-WT-2026-0002, following a prior 18-day-late invoice and a doubling of notification frequency over the last six months.",
+        "news_note": "No matching news coverage was found for this buyer, so the news component contributes nothing to the score.",
+        "lifts_it": [
+          "Clearing the 64-day and 41-day overdue invoices",
+          "Reversing the doubled notification frequency trend",
+          "A sustained run of on-time payments to reduce the score by 13.7 points into the Watch band"
+        ],
+        "worsens_it": [
+          "Further aging of the existing overdue invoices",
+          "A new policy or additional invoice going overdue",
+          "The INR 4.7M of not-yet-due exposure behind the current overdues converting into new overdue notifications"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

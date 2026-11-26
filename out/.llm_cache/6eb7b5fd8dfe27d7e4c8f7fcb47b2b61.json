@@ -1,0 +1,43 @@
+{
+  "result": {
+    "trend": "deteriorating",
+    "summary": "Boeing currently has one open overdue invoice of $500k, 45 days past due (due 2026-10-09), against a single $9M credit line (60-day terms) from TCI. Prior history shows only one resolved overdue (3 days late, June 2026), so the current 45-day delay is a marked worsening versus past behavior. The 60-day terms mean this invoice is not yet in breach of terms, but the escalation in days-late warrants monitoring.",
+    "concerns": [
+      "Current overdue (45 DPD) is significantly worse than the only prior resolved case (3 days late)",
+      "Single policy/insurer concentration (TCI) with no outstanding_by_ageing detail provided for the open notification",
+      "Limited notification history overall makes trend assessment somewhat fragile"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"event_id\": \"N-LIVE-01\", \"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"reason\": \"OVERDUE_INVOICE\", \"notification_date\": \"2026-11-23\", \"original_due_date\": \"2026-10-09\", \"exposure\": 500000.0, \"currency\": \"USD\", \"days_past_due\": 45, \"outstanding_by_ageing\": {}}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260607-00024\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-06-06\", \"resolved_date\": \"2026-06-09\", \"exposure\": 650000.0, \"days_late\": 3}], \"accumulation\": {\"window_days\": 180, \"last_window\": 2, \"window_before\": 0, \"policies_reporting_last_window\": 1}}"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-EX-2026-0001\", \"credit_limit\": 9000000.0, \"currency\": \"USD\", \"payment_terms_days\": 60, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-04-07\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 45,
+        "worst_event_id": "N-LIVE-01",
+        "trend": "deteriorating",
+        "summary": "Boeing currently has one open overdue invoice of $500k, 45 days past due (due 2026-10-09), against a single $9M credit line (60-day terms) from TCI. Prior history shows only one resolved overdue (3 days late, June 2026), so the current 45-day delay is a marked worsening versus past behavior. The 60-day terms mean this invoice is not yet in breach of terms, but the escalation in days-late warrants monitoring.",
+        "concerns": [
+          "Current overdue (45 DPD) is significantly worse than the only prior resolved case (3 days late)",
+          "Single policy/insurer concentration (TCI) with no outstanding_by_ageing detail provided for the open notification",
+          "Limited notification history overall makes trend assessment somewhat fragile"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

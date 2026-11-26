@@ -1,0 +1,37 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "IN03",
+    "name": "Vodafone Idea Limited",
+    "severity": 2,
+    "category": "widening_loss",
+    "reason": "Vodafone Idea reported a widened quarterly loss of \u20b95,975 crore, indicating ongoing financial stress, though it also raised additional \u20b94,000 crore in funding to shore up liquidity."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Vodafone Idea"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"IN03\", \"name\": \"Vodafone Idea Limited\", \"sector\": \"Telecommunications\", \"city\": \"Mumbai\"}]"
+    },
+    {
+      "tool": "get_entity",
+      "input": {
+        "entity_id": "IN03"
+      },
+      "result": "{\"id\": \"IN03\", \"kind\": \"buyer\", \"name\": \"Vodafone Idea Limited\", \"short_name\": \"Vodafone Idea\", \"sector\": \"Telecommunications\", \"city\": \"Mumbai\", \"size_band\": \"large\", \"parent\": null}"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "IN03",
+        "severity": 2,
+        "category": "widening_loss",
+        "reason": "Vodafone Idea reported a widened quarterly loss of \u20b95,975 crore, indicating ongoing financial stress, though it also raised additional \u20b94,000 crore in funding to shore up liquidity."
+      }
+    }
+  ],
+  "turns": 3
+}

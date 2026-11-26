@@ -404,6 +404,47 @@ class Outlook(unittest.TestCase):
                                     o["next_band"])
 
 
+class CaseFileCacheKey(unittest.TestCase):
+    """A case file is keyed on what the adjudicator concluded, not on how its review was
+    produced. The review's run metadata once sat in the key, so a case file written after
+    a fresh review missed on every later replay of that same review and ran the model again."""
+
+    def _write(self, review_cached: bool):
+        from unittest import mock
+        from ews import casefile
+        from ews.agents import runtime
+        rec = next(r for r in engine.run(llm=FallbackLLM(cache=False))["buyers"]
+                   if r["evidence"])
+        verdict = {**rec["verdict"], "review": {
+            "assessment": "agree", "rationale": "the formula reads the evidence fairly",
+            "concerns": [],
+            "agent": {"mode": "agent", "turns": 3, "cached": review_cached,
+                      "trace": [{"tool": "get_verdict", "input": {}}], "error": None}}}
+        seen = {}
+
+        def recording_attempt(llm, rules, *, spec, **kw):
+            seen.update(kw)
+            return {"mode": "rules", "result": rules(), "trace": [], "turns": 0,
+                    "cached": False, "error": None}
+
+        with mock.patch.object(runtime, "attempt", recording_attempt):
+            casefile.write(FallbackLLM(cache=False), Loader().buyers_by_id()[rec["buyer_id"]],
+                           verdict, rec["limits"], rec["evidence"], {})
+        get_verdict = next(t for t in seen["tools"] if t.name == "get_verdict")
+        return seen["cache_payload"], get_verdict.fn()
+
+    def test_the_key_is_the_same_after_a_fresh_or_a_replayed_review(self):
+        fresh, _ = self._write(review_cached=False)
+        replayed, _ = self._write(review_cached=True)
+        self.assertEqual(json.dumps(fresh, sort_keys=True), json.dumps(replayed, sort_keys=True))
+
+    def test_the_agent_never_sees_the_adjudicators_run_metadata(self):
+        payload, shown = self._write(review_cached=False)
+        self.assertNotIn("agent", shown["review"])
+        self.assertNotIn("agent", payload["facts"]["verdict"]["review"])
+        self.assertEqual(shown["review"]["assessment"], "agree")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
 

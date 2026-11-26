@@ -1,0 +1,71 @@
+{
+  "result": {
+    "narrative": "Shrivana Textile Mills is showing a genuine, deepening liquidity strain rather than an isolated billing dispute: the working-capital (WT) policy has an oldest overdue of 50 days, a second policy (SCF) has also gone overdue at 34 days, resolution lag on past overdues has worsened from 10 to 14 to 22 days across the last three cycles, and notification volume has doubled in the latest six-month window, now spanning two funding lines at once. Exposure on the WT line is also closing in on its limit, leaving less headroom to absorb further slippage.\n\nThe 71.9 score (High Risk band) is driven by this deteriorating payment pattern (70.0 raw, weighted 45.5) combined with a severity-4 news item reporting that two banks are reviewing their exposure after the company asked for longer credit terms amid falling European export orders (75.6 raw, weighted 26.4). The adjudicator agreed with the band but flagged a caveat: the news story comes from a single outlet with no independent corroboration, even though it contains specific, named detail rather than being a bare headline; it also noted that stress is now spreading to a second policy beyond the one used as the score's \"worst line.\"\n\nGiven the converging payment and news signals, the recommended action is to reduce both limits to the point where expected loss meets the 25% appetite threshold: the WT line from 80,000,000 to 42,000,000 INR, and the SCF line from 20,000,000 to 9,500,000 INR. Both cuts bring expected loss down materially (WT: 41,541,120 to 21,809,088; SCF: 10,385,280 to 4,933,008) and reflect the pd of 0.7212 against the insurer's 0.25 target.\n\nA move back to the Watch band would need the score to fall by 21.9 points, which in practice means clearing the current overdues, halting the rise in resolution lag, and the news-driven component fading (its effect roughly halves every 365 days) without fresh corroborating or escalating coverage; conversely, any further rise in days past due, additional overdue notifications, or corroborating/escalating news on the lenders' review would reinforce the current band or push risk higher.",
+    "source": "llm",
+    "rejected_numbers": [],
+    "judgement": {
+      "bottom_line": "Reduce both limits to the expected-loss/25%-appetite cutoff (WT to 42,000,000 INR, SCF to 9,500,000 INR); the adjudicator agreed with the High Risk band but flagged that the single news source is uncorroborated and that stress is now spreading to a second policy.",
+      "payment_note": "Payment record shows a deteriorating trend: 50 DPD on the WT policy plus a newly overdue SCF policy at 34 DPD, with resolution lag worsening (10\u219214\u219222 days) and notification volume doubling across two policies.",
+      "news_note": "A single-sourced severity-4 article (Illustrative, uncorroborated) reports that two banks are reviewing their exposure to the company after it sought longer credit terms amid falling export orders.",
+      "lifts_it": [
+        "Overdues on both the WT and SCF policies get cleared and resolution lag stops worsening",
+        "No further notification volume growth across policies",
+        "News effect fades (roughly 365-day half-life) without new corroborating or escalating coverage"
+      ],
+      "worsens_it": [
+        "DPD rises further on the WT line or the SCF overdue persists/grows",
+        "Additional policies or notifications show overdue stress, pushing exposure closer to limit",
+        "Corroborating or escalating news confirms the lenders' exposure review"
+      ]
+    }
+  },
+  "trace": [
+    {
+      "tool": "get_verdict",
+      "input": {},
+      "result": "{\"buyer_id\": \"IN04\", \"score\": 71.9, \"band\": \"High Risk\", \"pd\": 0.7212, \"payment\": {\"dpd\": 50, \"raw\": 70.0, \"weighted\": 45.5, \"worst_line\": \"TCI-WT-2026-0001\"}, \"news\": {\"severity\": 4, \"category\": \"lenders_reviewing_exposure\", \"article_id\": \"ILL-001\", \"age_days\": 30, \"headline\": \"Lenders review exposure to Shrivana Textile Mills as orders slow\", \"via_parent\": false, \"parent_name\": null, \"raw\": 75.6"
+    },
+    {
+      "tool": "get_limits",
+      "input": {},
+      "result": "[{\"limit_id\": \"LIM-IN04-1\", \"buyer_id\": \"IN04\", \"client_id\": \"TCI\", \"client_name\": \"Trade Credit Insurer\", \"policy_id\": \"TCI-WT-2026-0001\", \"insured_name\": \"Velaris Polymers\", \"product_type\": \"WHOLE_TURNOVER\", \"currency\": \"INR\", \"current_limit\": 80000000, \"owed\": 42000000, \"revised_limit\": 42000000, \"change\": -38000000, \"action\": \"REDUCE\", \"reason\": \"cut to the limit where expected loss meets 25% "
+    },
+    {
+      "tool": "get_outlook",
+      "input": {},
+      "result": "{\"next_band\": null, \"next_band_at\": null, \"points_to_next_band\": null, \"dpd_for_next_band\": null, \"lower_band\": \"Watch\", \"lower_band_below\": 50.0, \"points_to_lower_band\": 21.9, \"news_alone_holds_band\": false, \"news_half_life_days\": 365}"
+    },
+    {
+      "tool": "get_evidence",
+      "input": {},
+      "result": "[{\"id\": \"N-261005-00010\", \"kind\": \"payment\", \"date\": \"2026-10-04\", \"detail\": \"2 open overdue notification(s) under policy TCI-WT-2026-0001; the oldest is 50 days past due\", \"data\": {\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"dpd\": 50, \"owed\": 42000000.0, \"currency\": \"INR\", \"open_count\": 2}}, {\"id\": \"N-261021-00011\", \"kind\": \"payment\", \"date\": \"2026-10-20\", \"detail\": \"1 open overdue noti"
+    },
+    {
+      "tool": "get_article",
+      "input": {
+        "article_id": "ILL-001"
+      },
+      "result": "{\"article_id\": \"ILL-001\", \"published_date\": \"2026-10-24\", \"publication\": \"Illustrative\", \"headline\": \"Lenders review exposure to Shrivana Textile Mills as orders slow\", \"body\": \"Two banks are reviewing their exposure to Shrivana Textile Mills after the Tiruppur knitwear maker asked for longer credit on its working-capital lines, people familiar with the matter said. Export orders from two European"
+    },
+    {
+      "tool": "submit_case_file",
+      "input": {
+        "narrative": "Shrivana Textile Mills is showing a genuine, deepening liquidity strain rather than an isolated billing dispute: the working-capital (WT) policy has an oldest overdue of 50 days, a second policy (SCF) has also gone overdue at 34 days, resolution lag on past overdues has worsened from 10 to 14 to 22 days across the last three cycles, and notification volume has doubled in the latest six-month window, now spanning two funding lines at once. Exposure on the WT line is also closing in on its limit, leaving less headroom to absorb further slippage.\n\nThe 71.9 score (High Risk band) is driven by this deteriorating payment pattern (70.0 raw, weighted 45.5) combined with a severity-4 news item reporting that two banks are reviewing their exposure after the company asked for longer credit terms amid falling European export orders (75.6 raw, weighted 26.4). The adjudicator agreed with the band but flagged a caveat: the news story comes from a single outlet with no independent corroboration, even though it contains specific, named detail rather than being a bare headline; it also noted that stress is now spreading to a second policy beyond the one used as the score's \"worst line.\"\n\nGiven the converging payment and news signals, the recommended action is to reduce both limits to the point where expected loss meets the 25% appetite threshold: the WT line from 80,000,000 to 42,000,000 INR, and the SCF line from 20,000,000 to 9,500,000 INR. Both cuts bring expected loss down materially (WT: 41,541,120 to 21,809,088; SCF: 10,385,280 to 4,933,008) and reflect the pd of 0.7212 against the insurer's 0.25 target.\n\nA move back to the Watch band would need the score to fall by 21.9 points, which in practice means clearing the current overdues, halting the rise in resolution lag, and the news-driven component fading (its effect roughly halves every 365 days) without fresh corroborating or escalating coverage; conversely, any further rise in days past due, additional overdue notifications, or corroborating/escalating news on the lenders' review would reinforce the current band or push risk higher.",
+        "bottom_line": "Reduce both limits to the expected-loss/25%-appetite cutoff (WT to 42,000,000 INR, SCF to 9,500,000 INR); the adjudicator agreed with the High Risk band but flagged that the single news source is uncorroborated and that stress is now spreading to a second policy.",
+        "payment_note": "Payment record shows a deteriorating trend: 50 DPD on the WT policy plus a newly overdue SCF policy at 34 DPD, with resolution lag worsening (10\u219214\u219222 days) and notification volume doubling across two policies.",
+        "news_note": "A single-sourced severity-4 article (Illustrative, uncorroborated) reports that two banks are reviewing their exposure to the company after it sought longer credit terms amid falling export orders.",
+        "lifts_it": [
+          "Overdues on both the WT and SCF policies get cleared and resolution lag stops worsening",
+          "No further notification volume growth across policies",
+          "News effect fades (roughly 365-day half-life) without new corroborating or escalating coverage"
+        ],
+        "worsens_it": [
+          "DPD rises further on the WT line or the SCF overdue persists/grows",
+          "Additional policies or notifications show overdue stress, pushing exposure closer to limit",
+          "Corroborating or escalating news confirms the lenders' exposure review"
+        ]
+      }
+    }
+  ],
+  "turns": 3
+}

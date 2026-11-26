@@ -1,0 +1,30 @@
+{
+  "result": {
+    "kind": "buyer",
+    "id": "OS04",
+    "name": "Brightwell Home Retail Inc.",
+    "severity": 2,
+    "category": "store_closures",
+    "reason": "Brightwell Home Retail is closing 14 stores amid declining same-store sales for a third straight quarter, indicating notable negative business performance."
+  },
+  "trace": [
+    {
+      "tool": "search_entities",
+      "input": {
+        "name": "Brightwell"
+      },
+      "result": "[{\"kind\": \"buyer\", \"id\": \"OS04\", \"name\": \"Brightwell Home Retail Inc.\", \"sector\": \"Home Retail\", \"city\": \"Columbus, OH\"}]"
+    },
+    {
+      "tool": "submit_assessment",
+      "input": {
+        "kind": "buyer",
+        "entity_id": "OS04",
+        "severity": 2,
+        "category": "store_closures",
+        "reason": "Brightwell Home Retail is closing 14 stores amid declining same-store sales for a third straight quarter, indicating notable negative business performance."
+      }
+    }
+  ],
+  "turns": 2
+}

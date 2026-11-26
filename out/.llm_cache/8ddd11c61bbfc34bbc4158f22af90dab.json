@@ -1,0 +1,35 @@
+{
+  "result": {
+    "trend": "improving",
+    "summary": "No open overdue notifications for Aranya Pharma Packaging. History shows only two resolved overdues from a single policy (TCI), with days-late improving from 7 to 3 days, and no accumulation (1 notification per 6-month window, single policy reporting). Credit exposure (INR 50M) remains well supported given the clean resolution pattern.",
+    "concerns": []
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"note\": \"no open overdue notifications\"}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260217-00018\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-02-16\", \"resolved_date\": \"2026-02-23\", \"exposure\": 3000000.0, \"days_late\": 7}, {\"event_id\": \"N-260707-00019\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-07-06\", \"resolved_date\": \"2026-07-09\", \"exposure\": 2600000.0, \"days_late\": 3}], \"accumulation"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"credit_limit\": 50000000.0, \"currency\": \"INR\", \"payment_terms_days\": 45, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-06-01\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 0,
+        "worst_event_id": "",
+        "trend": "improving",
+        "summary": "No open overdue notifications for Aranya Pharma Packaging. History shows only two resolved overdues from a single policy (TCI), with days-late improving from 7 to 3 days, and no accumulation (1 notification per 6-month window, single policy reporting). Credit exposure (INR 50M) remains well supported given the clean resolution pattern.",
+        "concerns": []
+      }
+    }
+  ],
+  "turns": 2
+}

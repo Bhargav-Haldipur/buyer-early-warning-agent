@@ -1,0 +1,45 @@
+{
+  "result": {
+    "trend": "deteriorating",
+    "summary": "Aranya Pharma Packaging has one open overdue invoice of INR 5.0m, now 45 days past due (due 2026-10-09, reported 2026-11-23) against a single TCI policy with a 45-day term and INR 50m limit. This is a marked deterioration versus prior history, where two earlier overdues (INR 3.0m and 2.6m) were resolved quickly in 7 and 3 days respectively. Although notification volume remains low (single policy, 2 events in last 6 months), the current overdue is already far longer-dated and unresolved than any past case, warranting close monitoring.",
+    "concerns": [
+      "Current overdue (45 DPD) is significantly longer than any previously resolved case (max 7 days late)",
+      "Exposure of INR 5.0m is the largest single overdue notified to date, nearing 10% of the INR 50m credit limit",
+      "No ageing breakdown provided for the open notification, limiting visibility into severity",
+      "Single-policy reporting means any emerging pattern of delay is not yet confirmed across multiple insurers, but recent payment behavior shift warrants a review of the credit limit"
+    ]
+  },
+  "trace": [
+    {
+      "tool": "get_open_notifications",
+      "input": {},
+      "result": "[{\"event_id\": \"N-LIVE-01\", \"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"reason\": \"OVERDUE_INVOICE\", \"notification_date\": \"2026-11-23\", \"original_due_date\": \"2026-10-09\", \"exposure\": 5000000.0, \"currency\": \"INR\", \"days_past_due\": 45, \"outstanding_by_ageing\": {}}]"
+    },
+    {
+      "tool": "get_notification_history",
+      "input": {},
+      "result": "{\"resolved\": [{\"event_id\": \"N-260217-00018\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-02-16\", \"resolved_date\": \"2026-02-23\", \"exposure\": 3000000.0, \"days_late\": 7}, {\"event_id\": \"N-260707-00019\", \"client_id\": \"TCI\", \"reason\": \"OVERDUE_INVOICE\", \"original_due_date\": \"2026-07-06\", \"resolved_date\": \"2026-07-09\", \"exposure\": 2600000.0, \"days_late\": 3}], \"accumulation"
+    },
+    {
+      "tool": "get_credit_lines",
+      "input": {},
+      "result": "[{\"client_id\": \"TCI\", \"policy_id\": \"TCI-WT-2026-0001\", \"credit_limit\": 50000000.0, \"currency\": \"INR\", \"payment_terms_days\": 45, \"limit_status\": \"ACCEPTED\", \"last_reviewed_date\": \"2026-06-01\"}]"
+    },
+    {
+      "tool": "submit_payment_review",
+      "input": {
+        "worst_dpd": 45,
+        "worst_event_id": "N-LIVE-01",
+        "trend": "deteriorating",
+        "summary": "Aranya Pharma Packaging has one open overdue invoice of INR 5.0m, now 45 days past due (due 2026-10-09, reported 2026-11-23) against a single TCI policy with a 45-day term and INR 50m limit. This is a marked deterioration versus prior history, where two earlier overdues (INR 3.0m and 2.6m) were resolved quickly in 7 and 3 days respectively. Although notification volume remains low (single policy, 2 events in last 6 months), the current overdue is already far longer-dated and unresolved than any past case, warranting close monitoring.",
+        "concerns": [
+          "Current overdue (45 DPD) is significantly longer than any previously resolved case (max 7 days late)",
+          "Exposure of INR 5.0m is the largest single overdue notified to date, nearing 10% of the INR 50m credit limit",
+          "No ageing breakdown provided for the open notification, limiting visibility into severity",
+          "Single-policy reporting means any emerging pattern of delay is not yet confirmed across multiple insurers, but recent payment behavior shift warrants a review of the credit limit"
+        ]
+      }
+    }
+  ],
+  "turns": 2
+}

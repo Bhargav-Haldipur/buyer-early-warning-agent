@@ -437,7 +437,7 @@ class FetchResultPanel(unittest.TestCase):
             S.FETCH.clear(); S.FETCH.update(saved)
         self.assertIn("425 found", html)
         self.assertIn("341 dropped", html)
-        self.assertIn("<b>1 new</b> since the fetch at 2026-11-20 12:35 UTC", html)
+        self.assertIn("<b>1 new</b> since the fetch at 2026-11-20 18:05 IST", html)
         self.assertIn("Intel announces job cuts", html)
         self.assertIn("<b>Intel Corporation</b> &middot; severity 4", html)
         self.assertIn("28.0", html)                      # the score that moved
@@ -467,13 +467,28 @@ class ResetRestoresTheNews(unittest.TestCase):
         import dashboard.server as S
         saved = dict(S.FETCH)
         try:
-            S.FETCH.update(last="Manual fetch at 10:00 UTC", result={"title": "x"})
+            S.FETCH.update(last="Manual fetch at 10:00 IST", result={"title": "x"})
             with patch.object(S, "LIVE_BOOK", True), \
                     patch.object(S, "restore_news", lambda saved, d: self.fail("news restored")):
                 S.reset_live()
             self.assertEqual(S.FETCH["result"], {"title": "x"})
         finally:
             S.FETCH.clear(); S.FETCH.update(saved)
+
+    def test_no_scenario_banner_on_the_live_book(self):
+        """A typed story says HYPOTHETICAL wherever it appears, so the live-news book
+        drops the banner that repeated it on every page; the synthetic book keeps its."""
+        from unittest.mock import patch
+        import dashboard.server as S
+        keep = dict(S.LIVE)
+        try:
+            S.LIVE.update(articles=[{"article_id": "LIVE01"}], events=[], last=None)
+            with patch.object(S, "LIVE_BOOK", True):
+                self.assertEqual(S.live_banner(), "")
+            with patch.object(S, "LIVE_BOOK", False):
+                self.assertIn("Live input in play", S.live_banner())
+        finally:
+            S.LIVE.clear(); S.LIVE.update(keep)
 
     def test_reset_takes_out_only_the_score_only_inputs(self):
         import dashboard.server as S
@@ -513,9 +528,10 @@ class ClaudeForRealBuyersOnly(unittest.TestCase):
             def create(self, **_):
                 raise AgentError("model called")
 
-        from ews import config
+        from ews import config, settings
         # the book's own rates; config picks them by EWS_DATASET when it loads
         with patch.object(engine, "Loader", lambda **kw: Loader(SBI, **kw)), \
+                patch.object(settings, "REAL_BUYERS_ONLY", True), \
                 patch.dict(config.FX_TO_REPORTING, {"INR": 1.0, "USD": 93.3461}):
             out = engine.run(llm=ModelOffline())
         illustrative = {a["article_id"] for a in Loader(SBI).table("illustrative_articles")}
