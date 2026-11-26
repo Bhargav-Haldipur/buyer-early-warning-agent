@@ -164,8 +164,9 @@ News comes from the sources in `data/sbi/trusted_sources.csv` - edit it to chang
 
 | Source | What | Notes |
 |---|---|---|
-| SEC EDGAR Form 8-K | what the company itself reported (bankruptcy, debt acceleration, restatement, restructuring, officer changes...) - US companies with a CIK | free, official, no key; set `SEC_USER_AGENT` to your organisation and email |
-| Google News RSS | press coverage in the **company's own country edition** (India: `en-IN`), **kept only from the listed publishers** - global ones (Reuters, AP, Bloomberg, WSJ, FT...) plus, for Indian companies, Business Standard, The Economic Times, Mint, BusinessLine, Moneycontrol, NDTV Profit, CNBC TV18 | headline and snippet only; not an official API |
+| SEC EDGAR Form 8-K | what the company itself reported (bankruptcy, debt acceleration, restatement, restructuring, officer changes...) - US companies with a CIK; each filing carries the company's own words for every item reported | free, official, no key; set `SEC_USER_AGENT` to your organisation and email |
+| Google News RSS | press coverage in the **company's own country edition** (India: `en-IN`), **kept only from the listed publishers** - global ones (Reuters, AP, Bloomberg, WSJ, FT...) plus, for Indian companies, Business Standard, The Economic Times, Mint, BusinessLine, Moneycontrol, NDTV Profit, CNBC TV18 | headline only, no article text; not an official API |
+| Publisher RSS | the Indian publishers' own feeds (The Economic Times, ET Telecom, ET Infra, Business Standard, Mint, The Hindu BusinessLine): recent stories with the publisher's summary. A story Google News also returns (same headline within a day) takes the summary as its text; one only the feed has is added when it names a watched company | free, no key; only recent stories, so older coverage stays headline-only |
 
 Each company on `news_watchlist.csv` is routed by its `country`; a publisher row with a
 `country` is trusted only for companies of that country. Only real companies are on the
@@ -175,9 +176,17 @@ Fetching writes `data/sbi/news_articles.csv`; the engine reads that file, so run
 reproducible and the agent cache still works. The live page's **Fetch latest news**
 button does the same and re-scores, then shows what the fetch changed: how many stories
 were found, dropped (publisher not on the list) and kept, which are new since the last
-fetch and what the News agent decided about each, and whose score moved. **Reset to the
-shipped dataset** puts the news back as it was when the dashboard started, so a rehearsal
-fetch does not use up the stories the real one should find.
+fetch and what the News agent decided about each, and whose score moved.
+
+A fetch **merges** with what earlier fetches found: a story stays until it is older than
+the lookback window, even if a feed stops returning it, and the fetch reports it as
+*carried*. A story that gained text keeps it. Most Google News stories are still a
+headline only, so the Adjudicator searches the other trusted outlets and says whether a
+severity is corroborated or rests on one headline.
+
+**Reset the Score only inputs** on the live page takes out only what was added with
+**Score only**. Inputs sent with the full buttons stay, and so does the fetched news; a
+server restart clears every typed input.
 
 **Auto refresh** is an on/off switch next to that button. Off by default. While on, the
 dashboard fetches and re-scores every 15 minutes in the background, shows when the next

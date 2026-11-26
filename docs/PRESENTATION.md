@@ -349,7 +349,7 @@ python3 -m harness.evaluate                   # 8/8
   It is the only part that can go wrong and it is 30% of the marks.
 - **Record a 60-second backup clip of the live half working.** If the room's network dies
   you play it and say so. Cheap insurance; you will probably not need it.
-- **Reset `/live` before you present.** Last rehearsal's inputs must not be on screen.
+- **Restart the dashboard before you present.** Last rehearsal's inputs must not be on screen. The page's Reset only takes out Score only inputs; a restart clears every typed input.
 - Have `docs/WALKTHROUGH.md` §2 — the flow diagram — open on a second screen. It is your
   architecture slide and it answers *"smart choices for a three-day build?"* without a deck.
 
